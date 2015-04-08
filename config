@@ -174,8 +174,8 @@ bar {
 		separator 	#000000
 		# class			border	backgr.	text
 		focused_workspace	$blk	$col2 	$wht
-		active_workspace	$blk 	$col2 	$blk
-		inactive_workspace	$blk 	$col3	$wht
+		active_workspace	$blk 	$col2 	$wht
+		inactive_workspace	$blk 	$col3	$blk
 		urgent_workspace	$blk 	$acc  	$wht
 	}
 	position top
