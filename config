@@ -173,8 +173,8 @@ bar {
 		statusline 	$wht
 		separator 	#000000
 		# class			border	backgr.	text
-		focused_workspace	$blk	$col2 	#000000
-		active_workspace	$blk 	$col2 	$wht
+		focused_workspace	$blk	$col2 	$wht
+		active_workspace	$blk 	$col2 	$blk
 		inactive_workspace	$blk 	$col3	$wht
 		urgent_workspace	$blk 	$acc  	$wht
 	}
