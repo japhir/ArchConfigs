@@ -1,4 +1,5 @@
 # i3 config file
+# put it in ~/.config/i3/ or ~/.i3/config
 # Ilja Kocken (japhir)
 
 # Should you change your keyboard layout some time, delete
