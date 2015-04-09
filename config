@@ -135,9 +135,6 @@ bindsym $mod+Shift+o move scratchpad
 # Show the first scratchpad window
 bindsym $mod+p scratchpad show
 
-# The middle button over a titlebar kills the window (doesn't seem to work yet)
-bindsym --release button2 kill
-
 # Lock the desktop
 bindsym $mod+Delete exec i3lock -c 000000 && sudo pm-suspend
 
@@ -228,3 +225,17 @@ bindsym $mod+x exec nautilus
 
 # Take a screenshot with scrot
 bindsym Print exec scrot '%Y-%m-%d-%T_$wx$h_scrot.png' -e 'mv $f '~/Pictures/Screenshots/'
+
+#=======================================================================
+# Mouse integration (not fully working)
+#=======================================================================
+
+# Hide the mouse when it's not moving
+exec --no-startup-id unclutter
+
+# Mouse + mod to drag floating window
+floating_modifier $mod
+
+# The middle button over a titlebar kills the window (doesn't seem to work yet)
+bindsym --release button2 kill
+
