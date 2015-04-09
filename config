@@ -203,15 +203,15 @@ for_window [class="Chromium" instance="crx_nckgahadagoaajjgafhacjanaoiihapd"] fl
 #=======================================================================
 
 exec --no-startup-id "pulseaudio --start"
-exec dropbox
-exec chromium
+exec --no-startup-id dropbox
+exec --no-startup-id chromium
 
 # software for automounting usb-drives etc (don't have it installed yet)
 #exec --no-startup-id "devmon --no-gui" 
 
 # f.lux or redshift
-#exec xflux -l 52.0844084 -g 5.118042
-exec redshift -l 52.0844084:5.118042 -m randr
+#exec --no-startup-id xflux -l 52.0844084 -g 5.118042
+exec --no-startup-id redshift -l 52.0844084:5.118042 -m randr
 
 #=======================================================================
 # Specific software combo's
