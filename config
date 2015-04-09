@@ -212,14 +212,18 @@ exec chromium
 # software for automounting usb-drives etc (don't have it installed yet)
 #exec --no-startup-id "devmon --no-gui" 
 
-# f.lux
-exec xflux -l 52.0844084 -g 5.118042
-#exec redshift -l 52.0844084:5.118042 -m randr
+# f.lux or redshift
+#exec xflux -l 52.0844084 -g 5.118042
+exec redshift -l 52.0844084:5.118042 -m randr
 
-# Launch chrome with keycombo
+#=======================================================================
+# Specific software combo's
+#=======================================================================
+
+# Chromium
 bindsym $mod+c exec chromium 
 
-# Launch nautilus with keycombo
+# Nautilus file manager
 bindsym $mod+x exec nautilus
 
 # Take a screenshot with scrot
