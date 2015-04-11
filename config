@@ -227,7 +227,7 @@ bindsym $mod+x exec nautilus
 bindsym Print exec scrot '%Y-%m-%d-%T_$wx$h_scrot.png' -e 'mv $f '~/Pictures/Screenshots/'
 
 #=======================================================================
-# Mouse integration (not fully working)
+# Mouse integration
 #=======================================================================
 
 # Hide the mouse when it's not moving
@@ -236,6 +236,6 @@ exec --no-startup-id unclutter
 # Mouse + mod to drag floating window
 floating_modifier $mod
 
-# The middle button over a titlebar kills the window (doesn't seem to work yet)
+# The middle button over a titlebar kills the window (not for floating windows unfortunately)
 bindsym --release button2 kill
 
