@@ -195,6 +195,9 @@ for_window [class="Chromium" window_role="browser"] border 1pixel
 # pop-up windows are always floating
 for_window [window_role="pop-up"] floating enable
 
+# Bubble windows (chrome notifications) also
+for_window [window_role="bubble"] floating enable
+
 # hangouts windows need zome extra love
 for_window [class="Chromium" instance="crx_nckgahadagoaajjgafhacjanaoiihapd"] floating enable border none
 
@@ -205,13 +208,14 @@ for_window [class="Chromium" instance="crx_nckgahadagoaajjgafhacjanaoiihapd"] fl
 exec --no-startup-id "pulseaudio --start"
 exec --no-startup-id dropbox
 exec --no-startup-id chromium
+exec --no-startup-id feh --bg-scale ~/Desktop/tiger.jpg
 
 # software for automounting usb-drives etc (don't have it installed yet)
 #exec --no-startup-id "devmon --no-gui" 
 
 # f.lux or redshift
-#exec --no-startup-id xflux -l 52.0844084 -g 5.118042
-exec --no-startup-id redshift -l 52.0844084:5.118042 -m randr
+exec --no-startup-id xflux -l 52.1 -g 5.12
+#exec --no-startup-id redshift -l 52.1:5.12 -m randr
 
 #=======================================================================
 # Specific software combo's
@@ -224,7 +228,8 @@ bindsym $mod+c exec chromium
 bindsym $mod+x exec nautilus
 
 # Take a screenshot with scrot
-bindsym Print exec scrot '%Y-%m-%d-%T_$wx$h_scrot.png' -e 'mv $f '~/Pictures/Screenshots/'
+bindsym Print exec scrot -b -q 100 ~/Pictures/Screenshots/%Y-%m-%d-%T.png 
+bindsym Shift+Print exec scrot -s -q 100 ~/Pictures/Screenshots/%Y-%m-%d-%T_section.png
 
 #=======================================================================
 # Mouse integration
