@@ -179,6 +179,7 @@ bar {
 	position top
     status_command i3status
 }
+
 #=======================================================================
 # Specific program interface settings
 #=======================================================================
@@ -193,7 +194,7 @@ for_window [class="Chromium" window_role="browser"] border 1pixel
 #assign [class="Chromium" window_role="browser"] 1
 
 # pop-up windows are always floating
-for_window [window_role="pop-up"] floating enable
+#for_window [window_role="pop-up"] floating enable
 
 # Bubble windows (chrome notifications) also
 for_window [window_role="bubble"] floating enable
