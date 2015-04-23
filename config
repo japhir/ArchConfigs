@@ -185,16 +185,16 @@ bar {
 #=======================================================================
 
 # urxvt, my terminal doesn't need a border
-for_window [class="URxvt"] border none
+for_window [class="URxvt"] border 1pixel 
 
 # chromium can have a smaller border
 for_window [class="Chromium" window_role="browser"] border 1pixel
 
-# Move chromium to window 1 (I don't find it that good yet)
+# Move chromium to window 1 (I don't find it that useful yet)
 #assign [class="Chromium" window_role="browser"] 1
 
 # pop-up windows are always floating
-#for_window [window_role="pop-up"] floating enable
+for_window [window_role="pop-up"] floating enable
 
 # Bubble windows (chrome notifications) also
 for_window [window_role="bubble"] floating enable
