@@ -2,10 +2,6 @@
 # put it in ~/.config/i3/ or ~/.i3/config
 # Ilja Kocken (japhir)
 
-# Should you change your keyboard layout some time, delete
-# this file and re-run i3-config-wizard(1).
-# Please see http://i3wm.org/docs/userguide.html for a complete reference!
-
 # I use the superkey, you can also use Alt
 set $mod Mod4 
 
@@ -206,11 +202,11 @@ for_window [class="Chromium" instance="crx_nckgahadagoaajjgafhacjanaoiihapd"] fl
 # Startup software
 #=======================================================================
 
-exec --no-startup-id menutray -i #if you don't remember the program name, a visual menu is nice
-exec --no-startup-id "pulseaudio --start"
-exec --no-startup-id dropbox
-#exec --no-startup-id google-drive-ocamlfuse -o nonempty /mnt/HDD/Google\ Drive/ #if you want to drive
-exec --no-startup-id chromium
+exec --no-startup-id menutray -i #visual start menu
+exec --no-startup-id "pulseaudio --start" #audio
+exec --no-startup-id dropbox     #file syncing
+#exec --no-startup-id google-drive-ocamlfuse -o nonempty /mnt/HDD/Google\ Drive/ #if you want
+exec --no-startup-id chromium   
 exec --no-startup-id feh --bg-scale ~/Desktop/tiger.jpg #background image
 exec --no-startup-id caffeine #keeps the pc awake when viewing youtube videos
 
@@ -225,11 +221,8 @@ exec --no-startup-id xflux -l 52.1 -g 5.12
 # Specific software combo's
 #=======================================================================
 
-# Chromium
-bindsym $mod+c exec chromium 
-
-# Nautilus file manager
-bindsym $mod+x exec nautilus
+bindsym $mod+c exec chromium # Chromium
+bindsym $mod+x exec nautilus # Nautilus file manager
 
 # Take a screenshot with scrot
 bindsym Print exec scrot -b -q 100 /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T.png 
