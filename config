@@ -238,5 +238,11 @@ exec --no-startup-id unclutter
 # Mouse + mod to drag floating window
 floating_modifier $mod
 
+# Mod + rmb over titlebar toggles floating mode
+bindsym $mod+button3 floating toggle
+
 # The middle button over a titlebar kills the window (not for floating windows unfortunately)
 bindsym --release button2 kill
+
+# Mouse hovering shouldn't dictate mouse focus
+focus_follows_mouse no
