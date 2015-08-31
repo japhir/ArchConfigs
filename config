@@ -202,31 +202,34 @@ for_window [class="Chromium" instance="crx_nckgahadagoaajjgafhacjanaoiihapd"] fl
 # Startup software
 #=======================================================================
 
-exec --no-startup-id menutray -i #visual start menu
+#load arandr-generated monitor layout
+exec --no-startup-id ~/.screenlayout/desktop2screens.sh 
+
 exec --no-startup-id "pulseaudio --start" #audio
 exec --no-startup-id dropbox     #file syncing
 #exec --no-startup-id google-drive-ocamlfuse -o nonempty /mnt/HDD/Google\ Drive/ #if you want
 exec --no-startup-id chromium   
-exec --no-startup-id feh --bg-scale ~/Desktop/tiger.jpg #background image
+#exec --no-startup-id feh --bg-scale ~/Desktop/wolf.jpg #background image
+exec --no-startup-id nitrogen --restore #manages dekstop wallpapers for multiple monitors
 exec --no-startup-id caffeine #keeps the pc awake when viewing youtube videos
 
 # software for automounting usb-drives etc (don't have it installed yet)
 #exec --no-startup-id "devmon --no-gui" 
 
 # f.lux or redshift reduces eye strain at night
-exec --no-startup-id xflux -l 52.1 -g 5.12
-#exec --no-startup-id redshift -l 52.1:5.12 -m randr
+#exec --no-startup-id xflux -l 52.1 -g 5.12
+exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr
 
 #=======================================================================
 # Specific software combo's
 #=======================================================================
-
+     
 bindsym $mod+c exec chromium # Chromium
 bindsym $mod+x exec nautilus # Nautilus file manager
 
 # Take a screenshot with scrot
 bindsym Print exec scrot -b -q 100 /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T.png 
-bindsym Shift+Print exec scrot -s -q 100 /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T-region.png 
+bindsym --release Shift+Print exec scrot -s -q 100 /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T-region.png 
 
 #=======================================================================
 # Mouse integration
