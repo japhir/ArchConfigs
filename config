@@ -228,8 +228,8 @@ bindsym $mod+c exec chromium # Chromium
 bindsym $mod+x exec nautilus # Nautilus file manager
 
 # Take a screenshot with scrot
-bindsym Print exec scrot -b -q 100 /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T.png 
-bindsym --release Shift+Print exec scrot -s -q 100 /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T-region.png 
+bindsym Print exec scrot -b /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T.png 
+bindsym --release Shift+Print exec scrot -s /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T-region.png 
 
 #=======================================================================
 # Mouse integration
