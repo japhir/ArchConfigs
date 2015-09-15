@@ -1,8 +1,9 @@
-# i3config
+This is my config file repository.
 
-This is my setup for the i3 window manager I use with Arch Linux.
-I've been figuring out how to make it the way I want recently, and thought I'd share.
+Simply git clone in where you want and symlink the files to their proper destination. Everything except for `fstab` and `config` should be in your home directory.
 
-Enjoy!
+so type: `ln -s {target-filename} {symbolic filename}`, for example for i3: `ln -s config ~/.config/i3/config`
+
+Kind regards,
 
 Japhir
