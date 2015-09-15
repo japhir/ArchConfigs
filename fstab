@@ -1,0 +1,8 @@
+# /dev/sda4: root
+UUID=b9579245-7188-4f7e-a051-02b959c34968	/         	ext4      	rw,relatime,data=ordered	0 1
+
+# /dev/sdb1: HDD
+UUID=EE9AC9F69AC9BAFB				/mnt/HDD	ntfs-3g		uid=japhir,gid=users,dmask=022,fmask=133	0	0
+
+# /dev/sdc1: ExternHDD
+UUID=302A5D2B2A5CEF7A				/mnt/ExternHDD	ntfs-3g		user,noauto,noatime,flush	0	0

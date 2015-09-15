@@ -195,7 +195,7 @@ bar {
 		inactive_workspace	$blk 	$col3	$blk
 		urgent_workspace	$blk 	$acc  	$wht
 	}
-	position bottom
+	position top
     status_command i3status
 }
 
