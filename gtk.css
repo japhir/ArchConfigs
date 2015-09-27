@@ -26,6 +26,8 @@ https://wiki.archlinux.org/index.php/GTK%2B#Client-side_decorations
   box-shadow: none;
 }
 
+/*
 GtkLabel.title {
   opacity: 0;
 }
+*/

@@ -1,0 +1,14 @@
+#!/bin/zsh
+
+sudo ln -s fstab /etc/fstab # you probably don't want to copy this one!
+
+ln -s .zshrc ~/.zshrc
+ln -s .xinitrc ~/.xinitrc
+ln -s .Xresources ~/.Xresources
+ln -s .emacs ~/.emacs
+
+ln -s gtksettings.ini ~/.config/gtk-3.0/gtksettings.ini
+ln -s gtk.css ~/.config/gtk-3.0/gtk.css
+
+ln -s i3config ~/.config/i3/config
+ln -s i3status.conf ~/.config/i3status/config
