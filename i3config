@@ -224,6 +224,9 @@ for_window [class="Chromium" instance="crx_nckgahadagoaajjgafhacjanaoiihapd"] fl
 # spotify needs to be floating because otherwise it flickers very annoyingly
 for_window [class="^Spotify$"] floating enable
 
+# my main musciplayer cantata (yay I finally found one that is satisfactory!)
+for_window [class="cantata"] flating enable 
+
 #=======================================================================
 # Specific software combo's
 #=======================================================================

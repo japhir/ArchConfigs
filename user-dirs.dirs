@@ -1,0 +1,8 @@
+XDG_DESKTOP_DIR="/mnt/HDD/Desktop"
+XDG_DOCUMENTS_DIR="/mnt/HDD/My Documents"
+XDG_DOWNLOAD_DIR="/mnt/HDD/Downloads"
+XDG_MUSIC_DIR="/mnt/HDD/Audio/Music"
+XDG_PICTURES_DIR="/mnt/HDD/Pictures"
+XDG_PUBLICSHARE_DIR="/mnt/HDD/Publicshare"
+XDG_TEMPLATES_DIR="/mnt/HDD/Templates"
+XDG_VIDEOS_DIR="/mnt/HDD/Videos"
