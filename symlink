@@ -10,6 +10,6 @@ ln -s ~/ArchConfigs/.emacs ~/.emacs
 ln -s ~/ArchConfigs/user-dirs.dirs ~/.config/user-dirs.dirs
 ln -s ~/ArchConfigs/gtksettings.ini ~/.config/gtk-3.0/settings.ini
 ln -s ~/ArchConfigs/gtk.css ~/.config/gtk-3.0/gtk.css
-
+ln -s ~/ArchConfigs/cantata.conf ~/.config/cantata/cantata.conf
 ln -s ~/ArchConfigs/i3config ~/.config/i3/config
 ln -s ~/ArchConfigs/i3status.conf ~/.config/i3status/config
