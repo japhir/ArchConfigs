@@ -149,7 +149,7 @@ exec --no-startup-id chromium
 exec --no-startup-id nitrogen --restore #manages dekstop wallpapers for multiple monitors
 exec --no-startup-id caffeine #keeps the pc awake when viewing youtube videos
 
-# software for automounting usb-drives etc (don't have it installed yet)
+# software for automounting usb-drives etc (I use nautilus instead)
 #exec --no-startup-id "devmon --no-gui" 
 
 # f.lux or redshift reduces eye strain at night
@@ -213,7 +213,7 @@ for_window [class="Chromium" window_role="browser"] border 1pixel
 #assign [class="Chromium" window_role="browser"] 1
 
 # pop-up windows are always floating
-for_window [window_role="pop-up"] floating enable
+#for_window [window_role="pop-up"] floating enable
 
 # Bubble windows (chrome notifications) also
 for_window [window_role="bubble"] floating enable
@@ -225,7 +225,7 @@ for_window [class="Chromium" instance="crx_nckgahadagoaajjgafhacjanaoiihapd"] fl
 for_window [class="^Spotify$"] floating enable
 
 # my main musciplayer cantata (yay I finally found one that is satisfactory!)
-for_window [class="cantata"] flating enable 
+for_window [class="cantata"] floating enable 
 
 #=======================================================================
 # Specific software combo's
