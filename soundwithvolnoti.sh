@@ -1,5 +1,6 @@
 #!/bin/bash
 # from https://bbs.archlinux.org/viewtopic.php?id=132218
+# needs volnoti to be run on startup
 
 VOLUME=$(pamixer --get-volume)
 VALUE=5
