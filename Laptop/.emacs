@@ -20,7 +20,7 @@
 (setq inhibit-splash-screen t) ; no splash screen
 (electric-pair-mode 1) ; auto-insert matching bracket
 (show-paren-mode 1)    ; turn on paren match highlighting
-(set-language-environment "UTF-8") ; is this still needed?
+(set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8)
 ;; (setq show-paren-style 'expression) ; highlight entire bracket expression
 ;; (recentf-mode 1) ; keep a list of recently opened files
@@ -42,13 +42,13 @@
 ;;; org-mode settings
 (require 'org)
 (setq org-agenda-files
-      '("/mnt/HDD/Dropbox/Apps/orgzly/todo.org" "/mnt/HDD/Dropbox/Apps/orgzly/life.org" "/mnt/HDD/Dropbox/Apps/orgzly/someday.org"))
+      '("~/Dropbox/Apps/orgzly/todo.org" "~/Dropbox/Apps/orgzly/life.org" "~/Dropbox/Apps/orgzly/someday.org"))
 (setq org-refile-targets
       '((nil :maxlevel . 3)
 	(org-agenda-files :maxlevel . 3)))
 (setq org-log-done 'time)
 ;; this function opens my todo-file, specified in the variable below
-(defvar org-gtd-file "/mnt/HDD/Dropbox/Apps/orgzly/todo.org")
+(defvar org-gtd-file "~/Dropbox/Apps/orgzly/todo.org")
 (defun gtd ()
   "Open the GTD file"
   (interactive)
@@ -58,9 +58,9 @@
 (define-key global-map "\C-ca" 'org-agenda)
 (define-key global-map "\C-cc" 'org-capture)
 (setq org-capture-templates
-      '(("t" "Todo" entry (file+headline "/mnt/HDD/Dropbox/Apps/orgzly/todo.org" "Inbox")
+      '(("t" "Todo" entry (file+headline "~/Dropbox/Apps/orgzly/todo.org" "Inbox")
 	 "* %?\n %i\n %a")
-	("j" "Journal" entry (file+datetree "/mnt/HDD/Dropbox/Apps/orgzly/journal.org")
+	("j" "Journal" entry (file+datetree "~/Dropbox/Apps/orgzly/journal.org")
 	 "* %?\nEntered on %U\n %i\n %a")))
 ;; the todo-states of my gtd-system
 (setq org-todo-keywords 
@@ -120,7 +120,7 @@
 (setq org-fontify-emphasized-text t) ; not sure what this does
 (setq org-fontify-done-headline t)
 (setq org-agenda-include-all-todo nil); ??
-(setq org-directory "/mnt/HDD/Dropbox/Apps/orgzly/")
+(setq org-directory "~/Dropbox/Apps/orgzly/")
 (setq org-export-with-toc nil)
 (setq org-export-with-section-numbers nil)
 (setq org-adapt-indentation nil) ;?
@@ -140,6 +140,7 @@
    (quote
     (fill-column-indicator ess writeroom-mode column-marker markdown-mode pandoc-mode org-pandoc)))
  '(show-paren-mode t)
+ '(todotxt-file "/home/japhir/Dropbox/Apps/Simpletask App Folder/todo.txt" nil (todotxt))
  '(tool-bar-mode nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
