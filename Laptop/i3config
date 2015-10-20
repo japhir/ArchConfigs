@@ -135,34 +135,6 @@ bindsym $mod+p scratchpad show
 bindsym $mod+Delete exec ~/ArchConfigs/launchi3lock.sh #&& sudo sh -c "echo mem > /sys/power/state
 
 #=======================================================================
-# Startup software
-#=======================================================================
-
-#load arandr-generated monitor layout
-exec --no-startup-id "emacs --daemon"
-exec --no-startup-id "pulseaudio --start"	#audio
-exec --no-startup-id xbindkeys
-exec --no-startup-id volnoti
-exec --no-startup-id "feh --bg-scale ~/Desktop/backround.jpg" #background image
-exec --no-startup-id cbatticon 	     		# battery indicator
-exec --no-startup-id wicd-client --tray 	# wireless network applet
-exec --no-startup-id dropbox     		#file syncing
-exec --no-startup-id chromium   
-exec --no-startup-id caffeine			#keeps the pc awake when viewing youtube videos
-exec --no-startup-di cantata 			# musicplayer
-
-#exec --no-startup-id ~/.screenlayout/desktop2screens.sh 
-#exec --no-startup-id nitrogen --restore #manages dekstop wallpapers for multiple monitors
-#exec --no-startup-id google-drive-ocamlfuse -o nonempty /mnt/HDD/Google\ Drive/ #if you want
-
-# software for automounting usb-drives etc (I use nautilus instead)
-#exec --no-startup-id "devmon --no-gui" 
-
-# f.lux or redshift reduces eye strain at night
-#exec --no-startup-id xflux -l 52.1 -g 5.12
-exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr
-
-#=======================================================================
 # Design section
 #=======================================================================
 
@@ -212,16 +184,13 @@ bar {
 # urxvt, my terminal doesn't need a thick border
 for_window [class="URxvt"] border 1pixel 
 
-# chromium can have a smaller border
+# chromium can have a thin border 
 for_window [class="Chromium" window_role="browser"] border 1pixel
-
-# Move chromium to window 1 (I don't find it that useful yet)
-#assign [class="Chromium" window_role="browser"] 1
 
 # pop-up windows are always floating
 #for_window [window_role="pop-up"] floating enable
 
-# Bubble windows (chrome notifications) also
+# Bubble windows (chrome notifications) are always floating
 for_window [window_role="bubble"] floating enable
 
 # hangouts chrome plugin windows need zome extra love
@@ -230,20 +199,40 @@ for_window [class="Chromium" instance="crx_nckgahadagoaajjgafhacjanaoiihapd"] fl
 # spotify needs to be floating because otherwise it flickers very annoyingly
 for_window [class="^Spotify$"] floating enable
 
-# my main musciplayer cantata (yay I finally found one that is satisfactory!)
-for_window [class="cantata"] floating enable 
+# emacs-scratchpad is a scratchpad ;)
+for_window [instance="scratchpad"] move window to scratchpad
+
+#=======================================================================
+# Startup software
+#=======================================================================
+
+exec --no-startup-id emacs --daemon		# run emacs as a daemon
+exec --no-startup-id emacs -name scratchpad	# and run one instance as a scratchpad
+exec --no-startup-id pulseaudio --start		# audio
+exec --no-startup-id xbindkeys
+exec --no-startup-id volnoti			# mediakey volume change notification
+exec --no-startup-id feh --bg-scale ~/Desktop/backround.jpg #background image
+exec --no-startup-id cbatticon 	     		# battery indicator
+exec --no-startup-id wicd-client --tray 	# wireless network applet
+exec --no-startup-id dropbox     		# file syncing
+exec --no-startup-id caffeine			# keeps the pc awake when viewing youtube videos
+exec --no-startup-id cantata 			# musicplayer
+
+# f.lux or redshift reduces eye strain at night
+#exec --no-startup-id xflux -l 52.1 -g 5.12
+exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2000
 
 #=======================================================================
 # Specific software combo's
 #=======================================================================
      
-bindsym $mod+c exec chromium # Chromium
-bindsym $mod+x exec nautilus # Nautilus file manager
+bindsym $mod+c exec chromium 
+bindsym $mod+x exec nautilus # Gnome Files
 bindsym $mod+g exec chromium --show-app-list # Chrome app launcher
 
 # Take a screenshot with scrot
-bindsym Print exec scrot -b /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T.png 
-bindsym --release Shift+Print exec scrot -s /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T-region.png 
+bindsym Print exec scrot -b ~/Pictures/Screenshots/%Y-%m-%d-%T.png 
+bindsym --release Shift+Print exec scrot -s ~/Pictures/Screenshots/%Y-%m-%d-%T-region.png 
 
 #=======================================================================
 # Mouse integration

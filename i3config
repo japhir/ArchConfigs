@@ -146,8 +146,8 @@ exec --no-startup-id cantata
 exec --no-startup-id dropbox     #file syncing
 #exec --no-startup-id google-drive-ocamlfuse -o nonempty /mnt/HDD/Google\ Drive/ #if you want
 exec --no-startup-id chromium   
-#exec --no-startup-id feh --bg-scale ~/Desktop/wolf.jpg #background image
-exec --no-startup-id nitrogen --restore #manages dekstop wallpapers for multiple monitors
+exec --no-startup-id feh --bg-scale ~/Desktop/Background.jpg #background image
+#exec --no-startup-id nitrogen --restore #manages dekstop wallpapers for multiple monitors
 exec --no-startup-id caffeine #keeps the pc awake when viewing youtube videos
 
 # software for automounting usb-drives etc (I use nautilus instead)
