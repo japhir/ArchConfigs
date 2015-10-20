@@ -140,8 +140,9 @@ bindsym $mod+Delete exec i3lock -c 000000 && sudo pm-suspend
 
 #load arandr-generated monitor layout
 exec --no-startup-id ~/.screenlayout/desktop2screens.sh 
-
+exec --no-startup-id compton -CGb #screen composite to avoid tearing
 exec --no-startup-id "pulseaudio --start" #audio
+exec --no-startup-id cantata
 exec --no-startup-id dropbox     #file syncing
 #exec --no-startup-id google-drive-ocamlfuse -o nonempty /mnt/HDD/Google\ Drive/ #if you want
 exec --no-startup-id chromium   
@@ -175,7 +176,7 @@ set $blk #1C1C1C
 
 # class			        border	backgr.	text	indicator
 client.focused		    $blk	$col2	$wht	$col1	
-client.focused_inactive	$blk	$col3	$wht	$col1
+client.focused_inactive	    $blk	$col3	$wht	$col1
 client.unfocused	    $blk	$col3	$wht	$col2
 client.urgent		    $acc	$acc	$wht	$acc
 client.placeholder	    $blk	$col2	$wht	$col2
@@ -213,7 +214,7 @@ for_window [class="Chromium" window_role="browser"] border 1pixel
 #assign [class="Chromium" window_role="browser"] 1
 
 # pop-up windows are always floating
-#for_window [window_role="pop-up"] floating enable
+#for_window [window_role="pop-up"] floating enale
 
 # Bubble windows (chrome notifications) also
 for_window [window_role="bubble"] floating enable
@@ -233,6 +234,7 @@ for_window [class="cantata"] floating enable
      
 bindsym $mod+c exec chromium # Chromium
 bindsym $mod+x exec nautilus # Nautilus file manager
+#bindsym $mod+shift+e exec emacs    # Emacs
 
 # Take a screenshot with scrot
 bindsym Print exec scrot -b /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T.png 
