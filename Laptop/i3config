@@ -194,7 +194,7 @@ for_window [class="Chromium" window_role="browser"] border 1pixel
 for_window [window_role="bubble"] floating enable
 
 # hangouts chrome plugin windows need zome extra love
-for_window [class="Chromium" instance="crx_nckgahadagoaajjgafhacjanaoiihapd"] floating enable border none
+for_window [class="chromium" instance="crx_nckgahadagoaajjgafhacjanaoiihapd"] floating enable border none
 
 # spotify needs to be floating because otherwise it flickers very annoyingly
 for_window [class="^Spotify$"] floating enable
