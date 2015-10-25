@@ -1,4 +1,6 @@
 ! Based almost entirely on http://tutos.readthedocs.org/en/latest/source/Arch.html
+!Turn off the annoying beeps
+URxvt.urgentOnBell: False
 !urxvt
 URxvt*geometry:		115x40
 !URxvt*font: xft:Liberation Mono:pixelsize=14:antialias=false:hinting=true

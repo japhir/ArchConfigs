@@ -1,0 +1,19 @@
+yes# Increase volume
+"sh /home/japhir/ArchConfigs/soundwithvolnoti.sh up"
+    m:0x0 + c:123
+    XF86AudioRaiseVolume
+
+# Decrease volume
+"sh /home/japhir/ArchConfigs/soundwithvolnoti.sh down"
+    m:0x0 + c:122
+    XF86AudioLowerVolume
+
+# Toggle mute
+"sh /home/japhir/ArchConfigs/soundwithvolnoti.sh mute"
+    m:0x0 + c:121
+    XF86AudioMute
+
+# Suspend also locks
+"systemctl suspend & sh $HOME/ArchConfigs/launchi3lock.sh"
+    m:0x0 + c:150
+    XF86Sleep
