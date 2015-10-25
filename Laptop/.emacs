@@ -47,10 +47,10 @@
 ;;; org-mode settings
 (require 'org)
 (setq org-agenda-files
-      '("~/Dropbox/Apps/orgzly/todo.org" "~/Dropbox/Apps/orgzly/someday.org"))
+      '("~/Dropbox/Apps/orgzly/todo.org"))
 (setq org-refile-targets
-      '((nil :maxlevel . 2)
-	(org-agenda-files :maxlevel . 2)))
+      '((nil :maxlevel . 2)  ; refile within file
+	(org-agenda-files :maxlevel . 2)))  ; refile to todo.org
 (setq org-log-done 'time)
 (defvar org-gtd-file "~/Dropbox/Apps/orgzly/todo.org")
 ;; this function opens my todo-file
