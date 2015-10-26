@@ -9,8 +9,16 @@
 (when (not package-archive-contents)
   (package-refresh-contents))
 
-;;; Load specific packages
-(require 'ess-site) ; emacs speaks statistics, work with R etc.
+;;; emacs speaks statistics, work with R etc.
+(require 'ess-site) 
+
+;; auto-complete
+(require 'auto-complete)
+(global-auto-complete-mode t)
+(define-key ac-complete-mode-map "\t" 'ac-complete)
+(define-key ac-complete-mode-map "\r" nil)
+(define-key ac-complete-mode-map "\C-n" 'ac-next)
+(define-key ac-complete-mode-map "\C-p" 'ac-previous)
 
 ;; prevent emacs from ruining my git repo's
 (setq backup-directory-alist
@@ -22,19 +30,18 @@
 (setq inhibit-splash-screen t) ; no splash screen
 (electric-pair-mode 1) ; auto-insert matching bracket
 (show-paren-mode 1)    ; turn on paren match highlighting
-;(set-language-environment "UTF-8") ; don't know if this is still needed
-;(set-default-coding-systems 'utf-8)
 
 ;; Easy symbol insertion
-; C-x 8 o = degree
+; C-x 8 o = °, C-x 8 m = µ
 (global-set-key (kbd "C-x 8 a") (lambda () (interactive) (insert "α")))
 (global-set-key (kbd "C-x 8 b") (lambda () (interactive) (insert "β")))
 (global-set-key (kbd "C-x 8 d") (lambda () (interactive) (insert "δ")))
 
 ;; wrap at column 80
-(add-hook 'text-mode-hook 'turn-on-auto-fill)
-(add-hook 'text-mode-hook
-	  '(lambda() (set-fill-column 80)))
+;(add-hook 'text-mode-hook 'turn-on-auto-fill)
+;(add-hook 'text-mode-hook
+;	  '(lambda() (set-fill-column 80)))
+; this is awesome when writing but very annoying when programming/working in r 
 
 ;;; mode loading
 ;; load pandoc and markdown modes
@@ -46,6 +53,14 @@
 
 ;;; org-mode settings
 (require 'org)
+
+;; mobileorg
+(setq org-mobile-inbox-for-pull "~/Dropbox/Apps/orgzly/inbox.org")
+(setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
+(setq org-mobile-force-id-on-agenda-items nil)
+(add-hook 'after-init-hook 'org-mobile-pull)
+(add-hook 'kill-emacs-hook 'org-mobile-push)
+
 (setq org-agenda-files
       '("~/Dropbox/Apps/orgzly/todo.org"))
 (setq org-refile-targets
@@ -129,9 +144,10 @@
 (setq org-fontifywhole-heading-line t) ;; works better with theme
 
 ;; org-gcal settings
-(require 'org-gcal)
-(setq org-gcal-client-id "r487anihgu01dvo0nc7vohho6g@group.calendar.google.com"
-      org-gcal-client-secret "")
+;(require 'org-gcal)
+;(setq org-gcal-client-id "r487anihgu01dvo0nc7vohho6g@group.calendar.google.com"
+;      org-gcal-client-secret "")
+
 ;; theme setting
 (load-theme 'leuven t)
 
