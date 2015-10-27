@@ -1,4 +1,5 @@
 ;;; Emacs config file
+;; Japhir
 
 ;;; Load package databases
 (package-initialize)
@@ -57,14 +58,14 @@
 ;; mobileorg
 (setq org-mobile-inbox-for-pull "~/Dropbox/Apps/orgzly/inbox.org")
 (setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
-(setq org-mobile-force-id-on-agenda-items nil)
-(add-hook 'after-init-hook 'org-mobile-pull)
-(add-hook 'kill-emacs-hook 'org-mobile-push)
+(setq org-mobile-force-id-on-agenda-items nil) ; I don't want properties everywhere
+;(add-hook 'after-init-hook 'org-mobile-pull)
+;(add-hook 'kill-emacs-hook 'org-mobile-push) ; this just slows it down waaay too much
 
 (setq org-agenda-files
       '("~/Dropbox/Apps/orgzly/todo.org"))
 (setq org-refile-targets
-      '((nil :maxlevel . 2)  ; refile within file
+      '((nil :maxlevel . 3)  ; refile within file
 	(org-agenda-files :maxlevel . 2)))  ; refile to todo.org
 (setq org-log-done 'time)
 (defvar org-gtd-file "~/Dropbox/Apps/orgzly/todo.org")
@@ -134,12 +135,12 @@
 (setq org-deadline-warning-days 14)
 (setq org-fontify-emphasized-text t) 
 (setq org-fontify-done-headline t)
-;(setq org-agenda-include-all-todo nil); ??
+(setq org-agenda-include-all-todo nil)
 (setq org-directory "~/Dropbox/Apps/orgzly/")
 (setq org-export-with-toc nil)
 (setq org-export-with-section-numbers nil)
-;(setq org-adapt-indentation nil) ;?
-;(setq org-agenda-prefix-format "  %-17:c%?-12t% s") ;?
+(setq org-adapt-indentation t) ; makes todo contents indent at headline level
+(setq org-agenda-prefix-format "  %-17:c%?-12t% s") 
 
 (setq org-fontifywhole-heading-line t) ;; works better with theme
 
