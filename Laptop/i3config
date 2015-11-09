@@ -211,7 +211,7 @@ exec --no-startup-id emacs -name scratchpad	# and run one instance as a scratchp
 exec --no-startup-id pulseaudio --start		# audio
 exec --no-startup-id xbindkeys
 exec --no-startup-id volnoti			# mediakey volume change notification
-exec --no-startup-id feh --bg-scale ~/Desktop/backround.jpg #background image
+exec --no-startup-id feh --bg-scale ~/Desktop/background.jpg #background image
 exec --no-startup-id cbatticon 	     		# battery indicator
 exec --no-startup-id wicd-client --tray 	# wireless network applet
 exec --no-startup-id dropbox     		# file syncing
@@ -219,8 +219,9 @@ exec --no-startup-id caffeine			# keeps the pc awake when viewing youtube videos
 exec --no-startup-id cantata 			# musicplayer
 
 # f.lux or redshift reduces eye strain at night
-#exec --no-startup-id xflux -l 52.1 -g 5.12
-exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2000
+#exec --no-startup-id xflux -l 52.1 -g 5.12 
+# default is 3000-4000 during night, 5500-6500 during the day.
+exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2500
 
 #=======================================================================
 # Specific software combo's
