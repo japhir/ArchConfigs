@@ -1,0 +1,10 @@
+[Unit]
+Description=Run google-calendar to org-mode daily and on boot
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+Unit=gcalsync.service
+
+[Install]
+WantedBy=timers.target
