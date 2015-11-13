@@ -31,7 +31,7 @@
 (setq inhibit-splash-screen t) ; no splash screen
 (electric-pair-mode 1) ; auto-insert matching bracket
 (show-paren-mode 1)    ; turn on paren match highlighting
-
+(setq mouse-wheel-progressive-speed nil) ; prevent scrolling excelleration
 ;; Easy symbol insertion
 ; C-x 8 o = °, C-x 8 m = µ
 (global-set-key (kbd "C-x 8 a") (lambda () (interactive) (insert "α")))
@@ -85,7 +85,7 @@
 	 "* %?\nEntered on %U\n %i\n %a")))
 ;; the todo-states of my gtd-system
 (setq org-todo-keywords 
-      '((sequence "NEXT(n)" "WAITING(w)" "SCHEDULED(a)" "SOMEDAY(s)" "|" 
+      '((sequence "NEXT(n)" "WAITING(w!/!)" "SCHEDULED(a)" "SOMEDAY(s!/!)" "|" 
 		  "DONE(d)" "CANCELLED(c)")))
 ;; prettify the todo keywords
 (setq org-todo-keyword-faces

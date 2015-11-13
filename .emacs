@@ -22,8 +22,7 @@
 (setq inhibit-splash-screen t) ; no splash screen
 (electric-pair-mode 1) ; auto-insert matching bracket
 (show-paren-mode 1)    ; turn on paren match highlighting
-;(set-language-environment "UTF-8") ; don't know if this is still needed
-;(set-default-coding-systems 'utf-8)
+(setq mouse-wheel-progressive-speed nil) ; disable scroll ecceleration
 
 ;; Easy symbol insertion
 ; C-x 8 o = degree
@@ -69,7 +68,7 @@
 	 "* %?\nEntered on %U\n %i\n %a")))
 ;; the todo-states of my gtd-system
 (setq org-todo-keywords 
-      '((sequence "NEXT(n)" "WAITING(w)" "SCHEDULED(a)" "SOMEDAY(s)" "|" 
+      '((sequence "NEXT(n)" "WAITING(w!/!)" "SCHEDULED(a)" "SOMEDAY(s!/!)" "|" 
 		  "DONE(d)" "CANCELLED(c)")))
 ;; prettify the todo keywords
 (setq org-todo-keyword-faces
@@ -119,7 +118,7 @@
 (setq org-deadline-warning-days 14)
 (setq org-fontify-emphasized-text t) 
 (setq org-fontify-done-headline t)
-;(setq org-agenda-include-all-todo nil); ??
+;(setq org-agenda-include-all-todo nil) ; maybe if I notice that it is slow
 (setq org-directory "/mnt/HDD/Dropbox/Apps/orgzly/")
 (setq org-export-with-toc nil)
 (setq org-export-with-section-numbers nil)
