@@ -196,9 +196,6 @@ for_window [window_role="bubble"] floating enable
 # hangouts chrome plugin windows need zome extra love
 for_window [class="chromium" instance="crx_nckgahadagoaajjgafhacjanaoiihapd"] floating enable border none
 
-# spotify needs to be floating because otherwise it flickers very annoyingly
-for_window [class="^Spotify$"] floating enable
-
 # emacs-scratchpad is a scratchpad ;)
 for_window [instance="scratchpad"] move window to scratchpad
 
