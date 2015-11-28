@@ -1,0 +1,9 @@
+[Unit]
+Description=Call orgsync
+Wants=orgcalsync.timer
+
+[Service]
+ExecStart=/home/japhir/bin/orggcalsync
+
+[Install]
+WantedBy=timers.target

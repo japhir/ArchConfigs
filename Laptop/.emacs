@@ -4,7 +4,7 @@
 ;;; Load package databases
 (package-initialize)
 (add-to-list 'package-archives
-	     '("melpa" . "http://melpa.org/packages/"))
+	     '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives
 	     '("org" . "http://orgmode.org/elpa/"))
 (when (not package-archive-contents)
@@ -55,15 +55,13 @@
 ;;; org-mode settings
 (require 'org)
 
-;; mobileorg
-(setq org-mobile-inbox-for-pull "~/Dropbox/Apps/orgzly/inbox.org")
-(setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
-(setq org-mobile-force-id-on-agenda-items nil) ; I don't want properties everywhere
-;(add-hook 'after-init-hook 'org-mobile-pull)
-;(add-hook 'kill-emacs-hook 'org-mobile-push) ; this just slows it down waaay too much
-
-(setq org-agenda-files
-      '("~/Dropbox/Apps/orgzly/todo.org"))
+(setq org-agenda-files (list "~/Dropbox/Apps/orgzly/todo.org"
+			     "~/Dropbox/Apps/orgzly/calendars/IljaKocken.org"
+			     "~/Dropbox/Apps/orgzly/calendars/marinesciences.org"
+			     "~/Dropbox/Apps/orgzly/calendars/assistant.org"
+			     "~/Dropbox/Apps/orgzly/calendars/ubv.org"
+			     "~/Dropbox/Apps/orgzly/calendars/kristel.org"
+			     "~/Dropbox/Apps/orgzly/calendars/options.org"))
 (setq org-refile-targets
       '((nil :maxlevel . 3)  ; refile within file
 	(org-agenda-files :maxlevel . 2)))  ; refile to todo.org
