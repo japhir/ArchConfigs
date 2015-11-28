@@ -139,39 +139,39 @@ bindsym $mod+Delete exec ~/ArchConfigs/launchi3lock.sh #&& sudo sh -c "echo mem 
 #=======================================================================
 
 # Set the font
-font pango: Roboto Bold 10 
+font pango: Roboto Bold 9
 
 # Colors 
 # first the main theme colors and the accent color are defined to reuse
-set $col1 #B3E5FC
-set $col2 #03A9F4
-set $col3 #01579B
-set $acc #E91E63
+set $light #424242
+set $mid #303030
+set $dark #212121
 
+set $acc #F44336
 set $wht #FFFFFF
-set $blk #1C1C1C
+set $blk #000000
 
-# class			        border	backgr.	text	indicator
-client.focused		    $blk	$col2	$wht	$col1	
-client.focused_inactive	$blk	$col3	$wht	$col1
-client.unfocused	    $blk	$col3	$wht	$col2
-client.urgent		    $acc	$acc	$wht	$acc
-client.placeholder	    $blk	$col2	$wht	$col2
+# class			    border	backgr.	text	indicator
+client.focused		    $light	$light	$wht	
+client.focused_inactive	    $mid	$mid	#c4c4c4
+client.unfocused	    $blk	$dark	#5e5e5e
+client.urgent		    $acc	$acc	$wht	
+client.placeholder	    $blk	$mid	$wht	
 
 # Start i3bar to display a workspace bar 
 # (plus the system information i3status finds out, if available)
 bar {
     verbose yes
-    font pango: Roboto Bold 8 
+    font pango: Roboto Bold 7 
 	colors {
 		background 	$blk
-		statusline 	$wht
-		separator 	#000000
-		# class			    border	backgr.	text
-		focused_workspace	$blk	$col2 	$wht
-		active_workspace	$blk 	$col2 	$wht
-		inactive_workspace	$blk 	$col3	$blk
-		urgent_workspace	$blk 	$acc  	$wht
+		statusline 	#b0b0b0
+		separator 	#1c1c1c
+		# class			border	backgr.	text
+		focused_workspace	$light	$light 	$wht
+		active_workspace	$light 	$light 	#c4c4c4
+		inactive_workspace	$mid 	$mid	#696969
+		urgent_workspace	$acc 	$acc  	$wht
 	}
 	position top
     status_command i3status
