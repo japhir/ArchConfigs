@@ -185,7 +185,7 @@ bar {
 for_window [class="URxvt"] border 1pixel 
 
 # chromium can have a smaller border
-for_window [class="^chromium$" window-role="browser"] border 1pixel
+for_window [class="^chromium$" window_role="browser"] border 1pixel
 
 # Bubble windows (chrome notifications) are always floating
 for_window [window_role="bubble"] floating enable
