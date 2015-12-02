@@ -105,11 +105,18 @@
 	("ge" "Email" tags-todo "@email")
 	("gb" "Bellen" tags-todo "@bellen")
 	("ga" "Agenda" tags-todo "@agenda")
-	("G" "GTD Block Agenda" ; everything in one buffer
-	 ((tags-todo "@home")
-	  (tags-todo "@UU")
-	  (tags-todo "@stad")
+	("U" "Work: all UU-contexts"
+	 ((tags-todo "@UU")
 	  (tags-todo "@lab")
+	  (tags-todo "@computer")
+	  (tags-todo "@internet")
+	  (tags-todo "@email")
+	  (tags-todo "@bellen")
+	  (tags-todo "@agenda"))
+	 nil)
+	("H" "Home: all personal contexts" 
+	 ((tags-todo "@home")
+	  (tags-todo "@stad")
 	  (tags-todo "@computer")
 	  (tags-todo "@internet")
 	  (tags-todo "@email")
