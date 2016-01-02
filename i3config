@@ -207,7 +207,8 @@ for_window [instance="scratchpad"] move window to scratchpad
 exec --no-startup-id ~/.screenlayout/desktop2screens.sh 
 exec --no-startup-id compton -CGb #screen composite to avoid tearing
 exec --no-startup-id "pulseaudio --start" #audio
-exec --no-startup-id cantata
+#exec --no-startup-id cantata
+exec --no-startup-id spotify
 exec --no-startup-id dropbox     #file syncing
 exec --no-startup-id chromium   
 exec --no-startup-id nitrogen --restore #manages dekstop wallpapers for multiple monitors
