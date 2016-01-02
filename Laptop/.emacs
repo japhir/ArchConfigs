@@ -67,12 +67,18 @@
 	(org-agenda-files :maxlevel . 2)))  ; refile to todo.org
 (setq org-log-done 'time)
 (defvar org-gtd-file "~/Dropbox/Apps/orgzly/todo.org")
+(defvar org-in-file "~/Dropbox/Apps/orgzly/inbox.org")
 ;; this function opens my todo-file
 (defun gtd ()
   "Open the GTD file"
   (interactive)
   (find-file org-gtd-file))
+(defun inb ()
+  "Open the inbox file"
+  (interactive)
+  (find-file org-in-file))
 (define-key global-map "\C-cg" 'gtd)
+(define-key global-map "\C-ci" 'inb)
 (define-key global-map "\C-cl" 'org-store-link)
 (define-key global-map "\C-ca" 'org-agenda)
 (define-key global-map "\C-cc" 'org-capture)
