@@ -233,8 +233,11 @@ bindsym --release Shift+Print exec scrot -s /mnt/HDD/Pictures/Screenshots/%Y-%m-
 # Mouse integration
 #=======================================================================
 
-exec --no-startup-id unclutter # Hide the mouse when it's not moving
-floating_modifier $mod # Mouse + mod to drag floating window
+# Hide the mouse when it's not moving
+exec --no-startup-id unclutter
+
+# Mouse + mod to drag floating window
+floating_modifier $mod
 
 # Mod + rmb over titlebar toggles floating mode
 bindsym $mod+button3 floating toggle
