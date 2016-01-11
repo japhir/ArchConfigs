@@ -243,6 +243,7 @@ exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr
 #=======================================================================
      
 bindsym $mod+c exec chromium		# Chromium
+bindsym $mod+g exec chromium --show-app-list # Chrome app launcher
 bindsym $mod+x exec nautilus		# Nautilus file manager
 #bindsym $mod+shift+e exec emacs    	# Emacs
 
