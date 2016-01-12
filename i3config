@@ -108,7 +108,9 @@ bindsym $mod+Shift+9 move container to workspace $workspace9
 bindsym $mod+Shift+0 move container to workspace $workspace10
 
 # move programs to specific workspaces
-assign [class="Spotify"] $workspace10
+#assign [class="Spotify"] $workspace10 # spotify doesn't do this correctly yet so for now:
+for_window [class="Spotify"] move to workspace $workspace10
+#assign [class="chromium"] $workspace2 # maybe if I decide I like the restriction
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
