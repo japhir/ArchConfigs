@@ -68,7 +68,7 @@
 (define-key global-map "\C-ca" 'org-agenda)
 (define-key global-map "\C-cc" 'org-capture)
 (setq org-capture-templates
-      '(("t" "Todo" entry (file "/mnt/HDD/Dropbox/Apps/orgzly/todo.org")
+      '(("t" "Todo" entry (file "/mnt/HDD/Dropbox/Apps/orgzly/inbox.org")
 	 "* %?\n %i\n %a")
 	("j" "Journal" entry (file+datetree "/mnt/HDD/Dropbox/Apps/orgzly/journal.org")
 	 "* %?\nEntered on %U\n %i\n %a")))
