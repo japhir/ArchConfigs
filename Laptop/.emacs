@@ -32,6 +32,7 @@
 (electric-pair-mode 1) ; auto-insert matching bracket
 (show-paren-mode 1)    ; turn on paren match highlighting
 (setq mouse-wheel-progressive-speed nil) ; prevent scrolling excelleration
+
 ;; Easy symbol insertion
 ; C-x 8 o = °, C-x 8 m = µ
 (global-set-key (kbd "C-x 8 a") (lambda () (interactive) (insert "α")))
@@ -43,6 +44,12 @@
 ;(add-hook 'text-mode-hook
 ;	  '(lambda() (set-fill-column 80)))
 ; this is awesome when writing but very annoying when programming/working in r 
+;; pretty bullets
+(require 'org-bullets)
+(setq org-bullets-bullet-list
+      '("◉" "◎" "⚫" "○" "►" "◇"))
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
 
 ;;; mode loading
 ;; load pandoc and markdown modes
@@ -55,7 +62,8 @@
 ;;; org-mode settings
 (require 'org)
 
-(setq org-agenda-files (list "~/Dropbox/Apps/orgzly/todo.org"
+(setq org-agenda-files (list "~/Dropbox/Apps/orgzly/inbox.org"
+			     "~/Dropbox/Apps/orgzly/todo.org"
 			     "~/Dropbox/Apps/orgzly/calendars/IljaKocken.org"
 			     "~/Dropbox/Apps/orgzly/calendars/marinesciences.org"
 			     "~/Dropbox/Apps/orgzly/calendars/assistant.org"
@@ -112,22 +120,22 @@
 	("gb" "Bellen" tags-todo "@bellen/+NEXT|+WAITING")
 	("ga" "Agenda" tags-todo "@agenda/+NEXT|+WAITING")
 	("U" "Work: all UU-contexts"
-	 ((tags-todo "@UU/+NEXT|+WAITING")
-	  (tags-todo "@lab/+NEXT|+WAITING")
-	  (tags-todo "@computer/+NEXT|+WAITING")
-	  (tags-todo "@internet/+NEXT|+WAITING")
-	  (tags-todo "@email/+NEXT|+WAITING")
-	  (tags-todo "@bellen/+NEXT|+WAITING")
-	  (tags-todo "@agenda/+NEXT|+WAITING"))
+	 (AREA="work"&(tags-todo "@UU/+NEXT|+WAITING")
+	       (tags-todo "@lab/+NEXT|+WAITING")
+	       (tags-todo "@computer/+NEXT|+WAITING")
+	       (tags-todo "@internet/+NEXT|+WAITING")
+	       (tags-todo "@email/+NEXT|+WAITING")
+	       (tags-todo "@bellen/+NEXT|+WAITING")
+	       (tags-todo "@agenda/+NEXT|+WAITING"))
 	 nil)
 	("H" "Home: all personal contexts" 
-	 ((tags-todo "@home/+NEXT|+WAITING")
-	  (tags-todo "@stad/+NEXT|+WAITING")
-	  (tags-todo "@computer/+NEXT|+WAITING")
-	  (tags-todo "@internet/+NEXT|+WAITING")
-	  (tags-todo "@email/+NEXT|+WAITING")
-	  (tags-todo "@bellen/+NEXT|+WAITING")
-	  (tags-todo "@agenda/+NEXT|+WAITING"))
+	 (AREA="personal"&(tags-todo "@home/+NEXT|+WAITING")
+	       (tags-todo "@stad/+NEXT|+WAITING")
+	       (tags-todo "@computer/+NEXT|+WAITING")
+	       (tags-todo "@internet/+NEXT|+WAITING")
+	       (tags-todo "@email/+NEXT|+WAITING")
+	       (tags-todo "@bellen/+NEXT|+WAITING")
+	       (tags-todo "@agenda/+NEXT|+WAITING"))
 	 nil)
 	("n" todo "NEXT" nil)
 	("w" todo "WAITING" nil)
