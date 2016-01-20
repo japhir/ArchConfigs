@@ -44,12 +44,6 @@
 ;(add-hook 'text-mode-hook
 ;	  '(lambda() (set-fill-column 80)))
 ; this is awesome when writing but very annoying when programming/working in r 
-;; pretty bullets
-(require 'org-bullets)
-(setq org-bullets-bullet-list
-      '("◉" "◎" "⚫" "○" "►" "◇"))
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-
 
 ;;; mode loading
 ;; load pandoc and markdown modes
@@ -99,6 +93,9 @@
 (setq org-todo-keywords 
       '((sequence "NEXT(n)" "WAITING(w!/!)" "SCHEDULED(a)" "SOMEDAY(s!/!)" "|" 
 		  "DONE(d)" "CANCELLED(c)")))
+;; add effort estimate standards
+(add-to-list 'org-global-properties
+      '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
 ;; prettify the todo keywords
 (setq org-todo-keyword-faces
       '(("NEXT" . (:foreground "light yellow" :background "red" :weight bold))
@@ -107,6 +104,11 @@
 	("SOMEDAY" . (:background "deep sky blue"))
 	("DONE" . (:foreground "green4" :background "pale green"))
 	("CANCELLED" . (:foreground "dim gray" :background "gray"))))
+;; pretty bullets
+(require 'org-bullets)
+(setq org-bullets-bullet-list
+      '("◉" "◎" "⚫" "○" "►" "◇"))
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 ;; this is the amazing "view interesting tasks" menu
 (setq org-agenda-custom-commands
       '(("g" . "GTD contexts")
