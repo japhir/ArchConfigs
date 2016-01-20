@@ -7,7 +7,7 @@
 # If the above line is not correctly displayed, fix your editor first!
 
 general {
-        colors = true
+        colors = false
         interval = 5
 }
 
@@ -21,27 +21,31 @@ order += "tztime local"
 ethernet _first_ {
         # if you use %speed, i3status requires root privileges
         format_up = "E: %ip (%speed)"
-        format_down = "E: down"
+        format_down = "E down"
 }
 
 wireless _first_ {
-	format_up = "W: (%quality at %essid) / %frequency) %ip"
-	format_down = "W: down"
+	format_up = " %essid %ip"
+	format_down = " down"
 }
 
 battery 0 {
 	format = "%status %percentage %remaining"
+	format_down = 
+	status_chr = 
+	status_bat = 
+	status_full = 
 }
 
 
 tztime local {
-        format = "%Y-%m-%d %H:%M:%S"
+        format = " %Y-%m-%d  %H:%M:%S"
 }
 
 disk "/home" {
-        format = "home: %avail"
+        format = " %avail"
 }
 
 disk "/" {
-     	format = "/ %avail"
+     	format = ": %avail"
 }
