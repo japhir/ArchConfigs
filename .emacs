@@ -22,7 +22,9 @@
 (setq inhibit-splash-screen t) ; no splash screen
 (electric-pair-mode 1) ; auto-insert matching bracket
 (show-paren-mode 1)    ; turn on paren match highlighting
-(setq mouse-wheel-progressive-speed nil) ; disable scroll ecceleration
+(scroll-bar-mode -1)   ; turn off the scroll bar
+(menu-bar-mode -1)     ; turn off the menu
+(setq mouse-wheel-progressive-speed nil) ; disable scroll acceleration
 
 ;; Easy symbol insertion
 ; C-x 8 o = degree
