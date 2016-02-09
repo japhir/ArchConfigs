@@ -227,14 +227,15 @@ for_window [instance="scratchpad"] move window to scratchpad
 exec --no-startup-id emacs --daemon		# run emacs as a daemon
 exec --no-startup-id emacs -name scratchpad	# and run one instance as a scratchpad
 exec --no-startup-id pulseaudio --start		# audio
-exec --no-startup-id xbindkeys
+exec --no-startup-id xbindkeys			# alternative keyboard layout
 exec --no-startup-id volnoti			# mediakey volume change notification
 exec --no-startup-id feh --bg-scale ~/Desktop/background.jpg #background image
-#exec --no-startup-id cbatticon 	     		# battery indicator
-exec --no-startup-id wicd-client --tray 	# wireless network applet
+exec --no-startup-id cbatticon 	     		# battery indicator
+#exec --no-startup-id wicd-client --tray 	# wicd wifi - switched to nm
+exec --no-startup-id nm-applet	  		# NetworkManager applet
 exec --no-startup-id dropbox     		# file syncing
 exec --no-startup-id caffeine			# keeps the pc awake when viewing youtube videos
-#exec --no-startup-id cantata 			# musicplayer
+#exec --no-startup-id cantata 			# musicplayer, i now use spotify
 
 # f.lux or redshift reduces eye strain at night
 #exec --no-startup-id xflux -l 52.1 -g 5.12 
@@ -246,8 +247,8 @@ exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2500
 #=======================================================================
      
 bindsym $mod+c exec chromium 
-bindsym $mod+x exec nautilus # Gnome Files
-bindsym $mod+g exec chromium --show-app-list # Chrome app launcher
+bindsym $mod+x exec nautilus			# Gnome Files
+bindsym $mod+g exec chromium --show-app-list 	# Chrome app launcher
 
 # Take a screenshot with scrot
 bindsym Print exec scrot -b ~/Pictures/Screenshots/%Y-%m-%d-%T.png 
@@ -266,7 +267,7 @@ floating_modifier $mod
 # Mod + rmb over titlebar toggles floating mode
 bindsym $mod+button3 floating toggle
 
-# The middle button over a titlebar kills the window (not for floating windows unfortunately)
+# The middle button over a titlebar kills the window 
 bindsym --release button2 kill
 
 # Mouse hovering shouldn't dictate mouse focus
