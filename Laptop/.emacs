@@ -31,19 +31,15 @@
 (setq inhibit-splash-screen t) ; no splash screen
 (electric-pair-mode 1) ; auto-insert matching bracket
 (show-paren-mode 1)    ; turn on paren match highlighting
-(setq mouse-wheel-progressive-speed nil) ; prevent scrolling excelleration
+(scroll-bar-mode -1)   ; turn off the scroll bar
+(menu-bar-mode -1)     ; turn off the menu
+;(setq mouse-wheel-progressive-speed nil) ; disable scroll acceleration
 
 ;; Easy symbol insertion
 ; C-x 8 o = °, C-x 8 m = µ
 (global-set-key (kbd "C-x 8 a") (lambda () (interactive) (insert "α")))
 (global-set-key (kbd "C-x 8 b") (lambda () (interactive) (insert "β")))
 (global-set-key (kbd "C-x 8 d") (lambda () (interactive) (insert "δ")))
-
-;; wrap at column 80
-;(add-hook 'text-mode-hook 'turn-on-auto-fill)
-;(add-hook 'text-mode-hook
-;	  '(lambda() (set-fill-column 80)))
-; this is awesome when writing but very annoying when programming/working in r 
 
 ;;; mode loading
 ;; load pandoc and markdown modes
@@ -164,11 +160,6 @@
 (setq org-agenda-prefix-format "  %-17:c%?-12t% s") 
 
 (setq org-fontifywhole-heading-line t) ;; works better with theme
-
-;; org-gcal settings
-;(require 'org-gcal)
-;(setq org-gcal-client-id "r487anihgu01dvo0nc7vohho6g@group.calendar.google.com"
-;      org-gcal-client-secret "")
 
 ;; theme setting
 (load-theme 'leuven t)
