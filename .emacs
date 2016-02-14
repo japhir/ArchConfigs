@@ -86,6 +86,11 @@
 	("SOMEDAY" . (:background "deep sky blue"))
 	("DONE" . (:foreground "green4" :background "pale green"))
 	("CANCELLED" . (:foreground "dim gray" :background "gray"))))
+;; pretty bullets
+(require 'org-bullets)
+(setq org-bullets-bullet-list
+      '("◉" "◎" "⚫" "○" "►" "◇"))
+(add-hook 'org-mode-hook (lambda() (org-bullets-mode 1)))
 ;; this is the amazing "view interesting tasks" menu
 (setq org-agenda-custom-commands
       '(("g" . "GTD contexts")
@@ -158,6 +163,10 @@
    [default default default italic underline success warning error])
  '(ansi-color-names-vector
    ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
+ '(custom-enabled-themes (quote (tangotango)))
+ '(custom-safe-themes
+   (quote
+    ("5999e12c8070b9090a2a1bbcd02ec28906e150bb2cdce5ace4f965c76cf30476" default)))
  '(package-selected-packages
    (quote
     (fill-column-indicator ess writeroom-mode column-marker markdown-mode pandoc-mode org-pandoc)))
