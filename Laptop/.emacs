@@ -12,6 +12,15 @@
 
 ;;; emacs speaks statistics, work with R etc.
 (require 'ess-site) 
+(require 'calfw)
+(require 'calfw-gcal)
+(require 'calfw-org)
+(require 'evil)
+(require 'evil-org)
+(require 'evil-magit)
+
+(global-evil-leader-mode)
+(evil-mode 1)
 
 ;; auto-complete
 (require 'auto-complete)
@@ -51,7 +60,6 @@
 
 ;;; org-mode settings
 (require 'org)
-
 (setq org-agenda-files (list "~/Dropbox/Apps/orgzly/inbox.org"
 			     "~/Dropbox/Apps/orgzly/todo.org"
 			     "~/Dropbox/Apps/orgzly/calendars/IljaKocken.org"
@@ -159,10 +167,14 @@
 (setq org-adapt-indentation t) ; makes todo contents indent at headline level
 (setq org-agenda-prefix-format "  %-17:c%?-12t% s") 
 
-(setq org-fontifywhole-heading-line t) ;; works better with theme
+;; Calendar settings
+; First day of the week
+(setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
+
+;(setq org-fontifywhole-heading-line t) ;; works better with theme
 
 ;; theme setting
-(load-theme 'leuven t)
+;(load-theme 'leuven t)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -173,6 +185,7 @@
    [default default default italic underline success warning error])
  '(ansi-color-names-vector
    ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
+ '(custom-enabled-themes (quote (tango-dark)))
  '(package-selected-packages
    (quote
     (fill-column-indicator ess writeroom-mode column-marker markdown-mode pandoc-mode org-pandoc)))
