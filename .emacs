@@ -16,8 +16,8 @@
 (require 'evil-magit)
 
 (global-evil-leader-mode)
-(evil-set-initial-state 'calendar-mode 'emacs)
 (evil-mode 1)
+(evil-set-initial-state 'calendar-mode 'emacs)
 
 ;; prevent emacs from ruining my git repo's
 (setq backup-directory-alist
