@@ -22,10 +22,10 @@ bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 # bindsym $mod+d exec rofi -show run -lines 3 -eh 2 -width 100 -fullscreen -opacity "85" -bw 0 -bc "$blk" -bg "$blk" -fg "$wht" -hlbg "$blk" -hlfg "#9575cd" -font "Roboto 18"
 
 # change focus
-bindsym $mod+j focus left
-bindsym $mod+k focus down
-bindsym $mod+l focus up
-bindsym $mod+semicolon focus right
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
 
 # alternatively, you can use the cursor keys:
 bindsym $mod+Left focus left
@@ -45,8 +45,8 @@ bindsym $mod+Shift+Down move down
 bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
-# split in horizontal orientation
-bindsym $mod+h split h
+# split toggle
+bindsym $mod+t split t
 
 # split in vertical orientation
 bindsym $mod+v split v
