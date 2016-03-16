@@ -18,9 +18,11 @@
 (require 'evil)
 (require 'evil-org)
 (require 'evil-magit)
+(require 'powerline-evil)
 
 (global-evil-leader-mode)
 (evil-mode 1)
+(powerline-evil-vim-color-theme)
 
 ;; auto-complete
 (require 'auto-complete)
@@ -185,7 +187,10 @@
    [default default default italic underline success warning error])
  '(ansi-color-names-vector
    ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
- '(custom-enabled-themes (quote (tango-dark)))
+ '(custom-enabled-themes (quote (tangotango)))
+ '(custom-safe-themes
+   (quote
+    ("5999e12c8070b9090a2a1bbcd02ec28906e150bb2cdce5ace4f965c76cf30476" default)))
  '(package-selected-packages
    (quote
     (fill-column-indicator ess writeroom-mode column-marker markdown-mode pandoc-mode org-pandoc)))
