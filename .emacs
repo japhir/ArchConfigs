@@ -11,6 +11,13 @@
 
 ;;; Load specific packages
 (require 'ess-site) ; emacs speaks statistics, work with R etc.
+(require 'evil)
+(require 'evil-org)
+(require 'evil-magit)
+
+(global-evil-leader-mode)
+(evil-mode 1)
+(evil-set-initial-state 'calendar-mode 'emacs)
 
 ;; prevent emacs from ruining my git repo's
 (setq backup-directory-alist
@@ -163,7 +170,7 @@
    [default default default italic underline success warning error])
  '(ansi-color-names-vector
    ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
- '(custom-enabled-themes (quote (tangotango)))
+ '(custom-enabled-themes (quote (tango-dark)))
  '(custom-safe-themes
    (quote
     ("5999e12c8070b9090a2a1bbcd02ec28906e150bb2cdce5ace4f965c76cf30476" default)))
