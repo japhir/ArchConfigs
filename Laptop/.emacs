@@ -39,11 +39,12 @@
       `((".*" ,temporary-file-directory t)))
 
 ;; interface layout settings
-(setq inhibit-splash-screen t) ; no splash screen
+(setq inhibit-splash-screen t) 
 (electric-pair-mode 1) ; auto-insert matching bracket
 (show-paren-mode 1)    ; turn on paren match highlighting
 (scroll-bar-mode -1)   ; turn off the scroll bar
 (menu-bar-mode -1)     ; turn off the menu
+(setq-default fill-column 80)
 ;(setq mouse-wheel-progressive-speed nil) ; disable scroll acceleration
 
 ;; Easy symbol insertion
@@ -52,7 +53,6 @@
 (global-set-key (kbd "C-x 8 b") (lambda () (interactive) (insert "β")))
 (global-set-key (kbd "C-x 8 d") (lambda () (interactive) (insert "δ")))
 
-;;; mode loading
 ;; load pandoc and markdown modes
 (add-hook 'markdown-mode-hook 'pandoc-mode)
 ;; load AUCTeX-mode
@@ -61,6 +61,41 @@
 (setq-default TeX-master nil)
 
 ;;; org-mode settings
+;; for thesis
+;; helm bibtex https://github.com/tmalsburg/helm-bibtex
+(setq bibtex-completion-bibliography '("/home/japhir/Documents/References/MRP.bib"))
+(setq bibtex-completion-library-path '("/home/japhir/Dropbox/MRP/References"))
+(setq bibtex-completion-pdf-field "file")
+(setq bibtex-completion-notes-path "/home/japhir/Dropbox/Apps/orgzly/referencenotes.org")
+;; open bibtex links with zathura
+(setq bibtex-completion-pdf-open-function
+  (lambda (fpath)
+    (call-process "zathura" nil 0 nil fpath)))
+(setq bibtex-completion-browser-function 'browser-url-chromium)
+(setq bibtex-completion-format-citation-functions
+  '((org-mode      . bibtex-completion-format-citation-cite)
+    (latex-mode    . bibtex-completion-format-citation-cite)
+    (markdown-mode . bibtex-completion-format-citation-pandoc-citeproc)
+    (default       . bibtex-completion-format-citation-default)))
+(setq bibtex-completion-cite-default-command "citep")
+;; no before or after promts
+(setq bibtex-completion-cite-prompt-for-optional-arguments nil)
+;; not fullscreen (not working)
+;(setq bibtex-completion-full-frame nil)
+(global-set-key (kbd "C-x c") 'helm-bibtex)
+;(helm-delete-action-from-source "Insert citation" helm-source-bibtex)
+;(helm-add-action-to-source "Insert citation" 'bibtex-completion-insert-citation 0)
+(eval-after-load 'org
+  '(setf org-highlight-latex-and-related '(latex script entities)))
+;; check this out later, might need to use citeproc in stead of biber
+(setq org-latex-pdf-process
+  '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
+(org-babel-do-load-languages
+   'org-babel-load-languages
+   '((R . t)
+     (org . t)))
+
+;; todo settings
 (require 'org)
 (setq org-agenda-files (list "~/Dropbox/Apps/orgzly/inbox.org"
 			     "~/Dropbox/Apps/orgzly/todo.org"
@@ -191,6 +226,9 @@
  '(custom-safe-themes
    (quote
     ("5999e12c8070b9090a2a1bbcd02ec28906e150bb2cdce5ace4f965c76cf30476" default)))
+ '(org-agenda-files
+   (quote
+    ("~/Dropbox/MRP/Report/Report.org" "~/Dropbox/Apps/orgzly/inbox.org" "~/Dropbox/Apps/orgzly/todo.org" "~/Dropbox/Apps/orgzly/calendars/IljaKocken.org" "~/Dropbox/Apps/orgzly/calendars/marinesciences.org" "~/Dropbox/Apps/orgzly/calendars/assistant.org" "~/Dropbox/Apps/orgzly/calendars/ubv.org" "~/Dropbox/Apps/orgzly/calendars/kristel.org" "~/Dropbox/Apps/orgzly/calendars/options.org")))
  '(package-selected-packages
    (quote
     (fill-column-indicator ess writeroom-mode column-marker markdown-mode pandoc-mode org-pandoc)))

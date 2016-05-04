@@ -2,7 +2,7 @@ ZSH=/usr/share/oh-my-zsh
 DISABLE_AUTO_UPDATE="true"
 ZSH_CACHE_DIR=$HOME/.oh-my-zsh-cache
 ZSH_THEME="robbyrussell"
-plugins=(git)
+plugins=(git vi-mode)
 if [[ ! -d $ZSH_CACHE_DIR ]]; then
     mkdir $ZSH_CACHE_DIR
 fi
@@ -14,18 +14,19 @@ SAVEHIST=1000
 
 setopt autocd
 unsetopt beep
-bindkey -e
+bindkey -v
 
 zstyle :compinstall filename '/home/japhir/.zshrc'
 autoload -Uz compinit
 compinit
 
-alias MRP='cd ~/Dropbox/UU/MS/Major\ Research\ Project'
-alias em='emacsclient'
+alias em='emacs'
 alias ls='ls --color'
+alias R='R --quiet'
 export ALTERNATE_EDITOR=""
-export EDITOR='emacsclient'
-
-PATH=$PATH:~/.cabal/bin
-
+export EDITOR='emacs'
+export WINEPREFIX=$HOME/.win32
+export WINEARCH=win32
+export PATH=$PATH:~/.cabal/bin
+export KEYTIMEOUT=1
 
