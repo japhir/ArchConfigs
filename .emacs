@@ -1,13 +1,25 @@
 ;;; Emacs config file
+(package-initialize nil)
+
+;; interface layout settings
+(setq inhibit-splash-screen t) ; no splash screen
+(scroll-bar-mode -1)   ; turn off the scroll bar
+(menu-bar-mode -1)     ; turn off the menu
+(show-paren-mode 1)    ; turn on paren match highlighting
+(setq mouse-wheel-progressive-speed nil) ; disable scroll acceleration
+(electric-pair-mode 1) ; auto-insert matching bracket
 
 ;;; Load package databases
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
+(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
+
+(package-initialize nil)
+(when (not package-archive-contents) (package-refresh-contents))
+
+(setq package-enable-at-startup nil)
 (package-initialize)
-(add-to-list 'package-archives
-	     '("melpa" . "http://melpa.org/packages/"))
-(add-to-list 'package-archives
-	     '("org" . "http://orgmode.org/elpa/"))
-(when (not package-archive-contents)
-  (package-refresh-contents))
 
 ;;; Load specific packages
 (require 'ess-site) ; emacs speaks statistics, work with R etc.
@@ -15,6 +27,7 @@
 (require 'evil-org)
 (require 'evil-magit)
 
+;; evil stuff
 (global-evil-leader-mode)
 (evil-mode 1)
 (evil-set-initial-state 'calendar-mode 'emacs)
@@ -24,14 +37,6 @@
       `((".*" . ,temporary-file-directory)))
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
-
-;; interface layout settings
-(setq inhibit-splash-screen t) ; no splash screen
-(electric-pair-mode 1) ; auto-insert matching bracket
-(show-paren-mode 1)    ; turn on paren match highlighting
-(scroll-bar-mode -1)   ; turn off the scroll bar
-(menu-bar-mode -1)     ; turn off the menu
-(setq mouse-wheel-progressive-speed nil) ; disable scroll acceleration
 
 ;; Easy symbol insertion
 ; C-x 8 o = degree
