@@ -12,6 +12,7 @@
 
 ;;; emacs speaks statistics, work with R etc.
 (require 'ess-site) 
+(setq ess-default-style 'RStudio)
 (require 'calfw)
 (require 'calfw-gcal)
 (require 'calfw-org)
@@ -63,7 +64,7 @@
 ;;; org-mode settings
 ;; for thesis
 ;; helm bibtex https://github.com/tmalsburg/helm-bibtex
-(setq bibtex-completion-bibliography '("/home/japhir/Documents/References/MRP.bib"))
+(setq bibtex-completion-bibliography '("/home/japhir/Documents/References/MRP.bib" "/home/japhir/Documents/References/Minor Research Project.bib"))
 (setq bibtex-completion-library-path '("/home/japhir/Dropbox/MRP/References"))
 (setq bibtex-completion-pdf-field "file")
 (setq bibtex-completion-notes-path "/home/japhir/Dropbox/Apps/orgzly/referencenotes.org")
