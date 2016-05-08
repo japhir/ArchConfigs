@@ -9,6 +9,7 @@
 	     '("org" . "http://orgmode.org/elpa/"))
 (when (not package-archive-contents)
   (package-refresh-contents))
+(spu-package-upgrade-daily)
 
 ;;; emacs speaks statistics, work with R etc.
 (require 'ess-site) 
