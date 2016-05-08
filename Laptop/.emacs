@@ -1,39 +1,17 @@
-;;; Emacs config file
-;; Japhir
-
 ;;; Load package databases
-(package-initialize)
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives
+(require 'package)
+(setq package-enable-at-startup nil)
+(add-to-list 'package-archives 
+	     '("melpa" . "https://melpa.org/packages/")
 	     '("org" . "http://orgmode.org/elpa/"))
-(when (not package-archive-contents)
-  (package-refresh-contents))
-(spu-package-upgrade-daily)
 
-;;; emacs speaks statistics, work with R etc.
-(require 'ess-site) 
-(setq ess-default-style 'RStudio)
-(require 'calfw)
-(require 'calfw-gcal)
-(require 'calfw-org)
-(require 'evil)
-(require 'evil-org)
-(require 'evil-magit)
-(require 'powerline-evil)
+(package-initialize)
 
-(global-evil-leader-mode)
-(evil-mode 1)
-(powerline-evil-vim-color-theme)
-
-;; auto-complete
-(require 'auto-complete)
-(global-auto-complete-mode t)
-(define-key ac-complete-mode-map "\t" 'ac-complete)
-(define-key ac-complete-mode-map "\r" nil)
-(define-key ac-complete-mode-map "\C-n" 'ac-next)
-(define-key ac-complete-mode-map "\C-p" 'ac-previous)
-
+;; bootstrap use-package
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+  
 ;; prevent emacs from ruining my git repo's
 (setq backup-directory-alist
       `((".*" . ,temporary-file-directory)))
@@ -55,67 +33,7 @@
 (global-set-key (kbd "C-x 8 b") (lambda () (interactive) (insert "β")))
 (global-set-key (kbd "C-x 8 d") (lambda () (interactive) (insert "δ")))
 
-;; load pandoc and markdown modes
-(add-hook 'markdown-mode-hook 'pandoc-mode)
-;; load AUCTeX-mode
-(setq TeX-suto-save t)
-(setq TeX-parse-self t)
-(setq-default TeX-master nil)
-
-;;; org-mode settings
-;; for thesis
-;; helm bibtex https://github.com/tmalsburg/helm-bibtex
-(setq bibtex-completion-bibliography '("/home/japhir/Documents/References/MRP.bib" "/home/japhir/Documents/References/Minor Research Project.bib"))
-(setq bibtex-completion-library-path '("/home/japhir/Dropbox/MRP/References"))
-(setq bibtex-completion-pdf-field "file")
-(setq bibtex-completion-notes-path "/home/japhir/Dropbox/Apps/orgzly/referencenotes.org")
-;; open bibtex links with zathura
-(setq bibtex-completion-pdf-open-function
-  (lambda (fpath)
-    (call-process "zathura" nil 0 nil fpath)))
-(setq bibtex-completion-browser-function 'browser-url-chromium)
-(setq bibtex-completion-format-citation-functions
-  '((org-mode      . bibtex-completion-format-citation-cite)
-    (latex-mode    . bibtex-completion-format-citation-cite)
-    (markdown-mode . bibtex-completion-format-citation-pandoc-citeproc)
-    (default       . bibtex-completion-format-citation-default)))
-(setq bibtex-completion-cite-default-command "citep")
-;; no before or after promts
-(setq bibtex-completion-cite-prompt-for-optional-arguments nil)
-;; not fullscreen (not working)
-;(setq bibtex-completion-full-frame nil)
-(global-set-key (kbd "C-x c") 'helm-bibtex)
-;(helm-delete-action-from-source "Insert citation" helm-source-bibtex)
-;(helm-add-action-to-source "Insert citation" 'bibtex-completion-insert-citation 0)
-(eval-after-load 'org
-  '(setf org-highlight-latex-and-related '(latex script entities)))
-;; check this out later, might need to use citeproc in stead of biber
-(setq org-latex-pdf-process
-  '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
-(org-babel-do-load-languages
-   'org-babel-load-languages
-   '((R . t)
-     (org . t)))
-
-;; todo settings
-(require 'org)
-;; org settings for writing my thesis
-((eval-after-load 'org '(require 'org-pdfview))  ;inline pdf preview
-(setq org-highlight-latex-and-related '(latex script entities))  
-
-;; org settings for my todo system
-setq org-agenda-files (list "~/Dropbox/Apps/orgzly/inbox.org"
-			     "~/Dropbox/Apps/orgzly/todo.org"
-			     "~/Dropbox/Apps/orgzly/calendars/IljaKocken.org"
-			     "~/Dropbox/Apps/orgzly/calendars/marinesciences.org"
-			     "~/Dropbox/Apps/orgzly/calendars/assistant.org"
-			     "~/Dropbox/Apps/orgzly/calendars/ubv.org"
-			     "~/Dropbox/Apps/orgzly/calendars/kristel.org"
-			     "~/Dropbox/Apps/orgzly/calendars/options.org"))
-(setq org-refile-targets
-      '((nil :maxlevel . 3)  ; refile within file
-	(org-agenda-files :maxlevel . 2)))  ; refile to todo.org
-(setq org-log-done 'time)
+;; my gtd and inbox files
 (defvar org-gtd-file "~/Dropbox/Apps/orgzly/todo.org")
 (defvar org-in-file "~/Dropbox/Apps/orgzly/inbox.org")
 ;; this function opens my todo-file
@@ -132,93 +50,157 @@ setq org-agenda-files (list "~/Dropbox/Apps/orgzly/inbox.org"
 (define-key global-map "\C-cl" 'org-store-link)
 (define-key global-map "\C-ca" 'org-agenda)
 (define-key global-map "\C-cc" 'org-capture)
-(setq org-capture-templates
-      '(("t" "Todo" entry (file "~/Dropbox/Apps/orgzly/inbox.org")
-	 "* %?\n %i\n %a")
-	("j" "Journal" entry (file+datetree "~/Dropbox/Apps/orgzly/journal.org")
-	 "* %?\nEntered on %U\n %i\n %a")))
-;; the todo-states of my gtd-system
-(setq org-todo-keywords 
-      '((sequence "NEXT(n)" "WAITING(w!/!)" "SCHEDULED(a)" "SOMEDAY(s!/!)" "|" 
-		  "DONE(d)" "CANCELLED(c)")))
-;; add effort estimate standards
-(add-to-list 'org-global-properties
-      '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
-;; prettify the todo keywords
-(setq org-todo-keyword-faces
-      '(("NEXT" . (:foreground "light yellow" :background "red" :weight bold))
-	("WAITING" . (:background "yellow"))
-	("SCHEDULED" . (:background "light slate blue"))
-	("SOMEDAY" . (:background "deep sky blue"))
-	("DONE" . (:foreground "green4" :background "pale green"))
-	("CANCELLED" . (:foreground "dim gray" :background "gray"))))
-;; pretty bullets
-(require 'org-bullets)
-(setq org-bullets-bullet-list
-      '("◉" "◎" "⚫" "○" "►" "◇"))
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-;; this is the amazing "view interesting tasks" menu
-(setq org-agenda-custom-commands
-      '(("g" . "GTD contexts")
-	("gh" "Home" tags-todo "@home/+NEXT|+WAITING")
-	("gu" "University" tags-todo "@UU/+NEXT|+WAITING")
-	("gs" "Stad" tags-todo "@stad/+NEXT|+WAITING")
-	("gl" "Laboratory" tags-todo "@lab/+NEXT|+WAITING")
-	("gc" "Computer" tags-todo "@computer/+NEXT|+WAITING")
-	("gi" "Internet" tags-todo "@internet/+NEXT|+WAITING")
-	("ge" "Email" tags-todo "@email/+NEXT|+WAITING")
-	("gb" "Bellen" tags-todo "@bellen/+NEXT|+WAITING")
-	("ga" "Agenda" tags-todo "@agenda/+NEXT|+WAITING")
-	("U" "Work: all UU-contexts"
-	 (AREA="work"&(tags-todo "@UU/+NEXT|+WAITING")
-	       (tags-todo "@lab/+NEXT|+WAITING")
-	       (tags-todo "@computer/+NEXT|+WAITING")
-	       (tags-todo "@internet/+NEXT|+WAITING")
-	       (tags-todo "@email/+NEXT|+WAITING")
-	       (tags-todo "@bellen/+NEXT|+WAITING")
-	       (tags-todo "@agenda/+NEXT|+WAITING"))
-	 nil)
-	("H" "Home: all personal contexts" 
-	 (AREA="personal"&(tags-todo "@home/+NEXT|+WAITING")
-	       (tags-todo "@stad/+NEXT|+WAITING")
-	       (tags-todo "@computer/+NEXT|+WAITING")
-	       (tags-todo "@internet/+NEXT|+WAITING")
-	       (tags-todo "@email/+NEXT|+WAITING")
-	       (tags-todo "@bellen/+NEXT|+WAITING")
-	       (tags-todo "@agenda/+NEXT|+WAITING"))
-	 nil)
-	("n" todo "NEXT" nil)
-	("w" todo "WAITING" nil)
-	("s" todo "SOMEDAY" nil)
-	("d" "Agenda + Next actions" ((agenda) (todo "NEXT")))
-	))
-(setq org-tag-alist '(("@home" . ?h)("@UU" . ?u)("@stad" . ?s)("@lab" . ?l)
-		      ("@computer" . ?c)("@internet" . ?i)("@email" . ?e)
-		      ("@bellen" . ?b)("@agenda" . ?a)))
-;; extra org settings
-(setq org-return-follows-link t)
-(setq org-hide-leading-stars t)
-(setf org-tags-column -65)
-(setf org-special-ctrl-a/e t)
-(setq org-log-done t) ; add date-entry upon task completion
-(setq org-deadline-warning-days 14)
-(setq org-fontify-emphasized-text t) 
-(setq org-fontify-done-headline t)
-(setq org-agenda-include-all-todo nil)
-(setq org-directory "~/Dropbox/Apps/orgzly/")
-(setq org-export-with-toc nil)
-(setq org-export-with-section-numbers nil)
-(setq org-adapt-indentation t) ; makes todo contents indent at headline level
-(setq org-agenda-prefix-format "  %-17:c%?-12t% s") 
 
-;; Calendar settings
-; First day of the week
-(setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
+;; emacs speaks statistics, work with R etc.
+(use-package ess 
+  :ensure t
+  :config (setq ess-default-style 'RStudio)
+  :commands R)
+(use-package evil
+  :ensure t
+  :config (evil-mode 1))
+(use-package evil-org)
+(use-package magit)
+(use-package evil-magit)
+(use-package powerline-evil
+  :config (powerline-evil-vim-color-theme))
+(use-package auto-complete
+  :config (global-auto-complete-mode t))
+(use-package pandoc-mode
+  :init (add-hook 'markdown-mode-hook 'pandoc-mode))
+(use-package tex
+  :config
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq-default TeX-master nil))
 
-;(setq org-fontifywhole-heading-line t) ;; works better with theme
+;; helm bibtex https://github.com/tmalsburg/helm-bibtex
+(use-package helm-bibtex
+  :config
+  (setq bibtex-completion-bibliography '("/home/japhir/Documents/References/MRP.bib" "/home/japhir/Documents/References/Minor Research Project.bib"))
+  (setq bibtex-completion-library-path '("/home/japhir/Dropbox/MRP/References"))
+  (setq bibtex-completion-pdf-field "file")
+  (setq bibtex-completion-notes-path "/home/japhir/Dropbox/Apps/orgzly/referencenotes.org")
+  ;; open bibtex links with zathura
+  (setq bibtex-completion-pdf-open-function
+	(lambda (fpath)
+	  (call-process "zathura" nil 0 nil fpath)))
+  (setq bibtex-completion-browser-function 'browser-url-chromium)
+  (setq bibtex-completion-format-citation-functions
+	'((org-mode      . bibtex-completion-format-citation-cite)
+	  (latex-mode    . bibtex-completion-format-citation-cite)
+	  (markdown-mode . bibtex-completion-format-citation-pandoc-citeproc)
+	  (default       . bibtex-completion-format-citation-default)))
+  (setq bibtex-completion-cite-default-command "citep")
+  ;; no before or after promts
+  (setq bibtex-completion-cite-prompt-for-optional-arguments nil)
+  ;; not fullscreen (not working)
+					;(setq bibtex-completion-full-frame nil)
+  :bind
+  ("C-x c" . helm-bibtex))
 
-;; theme setting
-;(load-theme 'leuven t)
+(use-package org
+  :config
+  (setf org-highlight-latex-and-related '(latex script entities))
+  (setq org-latex-pdf-process
+	'("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
+  (setq org-highlight-latex-and-related '(latex script entities))  
+  ;; org settings for my todo system
+  (setq org-agenda-files (list "~/Dropbox/Apps/orgzly/inbox.org"
+			       "~/Dropbox/Apps/orgzly/todo.org"
+			       "~/Dropbox/Apps/orgzly/calendars/IljaKocken.org"
+			       "~/Dropbox/Apps/orgzly/calendars/marinesciences.org"
+			       "~/Dropbox/Apps/orgzly/calendars/assistant.org"
+			       "~/Dropbox/Apps/orgzly/calendars/ubv.org"
+			       "~/Dropbox/Apps/orgzly/calendars/kristel.org"
+			       "~/Dropbox/Apps/orgzly/calendars/options.org"))
+  (setq org-refile-targets
+	'((nil :maxlevel . 3)  ; refile within file
+	  (org-agenda-files :maxlevel . 2)))  ; refile to todo.org
+  (setq org-log-done 'time)
+  (setq org-capture-templates
+	'(("t" "Todo" entry (file "~/Dropbox/Apps/orgzly/inbox.org")
+	   "* %?\n %i\n %a")
+	  ("j" "Journal" entry (file+datetree "~/Dropbox/Apps/orgzly/journal.org")
+	   "* %?\nEntered on %U\n %i\n %a")))
+  ;; the todo-states of my gtd-system
+  (setq org-todo-keywords 
+	'((sequence "NEXT(n)" "WAITING(w!/!)" "SCHEDULED(a)" "SOMEDAY(s!/!)" "|" 
+		    "DONE(d)" "CANCELLED(c)")))
+  ;; add effort estimate standards
+  (add-to-list 'org-global-properties
+	       '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
+  ;; prettify the todo keywords
+  (setq org-todo-keyword-faces
+	'(("NEXT" . (:foreground "light yellow" :background "red" :weight bold))
+		   ("WAITING" . (:background "yellow"))
+		   ("SCHEDULED" . (:background "light slate blue"))
+		   ("SOMEDAY" . (:background "deep sky blue"))
+		   ("DONE" . (:foreground "green4" :background "pale green"))
+		   ("CANCELLED" . (:foreground "dim gray" :background "gray"))))
+	   ;; this is the amazing "view interesting tasks" menu
+  (setq org-agenda-custom-commands
+	'(("g" . "GTD contexts")
+	  ("gh" "Home" tags-todo "@home/+NEXT|+WAITING")
+	  ("gu" "University" tags-todo "@UU/+NEXT|+WAITING")
+	  ("gs" "Stad" tags-todo "@stad/+NEXT|+WAITING")
+	  ("gl" "Laboratory" tags-todo "@lab/+NEXT|+WAITING")
+	  ("gc" "Computer" tags-todo "@computer/+NEXT|+WAITING")
+	  ("gi" "Internet" tags-todo "@internet/+NEXT|+WAITING")
+	  ("ge" "Email" tags-todo "@email/+NEXT|+WAITING")
+	  ("gb" "Bellen" tags-todo "@bellen/+NEXT|+WAITING")
+	  ("ga" "Agenda" tags-todo "@agenda/+NEXT|+WAITING")
+	  ("U" "Work: all UU-contexts"
+	   (AREA="work"&(tags-todo "@UU/+NEXT|+WAITING")
+		 (tags-todo "@lab/+NEXT|+WAITING")
+		 (tags-todo "@computer/+NEXT|+WAITING")
+		 (tags-todo "@internet/+NEXT|+WAITING")
+		 (tags-todo "@email/+NEXT|+WAITING")
+		 (tags-todo "@bellen/+NEXT|+WAITING")
+		 (tags-todo "@agenda/+NEXT|+WAITING"))
+	   nil)
+	  ("H" "Home: all personal contexts" 
+	   (AREA="personal"&(tags-todo "@home/+NEXT|+WAITING")
+		 (tags-todo "@stad/+NEXT|+WAITING")
+		 (tags-todo "@computer/+NEXT|+WAITING")
+		 (tags-todo "@internet/+NEXT|+WAITING")
+		 (tags-todo "@email/+NEXT|+WAITING")
+		 (tags-todo "@bellen/+NEXT|+WAITING")
+		 (tags-todo "@agenda/+NEXT|+WAITING"))
+	   nil)
+	  ("n" todo "NEXT" nil)
+	  ("w" todo "WAITING" nil)
+	  ("s" todo "SOMEDAY" nil)
+	  ("d" "Agenda + Next actions" ((agenda) (todo "NEXT")))))
+	  (setq org-tag-alist '(("@home" . ?h)("@UU" . ?u)("@stad" . ?s)("@lab" . ?l)
+				("@computer" . ?c)("@internet" . ?i)("@email" . ?e)
+				("@bellen" . ?b)("@agenda" . ?a)))
+	  ;; extra org settings
+	  (setq org-return-follows-link t)
+	  (setq org-hide-leading-stars t)
+	  (setf org-tags-column -65)
+	  (setf org-special-ctrl-a/e t)
+	  (setq org-log-done t) ; add date-entry upon task completion
+	  (setq org-deadline-warning-days 14)
+	  (setq org-fontify-emphasized-text t) 
+	  (setq org-fontify-done-headline t)
+	  (setq org-agenda-include-all-todo nil)
+	  (setq org-directory "~/Dropbox/Apps/orgzly/")
+	  (setq org-export-with-toc nil)
+	  (setq org-export-with-section-numbers nil)
+	  (setq org-adapt-indentation t) ; makes todo contents indent at headline level
+	  (setq org-agenda-prefix-format "  %-17:c%?-12t% s") 
+	  
+	  ;; Calendar settings
+	  (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
+	  (setq org-fontifywhole-heading-line t))
+  
+(use-package org-bullets
+  :config
+  (setq org-bullets-bullet-list
+	'("◉" "◎" "⚫" "○" "►" "◇"))
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
