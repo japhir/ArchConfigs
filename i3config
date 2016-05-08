@@ -18,6 +18,8 @@ bindsym $mod+Shift+q kill
 # dmenu with only .desktop files
 bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
+<<<<<<< HEAD
+=======
 # I might switch to using rofi sometime soon
 # bindsym $mod+d exec rofi -show run -lines 3 -eh 2 -width 100 -fullscreen -opacity "85" -bw 0 -bc "$blk" -bg "$blk" -fg "$wht" -hlbg "$blk" -hlfg "#9575cd" -font "Roboto 18"
 
@@ -27,6 +29,7 @@ set $down j
 set $up k
 set $right l
 
+>>>>>>> 3eb622d0d47b4c7326518391533d318ae786d866
 # change focus
 bindsym $mod+$left focus left
 bindsym $mod+$down focus down
@@ -40,10 +43,17 @@ bindsym $mod+Up focus up
 bindsym $mod+Right focus right
 
 # move focused window
+<<<<<<< HEAD
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+=======
 bindsym $mod+Shift+$left move left
 bindsym $mod+Shift+$down move down
 bindsym $mod+Shift+$up move up
 bindsym $mod+Shift+$right move right
+>>>>>>> 3eb622d0d47b4c7326518391533d318ae786d866
 
 # alternatively, you can use the cursor keys:
 bindsym $mod+Shift+Left move left
@@ -52,7 +62,7 @@ bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
 # split toggle
-bindsym $mod+t split t
+bindsym $mod+t split toggle
 
 # split in vertical orientation
 bindsym $mod+v split v
@@ -179,7 +189,7 @@ bindsym $mod+Delete exec i3lock -c 000000 && sudo pm-suspend
 #=======================================================================
 
 # Set the font
-font pango: Roboto Bold 9
+font pango: Roboto Bold, FontAwesome 10
 
 # Colors 
 # first the main theme colors and the accent color are defined to reuse
@@ -202,7 +212,7 @@ client.placeholder	    $blk	$mid	$wht
 # (plus the system information i3status finds out, if available)
 bar {
     verbose yes
-    font pango: Roboto Bold 7 
+    font pango: Roboto Bold, FontAwesome 8
 	colors {
 		background 	$blk
 		statusline 	#b0b0b0
@@ -224,8 +234,11 @@ bar {
 # urxvt, my terminal doesn't need a thick border
 for_window [class="URxvt"] border 1pixel 
 
-# chromium can have a smaller border
+# chromium can have a thin border 
 for_window [class="^chromium$" window_role="browser"] border 1pixel
+
+# pop-up windows are always floating
+#for_window [window_role="pop-up"] floating enable
 
 # Bubble windows (chrome notifications) are always floating
 for_window [window_role="bubble"] floating enable
@@ -251,6 +264,11 @@ exec --no-startup-id nitrogen --restore #manages dekstop wallpapers for multiple
 exec --no-startup-id "pulseaudio --start" #audio
 exec --no-startup-id dropbox    
 exec --no-startup-id caffeine #keeps the pc awake when viewing youtube videos
+<<<<<<< HEAD
+=======
+#exec --no-startup-id emacs --daemon
+#exec --no-startup-id emacs -name scratchpad
+>>>>>>> 0dbf0d7b6d4766da47e0fbde5d8d02ff62e345bd
 exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr
 exec --no-startup-id spotify
 
