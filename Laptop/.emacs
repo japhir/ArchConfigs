@@ -62,7 +62,12 @@
 
 ;;; org-mode settings
 (require 'org)
-(setq org-agenda-files (list "~/Dropbox/Apps/orgzly/inbox.org"
+;; org settings for writing my thesis
+((eval-after-load 'org '(require 'org-pdfview))  ;inline pdf preview
+(setq org-highlight-latex-and-related '(latex script entities))  
+
+;; org settings for my todo system
+setq org-agenda-files (list "~/Dropbox/Apps/orgzly/inbox.org"
 			     "~/Dropbox/Apps/orgzly/todo.org"
 			     "~/Dropbox/Apps/orgzly/calendars/IljaKocken.org"
 			     "~/Dropbox/Apps/orgzly/calendars/marinesciences.org"

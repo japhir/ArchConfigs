@@ -80,13 +80,13 @@ bindsym $mod+a focus parent
 # workspace names
 set $workspace1 "1: "
 set $workspace2 "2: "
-set $workspace3 "3: "
-set $workspace4 "4: "
+set $workspace3 "3: "
+set $workspace4 "4: "
 set $workspace5 "5: "
 set $workspace6 "6: "
 set $workspace7 "7: "
 set $workspace8 "8: "
-set $workspace9 "9: "
+set $workspace9 "9: "
 set $workspace10 "10: "
 
 # switch to workspace
@@ -113,10 +113,21 @@ bindsym $mod+Shift+8 move container to workspace $workspace8
 bindsym $mod+Shift+9 move container to workspace $workspace9
 bindsym $mod+Shift+0 move container to workspace $workspace10
 
+# move workspaces to specific screens
+# right primary
+workspace $workspace2 output DVI-I-2
+workspace $workspace3 output DVI-I-2
+workspace $workspace1 output DVI-I-2
+# left smaller
+workspace $workspace9 output DVI-I-1
+workspace $workspace4 output DVI-I-1
+
 # move programs to specific workspaces
-#assign [class="Spotify"] $workspace10 # spotify doesn't do this correctly yet so for now:
-for_window [class="Spotify"] move to workspace $workspace10
-#assign [class="chromium"] $workspace2 # maybe if I decide I like the restriction
+#assign [class="^Spotify$"] $workspace10  # spotify doesn't do this correctly yet so for now:
+for_window [class="^Spotify$"] move to workspace $workspace10
+#assign [class="chromium"] $workspace2  # maybe if I decide I like the restriction
+assign [class="^R_x11$"] → $workspace9  # this is for R graphics output
+assign [class="^chromium$" title="WhatsApp Web"] $workspace4
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -233,18 +244,15 @@ for_window [instance="scratchpad"] move window to scratchpad
 #=======================================================================
 
 #load arandr-generated monitor layout
+exec --no-startup-id chromium   
 exec --no-startup-id ~/.screenlayout/desktop2screens.sh # created with arandr
 exec --no-startup-id compton -CGbf # screen composite to avoid tearing
-exec --no-startup-id "pulseaudio --start" #audio
-#exec --no-startup-id cantata
-exec --no-startup-id spotify
-exec --no-startup-id dropbox    
-exec --no-startup-id chromium   
 exec --no-startup-id nitrogen --restore #manages dekstop wallpapers for multiple monitors
+exec --no-startup-id "pulseaudio --start" #audio
+exec --no-startup-id dropbox    
 exec --no-startup-id caffeine #keeps the pc awake when viewing youtube videos
-exec --no-startup-id emacs --daemon
-exec --no-startup-id emacs -name scratchpad
 exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr
+exec --no-startup-id spotify
 
 #=======================================================================
 # Specific software combo's

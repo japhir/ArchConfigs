@@ -1,5 +1,6 @@
 ;;; Emacs config file
 (package-initialize nil)
+(spu-package-upgrade-daily)
 
 ;; interface layout settings
 (setq inhibit-splash-screen t) ; no splash screen
@@ -49,6 +50,9 @@
 (add-hook 'text-mode-hook
 	  '(lambda() (set-fill-column 80)))
 
+;; set ess-style to RStudio
+(setq ess-default-style 'RStudio)
+
 ;;; mode loading
 ;; load pandoc and markdown modes
 (add-hook 'markdown-mode-hook 'pandoc-mode)
@@ -62,8 +66,8 @@
 (setq org-agenda-files
       '("/mnt/HDD/Dropbox/Apps/orgzly/todo.org"))
 (setq org-refile-targets
-      '((nil :maxlevel . 2)  ; refile in the current buffer
-	(org-agenda-files :maxlevel . 2))) ; refile to todo.org
+      '((nil :maxlevel . 4)  ; refile in the current buffer
+	(org-agenda-files :maxlevel . 3))) ; refile to todo.org
 (setq org-log-done 'time)
 (defvar org-gtd-file "/mnt/HDD/Dropbox/Apps/orgzly/todo.org")
 (defvar org-in-file "/mnt/HDD/Dropbox/Apps/orgzly/inbox.org")
