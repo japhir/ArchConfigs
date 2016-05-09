@@ -56,6 +56,15 @@
   :ensure t
   :config (setq ess-default-style 'RStudio)
   :commands R)
+(use-package matlab
+  :init
+  (autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
+  (add-to-list
+   'auto-mode-alist
+   '("\\.m$" . matlab-mode))
+  :config
+  (setq matlab-indent-function t)
+  (setq matlab-indent-function "matlab"))
 (use-package evil
   :ensure t
   :config (evil-mode 1))
@@ -188,7 +197,7 @@
 	  (setq org-directory "~/Dropbox/Apps/orgzly/")
 	  (setq org-export-with-toc nil)
 	  (setq org-export-with-section-numbers nil)
-	  (setq org-adapt-indentation t) ; makes todo contents indent at headline level
+	  ;(setq org-adapt-indentation t) ; makes todo contents indent at headline level
 	  (setq org-agenda-prefix-format "  %-17:c%?-12t% s") 
 	  
 	  ;; Calendar settings
