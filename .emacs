@@ -1,6 +1,6 @@
 ;;; Emacs config file
 (package-initialize nil)
-(spu-package-upgrade-daily)
+;(spu-package-upgrade-daily)
 
 ;; interface layout settings
 (setq inhibit-splash-screen t) ; no splash screen
