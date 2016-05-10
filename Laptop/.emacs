@@ -33,6 +33,12 @@
 (global-set-key (kbd "C-x 8 b") (lambda () (interactive) (insert "β")))
 (global-set-key (kbd "C-x 8 d") (lambda () (interactive) (insert "δ")))
 
+(defadvice find-file (after find-file-sudo activate)
+  "Find file as root if necessary."
+  (unless (and buffer-file-name
+               (file-writable-p buffer-file-name))
+    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
+
 ;; my gtd and inbox files
 (defvar org-gtd-file "~/Dropbox/Apps/orgzly/todo.org")
 (defvar org-in-file "~/Dropbox/Apps/orgzly/inbox.org")
