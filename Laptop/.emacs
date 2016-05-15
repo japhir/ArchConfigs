@@ -71,6 +71,8 @@
   :config
   (setq matlab-indent-function t)
   (setq matlab-indent-function "matlab"))
+(use-package evil-leader  ; default is \
+  :config (global-evil-leader-mode))
 (use-package evil
   :ensure t
   :config (evil-mode 1))
@@ -123,11 +125,11 @@
   ;; org settings for my todo system
   (setq org-agenda-files (list "~/Dropbox/Apps/orgzly/inbox.org"
 			       "~/Dropbox/Apps/orgzly/todo.org"
+			       "~/LOSCAR/Loscar-2.0.4/Notes.org"
 			       "~/Dropbox/Apps/orgzly/calendars/IljaKocken.org"
 			       "~/Dropbox/Apps/orgzly/calendars/marinesciences.org"
 			       "~/Dropbox/Apps/orgzly/calendars/assistant.org"
 			       "~/Dropbox/Apps/orgzly/calendars/ubv.org"
-			       "~/Dropbox/Apps/orgzly/calendars/kristel.org"
 			       "~/Dropbox/Apps/orgzly/calendars/options.org"))
   (setq org-refile-targets
 	'((nil :maxlevel . 3)  ; refile within file
@@ -157,8 +159,8 @@
   (setq org-agenda-custom-commands
 	'(("g" . "GTD contexts")
 	  ("gh" "Home" tags-todo "@home/+NEXT|+WAITING")
-	  ("gu" "University" tags-todo "@UU/+NEXT|+WAITING")
-	  ("gs" "Stad" tags-todo "@stad/+NEXT|+WAITING")
+	  ("gu" "University" tags-todo "@uni/+NEXT|+WAITING")
+	  ("gs" "Stad" tags-todo "@errands/+NEXT|+WAITING")
 	  ("gl" "Laboratory" tags-todo "@lab/+NEXT|+WAITING")
 	  ("gc" "Computer" tags-todo "@computer/+NEXT|+WAITING")
 	  ("gi" "Internet" tags-todo "@internet/+NEXT|+WAITING")
@@ -166,7 +168,7 @@
 	  ("gb" "Bellen" tags-todo "@bellen/+NEXT|+WAITING")
 	  ("ga" "Agenda" tags-todo "@agenda/+NEXT|+WAITING")
 	  ("U" "Work: all UU-contexts"
-	   (AREA="work"&(tags-todo "@UU/+NEXT|+WAITING")
+	   (AREA="work"&(tags-todo "@uni/+NEXT|+WAITING")
 		 (tags-todo "@lab/+NEXT|+WAITING")
 		 (tags-todo "@computer/+NEXT|+WAITING")
 		 (tags-todo "@internet/+NEXT|+WAITING")
@@ -176,7 +178,7 @@
 	   nil)
 	  ("H" "Home: all personal contexts" 
 	   (AREA="personal"&(tags-todo "@home/+NEXT|+WAITING")
-		 (tags-todo "@stad/+NEXT|+WAITING")
+		 (tags-todo "@errands/+NEXT|+WAITING")
 		 (tags-todo "@computer/+NEXT|+WAITING")
 		 (tags-todo "@internet/+NEXT|+WAITING")
 		 (tags-todo "@email/+NEXT|+WAITING")
@@ -187,7 +189,7 @@
 	  ("w" todo "WAITING" nil)
 	  ("s" todo "SOMEDAY" nil)
 	  ("d" "Agenda + Next actions" ((agenda) (todo "NEXT")))))
-	  (setq org-tag-alist '(("@home" . ?h)("@UU" . ?u)("@stad" . ?s)("@lab" . ?l)
+	  (setq org-tag-alist '(("@home" . ?h)("@uni" . ?u)("@errands" . ?s)("@lab" . ?l)
 				("@computer" . ?c)("@internet" . ?i)("@email" . ?e)
 				("@bellen" . ?b)("@agenda" . ?a)))
 	  ;; extra org settings

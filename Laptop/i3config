@@ -247,7 +247,10 @@ exec --no-startup-id caffeine			# keeps the pc awake when viewing youtube videos
 # f.lux or redshift reduces eye strain at night
 #exec --no-startup-id xflux -l 52.1 -g 5.12 
 # default is 3000-4000 during night, 5500-6500 during the day.
-exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2500
+# Netherlands
+#exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2500
+# Hawai'i
+exec --no-startup-id redshift-gtk -l 21.3:-157.8211567 -m randr -t 5500:2500
 
 #=======================================================================
 # Specific software combo's
