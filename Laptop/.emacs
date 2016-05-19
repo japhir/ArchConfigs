@@ -33,11 +33,12 @@
 (global-set-key (kbd "C-x 8 b") (lambda () (interactive) (insert "β")))
 (global-set-key (kbd "C-x 8 d") (lambda () (interactive) (insert "δ")))
 
-(defadvice find-file (after find-file-sudo activate)
-  "Find file as root if necessary."
-  (unless (and buffer-file-name
-               (file-writable-p buffer-file-name))
-    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
+;; this is showing up randomly every now and then...
+;(defadvice find-file (after find-file-sudo activate)
+;  "Find file as root if necessary."
+;  (unless (and buffer-file-name
+;               (file-writable-p buffer-file-name))
+;    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
 ;; my gtd and inbox files
 (defvar org-gtd-file "~/Dropbox/Apps/orgzly/todo.org")
@@ -234,7 +235,7 @@
     ("5999e12c8070b9090a2a1bbcd02ec28906e150bb2cdce5ace4f965c76cf30476" default)))
  '(org-agenda-files
    (quote
-    ("~/Dropbox/MRP/Report/Report.org" "~/Dropbox/Apps/orgzly/inbox.org" "~/Dropbox/Apps/orgzly/todo.org" "~/Dropbox/Apps/orgzly/calendars/IljaKocken.org" "~/Dropbox/Apps/orgzly/calendars/marinesciences.org" "~/Dropbox/Apps/orgzly/calendars/assistant.org" "~/Dropbox/Apps/orgzly/calendars/ubv.org" "~/Dropbox/Apps/orgzly/calendars/kristel.org" "~/Dropbox/Apps/orgzly/calendars/options.org")))
+    ("~/Dropbox/MinorRP/LOSCAR/notes/Notes.org" "~/Dropbox/MRP/Report/Report.org" "~/Dropbox/Apps/orgzly/inbox.org" "~/Dropbox/Apps/orgzly/todo.org" "~/Dropbox/Apps/orgzly/calendars/IljaKocken.org" "~/Dropbox/Apps/orgzly/calendars/marinesciences.org" "~/Dropbox/Apps/orgzly/calendars/assistant.org" "~/Dropbox/Apps/orgzly/calendars/ubv.org" "~/Dropbox/Apps/orgzly/calendars/kristel.org" "~/Dropbox/Apps/orgzly/calendars/options.org")))
  '(package-selected-packages
    (quote
     (fill-column-indicator ess writeroom-mode column-marker markdown-mode pandoc-mode org-pandoc)))

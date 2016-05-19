@@ -83,8 +83,9 @@ set $workspace5 "5: "
 set $workspace6 "6: "
 set $workspace7 "7: "
 set $workspace8 "8: "
-set $workspace9 "9: "
+set $workspace9 "9: "
 set $workspace10 "10: "
+
 # switch to workspace
 bindsym $mod+1 workspace $workspace1
 bindsym $mod+2 workspace $workspace2
@@ -115,6 +116,7 @@ bindsym $mod+Shift+0 move container to workspace $workspace10
 assign [class="Mendeleydesktop.x86_64"] $workspace4  # pretty cool
 #assign [class="Spotify"] $workspace10 # doesn't work so workaround
 for_window [class="Spotify"] move to workspace $workspace10
+assign [class="R_x11"] move to workspace $workspace9
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
