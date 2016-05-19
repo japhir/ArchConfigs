@@ -116,7 +116,7 @@ bindsym $mod+Shift+0 move container to workspace $workspace10
 assign [class="Mendeleydesktop.x86_64"] $workspace4  # pretty cool
 #assign [class="Spotify"] $workspace10 # doesn't work so workaround
 for_window [class="Spotify"] move to workspace $workspace10
-assign [class="R_x11"] move to workspace $workspace9
+assign [class="R_x11"] $workspace9
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
