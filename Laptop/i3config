@@ -110,13 +110,15 @@ bindsym $mod+Shift+8 move container to workspace $workspace8
 bindsym $mod+Shift+9 move container to workspace $workspace9
 bindsym $mod+Shift+0 move container to workspace $workspace10
 
+# alt-tab like feature, switch to previous workspace by switching to current
+workspace_auto_back_and_forth yes
+
 # move programs to specific workspaces
-#assign [class="URxvt"] $workspace1     # is pretty annoying 
-#assign [class="chromium"] $workspace2  # also annoying
-assign [class="Mendeleydesktop.x86_64"] $workspace4  # pretty cool
+assign [class="Mendeleydesktop.x86_64"] $workspace4  
 #assign [class="Spotify"] $workspace10 # doesn't work so workaround
 for_window [class="Spotify"] move to workspace $workspace10
-assign [class="R_x11"] $workspace9
+assign [class="R_x11"] $workspace9     # R graphics output
+for_window [class="^Toggl Desktop$"] move to scratchpad
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -233,18 +235,16 @@ for_window [instance="scratchpad"] move window to scratchpad
 # Startup software
 #=======================================================================
 
-#exec --no-startup-id emacs --daemon		# run emacs as a daemon
-#exec --no-startup-id emacs -name scratchpad	# and run one instance as a scratchpad
 exec --no-startup-id pulseaudio --start		# audio
 exec --no-startup-id xbindkeys			# alternative keyboard layout
 exec --no-startup-id volnoti			# mediakey volume change notification
 exec_always --no-startup-id feh --bg-scale ~/Desktop/background.jpg #background image
 exec --no-startup-id cbatticon 	     		# battery indicator
-#exec --no-startup-id wicd-client --tray 	# wicd wifi - switched to nm
 exec --no-startup-id nm-applet	  		# NetworkManager applet
 exec --no-startup-id dropbox     		# file syncing
 exec --no-startup-id caffeine			# keeps the pc awake when viewing youtube videos
 #exec --no-startup-id cantata 			# musicplayer, I now use spotify
+exec --no-startup-id toggl                      # timetracker
 
 # f.lux or redshift reduces eye strain at night
 #exec --no-startup-id xflux -l 52.1 -g 5.12 
