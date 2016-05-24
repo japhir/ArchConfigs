@@ -77,10 +77,14 @@
 (use-package evil
   :ensure t
   :config (evil-mode 1))
-(use-package evil-org)
-(use-package magit)
-(use-package evil-magit)
+(use-package evil-org
+  :ensure t)
+(use-package magit
+  :ensure t)
+(use-package evil-magit
+  :ensure t)
 (use-package powerline-evil
+  :ensure t
   :config (powerline-evil-vim-color-theme))
 (use-package auto-complete
   :config (global-auto-complete-mode t))
@@ -118,6 +122,7 @@
   ("C-x c" . helm-bibtex))
 
 (use-package org
+  :ensure t
   :config
   (setf org-highlight-latex-and-related '(latex script entities))
   (setq org-latex-pdf-process
@@ -214,6 +219,7 @@
 	  (setq org-fontifywhole-heading-line t))
   
 (use-package org-bullets
+  :ensure t
   :config
   (setq org-bullets-bullet-list
 	'("◉" "◎" "⚫" "○" "►" "◇"))
