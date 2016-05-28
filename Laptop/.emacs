@@ -4,14 +4,15 @@
 (add-to-list 'package-archives 
 	     '("melpa" . "https://melpa.org/packages/")
 	     '("org" . "http://orgmode.org/elpa/"))
-
+	   
 (package-initialize)
 
 ;; bootstrap use-package
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-  
+(eval-when-compile
+  (require 'use-package))
+(require 'bind-key)
+;; (require 'diminish) ; TODO see what this is useful for
+
 ;; prevent emacs from ruining my git repo's
 (setq backup-directory-alist
       `((".*" . ,temporary-file-directory)))
@@ -44,16 +45,16 @@
 (defvar org-gtd-file "~/Dropbox/Apps/orgzly/todo.org")
 (defvar org-in-file "~/Dropbox/Apps/orgzly/inbox.org")
 ;; this function opens my todo-file
-(defun gtd ()
+(defun open-gtd-file ()
   "Open the GTD file"
   (interactive)
   (find-file org-gtd-file))
-(defun inb ()
+(defun open-inbox-file ()
   "Open the inbox file"
   (interactive)
   (find-file org-in-file))
-(define-key global-map "\C-cg" 'gtd)
-(define-key global-map "\C-ci" 'inb)
+(define-key global-map "\C-cg" 'open-gtd-file)
+(define-key global-map "\C-ci" 'open-inbox-file)
 (define-key global-map "\C-cl" 'org-store-link)
 (define-key global-map "\C-ca" 'org-agenda)
 (define-key global-map "\C-cc" 'org-capture)
@@ -65,24 +66,26 @@
   (let ((inhibit-read-only t))
     (erase-buffer)
     (eshell-send-input)))
+
 (add-hook 'eshell-mode-hook
-      '(lambda()
-          (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
+	  '(lambda()
+	     (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
 
 ;; emacs speaks statistics, work with R etc.
 (use-package ess 
   :ensure t
+  :defer 
   :config (setq ess-default-style 'RStudio)
   :commands R)
 (use-package matlab
-  :init
-  (autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
-  (add-to-list
-   'auto-mode-alist
-   '("\\.m$" . matlab-mode))
+  :defer 
   :config
   (setq matlab-indent-function t)
-  (setq matlab-indent-function "matlab"))
+  (setq matlab-indent-function "matlab")
+  :init (autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
+  (add-to-list
+   'auto-mode-alist
+   '("\\.m$" . matlab-mode)))
 (use-package systemd
   :ensure t)
 (use-package evil-leader  ; default is \
@@ -93,7 +96,9 @@
 (use-package evil-org
   :ensure t)
 (use-package magit
-  :ensure t)
+  :ensure t
+  :bind
+  ("M-s" . magit-status))
 (use-package evil-magit
   :ensure t)
 (use-package powerline-evil
@@ -102,8 +107,10 @@
 (use-package auto-complete
   :config (global-auto-complete-mode t))
 (use-package pandoc-mode
+  :defer 
   :init (add-hook 'markdown-mode-hook 'pandoc-mode))
 (use-package tex
+  :defer 
   :config
   (setq TeX-auto-save t)
   (setq TeX-parse-self t)
@@ -111,6 +118,7 @@
 
 ;; helm bibtex https://github.com/tmalsburg/helm-bibtex
 (use-package helm-bibtex
+  :defer 3
   :config
   (setq bibtex-completion-bibliography '("/home/japhir/Documents/References/MRP.bib" "/home/japhir/Documents/References/Minor Research Project.bib"))
   (setq bibtex-completion-library-path '("/home/japhir/Dropbox/MRP/References"))
@@ -130,16 +138,13 @@
   ;; no before or after promts
   (setq bibtex-completion-cite-prompt-for-optional-arguments nil)
   ;; not fullscreen (not working)
-					;(setq bibtex-completion-full-frame nil)
+  ;;(setq bibtex-completion-full-frame nil)
   :bind
   ("C-x c" . helm-bibtex))
 
 (use-package org
   :ensure t
   :config
-  (setf org-highlight-latex-and-related '(latex script entities))
-  (setq org-latex-pdf-process
-	'("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
   (setq org-highlight-latex-and-related '(latex script entities))  
   ;; org settings for my todo system
   (setq org-agenda-files (list "~/Dropbox/Apps/orgzly/inbox.org"
@@ -153,7 +158,6 @@
   (setq org-refile-targets
 	'((nil :maxlevel . 3)  ; refile within file
 	  (org-agenda-files :maxlevel . 2)))  ; refile to todo.org
-  (setq org-log-done 'time)
   (setq org-capture-templates
 	'(("t" "Todo" entry (file "~/Dropbox/Apps/orgzly/inbox.org")
 	   "* %?\n %i\n %a")
@@ -214,21 +218,22 @@
 	  ;; extra org settings
 	  (setq org-return-follows-link t)
 	  (setq org-hide-leading-stars t)
-	  (setf org-tags-column -65)
 	  (setf org-special-ctrl-a/e t)
-	  (setq org-log-done t) ; add date-entry upon task completion
-	  (setq org-deadline-warning-days 14)
 	  (setq org-fontify-emphasized-text t) 
 	  (setq org-fontify-done-headline t)
-	  (setq org-agenda-include-all-todo nil)
 	  (setq org-directory "~/Dropbox/Apps/orgzly/")
-	  (setq org-export-with-toc nil)
-	  (setq org-export-with-section-numbers nil)
 	  ;(setq org-adapt-indentation t) ; makes todo contents indent at headline level
 	  (setq org-agenda-prefix-format "  %-17:c%?-12t% s") 
-	  
-	  ;; Calendar settings
+	  (setq org-export-with-section-numbers nil)
+	  (setq org-export-with-toc nil)
+	  (setq org-agenda-include-all-todo nil)
+	  (setq org-log-done 'time)
 	  (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
+	  (setq org-deadline-warning-days 14)
+	  (setf org-tags-column -65)
+	  (setf org-highlight-latex-and-related '(latex script entities))
+	  (setq org-latex-pdf-process
+		'("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
 	  (setq org-fontifywhole-heading-line t))
   
 (use-package org-bullets
