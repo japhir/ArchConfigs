@@ -58,6 +58,17 @@
 (define-key global-map "\C-ca" 'org-agenda)
 (define-key global-map "\C-cc" 'org-capture)
 
+;; C-l clears the eshell buffer
+(defun eshell-clear-buffer ()
+  "Clear terminal"
+  (interactive)
+  (let ((inhibit-read-only t))
+    (erase-buffer)
+    (eshell-send-input)))
+(add-hook 'eshell-mode-hook
+      '(lambda()
+          (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
+
 ;; emacs speaks statistics, work with R etc.
 (use-package ess 
   :ensure t
@@ -72,6 +83,8 @@
   :config
   (setq matlab-indent-function t)
   (setq matlab-indent-function "matlab"))
+(use-package systemd
+  :ensure t)
 (use-package evil-leader  ; default is \
   :config (global-evil-leader-mode))
 (use-package evil

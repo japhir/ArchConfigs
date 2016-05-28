@@ -21,9 +21,12 @@ autoload -Uz compinit
 compinit
 
 alias em='emacs'
+alias emnw='emacs -nw'
 alias ls='ls --color'
+alias grep='grep --color=auto'
 alias R='R --quiet'
-export ALTERNATE_EDITOR=""
+
+export ALTERNATE_EDITOR='vim'
 export EDITOR='emacs'
 export WINEPREFIX=$HOME/.win32
 export WINEARCH=win32
