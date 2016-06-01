@@ -28,8 +28,10 @@ alias R='R --quiet'
 
 export ALTERNATE_EDITOR='vim'
 export EDITOR='emacs'
+export SUDO_EDITOR='emacs -nw' # for sudoedit file
 export WINEPREFIX=$HOME/.win32
 export WINEARCH=win32
 export PATH=$PATH:~/.cabal/bin
 export KEYTIMEOUT=1
+
 
