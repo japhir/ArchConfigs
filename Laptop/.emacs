@@ -25,7 +25,7 @@
 (show-paren-mode 1)    ; turn on paren match highlighting
 (scroll-bar-mode -1)   ; turn off the scroll bar
 (menu-bar-mode -1)     ; turn off the menu
-(setq-default fill-column 80)
+(setq-default fill-column 79)
 ;(setq mouse-wheel-progressive-speed nil) ; disable scroll acceleration
 
 ;; Easy symbol insertion
@@ -33,13 +33,6 @@
 (global-set-key (kbd "C-x 8 a") (lambda () (interactive) (insert "α")))
 (global-set-key (kbd "C-x 8 b") (lambda () (interactive) (insert "β")))
 (global-set-key (kbd "C-x 8 d") (lambda () (interactive) (insert "δ")))
-
-;; this is showing up randomly every now and then...
-;(defadvice find-file (after find-file-sudo activate)
-;  "Find file as root if necessary."
-;  (unless (and buffer-file-name
-;               (file-writable-p buffer-file-name))
-;    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
 ;; my gtd and inbox files
 (defvar org-gtd-file "~/Dropbox/Apps/orgzly/todo.org")
@@ -58,6 +51,13 @@
 (define-key global-map "\C-cl" 'org-store-link)
 (define-key global-map "\C-ca" 'org-agenda)
 (define-key global-map "\C-cc" 'org-capture)
+
+;; ido-mode or do I want helm?
+(setq ido-enable-flex-matching t)
+(setq ido-everywhere t)
+(ido-mode 1)
+
+;(defalias 'list-buffers 'ibuffer)
 
 ;; C-l clears the eshell buffer
 (defun eshell-clear-buffer ()
@@ -92,9 +92,21 @@
   :config (global-evil-leader-mode))
 (use-package evil
   :ensure t
-  :config (evil-mode 1))
+  :config
+  (evil-mode 1)
+  (eval-after-load "evil"
+  '(progn
+     (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
+     (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
+     (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
+     (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right))))
 (use-package evil-org
   :ensure t)
+(use-package evil-escape
+  :ensure t
+  :config
+  (evil-escape-mode 1)
+  (setq-default evil-escape-key-sequence "jk"))
 (use-package magit
   :ensure t
   :bind
@@ -155,9 +167,13 @@
 			       "~/Dropbox/Apps/orgzly/calendars/assistant.org"
 			       "~/Dropbox/Apps/orgzly/calendars/ubv.org"
 			       "~/Dropbox/Apps/orgzly/calendars/options.org"))
-  (setq org-refile-targets
-	'((nil :maxlevel . 3)  ; refile within file
-	  (org-agenda-files :maxlevel . 2)))  ; refile to todo.org
+  (setq org-refile-targets '((nil :maxlevel . 9)
+			     (org-agenda-files :maxlevel . 9)))
+  (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
+  (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
+  ;;(setq org-refile-targets
+  ;;      '((nil :maxlevel . 3)  ; refile within file
+  ;;	  (org-agenda-files :maxlevel . 2)))  ; refile to todo.org
   (setq org-capture-templates
 	'(("t" "Todo" entry (file "~/Dropbox/Apps/orgzly/inbox.org")
 	   "* %?\n %i\n %a")
@@ -243,7 +259,6 @@
 	'("◉" "◎" "⚫" "○" "►" "◇"))
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -270,4 +285,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(default ((t (:family "Source Code Pro" :foundry "ADBO" :slant normal :weight normal :height 113 :width normal)))))
