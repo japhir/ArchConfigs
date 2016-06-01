@@ -240,6 +240,7 @@ exec --no-startup-id xbindkeys			# alternative keyboard layout
 exec --no-startup-id volnoti			# mediakey volume change notification
 exec_always --no-startup-id feh --bg-scale ~/Desktop/background.jpg #background image
 exec --no-startup-id cbatticon 	     		# battery indicator
+exec --no-startup-id compton -CGbfD 5           # composite manager for fade
 exec --no-startup-id nm-applet	  		# NetworkManager applet
 exec --no-startup-id dropbox     		# file syncing
 exec --no-startup-id caffeine			# keeps the pc awake when viewing youtube videos
