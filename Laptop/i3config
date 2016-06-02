@@ -226,6 +226,8 @@ for_window [window_role="bubble"] floating enable
 
 #for_window [class="chromium" instance="crx_nckgahadagoaajjgafhacjanaoiihapd"] floating enable border none
 
+for_window [class="^Nautilus$"] floating enable
+
 # my main musciplayer cantata (yay I finally found one that is satisfactory!)
 for_window [class="cantata"] floating enable 
 # emacs-scratchpad is a scratchpad ;)
@@ -246,6 +248,7 @@ exec --no-startup-id dropbox     		# file syncing
 exec --no-startup-id caffeine			# keeps the pc awake when viewing youtube videos
 #exec --no-startup-id banshee 			# musicplayer, I now use spotify
 exec --no-startup-id toggl                      # timetracker
+exec --no-startup-id emacs --daemon
 
 # f.lux or redshift reduces eye strain at night
 #exec --no-startup-id xflux -l 52.1 -g 5.12 
@@ -262,7 +265,7 @@ exec --no-startup-id redshift-gtk -l 21.3:-157.8211567 -m randr -t 5500:2500
 bindsym $mod+c exec chromium 
 bindsym $mod+x exec nautilus			# Gnome Files
 bindsym $mod+g exec chromium --show-app-list 	# Chrome app launcher
-bindsym $mod+m exec emacs
+bindsym $mod+m exec emacsclient -c 
 
 # Take a screenshot with scrot
 bindsym Print exec scrot -b ~/Pictures/Screenshots/%Y-%m-%d-%T.png 
