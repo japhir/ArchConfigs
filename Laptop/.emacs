@@ -57,6 +57,8 @@
 (setq ido-everywhere t)
 (ido-mode 1)
 
+(defalias 'yes-or-no-p 'y-or-n-p)
+
 ;(defalias 'list-buffers 'ibuffer)
 
 ;; C-l clears the eshell buffer
@@ -86,8 +88,12 @@
   (add-to-list
    'auto-mode-alist
    '("\\.m$" . matlab-mode)))
-(use-package systemd
-  :ensure t)
+;(use-package systemd ;; not sure why I have this...
+;  :ensure t)
+(use-package evil-nerd-commenter
+  :ensure t
+  :config
+  (evilnc-default-hotkeys))
 (use-package evil-leader  ; default is \
   :config (global-evil-leader-mode))
 (use-package evil
@@ -251,7 +257,6 @@
 	  (setq org-latex-pdf-process
 		'("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
 	  (setq org-fontifywhole-heading-line t))
-  
 (use-package org-bullets
   :ensure t
   :config
