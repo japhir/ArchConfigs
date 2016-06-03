@@ -91,11 +91,21 @@
 ;(use-package systemd ;; not sure why I have this...
 ;  :ensure t)
 (use-package evil-nerd-commenter
+  :ensure t)
+(use-package evil-leader  ; default is \
   :ensure t
   :config
-  (evilnc-default-hotkeys))
-(use-package evil-leader  ; default is \
-  :config (global-evil-leader-mode))
+  (global-evil-leader-mode)
+  (evil-leader/set-key
+    "ci" 'evilnc-comment-or-uncomment-lines
+    "cl" 'evilnc-quick-comment-or-uncomment-to-the-line
+    "ll" 'evilnc-quick-comment-or-uncomment-to-the-line
+    "cc" 'evilnc-copy-and-comment-lines
+    "cp" 'evilnc-comment-or-uncomment-paragraphs
+    "cr" 'comment-or-uncomment-region
+    "cv" 'evilnc-toggle-invert-comment-line-by-line
+    ;;"\\" 'evilnc-comment-operator ; if you prefer backslash key
+    ))
 (use-package evil
   :ensure t
   :config
@@ -237,6 +247,9 @@
 	  (setq org-tag-alist '(("@home" . ?h)("@uni" . ?u)("@errands" . ?s)("@lab" . ?l)
 				("@computer" . ?c)("@internet" . ?i)("@email" . ?e)
 				("@bellen" . ?b)("@agenda" . ?a)))
+	  ;; org agenda w/ j/k movement
+	  (define-key org-agenda-mode-map "j" 'evil-next-line)
+	  (define-key org-agenda-mode-map "k" 'evil-previous-line)
 	  ;; extra org settings
 	  (setq org-return-follows-link t)
 	  (setq org-hide-leading-stars t)
