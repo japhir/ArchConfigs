@@ -59,8 +59,6 @@
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-;(defalias 'list-buffers 'ibuffer)
-
 ;; C-l clears the eshell buffer
 (defun eshell-clear-buffer ()
   "Clear terminal"
@@ -68,7 +66,6 @@
   (let ((inhibit-read-only t))
     (erase-buffer)
     (eshell-send-input)))
-
 (add-hook 'eshell-mode-hook
 	  '(lambda()
 	     (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
@@ -76,18 +73,24 @@
 ;; emacs speaks statistics, work with R etc.
 (use-package ess 
   :ensure t
-  :defer 
   :config (setq ess-default-style 'RStudio)
   :commands R)
+(use-package polymode
+  :ensure t
+  :mode
+    ;; MARKDOWN
+    ("\\.md" . poly-markdown-mode)
+    ;; R modes
+    ("\\.Snw" . poly-noweb+r-mode)
+    ("\\.Rnw" . poly-noweb+r-mode)
+    ("\\.Rmd" . poly-markdown+r-mode))
 (use-package matlab
-  :defer 
+  :init (autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
+  :mode ("\\.m\\'" . matlab-mode)
+  :interpreter "matlab"
   :config
   (setq matlab-indent-function t)
-  (setq matlab-indent-function "matlab")
-  :init (autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
-  (add-to-list
-   'auto-mode-alist
-   '("\\.m$" . matlab-mode)))
+  (setq matlab-indent-function "matlab"))
 ;(use-package systemd ;; not sure why I have this...
 ;  :ensure t)
 (use-package evil-nerd-commenter
@@ -110,12 +113,11 @@
   :ensure t
   :config
   (evil-mode 1)
-  (eval-after-load "evil"
-  '(progn
-     (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
-     (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
-     (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
-     (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right))))
+  :bind (:map evil-normal-state-map
+	      ("C-h" . evil-window-left)
+	      ("C-j" . evil-window-down)
+	      ("C-k" . evil-window-up)
+	      ("C-l" . evil-window-right)))
 (use-package evil-org
   :ensure t)
 (use-package evil-escape
@@ -134,6 +136,8 @@
   :config (powerline-evil-vim-color-theme))
 (use-package auto-complete
   :config (global-auto-complete-mode t))
+(use-package markdown-mode
+  :ensure t)
 (use-package pandoc-mode
   :defer 
   :init (add-hook 'markdown-mode-hook 'pandoc-mode))
@@ -146,7 +150,6 @@
 
 ;; helm bibtex https://github.com/tmalsburg/helm-bibtex
 (use-package helm-bibtex
-  :defer 3
   :config
   (setq bibtex-completion-bibliography '("/home/japhir/Documents/References/MRP.bib" "/home/japhir/Documents/References/Minor Research Project.bib"))
   (setq bibtex-completion-library-path '("/home/japhir/Dropbox/MRP/References"))
@@ -169,7 +172,6 @@
   ;;(setq bibtex-completion-full-frame nil)
   :bind
   ("C-x c" . helm-bibtex))
-
 (use-package org
   :ensure t
   :config
@@ -187,6 +189,7 @@
 			     (org-agenda-files :maxlevel . 9)))
   (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
   (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
+  (setq org-completion-use-ido t)
   ;;(setq org-refile-targets
   ;;      '((nil :maxlevel . 3)  ; refile within file
   ;;	  (org-agenda-files :maxlevel . 2)))  ; refile to todo.org
@@ -244,38 +247,40 @@
 	  ("w" todo "WAITING" nil)
 	  ("s" todo "SOMEDAY" nil)
 	  ("d" "Agenda + Next actions" ((agenda) (todo "NEXT")))))
-	  (setq org-tag-alist '(("@home" . ?h)("@uni" . ?u)("@errands" . ?s)("@lab" . ?l)
-				("@computer" . ?c)("@internet" . ?i)("@email" . ?e)
-				("@bellen" . ?b)("@agenda" . ?a)))
-	  ;; org agenda w/ j/k movement
-	  (define-key org-agenda-mode-map "j" 'evil-next-line)
-	  (define-key org-agenda-mode-map "k" 'evil-previous-line)
-	  ;; extra org settings
-	  (setq org-return-follows-link t)
-	  (setq org-hide-leading-stars t)
-	  (setf org-special-ctrl-a/e t)
-	  (setq org-fontify-emphasized-text t) 
-	  (setq org-fontify-done-headline t)
-	  (setq org-directory "~/Dropbox/Apps/orgzly/")
-	  ;(setq org-adapt-indentation t) ; makes todo contents indent at headline level
-	  (setq org-agenda-prefix-format "  %-17:c%?-12t% s") 
-	  (setq org-export-with-section-numbers nil)
-	  (setq org-export-with-toc nil)
-	  (setq org-agenda-include-all-todo nil)
-	  (setq org-log-done 'time)
-	  (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
-	  (setq org-deadline-warning-days 14)
-	  (setf org-tags-column -65)
-	  (setf org-highlight-latex-and-related '(latex script entities))
-	  (setq org-latex-pdf-process
-		'("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
-	  (setq org-fontifywhole-heading-line t))
+  (setq org-tag-alist '(("@home" . ?h)("@uni" . ?u)("@errands" . ?s)("@lab" . ?l)
+			("@computer" . ?c)("@internet" . ?i)("@email" . ?e)
+			("@bellen" . ?b)("@agenda" . ?a)))
+  ;; extra org settings
+  (setq org-return-follows-link t)
+  (setq org-hide-leading-stars t)
+  (setf org-special-ctrl-a/e t)
+  (setq org-fontify-emphasized-text t) 
+  (setq org-fontify-done-headline t)
+  (setq org-directory "~/Dropbox/Apps/orgzly/")
+					;(setq org-adapt-indentation t) ; makes todo contents indent at headline level
+  (setq org-agenda-prefix-format "  %-17:c%?-12t% s") 
+  (setq org-export-with-section-numbers nil)
+  (setq org-export-with-toc nil)
+  (setq org-agenda-include-all-todo nil)
+  (setq org-log-done 'time)
+  (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
+  (setq org-deadline-warning-days 14)
+  (setf org-tags-column -65)
+  (setf org-highlight-latex-and-related '(latex script entities))
+  (setq org-latex-pdf-process
+	'("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
+  (setq org-fontifywhole-heading-line t)
+  (add-hook 'org-agenda-mode-hook
+	    (lambda ()
+	      (define-key org-agenda-mode-map "j" 'evil-next-line)
+	      (define-key org-agenda-mode-map "k" 'evil-previous-line))))
+
 (use-package org-bullets
   :ensure t
+  :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   :config
   (setq org-bullets-bullet-list
-	'("◉" "◎" "⚫" "○" "►" "◇"))
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+	'("◉" "◎" "⚫" "○" "►" "◇")))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -292,7 +297,7 @@
     ("5999e12c8070b9090a2a1bbcd02ec28906e150bb2cdce5ace4f965c76cf30476" default)))
  '(org-agenda-files
    (quote
-    ("~/Dropbox/MinorRP/LOSCAR/notes/Notes.org" "~/Dropbox/MRP/Report/Report.org" "~/Dropbox/Apps/orgzly/inbox.org" "~/Dropbox/Apps/orgzly/todo.org" "~/Dropbox/Apps/orgzly/calendars/IljaKocken.org" "~/Dropbox/Apps/orgzly/calendars/marinesciences.org" "~/Dropbox/Apps/orgzly/calendars/assistant.org" "~/Dropbox/Apps/orgzly/calendars/ubv.org" "~/Dropbox/Apps/orgzly/calendars/kristel.org" "~/Dropbox/Apps/orgzly/calendars/options.org")))
+    ("~/Dropbox/Apps/orgzly/inbox.org" "~/Dropbox/Apps/orgzly/todo.org" "~/Dropbox/Apps/orgzly/calendars/IljaKocken.org" "~/Dropbox/Apps/orgzly/calendars/marinesciences.org" "~/Dropbox/Apps/orgzly/calendars/assistant.org" "~/Dropbox/Apps/orgzly/calendars/ubv.org" "~/Dropbox/Apps/orgzly/calendars/options.org")))
  '(package-selected-packages
    (quote
     (fill-column-indicator ess writeroom-mode column-marker markdown-mode pandoc-mode org-pandoc)))
