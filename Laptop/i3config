@@ -248,7 +248,7 @@ exec --no-startup-id dropbox     		# file syncing
 exec --no-startup-id caffeine			# keeps the pc awake when viewing youtube videos
 #exec --no-startup-id banshee 			# musicplayer, I now use spotify
 exec --no-startup-id toggl                      # timetracker
-exec --no-startup-id emacs --daemon
+#exec --no-startup-id emacs --daemon     # test as systemd unit
 
 # f.lux or redshift reduces eye strain at night
 #exec --no-startup-id xflux -l 52.1 -g 5.12 
