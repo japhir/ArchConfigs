@@ -1,5 +1,5 @@
 # Path to your oh-my-zsh installation.
-  export ZSH=/home/japhir/.oh-my-zsh
+export ZSH=/home/japhir/.oh-my-zsh
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -66,7 +66,7 @@ if [[ -n $SSH_CONNECTION ]]; then
     export EDITOR='vim'
 else
     export EDITOR='emacsclient -t'
-    export SUDO_EDITOR='emacsclient -t'
+    export SUDO_EDITOR='emacsclient -c -a emacs'
     export VISUAL='emacsclient -c -a emacs'
     export WINEPREFIX=$HOME/.win32
     export WINARCH=win32
