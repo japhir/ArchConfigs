@@ -52,10 +52,37 @@
 (define-key global-map "\C-ca" 'org-agenda)
 (define-key global-map "\C-cc" 'org-capture)
 
+(use-package counsel
+  :ensure t
+  )
+
+(use-package swiper
+  :init (ivy-mode 1)
+  :ensure t
+  :config
+  (setq ivy-use-virtual-buffers t)
+  (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+  :bind
+  ("\C-s" . swiper)
+  ("C-c C-r" . ivy-resume)
+  ("<f6>" . ivy-resume)
+  ("M-x" . counsel-M-x)
+  ("C-x C-f" . counsel-find-file)
+  ("<f1> f" . counsel-describe-function)
+  ("<f1> v" . counsel-describe-variable)
+  ("<f1> l" . counsel-load-library)
+  ("<f2> i" . counsel-info-lookup-symbol)
+  ("<f2> u" . counsel-unicode-char)
+  ("C-c g" . counsel-git)
+  ("C-c j" . counsel-git-grep)
+  ("C-c k" . counsel-ag)
+  ("C-x l" . counsel-locate)
+  ("C-S-o" . counsel-rhythmbox))
+    
 ;; ido-mode or do I want helm?
-(setq ido-enable-flex-matching t)
-(setq ido-everywhere t)
-(ido-mode 1)
+;(setq ido-enable-flex-matching t)
+;(setq ido-everywhere t)
+;(ido-mode 1)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
@@ -73,7 +100,7 @@
 ;; emacs speaks statistics, work with R etc.
 (use-package ess 
   :ensure t
-  :config (setq ess-default-style 'RStudio)
+  ; :config (setq ess-default-style 'RStudio)
   :commands R)
 (use-package polymode
   :ensure t
@@ -189,7 +216,7 @@
 			     (org-agenda-files :maxlevel . 9)))
   (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
   (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
-  (setq org-completion-use-ido t)
+  ;;(setq org-completion-use-ido t)
   ;;(setq org-refile-targets
   ;;      '((nil :maxlevel . 3)  ; refile within file
   ;;	  (org-agenda-files :maxlevel . 2)))  ; refile to todo.org
