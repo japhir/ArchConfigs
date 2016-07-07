@@ -237,6 +237,8 @@ for_window [instance="scratchpad"] move window to scratchpad
 # Startup software
 #=======================================================================
 
+exec --no-startup-id ~/.screenlayout/atUH.sh    # screenlayout created w/ arandr
+exec --no-startup-id nitrogen --restore
 exec --no-startup-id pulseaudio --start		# audio
 exec --no-startup-id xbindkeys			# alternative keyboard layout
 exec --no-startup-id volnoti			# mediakey volume change notification

@@ -52,10 +52,21 @@
 (define-key global-map "\C-ca" 'org-agenda)
 (define-key global-map "\C-cc" 'org-capture)
 
-(use-package counsel
-  :ensure t
-  )
+(defalias 'yes-or-no-p 'y-or-n-p)
+;; C-l clears the eshell buffer
+(defun eshell-clear-buffer ()
+  "Clear terminal"
+  (interactive)
+  (let ((inhibit-read-only t))
+    (erase-buffer)
+    (eshell-send-input)))
+(add-hook 'eshell-mode-hook
+	  '(lambda()
+	     (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
 
+(use-package counsel
+  :ensure t)
+;; very nice search replacement
 (use-package swiper
   :init (ivy-mode 1)
   :ensure t
@@ -73,35 +84,21 @@
   ("<f1> l" . counsel-load-library)
   ("<f2> i" . counsel-info-lookup-symbol)
   ("<f2> u" . counsel-unicode-char)
-  ("C-c g" . counsel-git)
+  ;;("C-c g" . counsel-git) ;; conflicts with my view gtd file command
   ("C-c j" . counsel-git-grep)
   ("C-c k" . counsel-ag)
   ("C-x l" . counsel-locate)
   ("C-S-o" . counsel-rhythmbox))
-    
-;; ido-mode or do I want helm?
-;(setq ido-enable-flex-matching t)
-;(setq ido-everywhere t)
-;(ido-mode 1)
-
-(defalias 'yes-or-no-p 'y-or-n-p)
-
-;; C-l clears the eshell buffer
-(defun eshell-clear-buffer ()
-  "Clear terminal"
-  (interactive)
-  (let ((inhibit-read-only t))
-    (erase-buffer)
-    (eshell-send-input)))
-(add-hook 'eshell-mode-hook
-	  '(lambda()
-	     (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
-
+;; jump to next char
+(use-package avy
+  :ensure t
+  :bind ("M-s" . avy-goto-char))
 ;; emacs speaks statistics, work with R etc.
 (use-package ess 
   :ensure t
   ; :config (setq ess-default-style 'RStudio)
   :commands R)
+;; for orking with .Rmd files etc. 
 (use-package polymode
   :ensure t
   :mode
@@ -136,6 +133,7 @@
     "cv" 'evilnc-toggle-invert-comment-line-by-line
     ;;"\\" 'evilnc-comment-operator ; if you prefer backslash key
     ))
+;; vim emulator
 (use-package evil
   :ensure t
   :config
@@ -155,14 +153,17 @@
 (use-package magit
   :ensure t
   :bind
-  ("M-s" . magit-status))
+  ("M-g" . magit-status))
 (use-package evil-magit
   :ensure t)
 (use-package powerline-evil
   :ensure t
   :config (powerline-evil-vim-color-theme))
 (use-package auto-complete
-  :config (global-auto-complete-mode t))
+  :ensure t
+  :init
+  (ac-config-default)
+  (global-auto-complete-mode t))
 (use-package markdown-mode
   :ensure t)
 (use-package pandoc-mode
@@ -175,7 +176,7 @@
   (setq TeX-parse-self t)
   (setq-default TeX-master nil))
 
-;; helm bibtex https://github.com/tmalsburg/helm-bibtex
+;; reference manager
 (use-package helm-bibtex
   :config
   (setq bibtex-completion-bibliography '("/home/japhir/Documents/References/MRP.bib" "/home/japhir/Documents/References/Minor Research Project.bib"))
