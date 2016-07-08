@@ -116,6 +116,7 @@ workspace_auto_back_and_forth yes
 # move programs to specific workspaces
 assign [class="Mendeleydesktop.x86_64"] $workspace4  
 #assign [class="Spotify"] $workspace10 # doesn't work so workaround
+assign [class="^Google Play Music Desktop Player$"] $workspace10
 for_window [class="Spotify"] move to workspace $workspace10
 assign [class="R_x11"] $workspace9     # R graphics output
 for_window [class="^Toggl Desktop$"] move to scratchpad
@@ -238,7 +239,7 @@ for_window [instance="scratchpad"] move window to scratchpad
 #=======================================================================
 
 exec --no-startup-id ~/.screenlayout/atUH.sh    # screenlayout created w/ arandr
-exec --no-startup-id nitrogen --restore
+exec --no-startup-id nitrogen --restore         # backgrounds for two monitors
 exec --no-startup-id pulseaudio --start		# audio
 exec --no-startup-id xbindkeys			# alternative keyboard layout
 exec --no-startup-id volnoti			# mediakey volume change notification

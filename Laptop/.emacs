@@ -87,8 +87,8 @@
   ;;("C-c g" . counsel-git) ;; conflicts with my view gtd file command
   ("C-c j" . counsel-git-grep)
   ("C-c k" . counsel-ag)
-  ("C-x l" . counsel-locate)
-  ("C-S-o" . counsel-rhythmbox))
+  ("C-x l" . counsel-locate))
+  ;;("C-S-o" . counsel-rhythmbox))
 ;; jump to next char
 (use-package avy
   :ensure t
