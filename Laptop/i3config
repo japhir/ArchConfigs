@@ -245,13 +245,13 @@ exec --no-startup-id xbindkeys			# alternative keyboard layout
 exec --no-startup-id volnoti			# mediakey volume change notification
 exec_always --no-startup-id feh --bg-scale ~/Desktop/background.jpg #background image
 exec --no-startup-id cbatticon 	     		# battery indicator
-exec --no-startup-id compton -cbfD 5 -i .9      # composite manager for fade
+exec --no-startup-id compton -cbfD 5 		# composite manager for fade
 exec --no-startup-id nm-applet	  		# NetworkManager applet
 exec --no-startup-id dropbox     		# file syncing
 exec --no-startup-id caffeine			# keeps the pc awake when viewing youtube videos
 #exec --no-startup-id banshee 			# musicplayer, I now use spotify
 exec --no-startup-id toggl                      # timetracker
-#exec --no-startup-id emacs --daemon     # test as systemd unit
+#exec --no-startup-id emacs --daemon            # now runs as a systemd unit
 
 # f.lux or redshift reduces eye strain at night
 #exec --no-startup-id xflux -l 52.1 -g 5.12 
@@ -291,4 +291,4 @@ bindsym $mod+button3 floating toggle
 bindsym --release button2 kill
 
 # Mouse hovering shouldn't dictate mouse focus
-focus_follows_mouse no
+#focus_follows_mouse no # I do want this w/ dual screens

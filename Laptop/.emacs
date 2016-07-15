@@ -3,15 +3,19 @@
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives 
 	     '("melpa" . "https://melpa.org/packages/")
-	     '("org" . "http://orgmode.org/elpa/"))
-	   
+	     '("org"   . "http://orgmode.org/elpa/"))
 (package-initialize)
 
-;; bootstrap use-package
+;; Bootstrap `use-package'
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+;; require
 (eval-when-compile
   (require 'use-package))
+(require 'diminish)
 (require 'bind-key)
-;; (require 'diminish) ; TODO see what this is useful for
 
 ;; prevent emacs from ruining my git repo's
 (setq backup-directory-alist
@@ -19,13 +23,23 @@
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
 
-;; interface layout settings
+;; interface and appearance settings
 (setq inhibit-splash-screen t) 
 (electric-pair-mode 1) ; auto-insert matching bracket
 (show-paren-mode 1)    ; turn on paren match highlighting
 (scroll-bar-mode -1)   ; turn off the scroll bar
+(tool-bar-mode -1)
 (menu-bar-mode -1)     ; turn off the menu
-(setq-default fill-column 79)
+(setq-default fill-column 80)
+(load-theme 'leuven t)
+(set-face-attribute 'default nil
+                    :family "Source Code Pro" :height 130)
+
+(use-package beacon                     ; Highlight cursor position in buffer
+  :ensure t
+  :init (beacon-mode 1)
+  :diminish beacon-mode)
+(defalias 'yes-or-no-p 'y-or-n-p)
 ;(setq mouse-wheel-progressive-speed nil) ; disable scroll acceleration
 
 ;; Easy symbol insertion
@@ -52,7 +66,6 @@
 (define-key global-map "\C-ca" 'org-agenda)
 (define-key global-map "\C-cc" 'org-capture)
 
-(defalias 'yes-or-no-p 'y-or-n-p)
 ;; C-l clears the eshell buffer
 (defun eshell-clear-buffer ()
   "Clear terminal"
@@ -63,12 +76,32 @@
 (add-hook 'eshell-mode-hook
 	  '(lambda()
 	     (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
-
+;;; Appearance
+(use-package rainbow-delimiters
+:ensure t
+  :init (rainbow-delimiters-mode))
+(use-package telephone-line
+  :ensure t
+  :config
+  (telephone-line-mode 1)
+  (setq telephone-line-lhs
+  	'((evil   .  (telephone-line-evil-tag-segment))
+  	  (accent .  (telephone-line-vc-segment
+  		      telephone-line-erc-modified-channels-segment
+  		      telephone-line-process-segment))
+  	  (nil    .  (telephone-line-misc-info-segment
+  		      telephone-line-buffer-segment))))
+  (setq telephone-line-rhs
+  	'((nil    . (telephone-line-misc-info-segment))
+  	  (accent . (telephone-line-major-mode-segment))
+  	  (evil   . (telephone-line-airline-position-segment)))))
+;; required for swiper
 (use-package counsel
   :ensure t)
 ;; very nice search replacement
 (use-package swiper
   :init (ivy-mode 1)
+  :diminish ivy-mode
   :ensure t
   :config
   (setq ivy-use-virtual-buffers t)
@@ -108,6 +141,7 @@
     ("\\.Snw" . poly-noweb+r-mode)
     ("\\.Rnw" . poly-noweb+r-mode)
     ("\\.Rmd" . poly-markdown+r-mode))
+;; if I'm ever required to work in non-open-source crem
 (use-package matlab
   :init (autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
   :mode ("\\.m\\'" . matlab-mode)
@@ -115,8 +149,7 @@
   :config
   (setq matlab-indent-function t)
   (setq matlab-indent-function "matlab"))
-;(use-package systemd ;; not sure why I have this...
-;  :ensure t)
+;; easy comments in a lot of code formats
 (use-package evil-nerd-commenter
   :ensure t)
 (use-package evil-leader  ; default is \
@@ -143,39 +176,45 @@
 	      ("C-j" . evil-window-down)
 	      ("C-k" . evil-window-up)
 	      ("C-l" . evil-window-right)))
+;; evil keymap for org-mode
 (use-package evil-org
   :ensure t)
+;; escape from everything using jk
 (use-package evil-escape
   :ensure t
+  :diminish evil-escape-mode
   :config
   (evil-escape-mode 1)
   (setq-default evil-escape-key-sequence "jk"))
+;; git management
 (use-package magit
   :ensure t
   :bind
   ("M-g" . magit-status))
+;; evil keybindings for magit
 (use-package evil-magit
   :ensure t)
-(use-package powerline-evil
-  :ensure t
-  :config (powerline-evil-vim-color-theme))
+;; auto complete everything
 (use-package auto-complete
   :ensure t
+  :diminish auto-complete-mode
   :init
   (ac-config-default)
   (global-auto-complete-mode t))
+;; markdown mode for writing 
 (use-package markdown-mode
   :ensure t)
+;; exporting markdown
 (use-package pandoc-mode
   :defer 
   :init (add-hook 'markdown-mode-hook 'pandoc-mode))
+;; for working with \LaTeX
 (use-package tex
   :defer 
   :config
   (setq TeX-auto-save t)
   (setq TeX-parse-self t)
   (setq-default TeX-master nil))
-
 ;; reference manager
 (use-package helm-bibtex
   :config
@@ -200,6 +239,14 @@
   ;;(setq bibtex-completion-full-frame nil)
   :bind
   ("C-x c" . helm-bibtex))
+;; prettify org mode
+(use-package org-bullets
+  :ensure t
+  :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  :config
+  (setq org-bullets-bullet-list
+	'("◉" "◎" "⚫" "○" "►" "◇")))
+;; note-taking, todo system, calendar, everything
 (use-package org
   :ensure t
   :config
@@ -217,10 +264,7 @@
 			     (org-agenda-files :maxlevel . 9)))
   (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
   (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
-  ;;(setq org-completion-use-ido t)
-  ;;(setq org-refile-targets
-  ;;      '((nil :maxlevel . 3)  ; refile within file
-  ;;	  (org-agenda-files :maxlevel . 2)))  ; refile to todo.org
+  ;; avy makes refiling amazing!
   (setq org-capture-templates
 	'(("t" "Todo" entry (file "~/Dropbox/Apps/orgzly/inbox.org")
 	   "* %?\n %i\n %a")
@@ -235,13 +279,13 @@
 	       '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
   ;; prettify the todo keywords
   (setq org-todo-keyword-faces
-	'(("NEXT" . (:foreground "light yellow" :background "red" :weight bold))
-		   ("WAITING" . (:background "yellow"))
-		   ("SCHEDULED" . (:background "light slate blue"))
-		   ("SOMEDAY" . (:background "deep sky blue"))
-		   ("DONE" . (:foreground "green4" :background "pale green"))
-		   ("CANCELLED" . (:foreground "dim gray" :background "gray"))))
-	   ;; this is the amazing "view interesting tasks" menu
+  	'(("NEXT" . (:foreground "light yellow" :background "red" :weight bold))
+  		   ("WAITING" . (:background "yellow"))
+  		   ("SCHEDULED" . (:background "light slate blue"))
+  		   ("SOMEDAY" . (:background "deep sky blue"))
+  		   ("DONE" . (:foreground "green4" :background "pale green"))
+  		   ("CANCELLED" . (:foreground "dim gray" :background "gray"))))
+  ;; this is the amazing "view interesting tasks" menu
   (setq org-agenda-custom-commands
 	'(("g" . "GTD contexts")
 	  ("gh" "Home" tags-todo "@home/+NEXT|+WAITING")
@@ -302,38 +346,17 @@
 	    (lambda ()
 	      (define-key org-agenda-mode-map "j" 'evil-next-line)
 	      (define-key org-agenda-mode-map "k" 'evil-previous-line))))
-
-(use-package org-bullets
+;; sync google calendar w/ org mode
+(use-package org-gcal
   :ensure t
-  :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   :config
-  (setq org-bullets-bullet-list
-	'("◉" "◎" "⚫" "○" "►" "◇")))
+  (setq org-gcal-client-id "236079279666-ot1b1rmh5u4gbv2dg9tbh8ki863gb9vb.apps.googleusercontent.com"
+	org-gcal-client-secret "76hLDtgx7V23FaofP3ZcgGrA"
+	org-gcal-file-alist '(("iljakocken@gmail.com" . "~/Dropbox/Apps/orgzly/calendars/IljaKocken.org")
+			      ("74q69nhfch7t7org6midicqssk@group.calendar.google.com" . "~/Dropbox/Apps/orgzly/calendars/marinesciences.org")
+			      ("059kvm5c429o67fe2bdhiaoq80@group.calendar.google.com" . "~/Dropbox/Apps/orgzly/calendars/options.org")
+			      ("hee8o45gut9c9hlt85aib5bels@group.calendar.google.com" . "~/Dropbox/Apps/orgzly/calendars/assistant.org")
+			      ("1ml067usmbetgk8j20o1m7rqh8@group.calendar.google.com" . "~/Dropbox/Apps/orgzly/calendars/ubv.org")
+			      ("7jgqnthbefngqjp53f3bquv5l0@group.calendar.google.com" . "~/Dropbox/Apps/orgzly/todo.org"))))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-faces-vector
-   [default default default italic underline success warning error])
- '(ansi-color-names-vector
-   ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
- '(custom-enabled-themes (quote (tangotango)))
- '(custom-safe-themes
-   (quote
-    ("5999e12c8070b9090a2a1bbcd02ec28906e150bb2cdce5ace4f965c76cf30476" default)))
- '(org-agenda-files
-   (quote
-    ("~/Dropbox/Apps/orgzly/inbox.org" "~/Dropbox/Apps/orgzly/todo.org" "~/Dropbox/Apps/orgzly/calendars/IljaKocken.org" "~/Dropbox/Apps/orgzly/calendars/marinesciences.org" "~/Dropbox/Apps/orgzly/calendars/assistant.org" "~/Dropbox/Apps/orgzly/calendars/ubv.org" "~/Dropbox/Apps/orgzly/calendars/options.org")))
- '(package-selected-packages
-   (quote
-    (fill-column-indicator ess writeroom-mode column-marker markdown-mode pandoc-mode org-pandoc)))
- '(show-paren-mode t)
- '(tool-bar-mode nil))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:family "Source Code Pro" :foundry "ADBO" :slant normal :weight normal :height 113 :width normal)))))
+;; stuff I did w/ the *ahem* mouse...
