@@ -91,3 +91,4 @@ fi
 alias em='emacsclient -c -a emacs'
 alias emt='emacsclient -t'
 alias R='R --quiet'
+alias sudo='sudo ' # allow root to use the other aliases

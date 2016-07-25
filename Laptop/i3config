@@ -18,7 +18,7 @@ bindsym $mod+Shift+q kill
 # fancy launcher w/ icon previews etc.
 bindsym $mod+d exec synapse
 # default dmenu
-bindsym $mod+shift+d exec dmenu_run
+bindsym $mod+shift+d exec i3-dmenu-desktop 
 
 # vim keybindings
 set $left h
