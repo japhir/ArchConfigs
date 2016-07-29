@@ -16,42 +16,45 @@ bindsym $mod+Return exec i3-sensible-terminal
 bindsym $mod+Shift+q kill
 
 # fancy launcher w/ icon previews etc.
-bindsym $mod+d exec synapse
+# bindsym $mod+d exec synapse # will use default ctrl+space
 # default dmenu
-bindsym $mod+shift+d exec i3-dmenu-desktop 
+bindsym $mod+d exec i3-dmenu-desktop 
+
+# org-capture from anywhere, escape with q
+bindsym $mod+z exec emacsclient -d $DISPLAY -e '(my-org-capture-other-frame)'
 
 # vim keybindings
-set $left h
-set $down j
-set $up k
+set $left  h
+set $down  j
+set $up    k
 set $right l
 
 # change focus
-bindsym $mod+$left focus left
-bindsym $mod+$down focus down
-bindsym $mod+$up focus up
+bindsym $mod+$left  focus left
+bindsym $mod+$down  focus down
+bindsym $mod+$up    focus up
 bindsym $mod+$right focus right
 
 # alternatively, you can use the cursor keys:
-bindsym $mod+Left focus left
-bindsym $mod+Down focus down
-bindsym $mod+Up focus up
+bindsym $mod+Left  focus left
+bindsym $mod+Down  focus down
+bindsym $mod+Up    focus up
 bindsym $mod+Right focus right
 
 # move focused window
-bindsym $mod+Shift+$left move left
-bindsym $mod+Shift+$down move down
-bindsym $mod+Shift+$up move up
+bindsym $mod+Shift+$left  move left
+bindsym $mod+Shift+$down  move down
+bindsym $mod+Shift+$up    move up
 bindsym $mod+Shift+$right move right
 
 # alternatively, you can use the cursor keys:
-bindsym $mod+Shift+Left move left
-bindsym $mod+Shift+Down move down
-bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Left  move left
+bindsym $mod+Shift+Down  move down
+bindsym $mod+Shift+Up    move up
 bindsym $mod+Shift+Right move right
 
 # split toggle
-bindsym $mod+t split toggle
+bindsym $mod+t split toggle # just so I can mod+h for nav
 
 # split in vertical orientation
 bindsym $mod+v split v
@@ -117,8 +120,8 @@ workspace_auto_back_and_forth yes
 
 # move programs to specific workspaces
 assign [class="Mendeleydesktop.x86_64"] $workspace4  
-#assign [class="Spotify"] $workspace10 # doesn't work so workaround
 assign [class="^Google Play Music Desktop Player$"] $workspace10
+#assign [class="Spotify"] $workspace10 # doesn't work so workaround
 for_window [class="Spotify"] move to workspace $workspace10
 assign [class="R_x11"] $workspace9     # R graphics output
 for_window [class="^Toggl Desktop$"] move to scratchpad
@@ -138,16 +141,16 @@ mode "resize" {
         # Pressing right will grow the window’s width.
         # Pressing up will shrink the window’s height.
         # Pressing down will grow the window’s height.
-        bindsym $left resize shrink width 10 px or 10 ppt
-        bindsym $down resize grow height 10 px or 10 ppt
-        bindsym $up resize shrink height 10 px or 10 ppt
-        bindsym $right resize grow width 10 px or 10 ppt
+        bindsym $left  resize shrink width  10 px or 10 ppt
+        bindsym $down  resize grow   height 10 px or 10 ppt
+        bindsym $up    resize shrink height 10 px or 10 ppt
+        bindsym $right resize grow   width  10 px or 10 ppt
 
         # same bindings, but for the arrow keys
-        bindsym Left resize shrink width 10 px or 10 ppt
-        bindsym Down resize grow height 10 px or 10 ppt
-        bindsym Up resize shrink height 10 px or 10 ppt
-        bindsym Right resize grow width 10 px or 10 ppt
+        bindsym Left  resize shrink width  10 px or 10 ppt
+        bindsym Down  resize grow   height 10 px or 10 ppt
+        bindsym Up    resize shrink height 10 px or 10 ppt
+        bindsym Right resize grow   width  10 px or 10 ppt
 
         # back to normal: Enter or Escape
         bindsym Return mode "default"
@@ -185,30 +188,30 @@ set $acc #F44336
 set $wht #FFFFFF
 set $blk #000000
 
-# class			    border	backgr.	text	indicator
-client.focused		    $light	$light	$wht	
-client.focused_inactive	    $mid	$mid	#c4c4c4
-client.unfocused	    $blk	$dark	#5e5e5e
-client.urgent		    $acc	$acc	$wht	
-client.placeholder	    $blk	$mid	$wht	
+# class                  border  backgr. text    indicator
+client.focused           $light  $light  $wht    
+client.focused_inactive  $mid    $mid    #c4c4c4
+client.unfocused         $blk    $dark   #5e5e5e
+client.urgent            $acc    $acc    $wht    
+client.placeholder       $blk    $mid    $wht    
 
 # Start i3bar to display a workspace bar 
 # (plus the system information i3status finds out, if available)
 bar {
     verbose yes
-    font pango: Roboto Bold, FontAwesome 8
-	colors {
-		background 	$blk
-		statusline 	#b0b0b0
-		separator 	#1c1c1c
-		# class			border	backgr.	text
-		focused_workspace	$light	$light 	$wht
-		active_workspace	$light 	$light 	#c4c4c4
-		inactive_workspace	$mid 	$mid	#696969
-		urgent_workspace	$acc 	$acc  	$wht
-	}
-	position top
-    status_command i3status
+    font    pango: Roboto Bold, FontAwesome 8
+    colors {
+        background $blk
+        statusline #b0b0b0
+        separator  #1c1c1c
+        #                   class   border  backgr    text
+        focused_workspace   $light  $light  $wht
+        active_workspace    $light  $light  #c4c4c4
+        inactive_workspace  $mid    $mid    #696969
+        urgent_workspace    $acc    $acc    $wht
+    }
+    position        top
+    status_command  i3status
 }
 
 #=======================================================================
@@ -224,36 +227,48 @@ for_window [class="^chromium$" window_role="browser"] border 1pixel
 # pop-up windows are always floating
 #for_window [window_role="pop-up"] floating enable
 
+# popup windows by distraction-free chrome extension
+for_window [title="^StayFocusd$"] floating enable
+
+# org-capture frame
+for_window [class="Emacs" title="Org-Capture"] floating enable sticky toggle
+
 # Bubble windows (chrome notifications) are always floating
 for_window [window_role="bubble"] floating enable
 
-#for_window [class="chromium" instance="crx_nckgahadagoaajjgafhacjanaoiihapd"] floating enable border none
-
+# file manager
 for_window [class="^Nautilus$"] floating enable
-
-# my main musciplayer cantata (yay I finally found one that is satisfactory!)
-for_window [class="cantata"] floating enable 
-# emacs-scratchpad is a scratchpad ;)
-for_window [instance="scratchpad"] move window to scratchpad
 
 #=======================================================================
 # Startup software
 #=======================================================================
 
-exec_always --no-startup-id ~/.screenlayout/atUH.sh # screenlayout created w/ arandr
-exec_always --no-startup-id nitrogen --restore         # backgrounds for two monitors
-exec --no-startup-id pulseaudio --start		# audio
-exec_always --no-startup-id xbindkeys			# alternative keyboard layout
-exec --no-startup-id volnoti			# mediakey volume change notification
-exec_always --no-startup-id feh --bg-scale ~/Desktop/background.jpg #background image
-exec --no-startup-id cbatticon 	     		# battery indicator
-exec --no-startup-id compton -cbfD 5 		# composite manager for fade
-exec --no-startup-id nm-applet	  		# NetworkManager applet
-exec --no-startup-id dropbox     		# file syncing
-exec --no-startup-id caffeine			# keeps the pc awake when viewing youtube videos
-#exec --no-startup-id banshee 			# musicplayer, I now use spotify
-exec --no-startup-id toggl                      # timetracker
-#exec --no-startup-id emacs --daemon            # now runs as a systemd unit
+# screenlayout created w/ arandr
+exec_always --no-startup-id ~/.screenlayout/atUH.sh 
+# backgrounds for two monitors
+exec_always --no-startup-id nitrogen --restore
+# audio
+exec --no-startup-id pulseaudio --start
+# alternative keyboard layout
+exec_always --no-startup-id xbindkeys
+# media key volume change notification
+exec --no-startup-id volnoti
+#background image
+exec_always --no-startup-id feh --bg-scale ~/Desktop/background.jpg 
+# battery indicator
+exec --no-startup-id cbatticon 
+# composite manager for fade
+exec --no-startup-id compton -cbfD 5 
+# fancy app launcher, launch w/ Control-space
+exec --no-startup-id synapse
+# NetworkManager applet
+exec --no-startup-id nm-applet
+# file syncing
+exec --no-startup-id dropbox
+# don't sleep when playing youtube
+exec --no-startup-id caffeine
+# timetracker
+exec --no-startup-id toggl
 
 # f.lux or redshift reduces eye strain at night
 #exec --no-startup-id xflux -l 52.1 -g 5.12 
@@ -268,8 +283,7 @@ exec --no-startup-id redshift-gtk -l 21.3:-157.8211567 -m randr -t 5500:2500
 #=======================================================================
      
 bindsym $mod+c exec chromium 
-bindsym $mod+x exec nautilus			# Gnome Files
-bindsym $mod+g exec chromium --show-app-list 	# Chrome app launcher
+bindsym $mod+x exec nautilus          # Gnome Files
 bindsym $mod+m exec emacsclient -c 
 
 # Take a screenshot with scrot
