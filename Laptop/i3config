@@ -1,33 +1,38 @@
-# i3 config file
+#=======================================================================
+#                           i3 config file
+#=======================================================================
+
 # put it in ~/.config/i3/ or ~/.i3/config
-# Ilja Kocken (japhir)
+# Ilja Kocken (@japhir)
+
+#=======================================================================
+#                                Basics
+#=======================================================================
 
 # I use the superkey, you can also use Alt
 set $mod Mod4 
 
-#=======================================================================
-# Functionality section
-#=======================================================================
+# mouse modifier
+floating_modifier $mod
 
 # start a terminal
 bindsym $mod+Return exec i3-sensible-terminal
 
-# kill focused window
-bindsym $mod+Shift+q kill
-
-# fancy launcher w/ icon previews etc.
-# bindsym $mod+d exec synapse # will use default ctrl+space
-# default dmenu
+# smart dmenu
 bindsym $mod+d exec i3-dmenu-desktop 
 
-# org-capture from anywhere, escape with q
-bindsym $mod+z exec emacsclient -d $DISPLAY -e '(my-org-capture-other-frame)'
+#=======================================================================
+#                          Window management
+#=======================================================================
 
 # vim keybindings
 set $left  h
 set $down  j
 set $up    k
 set $right l
+
+# kill focused window
+bindsym $mod+Shift+q kill
 
 # change focus
 bindsym $mod+$left  focus left
@@ -54,13 +59,13 @@ bindsym $mod+Shift+Up    move up
 bindsym $mod+Shift+Right move right
 
 # split toggle
-bindsym $mod+t split toggle # just so I can mod+h for nav
+bindsym $mod+t split toggle
 
 # split in vertical orientation
 bindsym $mod+v split v
 
 # enter fullscreen mode for the focused container
-bindsym $mod+f fullscreen
+bindsym $mod+f fullscreen toggle
 
 # change container layout (stacked, tabbed, toggle split)
 bindsym $mod+s layout stacking
@@ -70,9 +75,6 @@ bindsym $mod+e layout toggle split
 # toggle tiling / floating
 bindsym $mod+Shift+space floating toggle
 
-# toggle the bar
-bindsym $mod+b bar mode toggle
-
 # change focus between tiling / floating windows
 bindsym $mod+space focus mode_toggle
 
@@ -81,6 +83,46 @@ bindsym $mod+a focus parent
 
 # focus the child container
 #bindsym $mod+d focus child
+
+# move the currently focused window to the scratchpad
+bindsym $mod+Shift+minus move scratchpad
+
+# show next scratchpad window or hide focused scratchpad window
+# cycle if there are multiple
+bindsym $mod+minus scratchpad show
+
+# make the currently focused window sticky
+bindsym $mod+Shift+s sticky toggle
+
+# resize window (you can also use the mouse)
+mode "resize" {
+        # These bindings trigger as soon as you enter the resize mode
+
+        # Pressing left will shrink the window’s width.
+        # Pressing right will grow the window’s width.
+        # Pressing up will shrink the window’s height.
+        # Pressing down will grow the window’s height.
+        bindsym $left  resize shrink width  10 px or 10 ppt
+        bindsym $down  resize grow   height 10 px or 10 ppt
+        bindsym $up    resize shrink height 10 px or 10 ppt
+        bindsym $right resize grow   width  10 px or 10 ppt
+
+        # same bindings, but for the arrow keys
+        bindsym Left  resize shrink width  10 px or 10 ppt
+        bindsym Down  resize grow   height 10 px or 10 ppt
+        bindsym Up    resize shrink height 10 px or 10 ppt
+        bindsym Right resize grow   width  10 px or 10 ppt
+
+        # back to normal: Enter or Escape
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+
+bindsym $mod+r mode "resize"
+
+#=======================================================================
+#                              Workspaces
+#=======================================================================
 
 # workspace names
 set $workspace1 "1: "
@@ -118,16 +160,12 @@ bindsym $mod+Shift+8 move container to workspace $workspace8
 bindsym $mod+Shift+9 move container to workspace $workspace9
 bindsym $mod+Shift+0 move container to workspace $workspace10
 
-# alt-tab like feature, switch to previous workspace by switching to current
+# switch to previous workspace by repeatedly tapping
 workspace_auto_back_and_forth yes
 
-# move programs to specific workspaces
-assign [class="Mendeleydesktop.x86_64"] $workspace4  
-assign [class="^Google Play Music Desktop Player$"] $workspace10
-#assign [class="Spotify"] $workspace10 # doesn't work so workaround
-for_window [class="Spotify"] move to workspace $workspace10
-assign [class="R_x11"] $workspace9     # R graphics output
-for_window [class="^Toggl Desktop$"] move to scratchpad
+#=======================================================================
+#                       Reload/Exit/Lock
+#=======================================================================
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -136,46 +174,11 @@ bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
-# resize window (you can also use the mouse for that)
-mode "resize" {
-        # These bindings trigger as soon as you enter the resize mode
-
-        # Pressing left will shrink the window’s width.
-        # Pressing right will grow the window’s width.
-        # Pressing up will shrink the window’s height.
-        # Pressing down will grow the window’s height.
-        bindsym $left  resize shrink width  10 px or 10 ppt
-        bindsym $down  resize grow   height 10 px or 10 ppt
-        bindsym $up    resize shrink height 10 px or 10 ppt
-        bindsym $right resize grow   width  10 px or 10 ppt
-
-        # same bindings, but for the arrow keys
-        bindsym Left  resize shrink width  10 px or 10 ppt
-        bindsym Down  resize grow   height 10 px or 10 ppt
-        bindsym Up    resize shrink height 10 px or 10 ppt
-        bindsym Right resize grow   width  10 px or 10 ppt
-
-        # back to normal: Enter or Escape
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
-}
-
-bindsym $mod+r mode "resize"
-
-# Make the currently focused window a scratchpad
-bindsym $mod+Shift+o move scratchpad
-
-# Show the first scratchpad window
-bindsym $mod+p scratchpad show
-
-# sticky window
-bindsym $mod+Shift+s sticky toggle
-
 # Lock the desktop
 bindsym $mod+Delete exec ~/ArchConfigs/launchi3lock.sh #&& sudo sh -c "echo mem > /sys/power/state
 
 #=======================================================================
-# Design section
+#                                 i3bar
 #=======================================================================
 
 # Set the font
@@ -217,59 +220,83 @@ bar {
     status_command  i3status
 }
 
+# toggle the bar
+bindsym $mod+b bar mode toggle
+
 #=======================================================================
-# Specific program interface settings
+#                      Specific program settings
 #=======================================================================
 
-# urxvt, my terminal doesn't need a thick border
-for_window [class="URxvt"] border 1pixel 
+### move programs to specific workspaces ###
 
-# chromium can have a thin border 
-for_window [class="^chromium$" window_role="browser"] border 1pixel
+assign [class="Mendeleydesktop.x86_64"] $workspace4  
+assign [class="^Google Play Music Desktop Player$"] $workspace10
+# assign [class="Spotify"] $workspace10 # doesn't work so workaround
+for_window [class="Spotify"] move to workspace $workspace10
+assign [class="R_x11"] $workspace9     # R graphics output
+
+### make programs floating ###
 
 # pop-up windows are always floating
 #for_window [window_role="pop-up"] floating enable
-
 # popup windows by distraction-free chrome extension
 for_window [title="^StayFocusd$"] floating enable
-
 # org-capture frame
 for_window [class="Emacs" title="Org-Capture"] floating enable sticky toggle
-
 # Bubble windows (chrome notifications) are always floating
 for_window [window_role="bubble"] floating enable
-
 # file manager
 for_window [class="^Nautilus$"] floating enable
 
+for_window [class="^Toggl Desktop$"] move to scratchpad
+
+### borders ###
+
+# Mendeley splash screen
+for_window [class="Mendeleydesktop.x86_64" instance="mendeleydesktop.x86_64" title="mendeleydesktop.x86_64"] border none
+# emacs
+for_window [class="^Emacs$"] border 1pixel
+# terminal
+for_window [class="URxvt"] border 1pixel 
+# chromium 
+for_window [class="^chromium$" window_role="browser"] border 1pixel
+
+### Specific software launching keybindings ###
+
+bindsym $mod+c exec chromium 
+bindsym $mod+x exec nautilus 
+bindsym $mod+m exec emacsclient -c 
+
+# org-capture from anywhere, escape with q
+bindsym $mod+z exec emacsclient -d $DISPLAY -e '(my-org-capture-other-frame)'
+
+# Take a screenshot with scrot
+bindsym Print exec scrot -b ~/Pictures/Screenshots/%Y-%m-%d-%T.png 
+bindsym --release Shift+Print exec scrot -s ~/Pictures/Screenshots/%Y-%m-%d-%T-region.png 
+
 #=======================================================================
-# Startup software
+#                            Startup software
 #=======================================================================
 
 # screenlayout created w/ arandr
 exec_always --no-startup-id ~/.screenlayout/atUH.sh 
+
 # backgrounds for two monitors
-exec_always --no-startup-id nitrogen --restore
-# audio
-exec --no-startup-id pulseaudio --start
-# alternative keyboard layout
-exec_always --no-startup-id xbindkeys
-# media key volume change notification
-exec --no-startup-id volnoti
-#background image
-exec_always --no-startup-id feh --bg-scale ~/Desktop/background.jpg 
-# battery indicator
-exec --no-startup-id cbatticon 
-# composite manager for fade
-exec --no-startup-id compton -cbfD 5 
-# NetworkManager applet
-exec --no-startup-id nm-applet
-# file syncing
+exec_always --no-startup-id nitrogen --restore 
+
+exec --no-startup-id pulseaudio --start  # audio
+exec_always --no-startup-id xbindkeys    # alternative keyboard layout
+exec --no-startup-id volnoti             # volume change notification
+exec --no-startup-id cbatticon           # battery indicator
+exec --no-startup-id compton -cbfD 5     # composite manager
+exec --no-startup-id nm-applet           # NetworkManager applet
 exec --no-startup-id dropbox
-# don't sleep when playing youtube
-exec --no-startup-id caffeine
-# timetracker
-exec --no-startup-id toggl
+exec --no-startup-id caffeine            # don't sleep when playing youtube
+exec --no-startup-id toggl               # timetracker
+
+# app launcher, launch w/ Control-space
+exec --no-startup-id synapse
+
 # f.lux or redshift reduces eye strain at night
 #exec --no-startup-id xflux -l 52.1 -g 5.12 
 # default is 3000-4000 during night, 5500-6500 during the day.
@@ -277,30 +304,13 @@ exec --no-startup-id toggl
 #exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2500
 # Hawai'i
 exec --no-startup-id redshift-gtk -l 21.3:-157.8211567 -m randr -t 5500:2500
-# fancy app launcher, launch w/ Control-space
-exec --no-startup-id synapse
 
 #=======================================================================
-# Specific software combo's
-#=======================================================================
-     
-bindsym $mod+c exec chromium 
-bindsym $mod+x exec nautilus          # Gnome Files
-bindsym $mod+m exec emacsclient -c 
-
-# Take a screenshot with scrot
-bindsym Print exec scrot -b ~/Pictures/Screenshots/%Y-%m-%d-%T.png 
-bindsym --release Shift+Print exec scrot -s ~/Pictures/Screenshots/%Y-%m-%d-%T-region.png 
-
-#=======================================================================
-# Mouse integration
+#                             Mouse integration
 #=======================================================================
 
 # Hide the mouse when it's not moving
 exec --no-startup-id unclutter
-
-# Mouse + mod to drag floating window
-floating_modifier $mod
 
 # Mod + rmb over titlebar toggles floating mode
 bindsym $mod+button3 floating toggle

@@ -49,7 +49,7 @@ COMPLETION_WAITING_DOTS="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(git emacs emacsclient archlinux)
 
 # User configuration
 
@@ -62,16 +62,16 @@ source $ZSH/oh-my-zsh.sh
 export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-    export EDITOR='vim'
-else
-    export EDITOR='emacsclient -t'
-    export SUDO_EDITOR='emacsclient -c -a emacs'
-    export VISUAL='emacsclient -c -a emacs'
+#if [[ -n $SSH_CONNECTION ]]; then
+    #export EDITOR='vim'
+#else
+    #export EDITOR='emacsclient -t'
+    #export SUDO_EDITOR='emacsclient -c -a emacs'
+    #export VISUAL='emacsclient -c -a emacs'
     export WINEPREFIX=$HOME/.win32
     export WINARCH=win32
     # export PATH=$PATH/.cabal/bin
-fi
+#fi
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -88,7 +88,7 @@ fi
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-alias em='emacsclient -c -a emacs'
-alias emt='emacsclient -t'
+#alias em='emacsclient -c -a emacs'
+#alias emt='emacsclient -t'
 alias R='R --quiet'
 alias sudo='sudo ' # allow root to use the other aliases
