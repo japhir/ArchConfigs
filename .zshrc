@@ -1,3 +1,6 @@
+# moo!
+fortune showerthoughts | cowthink
+
 # Path to your oh-my-zsh installation.
 export ZSH=/home/japhir/.oh-my-zsh
 
