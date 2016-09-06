@@ -132,9 +132,16 @@ set $workspace4 "4: "
 set $workspace5 "5: "
 set $workspace6 "6: "
 set $workspace7 "7: "
-set $workspace8 "8: "
+set $workspace8 "8: "
 set $workspace9 "9: "
 set $workspace10 "10: "
+# assign workspaces to screens
+workspace $workspace1 output LVDS1
+workspace $workspace9 output LVDS1
+workspace $workspace10 output LVDS1
+workspace $workspace2 output VGA1
+workspace $workspace3 output VGA1
+workspace $workspace4 output VGA1
 
 # switch to workspace
 bindsym $mod+1 workspace $workspace1
@@ -233,6 +240,7 @@ assign [class="Mendeleydesktop.x86_64"] $workspace4
 assign [class="^Google Play Music Desktop Player$"] $workspace10
 # assign [class="Spotify"] $workspace10 # doesn't work so workaround
 # for_window [class="Spotify"] move to workspace $workspace10
+assign [class="^VirtualBox$" title="^Win10"] $workspace8
 for_window [class="^chromium$" title="^Spotify| - Spotify$"] move to workspace $workspace10
 assign [class="R_x11"] $workspace9     # R graphics output
 
@@ -248,13 +256,15 @@ for_window [class="Emacs" title="Org-Capture"] floating enable sticky toggle
 for_window [window_role="bubble"] floating enable
 # file manager
 for_window [class="^Nautilus$"] floating enable
-for_window [class="^chromium$" title="^Spotify| - Spotify$"] border none
 for_window [class="^Toggl Desktop$" title="Toggl Desktop"] move to scratchpad
 
 ### borders ###
 
 # Mendeley splash screen
 for_window [class="Mendeleydesktop.x86_64" instance="mendeleydesktop.x86_64" title="mendeleydesktop.x86_64"] border none
+for_window [class="^chromium$" title="^Spotify| - Spotify$"] border none
+for_window [class="^Zathura$"] border none
+for_window [class="^VirtualBox$" title="^Win10"] border none
 # emacs
 for_window [class="^Emacs$"] border 1pixel
 # terminal
@@ -302,9 +312,9 @@ exec --no-startup-id synapse
 #exec --no-startup-id xflux -l 52.1 -g 5.12 
 # default is 3000-4000 during night, 5500-6500 during the day.
 # Netherlands
-#exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2500
+exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2500
 # Hawai'i
-exec --no-startup-id redshift-gtk -l 21.3:-157.8211567 -m randr -t 5500:2500
+# exec --no-startup-id redshift-gtk -l 21.3:-157.8211567 -m randr -t 5500:2500
 
 #=======================================================================
 #                             Mouse integration
