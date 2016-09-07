@@ -135,6 +135,7 @@ set $workspace7 "7: "
 set $workspace8 "8: "
 set $workspace9 "9: "
 set $workspace10 "10: "
+
 # assign workspaces to screens
 workspace $workspace1 output LVDS1
 workspace $workspace9 output LVDS1
@@ -282,15 +283,15 @@ bindsym $mod+m exec emacsclient -c
 bindsym $mod+z exec emacsclient -d $DISPLAY -e '(my-org-capture-other-frame)'
 
 # Take a screenshot with scrot
-bindsym Print exec scrot -b ~/Pictures/Screenshots/%Y-%m-%d-%T.png 
-bindsym --release Shift+Print exec scrot -s ~/Pictures/Screenshots/%Y-%m-%d-%T-region.png 
+bindsym Print exec scrot -b /mtn/HDD/Pictures/Screenshots/%Y-%m-%d-%T.png 
+bindsym --release Shift+Print exec scrot -s /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T-region.png 
 
 #=======================================================================
 #                            Startup software
 #=======================================================================
 
 # screenlayout created w/ arandr
-exec_always --no-startup-id ~/.screenlayout/atUH.sh 
+exec_always --no-startup-id ~/.screenlayout/desktop2screens.sh 
 
 # backgrounds for two monitors
 exec_always --no-startup-id nitrogen --restore 
@@ -298,9 +299,9 @@ exec_always --no-startup-id nitrogen --restore
 exec --no-startup-id pulseaudio --start  # audio
 exec_always --no-startup-id xbindkeys    # alternative keyboard layout
 exec --no-startup-id volnoti             # volume change notification
-exec --no-startup-id cbatticon           # battery indicator
+# exec --no-startup-id cbatticon           # battery indicator
 exec --no-startup-id compton -cbfD 5     # composite manager
-exec --no-startup-id nm-applet           # NetworkManager applet
+# exec --no-startup-id nm-applet           # NetworkManager applet
 exec --no-startup-id dropbox
 exec --no-startup-id caffeine            # don't sleep when playing youtube
 exec --no-startup-id toggl               # timetracker
@@ -313,8 +314,6 @@ exec --no-startup-id synapse
 # default is 3000-4000 during night, 5500-6500 during the day.
 # Netherlands
 exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2500
-# Hawai'i
-# exec --no-startup-id redshift-gtk -l 21.3:-157.8211567 -m randr -t 5500:2500
 
 #=======================================================================
 #                             Mouse integration
