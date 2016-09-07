@@ -233,7 +233,7 @@ for_window [class="^chromium$" window_role="browser"] border 1pixel
 # Bubble windows (chrome notifications) are always floating
 for_window [window_role="bubble"] floating enable
 
-# hangouts chrome plugin windows need zome extra love
+# hangouts chrome plugin windows need some extra love
 #for_window [class="chromium" instance="crx_nckgahadagoaajjgafhacjanaoiihapd"] floating enable border none
 
 # my main musciplayer cantata (yay I finally found one that is satisfactory!)
