@@ -137,12 +137,12 @@ set $workspace9 "9: "
 set $workspace10 "10: "
 
 # assign workspaces to screens
-workspace $workspace1 output LVDS1
-workspace $workspace9 output LVDS1
-workspace $workspace10 output LVDS1
-workspace $workspace2 output VGA1
-workspace $workspace3 output VGA1
-workspace $workspace4 output VGA1
+workspace $workspace1 output DVI-I-1
+workspace $workspace9 output DVI-I-1
+workspace $workspace10 output DVI-I-1
+workspace $workspace2 output DVI-I-2
+workspace $workspace3 output DVI-I-2
+workspace $workspace4 output DVI-I-2
 
 # switch to workspace
 bindsym $mod+1 workspace $workspace1
@@ -257,7 +257,6 @@ for_window [class="Emacs" title="Org-Capture"] floating enable sticky toggle
 for_window [window_role="bubble"] floating enable
 # file manager
 for_window [class="^Nautilus$"] floating enable
-for_window [class="^Toggl Desktop$" title="Toggl Desktop"] move to scratchpad
 
 ### borders ###
 
@@ -272,6 +271,8 @@ for_window [class="^Emacs$"] border 1pixel
 for_window [class="URxvt"] border 1pixel 
 # chromium 
 for_window [class="^chromium$" window_role="browser"] border 1pixel
+# toggl
+for_window [class="^Toggl Desktop$" title="Toggl Desktop"] move to scratchpad border 1pixel resize set 480 700
 
 ### Specific software launching keybindings ###
 
