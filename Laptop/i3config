@@ -290,7 +290,7 @@ bindsym --release Shift+Print exec scrot -s ~/Pictures/Screenshots/%Y-%m-%d-%T-r
 #=======================================================================
 
 # screenlayout created w/ arandr
-exec_always --no-startup-id ~/.screenlayout/atUH.sh 
+exec_always --no-startup-id ~/.screenlayout/atUU.sh 
 
 # backgrounds for two monitors
 exec_always --no-startup-id nitrogen --restore 
