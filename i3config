@@ -238,13 +238,13 @@ bindsym $mod+b bar mode toggle
 ### move programs to specific workspaces ###
 
 assign [class="Mendeleydesktop.x86_64"] $workspace4  
-assign [class="^Google Play Music Desktop Player$"] $workspace10
-assign [class="^Kodi$"] $workdpace7
-# assign [class="Spotify"] $workspace10 # doesn't work so workaround
-# for_window [class="Spotify"] move to workspace $workspace10
+assign [class="^Kodi$"] $workspace7
 assign [class="^VirtualBox$" title="^Win10"] $workspace8
-for_window [class="^chromium$" title="^Spotify| - Spotify$"] move to workspace $workspace10
 assign [class="R_x11"] $workspace9     # R graphics output
+assign [class="^Google Play Music Desktop Player$"] $workspace10
+# for_window [class="Spotify"] move to workspace $workspace10
+# assign [class="Spotify"] $workspace10 # doesn't work so workaround
+for_window [class="^chromium$" title="^Spotify| - Spotify$"] move to workspace $workspace10
 
 ### make programs floating ###
 
