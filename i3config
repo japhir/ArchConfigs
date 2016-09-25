@@ -131,7 +131,7 @@ set $workspace3 "3: "
 set $workspace4 "4: "
 set $workspace5 "5: "
 set $workspace6 "6: "
-set $workspace7 "7: "
+set $workspace7 "7: "
 set $workspace8 "8: "
 set $workspace9 "9: "
 set $workspace10 "10: "
@@ -239,6 +239,7 @@ bindsym $mod+b bar mode toggle
 
 assign [class="Mendeleydesktop.x86_64"] $workspace4  
 assign [class="^Google Play Music Desktop Player$"] $workspace10
+assign [class="^Kodi$"] $workdpace7
 # assign [class="Spotify"] $workspace10 # doesn't work so workaround
 # for_window [class="Spotify"] move to workspace $workspace10
 assign [class="^VirtualBox$" title="^Win10"] $workspace8
