@@ -143,6 +143,7 @@ workspace $workspace10 output DVI-I-1
 workspace $workspace2 output DVI-I-2
 workspace $workspace3 output DVI-I-2
 workspace $workspace4 output DVI-I-2
+workspace $workspace7 output DVI-I-2
 
 # switch to workspace
 bindsym $mod+1 workspace $workspace1
@@ -266,6 +267,7 @@ for_window [class="Mendeleydesktop.x86_64" instance="mendeleydesktop.x86_64" tit
 for_window [class="^chromium$" title="^Spotify| - Spotify$"] border none
 for_window [class="^Zathura$"] border none
 for_window [class="^VirtualBox$" title="^Win10"] border none
+for_window [class="^Kodi$"] fullscreen enable 
 # emacs
 for_window [class="^Emacs$"] border 1pixel
 # terminal
