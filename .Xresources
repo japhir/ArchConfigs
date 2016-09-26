@@ -1,8 +1,8 @@
 ! Based almost entirely on http://tutos.readthedocs.org/en/latest/source/Arch.html
 !Turn off the annoying beeps
-URxvt.urgentOnBell: False
+! URxvt.urgentOnBell: False
 !urxvt
-URxvt*geometry:		115x40
+! URxvt*geometry:		115x40
 !URxvt*font: xft:Liberation Mono:pixelsize=14:antialias=false:hinting=true
 URxvt*font:  		xft:Source Code Pro:size=12:antialias=true:hinting=true, -*-unifont-*-*-*-*-*-*-*-*-*-*-*-*
 URxvt*boldFont:		xft:Source Code Pro:bold:size=11:antialias=true:hinting=true
@@ -12,7 +12,7 @@ URxvt*depth:            24
 URxvt*borderless: 	1
 URxvt*scrollBar:        false
 URxvt*saveLines:  	2000
-URxvt.transparent:      true
+! URxvt.transparent:      true
 URxvt*.shading: 	10
 
 ! Meta modifier for keybindings 
@@ -36,32 +36,128 @@ URxvt.keysym.Shift-Control-C: perl:clipboard:copy
 URxvt.iso14755:    false
 URxvt.iso14755_52: false
 
-!urxvt color scheme:
-URxvt*background: #2B2B2B
-URxvt*foreground: #DEDEDE
-URxvt*colorUL:    #86a2b0
+!-------------------------------------------------------------------------------
+! Xft settings
+!-------------------------------------------------------------------------------
 
-! black
-URxvt*color0  : #2E3436
-URxvt*color8  : #555753
-! red
-URxvt*color1  : #CC0000
-URxvt*color9  : #EF2929
-! green
-URxvt*color2  : #4E9A06
-URxvt*color10 : #8AE234
-! yellow
-URxvt*color3  : #C4A000
-URxvt*color11 : #FCE94F
-! blue
-URxvt*color4  : #3465A4
-URxvt*color12 : #729FCF
-! magenta
-URxvt*color5  : #75507B
-URxvt*color13 : #AD7FA8
-! cyan
-URxvt*color6  : #06989A
-URxvt*color14 : #34E2E2
-! white
-URxvt*color7  : #D3D7CF
-URxvt*color15 : #EEEEEC
+Xft.dpi:                    96
+Xft.antialias:              false
+Xft.rgba:                   rgb
+Xft.hinting:                true
+Xft.hintstyle:              hintslight
+
+!-------------------------------------------------------------------------------
+! URxvt settings
+! Colours lifted from Solarized (http://ethanschoonover.com/solarized)
+! More info at:
+! http://pod.tst.eu/http://cvs.schmorp.de/rxvt-unicode/doc/rxvt.1.pod
+!-------------------------------------------------------------------------------
+
+URxvt.depth:                32
+URxvt.geometry:             90x30
+URxvt.transparent:          false
+URxvt.fading:               0
+URxvt.urgentOnBell:         true
+URxvt.visualBell:           true
+URxvt.loginShell:           true
+! URxvt.saveLines:            50
+URxvt.internalBorder:       3
+URxvt.lineSpace:            0
+
+! Fonts
+! URxvt.allow_bold:           false
+! /* URxvt.font:                 -*-terminus-medium-r-normal-*-12-120-72-72-c-60-iso8859-1 */
+! URxvt*font: xft:Monospace:pixelsize=14
+! URxvt*boldFont: xft:Monospace:pixelsize=14
+
+! Fix font space
+! URxvt*letterSpace: -1
+
+! Scrollbar
+! URxvt.scrollStyle:          rxvt
+! URxvt.scrollBar:            false
+
+! Perl extensions
+URxvt.perl-ext-common:      default,matcher
+URxvt.matcher.button:       1
+URxvt.url-Launcher:         chromium
+
+! Cursor
+URxvt.cursorBlink:          true
+URxvt.cursorColor:          #657b83
+URxvt.cursorUnderline:      false
+
+! Pointer
+URxvt.pointerBlank:         true
+
+!!Source http://github.com/altercation/solarized
+
+*background: #002b36
+! *foreground: #657b83
+*foreground: #839496
+!!*fading: 40
+*fadeColor: #002b36
+*cursorColor: #93a1a1
+*pointerColorBackground: #586e75
+*pointerColorForeground: #93a1a1
+
+!! black dark/light
+*color0: #073642
+*color8: #002b36
+
+!! red dark/light
+*color1: #dc322f
+*color9: #cb4b16
+
+!! green dark/light
+*color2: #859900
+*color10: #586e75
+
+!! yellow dark/light
+*color3: #b58900
+*color11: #657b83
+
+!! blue dark/light
+*color4: #268bd2
+*color12: #839496
+
+!! magenta dark/light
+*color5: #d33682
+*color13: #6c71c4
+
+!! cyan dark/light
+*color6: #2aa198
+*color14: #93a1a1
+
+!! white dark/light
+*color7: #eee8d5
+*color15: #fdf6e3
+
+! URxvt*background: #2B2B2B
+! URxvt*foreground: #DEDEDE
+! URxvt*colorUL:    #86a2b0
+
+! ! black
+! URxvt*color0  : #2E3436
+! URxvt*color8  : #555753
+! ! red
+! URxvt*color1  : #CC0000
+! URxvt*color9  : #EF2929
+! ! green
+! URxvt*color2  : #4E9A06
+! URxvt*color10 : #8AE234
+! ! yellow
+! URxvt*color3  : #C4A000
+! URxvt*color11 : #FCE94F
+! ! blue
+! URxvt*color4  : #3465A4
+! URxvt*color12 : #729FCF
+! ! magenta
+! URxvt*color5  : #75507B
+! URxvt*color13 : #AD7FA8
+! ! cyan
+! URxvt*color6  : #06989A
+! URxvt*color14 : #34E2E2
+! ! white
+! URxvt*color7  : #D3D7CF
+! URxvt*color15 : #EEEEEC

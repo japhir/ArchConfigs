@@ -8,7 +8,9 @@ export ZSH=/home/japhir/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="robbyrussell"
+# ZSH_THEME="robbyrussell"
+ZSH_THEME="agnoster"
+DEFAULT_USER="japhir"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
