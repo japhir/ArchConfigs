@@ -1,0 +1,615 @@
+* use-package
+  Use-package is an amazing resource to clean up my init file and have it play
+  nice on both my desktop and laptop.
+#+begin_src emacs-lisp
+;; require
+(eval-when-compile
+  (require 'use-package)) 
+(require 'diminish)  ; to omit lines from the mode-line
+(require 'bind-key)  ; for easy keybindings
+#+end_src
+* Interface and appearance
+** fortune cookies
+*** COMMENT in the frame title
+    currently commented out, I prefer scratch
+#+begin_src emacs-lisp
+(setf frame-title-format
+      (with-temp-buffer
+        (call-process "fortune" nil t)
+        (setf (point) (point-min))
+        (while (re-search-forward "[ \n\t]+" nil t)
+          (replace-match " " nil t))
+        (buffer-string)))
+#+end_src
+*** COMMENT in the scratch buffer 
+also commented out, I can see them in my terminal if desired
+#+begin_src emacs-lisp
+(setq initial-scratch-message 
+      (format 
+       ";; %s\n\n" 
+       (replace-regexp-in-string  
+        "\n" "\n;; " ; comment each line
+        (replace-regexp-in-string 
+         "\n$" ""    ; remove trailing linebreak
+         (shell-command-to-string "cowthink $(fortune showerthoughts)")))))
+#+end_src
+** turn off UI elements and small tweaks
+#+begin_src emacs-lisp
+(setq inhibit-splash-screen t) 
+(scroll-bar-mode -1)   ; turn off the scroll bar
+(tool-bar-mode -1)     ; turn off the tool bar
+(menu-bar-mode -1)     ; turn off the menu
+(setq-default fill-column 80)
+(defalias 'yes-or-no-p 'y-or-n-p)
+;(setq mouse-wheel-progressive-speed nil) ; disable scroll acceleration
+#+end_src
+** play nice with parentheses
+#+begin_src emacs-lisp
+(electric-pair-mode 1) ; auto-insert matching bracket
+(show-paren-mode 1)    ; turn on paren match highlighting
+#+end_src
+** rainbow-delimiters
+   matching parenthesis are highlighted with rainbow colours.
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :config
+    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+    (add-hook 'LaTeX-mode-hook 'rainbow-delimiters-mode))
+#+end_src
+** telephone-line
+   very nice powerline-based status line
+#+begin_src emacs-lisp
+(use-package telephone-line
+  :ensure t
+  :config
+  (setq telephone-line-lhs     ; left hand side
+  	'((evil   .  (telephone-line-evil-tag-segment))
+  	  (accent .  (telephone-line-vc-segment
+  		      telephone-line-erc-modified-channels-segment
+  		      telephone-line-process-segment))
+  	  (nil    .  (telephone-line-misc-info-segment
+  		      telephone-line-buffer-segment))))
+  (setq telephone-line-rhs     ; right hand side
+  	'((nil    . (telephone-line-misc-info-segment))
+  	  (accent . (telephone-line-major-mode-segment))
+  	  (evil   . (telephone-line-airline-position-segment))))
+  (telephone-line-mode t))
+#+end_src
+** set the theme
+#+begin_src emacs-lisp
+(use-package leuven-theme
+  :init
+  (load-theme 'leuven t))
+#+end_src
+** default font
+#+begin_src emacs-lisp
+  (set-face-attribute 'default nil
+                      :family "Source Code Pro" :height 130)
+#+end_src
+** beacon
+   Highlight the current line when scrolling
+#+begin_src emacs-lisp
+(use-package beacon
+  :ensure t
+  :init (beacon-mode 1)
+  :diminish beacon-mode
+  :config 
+  (setq beacon-size 80)
+  (setq beacon-color "#ffcccc"))
+#+end_src
+* evil
+** evil
+   vim emulator
+#+begin_src emacs-lisp
+(use-package evil
+  :ensure t
+  :config
+  (evil-mode 1)
+  :bind (:map evil-normal-state-map
+	      ("C-h" . evil-window-left)
+	      ("C-j" . evil-window-down)
+	      ("C-k" . evil-window-up)
+	      ("C-l" . evil-window-right)))
+#+end_src
+** evil-org
+   evil keymap for org-mode
+#+begin_src emacs-lisp
+(use-package evil-org
+  :ensure t
+  :config 
+  (evil-define-key 'normal evil-org-mode-map
+      "J" nil  ; disable J and O
+      "O" nil) 
+  :diminish evil-org-mode)
+#+end_src
+** COMMENT undo tree
+#+begin_src emacs-lisp
+(use-package undo-tree
+   :ensure t
+   :config (global-undo-tree-mode)
+   :diminish undo-tree-mode)
+#+end_src
+** evil-escape
+   escape from everything using =jk=
+#+begin_src emacs-lisp
+(use-package evil-escape
+  :ensure t
+  :diminish evil-escape-mode
+  :config
+  (evil-escape-mode 1)
+  (setq-default evil-escape-key-sequence "jk"))
+#+end_src
+** evil-nerd-commenter
+   easy comments in a lot of code formats. Keys are configured in [[evil-leader]].
+#+begin_src emacs-lisp
+(use-package evil-nerd-commenter
+  :ensure t)
+#+end_src
+** evil-leader
+#+begin_src emacs-lisp
+  (use-package evil-leader  ; default is \
+    :ensure t
+    :config
+    (global-evil-leader-mode)
+    (evil-leader/set-key
+      "i" 'evilnc-comment-or-uncomment-lines
+      "l" 'evilnc-quick-comment-or-uncomment-to-the-line
+      "c" 'evilnc-copy-and-comment-lines
+      "p" 'evilnc-comment-or-uncomment-paragraphs
+      "r" 'comment-or-uncomment-region
+      "v" 'evilnc-toggle-invert-comment-line-by-line
+      "\\" 'evilnc-comment-operator ; if you prefer backslash key
+      ))
+#+end_src
+** evil-magit
+   evil keybindings for magit
+#+begin_src emacs-lisp
+(use-package evil-magit
+  :ensure t)
+#+end_src
+* GTD 
+  Getting Things Done with emacs!
+** my gtd and inbox files finding functions
+#+begin_src emacs-lisp
+(defvar org-gtd-file "/mnt/HDD/Dropbox/Apps/orgzly/todo.org")
+(defvar org-in-file "/mnt/HDD/Dropbox/Apps/orgzly/inbox.org")
+;; this function opens my todo-file
+(defun open-gtd-file ()
+  "Open the GTD file"
+  (interactive)
+  (find-file org-gtd-file))
+(defun open-inbox-file ()
+  "Open the inbox file"
+  (interactive)
+  (find-file org-in-file))
+(define-key global-map "\C-cg" 'open-gtd-file)
+(define-key global-map "\C-ci" 'open-inbox-file)
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(define-key global-map "\C-cc" 'org-capture)
+#+end_src
+** org
+   note-taking, todo system, calendar, everything
+#+begin_src emacs-lisp
+  (use-package org
+    :ensure t
+    :config
+    (setq org-highlight-latex-and-related '(latex script entities))  
+    ;; org settings for my todo system
+    (setq org-agenda-files (list "/mnt/HDD/Dropbox/Apps/orgzly/inbox.org"
+                                 "/mnt/HDD/Dropbox/Apps/orgzly/todo.org"
+                                 "/mnt/HDD/Dropbox/MinorRP/LOSCAR/report/report.org"  ; temp
+                                 "/mnt/HDD/Dropbox/Apps/orgzly/calendars/IljaKocken.org"
+                                 "/mnt/HDD/Dropbox/Apps/orgzly/calendars/marinesciences.org"
+                                 "/mnt/HDD/Dropbox/Apps/orgzly/calendars/assistant.org"
+                                 "/mnt/HDD/Dropbox/Apps/orgzly/calendars/ubv.org"
+                                 "/mnt/HDD/Dropbox/Apps/orgzly/calendars/options.org"))
+    ;; refiling settings
+    (setq org-refile-targets '((nil :maxlevel . 9)
+                               (org-agenda-files :maxlevel . 9)))
+    (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
+    (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
+    ;; swyper makes refiling amazing!
+    ;; capture templates, could use some more work!
+    (setq org-capture-templates
+          '(("t" "Todo" entry (file "/mnt/HDD/Dropbox/Apps/orgzly/inbox.org")
+             "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a")
+            ("j" "Journal" entry (file+datetree "/mnt/HDD/Dropbox/Apps/orgzly/journal.org")
+             "* %?\nEntered on %U\n %i\n %a")))
+    ;; the todo-states of my gtd-system
+    (setq org-todo-keywords 
+          '((sequence "NEXT(n!/!)" "TODO(t!/!)" "WAITING(w!/!)" "SCHEDULED(a!/!)" "SOMEDAY(s!/!)" "|" 
+                      "DONE(d)" "CANCELLED(c!/!)")))
+    ;; add effort estimate standards
+    (add-to-list 'org-global-properties
+                 '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
+    ;; prettify the todo keywords
+    (setq org-todo-keyword-faces
+          '(("NEXT"      . (:foreground "light yellow" :background "red" :weight bold))
+            ("WAITING"   . (:background "yellow"))
+            ("SCHEDULED" . (:background "light slate blue"))
+            ("SOMEDAY"   . (:background "deep sky blue"))
+            ("DONE"      . (:foreground "green4"       :background "pale green"))
+            ("CANCELLED" . (:foreground "dim gray"     :background "gray"))))
+    ;; view tasks by context (sorted by todo state)
+    (setq org-agenda-custom-commands
+          '(("g" . "GTD contexts")
+            ("gh" "Home" tags-todo "@home"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("gu" "University" tags-todo "@uni"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("gw" "Write" tags-todo "@write"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("gr" "Read" tags-todo "@read"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("ge" "Errands" tags-todo "@errands"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("gl" "Laboratory" tags-todo "@lab"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("gc" "Computer" tags-todo "@computer"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("gi" "Internet" tags-todo "@internet"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("gm" "Email" tags-todo "@email"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("gb" "Call" tags-todo "@call"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("ga" "Agenda" tags-todo "@agenda"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ;; the following are all avaialable through C-a t r [x]
+            ;;("n" todo "NEXT" nil)   
+            ;;("c" todo "SCHEDULED" nil)
+            ;;("w" todo "WAITING" nil)
+            ;;("s" todo "SOMEDAY" nil)
+            ;; view agenda + next actions, sorted by category
+            ("d" "Agenda + Next actions" ((agenda) (todo "NEXT")))
+            ("w" "Work" tags-todo "Work" 
+             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("p" "Personal" tags-todo "Personal"
+             ((org-agenda-sorting-strategy '(todo-state-up))))))
+    ;; set up the context tags
+    (setq org-tag-alist '((:startgroup . nil)
+                          ("@home" . ?h)
+                          ("@uni" . ?u)
+                          ("@errands" . ?e)
+                          ("@lab" . ?l)    
+                          (:endgroup . nil)
+                          (:startgroup . nil)
+                          ("@read" . ?r)
+                          ("@write" . ?w)
+                          (:endgroup . nil)
+                          (:startgroup . nil)
+                          ("@R" . ?R)
+                          ("@computer" . ?c)
+                          ("@internet" . ?i)
+                          ("@email" . ?m)
+                          ("@call" . ?b) 
+                          ("@agenda" . ?a)
+                          (:endgroup . nil)
+                          (:startgroup . nil) 
+                          ("Work" . ?W)
+                          ("Personal" . ?P)
+                          (:endgroup . nil)))
+    ;; extra org settings
+    (setq org-return-follows-link t)
+    (setq org-hide-leading-stars t)
+    (setf org-special-ctrl-a/e t)
+    (setq org-fontify-emphasized-text t) 
+    (setq org-fast-tag-selection-single-key t)
+    (setq org-fontify-done-headline t)
+    (setq org-directory "/mnt/HDD/Dropbox/Apps/orgzly/")
+    ;(setq org-adapt-indentation t) ; makes todo contents indent at headline level
+    (setq org-agenda-prefix-format "  %-17:c%?-12t% s") 
+    (setq org-agenda-include-all-todo nil)
+    (setq org-log-done 'time)
+    (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
+    (setq org-deadline-warning-days 14)
+    (setf org-tags-column -65)
+    (setf org-highlight-latex-and-related '(latex script entities))
+    (setq org-latex-default-figure-position 'htbp)
+    (setq org-export-with-section-numbers nil)
+    (setq org-export-with-toc nil)
+    (setq org-latex-pdf-process
+          (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -f -pdf %f"))
+          ;; '("latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -pdf -f %f"))
+         ;; (quote ("texi2dvi -p -b -V %f")))
+          ;; '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -biber -f %f"))
+          ;'("latexmk -pdflatex='lualatex -shell-escape -interaction nonstopmode' -pdf -f  %f"))
+    (setq org-fontifywhole-heading-line t)
+    ;; allow for j/k movement in agenda view
+    (add-hook 'org-agenda-mode-hook
+              (lambda ()
+                (define-key org-agenda-mode-map "j" 'evil-next-line)
+                (define-key org-agenda-mode-map "k" 'evil-previous-line)))
+    (add-to-list 'org-file-apps '("\\.pdf" . "zathura %s")))
+#+end_src
+** org \latex entities
+   Disable the =\ang= entity in org-mode so that I can use siunit's =\ang= instead.
+#+begin_src emacs-lisp
+(with-eval-after-load 'org-entities
+  (setq org-entities
+        (cl-remove-if (lambda (x) (and (listp x) (equal (car x) "ang"))) org-entities)))
+#+end_src
+** org-capture
+   capture from anywhere! hotkey defined in window manager (i3).
+   from [[https://lists.gnu.org/archive/html/emacs-orgmode/2011-05/msg00076.html][here]]
+#+begin_src emacs-lisp
+(defun my-org-capture-other-frame ()
+  "Create a new frame and run org-capture."
+  (interactive)
+  (make-frame '((name . "Org-Capture")
+                (width  .  70)
+                (height .  20)
+                (menu-bar-lines . 0)
+                (tool-bar-lines . 0)
+                (auto-lower . nil)
+                (auto-raise . t)))
+  (select-frame-by-name "Org-Capture")
+  (if (condition-case nil
+          (progn (org-capture) t)
+        (error nil))
+      (delete-other-windows)
+    (my-org-capture-other-frame-cleanup)))
+
+(defun my-org-capture-other-frame-cleanup ()
+  "Close the Org-Capture frame."
+  (if (equal "Org-Capture" (frame-parameter nil 'name))
+      (delete-frame)))
+(add-hook 'org-capture-after-finalize-hook 'my-org-capture-other-frame-cleanup)
+#+end_src
+** org-bullets
+   prettify org mode
+#+begin_src emacs-lisp
+(use-package org-bullets
+  :ensure t
+  :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  :config
+  (setq org-bullets-bullet-list
+	'("◉" "◎" "⚫" "○" "►" "◇")))
+#+end_src
+* general packages and functions
+** easy symbol insertion
+   By default C-x 8 o = ° and C-x 8 m = µ. So:
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-x 8 a") (lambda () (interactive) (insert "α")))
+(global-set-key (kbd "C-x 8 b") (lambda () (interactive) (insert "β")))
+(global-set-key (kbd "C-x 8 d") (lambda () (interactive) (insert "δ")))
+#+end_src
+** revert buffer
+#+begin_src emacs-lisp
+(global-set-key (kbd "<f5>") 'revert-buffer)
+#+end_src
+** eshell
+*** open an eshell here
+#+begin_src emacs-lisp
+(defun eshell-here ()
+  "Opens up a new shell in the directory associated with the
+current buffer's file. The eshell is renamed to match that
+directory to make multiple eshell windows easier."
+  (interactive)
+  (let* ((parent (if (buffer-file-name)
+                     (file-name-directory (buffer-file-name))
+                   default-directory))
+         (height (/ (window-total-height) 3))
+         (name   (car (last (split-string parent "/" t)))))
+    (split-window-vertically (- height))
+    (other-window 1)
+    (eshell "new")
+    (rename-buffer (concat "*eshell: " name "*"))
+
+    (insert (concat "ls"))
+    (eshell-send-input)))
+(global-set-key (kbd "C-!") 'eshell-here)
+#+end_src
+*** close current eshell
+#+begin_src emacs-lisp
+(defun eshell/x ()
+  (insert "exit")
+  (eshell-send-input)
+  (delete-window))
+#+end_src
+*** C-l clears the eshell buffer
+ #+begin_src emacs-lisp
+ (defun eshell-clear-buffer ()
+   "Clear terminal"
+   (interactive)
+   (let ((inhibit-read-only t))
+     (erase-buffer)
+     (eshell-send-input)))
+ (add-hook 'eshell-mode-hook
+	   '(lambda()
+	      (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
+ #+end_src
+** swiper
+very nice search replacement
+#+begin_src emacs-lisp
+(use-package swiper
+  :init (ivy-mode 1)
+  :diminish ivy-mode
+  :ensure t
+  :config
+  (setq ivy-use-virtual-buffers t)
+  (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+  :bind
+  ("\C-s" . swiper)
+  ("C-c C-r" . ivy-resume)
+  ("<f6>" . ivy-resume)
+  ("M-x" . counsel-M-x)
+  ("C-x C-f" . counsel-find-file)
+  ("<f1> f" . counsel-describe-function)
+  ("<f1> v" . counsel-describe-variable)
+  ("<f1> l" . counsel-load-library)
+  ("<f2> i" . counsel-info-lookup-symbol)
+  ("<f2> u" . counsel-unicode-char)
+  ;;("C-c g" . counsel-git) ;; conflicts with my view gtd file command
+  ("C-c j" . counsel-git-grep)
+  ("C-c k" . counsel-ag)
+  ("C-c u" . swiper-all)
+  ("C-c v" . ivy-push-view)
+  ("C-c V" . ivy-pop-view)
+  ("C-x l" . counsel-locate))
+  ;;("C-S-o" . counsel-rhythmbox))
+#+end_src
+** COMMENT ace-window
+   Move to other buffers
+#+BEGIN_SRC emacs-lisp
+  (use-package ace-window
+    :ensure t
+    :init
+    (global-set-key [remap other-window] 'ace-window)
+    (custom-set-faces
+     '(aw-leading-char-face
+       ((t (:inherit ace-jump-face-foreground :height 2.0))))))
+#+END_SRC
+** counsel
+   Required for swiper
+#+begin_src emacs-lisp
+(use-package counsel
+  :ensure t)
+#+end_src
+** COMMENT avy
+   jump to next chararcter. Slightly redundant b/c of evil's =f= and =t=.
+#+begin_src emacs-lisp
+(use-package avy
+  :ensure t
+  :bind ("M-s" . avy-goto-char))
+#+end_src
+** magit
+   git management
+#+begin_src emacs-lisp
+(use-package magit
+  :ensure t
+  :bind
+  ("M-g" . magit-status))
+#+end_src
+** auto-complete
+   auto complete everything
+#+begin_src emacs-lisp
+(use-package auto-complete
+  :ensure t
+  :diminish auto-complete-mode
+  :init
+  (ac-config-default)
+  (global-auto-complete-mode t))
+#+end_src
+** file extension modes
+#+BEGIN_SRC emacs-lisp
+  (defvar auto-mode-alist-init
+    auto-mode-alist "emacs default value for `auto-mode-alist'.")
+  (setq auto-mode-alist
+        (append '(
+                  ("i3config" . conf-mode)
+                  ("i3status" . conf-mode)
+                  ("\\.inp\\'" . conf-mode)
+                  )
+                auto-mode-alist-init))
+#+END_SRC
+* Science packages
+** ess
+   emacs speaks statistics, work with R etc.
+#+begin_src emacs-lisp
+(use-package ess 
+  :ensure t
+  ; :config (setq ess-default-style 'RStudio)
+  :commands R)
+#+end_src
+** rainbow-mode
+   Highlight hex colours!
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-mode
+    :ensure t)
+#+END_SRC
+** polymode
+   for orking with .Rmd files etc. 
+#+begin_src emacs-lisp
+(use-package polymode
+  :ensure t
+  :mode
+    ;; MARKDOWN
+    ("\\.md" . poly-markdown-mode)
+    ;; R modes
+    ("\\.Snw" . poly-noweb+r-mode)
+    ("\\.Rnw" . poly-noweb+r-mode)
+    ("\\.Rmd" . poly-markdown+r-mode))
+#+end_src
+** matlab
+   if I'm ever required to work in non-open-source 
+#+begin_src emacs-lisp
+(use-package matlab
+  :init (autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
+  :mode ("\\.m\\'" . matlab-mode)
+  :interpreter "matlab"
+  :config
+  (setq matlab-indent-function t)
+  (setq matlab-indent-function "matlab"))
+#+end_src
+** markdown-mode
+   markdown mode for writing 
+#+begin_src emacs-lisp
+(use-package markdown-mode
+  :ensure t)
+#+end_src
+** COMMENT pandoc-mode
+   exporting markdown
+#+begin_src emacs-lisp
+(use-package pandoc-mode
+  :defer 
+  :init (add-hook 'markdown-mode-hook 'pandoc-mode))
+#+end_src
+
+** tex 
+   for working with \LaTeX
+#+begin_src emacs-lisp
+(use-package tex
+  :defer 
+  :config
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq-default TeX-master nil))
+#+end_src
+** bibtex/ivy-bibtex
+   reference manager
+   I use it in conjunction with mendeley, which generates the .bib files.
+#+begin_src emacs-lisp
+  (use-package ivy-bibtex
+    :ensure t
+    :config
+    (autoload 'ivy-bibtex "ivy-bibtex" "" t)
+    (setq bibtex-completion-bibliography '("/home/japhir/Documents/References/MajorResearchProject.bib" 
+                                           "/home/japhir/Documents/References/MinorResearchProject.bib")
+          bibtex-completion-library-path '("/mnt/HDD/Dropbox/MRP/References")
+          bibtex-completion-pdf-field "file"
+          bibtex-completion-notes-path "/mnt/HDD/Dropbox/Apps/orgzly/referencenotes.org"
+          ;; open bibtex links with zathura
+          bibtex-completion-pdf-open-function
+          (lambda (fpath)
+            (call-process "zathura" nil 0 nil fpath))
+                                          ;(setq bibtex-completion-browser-function 'browser-url-chromium)
+                                          ;(setq bibtex-completion-format-citation-functions
+                                          ;      '((org-mode      . bibtex-completion-format-citation-cite)
+                                          ;        (latex-mode    . bibtex-completion-format-citation-cite)
+                                          ;        (markdown-mode . bibtex-completion-format-citation-pandoc-citeproc)
+                                          ;        (default       . bibtex-completion-format-citation-default)))
+                                          ;(setq bibtex-completion-cite-default-command "citep")
+          ;; no before or after promts
+          bibtex-completion-cite-prompt-for-optional-arguments nil))
+#+end_src
+** ox-extra
+org-export ignore headlines with ~:ignore:~ tag
+#+BEGIN_SRC emacs-lisp
+(require 'ox-extra)
+(ox-extras-activate '(latex-header-blocks ignore-headlines))
+#+END_SRC
+** org-ref
+#+BEGIN_SRC emacs-lisp
+  (use-package org-ref
+    :init
+    (setq org-ref-completion-library 'org-ref-ivy-cite)
+    :ensure t
+    :config
+    (setq org-ref-open-pdf-function 'org-ref-get-mendeley-filename
+          org-ref-bibliography-notes "/mnt/HDD/Dropbox/Apps/orgzly/referencenotes.org"
+          org-ref-default-bibliography '("/home/japhir/Documents/References/MajorResearchProject.bib" 
+                                         "/home/japhir/Documents/References/MinorResearchProject.bib")))
+#+END_SRC
