@@ -488,7 +488,8 @@ very nice search replacement
         (use-package golden-ratio
           :ensure t
 	  :config 
-	  (golden-ratio-mode 1))
+	  (golden-ratio-mode 1)
+	  (setq golden-ratio-auto-scale t))
    #+END_SRC
 ** file extension modes
 #+BEGIN_SRC emacs-lisp
