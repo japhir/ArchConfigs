@@ -483,6 +483,13 @@ very nice search replacement
   (ac-config-default)
   (global-auto-complete-mode t))
 #+end_src
+** golden-ratio
+   #+BEGIN_SRC emacs-lisp
+        (use-package golden-ratio
+          :ensure t
+	  :config 
+	  (golden-ratio-mode 1))
+   #+END_SRC
 ** file extension modes
 #+BEGIN_SRC emacs-lisp
   (defvar auto-mode-alist-init
