@@ -1,3 +1,10 @@
+* local directories
+  These are all the settings that require directories, such as my org agenda
+  files etc. They require different setup between desktop and laptop and are
+  thus moved to these separate files which are symlinked to the below directory.
+#+BEGIN_SRC emacs-lisp
+  (load "~/.emacs.d/emacsdirs.el" t)
+#+END_SRC
 * use-package
   Use-package is an amazing resource to clean up my init file and have it play
   nice on both my desktop and laptop.
@@ -172,8 +179,6 @@ also commented out, I can see them in my terminal if desired
   Getting Things Done with emacs!
 ** my gtd and inbox files finding functions
 #+begin_src emacs-lisp
-(defvar org-gtd-file "/mnt/HDD/Dropbox/Apps/orgzly/todo.org")
-(defvar org-in-file "/mnt/HDD/Dropbox/Apps/orgzly/inbox.org")
 ;; this function opens my todo-file
 (defun open-gtd-file ()
   "Open the GTD file"
@@ -196,27 +201,12 @@ also commented out, I can see them in my terminal if desired
     :ensure t
     :config
     (setq org-highlight-latex-and-related '(latex script entities))  
-    ;; org settings for my todo system
-    (setq org-agenda-files (list "/mnt/HDD/Dropbox/Apps/orgzly/inbox.org"
-                                 "/mnt/HDD/Dropbox/Apps/orgzly/todo.org"
-                                 "/mnt/HDD/Dropbox/MinorRP/LOSCAR/report/report.org"  ; temp
-                                 "/mnt/HDD/Dropbox/Apps/orgzly/calendars/IljaKocken.org"
-                                 "/mnt/HDD/Dropbox/Apps/orgzly/calendars/marinesciences.org"
-                                 "/mnt/HDD/Dropbox/Apps/orgzly/calendars/assistant.org"
-                                 "/mnt/HDD/Dropbox/Apps/orgzly/calendars/ubv.org"
-                                 "/mnt/HDD/Dropbox/Apps/orgzly/calendars/options.org"))
     ;; refiling settings
     (setq org-refile-targets '((nil :maxlevel . 9)
                                (org-agenda-files :maxlevel . 9)))
     (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
     (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
     ;; swyper makes refiling amazing!
-    ;; capture templates, could use some more work!
-    (setq org-capture-templates
-          '(("t" "Todo" entry (file "/mnt/HDD/Dropbox/Apps/orgzly/inbox.org")
-             "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a")
-            ("j" "Journal" entry (file+datetree "/mnt/HDD/Dropbox/Apps/orgzly/journal.org")
-             "* %?\nEntered on %U\n %i\n %a")))
     ;; the todo-states of my gtd-system
     (setq org-todo-keywords 
           '((sequence "NEXT(n!/!)" "TODO(t!/!)" "WAITING(w!/!)" "SCHEDULED(a!/!)" "SOMEDAY(s!/!)" "|" 
@@ -298,7 +288,6 @@ also commented out, I can see them in my terminal if desired
     (setq org-fontify-emphasized-text t) 
     (setq org-fast-tag-selection-single-key t)
     (setq org-fontify-done-headline t)
-    (setq org-directory "/mnt/HDD/Dropbox/Apps/orgzly/")
     ;(setq org-adapt-indentation t) ; makes todo contents indent at headline level
     (setq org-agenda-prefix-format "  %-17:c%?-12t% s") 
     (setq org-agenda-include-all-todo nil)
@@ -576,24 +565,20 @@ very nice search replacement
     :ensure t
     :config
     (autoload 'ivy-bibtex "ivy-bibtex" "" t)
-    (setq bibtex-completion-bibliography '("/home/japhir/Documents/References/MajorResearchProject.bib" 
-                                           "/home/japhir/Documents/References/MinorResearchProject.bib")
-          bibtex-completion-library-path '("/mnt/HDD/Dropbox/MRP/References")
-          bibtex-completion-pdf-field "file"
-          bibtex-completion-notes-path "/mnt/HDD/Dropbox/Apps/orgzly/referencenotes.org"
+    (setq bibtex-completion-pdf-field "file"
           ;; open bibtex links with zathura
           bibtex-completion-pdf-open-function
           (lambda (fpath)
             (call-process "zathura" nil 0 nil fpath))
-                                          ;(setq bibtex-completion-browser-function 'browser-url-chromium)
-                                          ;(setq bibtex-completion-format-citation-functions
-                                          ;      '((org-mode      . bibtex-completion-format-citation-cite)
-                                          ;        (latex-mode    . bibtex-completion-format-citation-cite)
-                                          ;        (markdown-mode . bibtex-completion-format-citation-pandoc-citeproc)
-                                          ;        (default       . bibtex-completion-format-citation-default)))
-                                          ;(setq bibtex-completion-cite-default-command "citep")
-          ;; no before or after promts
-          bibtex-completion-cite-prompt-for-optional-arguments nil))
+            ;;(setq bibtex-completion-browser-function 'browser-url-chromium)
+            ;;(setq bibtex-completion-format-citation-functions
+            ;;      '((org-mode      . bibtex-completion-format-citation-cite)
+            ;;        (latex-mode    . bibtex-completion-format-citation-cite)
+            ;;        (markdown-mode . bibtex-completion-format-citation-pandoc-citeproc)
+            ;;        (default       . bibtex-completion-format-citation-default)))
+            ;;(setq bibtex-completion-cite-default-command "citep")
+            ;; no before or after promts
+            bibtex-completion-cite-prompt-for-optional-arguments nil))
 #+end_src
 ** ox-extra
 org-export ignore headlines with ~:ignore:~ tag
@@ -608,8 +593,5 @@ org-export ignore headlines with ~:ignore:~ tag
     (setq org-ref-completion-library 'org-ref-ivy-cite)
     :ensure t
     :config
-    (setq org-ref-open-pdf-function 'org-ref-get-mendeley-filename
-          org-ref-bibliography-notes "/mnt/HDD/Dropbox/Apps/orgzly/referencenotes.org"
-          org-ref-default-bibliography '("/home/japhir/Documents/References/MajorResearchProject.bib" 
-                                         "/home/japhir/Documents/References/MinorResearchProject.bib")))
+    (setq org-ref-open-pdf-function 'org-ref-get-mendeley-filename))
 #+END_SRC
