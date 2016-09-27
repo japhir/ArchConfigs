@@ -158,6 +158,7 @@ also commented out, I can see them in my terminal if desired
   (use-package evil-leader  ; default is \
     :ensure t
     :config
+    (evil-leader/set-leader "<SPC>")
     (global-evil-leader-mode)
     (evil-leader/set-key
       "i" 'evilnc-comment-or-uncomment-lines
