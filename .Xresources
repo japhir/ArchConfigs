@@ -4,8 +4,9 @@
 !urxvt
 ! URxvt*geometry:		115x40
 !URxvt*font: xft:Liberation Mono:pixelsize=14:antialias=false:hinting=true
-URxvt*font:  		xft:Source Code Pro:size=12:antialias=true:hinting=true, -*-unifont-*-*-*-*-*-*-*-*-*-*-*-*
-URxvt*boldFont:		xft:Source Code Pro:bold:size=11:antialias=true:hinting=true
+! URxvt*font:  		xft:Source Code Pro:size=12:antialias=true:hinting=true, -*-unifont-*-*-*-*-*-*-*-*-*-*-*-*
+URxvt*font:  		xft:Source\ Code\ Pro\ Medium:pixelsize=13:antialias=true:hinting=true,xft:Source\ Code\ Pro\ Medium:pixelsize=13:antialias=true,hinting=true
+! URxvt*boldFont:		xft:Source Code Pro:bold:size=11:antialias=true:hinting=true
 URxvt.letterSpace:      1
 !URxvt*boldFont: xft:Liberation Mono:bold:pixelsize=14:antialias=false:hinting=true
 URxvt*depth:            24
