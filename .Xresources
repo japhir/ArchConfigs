@@ -5,7 +5,9 @@
 ! URxvt*geometry:		115x40
 !URxvt*font: xft:Liberation Mono:pixelsize=14:antialias=false:hinting=true
 ! URxvt*font:  		xft:Source Code Pro:size=12:antialias=true:hinting=true, -*-unifont-*-*-*-*-*-*-*-*-*-*-*-*
-URxvt*font:  		xft:Source\ Code\ Pro\ Medium:pixelsize=13:antialias=true:hinting=true,xft:Source\ Code\ Pro\ Medium:pixelsize=13:antialias=true,hinting=true
+URxvt*font:  		xft:Source\ Code\ Pro\ Medium:pixelsize=13:antialias=true:hinting=true,\
+			xft:Source\ Code\ Pro\ Medium:pixelsize=13:antialias=true,hinting=true,\
+			-*-unifont-*-*-*-*-*-*-*-*-*-*-*-*
 ! URxvt*boldFont:		xft:Source Code Pro:bold:size=11:antialias=true:hinting=true
 URxvt.letterSpace:      1
 !URxvt*boldFont: xft:Liberation Mono:bold:pixelsize=14:antialias=false:hinting=true
@@ -133,32 +135,3 @@ URxvt.pointerBlank:         true
 !! white dark/light
 *color7: #eee8d5
 *color15: #fdf6e3
-
-! URxvt*background: #2B2B2B
-! URxvt*foreground: #DEDEDE
-! URxvt*colorUL:    #86a2b0
-
-! ! black
-! URxvt*color0  : #2E3436
-! URxvt*color8  : #555753
-! ! red
-! URxvt*color1  : #CC0000
-! URxvt*color9  : #EF2929
-! ! green
-! URxvt*color2  : #4E9A06
-! URxvt*color10 : #8AE234
-! ! yellow
-! URxvt*color3  : #C4A000
-! URxvt*color11 : #FCE94F
-! ! blue
-! URxvt*color4  : #3465A4
-! URxvt*color12 : #729FCF
-! ! magenta
-! URxvt*color5  : #75507B
-! URxvt*color13 : #AD7FA8
-! ! cyan
-! URxvt*color6  : #06989A
-! URxvt*color14 : #34E2E2
-! ! white
-! URxvt*color7  : #D3D7CF
-! URxvt*color15 : #EEEEEC
