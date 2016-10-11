@@ -19,7 +19,7 @@ floating_modifier $mod
 bindsym $mod+Return exec i3-sensible-terminal
 
 # smart dmenu
-bindsym $mod+d exec i3-dmenu-desktop 
+bindsym $mod+d exec dmenu_run
 
 #=======================================================================
 #                          Window management

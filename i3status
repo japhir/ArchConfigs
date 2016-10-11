@@ -23,7 +23,7 @@ ethernet _first_ {
 }
 
 tztime local {
-       	min_width = 1500
+       	min_width = 1490
         format = "%Y-%m-%d %H:%M:%S"
 	align = "center"
 }
