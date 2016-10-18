@@ -1,23 +1,3 @@
-! Based almost entirely on http://tutos.readthedocs.org/en/latest/source/Arch.html
-!Turn off the annoying beeps
-! URxvt.urgentOnBell: False
-!urxvt
-! URxvt*geometry:		115x40
-!URxvt*font: xft:Liberation Mono:pixelsize=14:antialias=false:hinting=true
-! URxvt*font:  		xft:Source Code Pro:size=12:antialias=true:hinting=true, -*-unifont-*-*-*-*-*-*-*-*-*-*-*-*
-URxvt*font:  		xft:Source\ Code\ Pro\ Medium:pixelsize=13:antialias=true:hinting=true,\
-			xft:Source\ Code\ Pro\ Medium:pixelsize=13:antialias=true,hinting=true,\
-			-*-unifont-*-*-*-*-*-*-*-*-*-*-*-*
-! URxvt*boldFont:		xft:Source Code Pro:bold:size=11:antialias=true:hinting=true
-URxvt.letterSpace:      1
-!URxvt*boldFont: xft:Liberation Mono:bold:pixelsize=14:antialias=false:hinting=true
-URxvt*depth:            24
-URxvt*borderless: 	1
-URxvt*scrollBar:        false
-URxvt*saveLines:  	2000
-! URxvt.transparent:      true
-URxvt*.shading: 	10
-
 ! Meta modifier for keybindings 
 URxvt.modifier: super
 
@@ -25,29 +5,29 @@ URxvt.modifier: super
 URxvt.perl-ext:		default,url-select,clipboard
 
 ! url-select (part of urxvt-perls package)
-URxvt.keysym.M-u:       perl:url-select:select_next
+URxvt.keysym.M-u:           perl:url-select:select_next
 URxvt.url-select.autocopy:  true
 URxvt.url-select.button:    2
 URxvt.url-select.launcher:  chromium
 URxvt.url-select.underline: true
 
-! Nastavuje kopirovani
+! Copy and paste
 URxvt.keysym.Shift-Control-V: perl:clipboard:paste
 URxvt.keysym.Shift-Control-C: perl:clipboard:copy
 
 ! disable the stupid ctrl+shift 'feature'
-URxvt.iso14755:    false
-URxvt.iso14755_52: false
+URxvt.iso14755:         false
+URxvt.iso14755_52:      false
 
 !-------------------------------------------------------------------------------
 ! Xft settings
 !-------------------------------------------------------------------------------
 
-Xft.dpi:                    96
-Xft.antialias:              true
-Xft.rgba:                   rgb
-Xft.hinting:                true
-Xft.hintstyle:              hintslight
+Xft.dpi:                96
+Xft.antialias:          true
+Xft.rgba:               rgb
+Xft.hinting:            true
+Xft.hintstyle:          hintslight
 
 !-------------------------------------------------------------------------------
 ! URxvt settings
@@ -56,42 +36,43 @@ Xft.hintstyle:              hintslight
 ! http://pod.tst.eu/http://cvs.schmorp.de/rxvt-unicode/doc/rxvt.1.pod
 !-------------------------------------------------------------------------------
 
-URxvt.depth:                32
-URxvt.geometry:             90x30
-URxvt.transparent:          false
-URxvt.fading:               0
-URxvt.urgentOnBell:         true
-URxvt.visualBell:           true
-URxvt.loginShell:           true
-! URxvt.saveLines:            50
-URxvt.internalBorder:       3
-URxvt.lineSpace:            0
+URxvt.depth:            32
+URxvt.geometry:         90x30
+URxvt.transparent:      true
+URxvt.fading:           0
+URxvt*.shading: 	10
+URxvt.urgentOnBell:     true
+URxvt.visualBell:       true
+URxvt.loginShell:       true
+URxvt*saveLines:  	2000
+URxvt.internalBorder:   3
+URxvt.lineSpace:        0
+
+URxvt*depth:            24
+URxvt*borderless: 	1
+URxvt*scrollBar:        false
+
 
 ! Fonts
-! URxvt.allow_bold:           false
-! /* URxvt.font:                 -*-terminus-medium-r-normal-*-12-120-72-72-c-60-iso8859-1 */
-! URxvt*font: xft:Monospace:pixelsize=14
-! URxvt*boldFont: xft:Monospace:pixelsize=14
+! URxvt*font: xft:Terminus:pixelsize=12,xft:Terminess\ Powerline:pixelsize=12
+URxvt.font:             xft:Source Code Pro for Powerline-12:hinting=True;antialias:True,xft:WenQuanYi Bitmap Song-12:medium;antialias=False,xft:WenQuanYi Zen Hei-12:medium;antialias=True,xft:HanaMinA-12:medium;antialias:True,xft:HanaMinB-12:medium;antialias:True,xft:HanaMinPlus-12:medium;antialias:True
+URxvt.boldFont:         xft:Source Code Pro for Powerline-12:bold;hinting=True;antialias:True,xft:WenQuanYi Bitmap Song-12:bold;antialias=False,xft:WenQuanYi Zen Hei-12:bold;antialias=True,xft:HanaMinA-12:bold;antialias:True,xft:HanaMinB-12:bold;antialias:True,xft:HanaMinPlus-12:bold;antialias:True
 
-! Fix font space
-! URxvt*letterSpace: -1
-
-! Scrollbar
-! URxvt.scrollStyle:          rxvt
-! URxvt.scrollBar:            false
+URxvt.allow_bold:       true
+URxvt.letterSpace:	0
 
 ! Perl extensions
-URxvt.perl-ext-common:      default,matcher
-URxvt.matcher.button:       1
-URxvt.url-Launcher:         chromium
+URxvt.perl-ext-common:  default,matcher
+URxvt.matcher.button:   1
+URxvt.url-Launcher:     chromium
 
 ! Cursor
-URxvt.cursorBlink:          false
-URxvt.cursorColor:          #657b83
-URxvt.cursorUnderline:      false
+URxvt.cursorBlink:      false
+URxvt.cursorColor:      #657b83
+URxvt.cursorUnderline:  false
 
 ! Pointer
-URxvt.pointerBlank:         true
+URxvt.pointerBlank:     true
 
 !!Source http://github.com/altercation/solarized
 
