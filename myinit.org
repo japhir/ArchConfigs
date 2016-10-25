@@ -46,6 +46,7 @@ also commented out, I can see them in my terminal if desired
 (scroll-bar-mode -1)   ; turn off the scroll bar
 (tool-bar-mode -1)     ; turn off the tool bar
 (menu-bar-mode -1)     ; turn off the menu
+(setq visible-bell 1)        ; turn off beeps, make them flash!
 (setq-default fill-column 80)
 (defalias 'yes-or-no-p 'y-or-n-p)
 ;(setq mouse-wheel-progressive-speed nil) ; disable scroll acceleration
