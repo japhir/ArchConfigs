@@ -1,7 +1,7 @@
 clear lock
 clear control
 add control = Caps_Lock Control_L Control_R
-keycode 66 = Control_L Caps_Lock NoSymbol NoSymbol
+keycode 66 = Control_L NoSymbol NoSymbol NoSymbol
 keycode   8 =
 keycode   9 = Escape NoSymbol Escape NoSymbol Escape
 keycode  10 = 1 exclam 1 exclam onesuperior exclamdown onesuperior
