@@ -238,7 +238,7 @@ exec_always --no-startup-id $HOME/.config/lemonbuddy/launch.sh
 
 ### move programs to specific workspaces ###
 
-assign [class="Mendeleydesktop.x86_64"] $workspace4  
+assign [class="Mendeley Desktop"] $workspace4  
 assign [class="^Google Play Music Desktop Player$"] $workspace10
 # assign [class="Spotify"] $workspace10 # doesn't work so workaround
 # for_window [class="Spotify"] move to workspace $workspace10
@@ -263,7 +263,7 @@ for_window [class="^Toggl Desktop$" title="Toggl Desktop"] move to scratchpad
 ### borders ###
 
 # Mendeley splash screen
-for_window [class="Mendeleydesktop.x86_64" instance="mendeleydesktop.x86_64" title="mendeleydesktop.x86_64"] border none
+for_window [class="Mendeley Desktop" instance="mendeleydesktop.x86_64" title="mendeleydesktop.x86_64"] border none
 for_window [class="^Chromium$" title="^Spotify| - Spotify$"] border none
 for_window [class="^Zathura$"] border none
 for_window [class="^VirtualBox$" title="^Win10"] border none

@@ -241,7 +241,7 @@ exec_always --no-startup-id $HOME/.config/lemonbuddy/launch.sh
 
 ### move programs to specific workspaces ###
 
-assign [class="Mendeleydesktop.x86_64"] $workspace4  
+assign [class="Mendeley Desktop"] $workspace4  
 assign [class="^Kodi$"] $workspace7
 assign [class="^VirtualBox$" title="^Win10"] $workspace8
 assign [class="R_x11"] $workspace9     # R graphics output
@@ -266,7 +266,7 @@ for_window [class="^Nautilus$"] floating enable
 ### borders ###
 
 # Mendeley splash screen
-for_window [class="Mendeleydesktop.x86_64" instance="mendeleydesktop.x86_64" title="mendeleydesktop.x86_64"] border none
+for_window [class="Mendeley Desktop" instance="mendeleydesktop.x86_64" title="mendeleydesktop.x86_64"] border none
 for_window [class="^Chromium$" title="^Spotify| - Spotify$"] border none
 for_window [class="^Zathura$"] border none
 for_window [class="^VirtualBox$" title="^Win10"] border none
