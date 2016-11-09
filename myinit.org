@@ -42,14 +42,14 @@ also commented out, I can see them in my terminal if desired
 #+end_src
 ** turn off UI elements and small tweaks
 #+begin_src emacs-lisp
-(setq inhibit-splash-screen t) 
-(scroll-bar-mode -1)   ; turn off the scroll bar
-(tool-bar-mode -1)     ; turn off the tool bar
-(menu-bar-mode -1)     ; turn off the menu
-(setq visible-bell 1)        ; turn off beeps, make them flash!
-(setq-default fill-column 80)
-(defalias 'yes-or-no-p 'y-or-n-p)
-;(setq mouse-wheel-progressive-speed nil) ; disable scroll acceleration
+  (setq inhibit-splash-screen t) 
+  (scroll-bar-mode -1)   ; turn off the scroll bar
+  (tool-bar-mode -1)     ; turn off the tool bar
+  (menu-bar-mode -1)     ; turn off the menu
+  (setq visible-bell 1)        ; turn off beeps, make them flash!
+  (setq-default fill-column 80)
+  (defalias 'yes-or-no-p 'y-or-n-p)
+  ;(setq mouse-wheel-progressive-speed nil) ; disable scroll acceleration
 #+end_src
 ** play nice with parentheses
 #+begin_src emacs-lisp
@@ -141,12 +141,12 @@ also commented out, I can see them in my terminal if desired
 ** evil-escape
    escape from everything using =jk=
 #+begin_src emacs-lisp
-(use-package evil-escape
-  :ensure t
-  :diminish evil-escape-mode
-  :config
-  (evil-escape-mode 1)
-  (setq-default evil-escape-key-sequence "jk"))
+  (use-package evil-escape
+    :ensure t
+    :diminish evil-escape-mode
+    :config
+    (evil-escape-mode 1)
+    (setq-default evil-escape-key-sequence "jk"))
 #+end_src
 ** evil-nerd-commenter
    easy comments in a lot of code formats. Keys are configured in [[evil-leader]].
