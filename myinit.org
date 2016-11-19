@@ -105,6 +105,7 @@ also commented out, I can see them in my terminal if desired
   :config 
   (setq beacon-size 80)
   (setq beacon-color "#ffcccc"))
+(global-hl-line-mode t)
 #+end_src
 * evil
 ** evil
@@ -504,6 +505,24 @@ very nice search replacement
                   ("\\.inp\\'" . conf-mode)
                   )
                 auto-mode-alist-init))
+#+END_SRC
+** flycheck
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :init
+    (global-flycheck-mode t))
+#+END_SRC
+** yasnippet
+   usefull snippets for me: org-mode (fig_, )
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :init
+    (yas-global-mode 1))
+  (use-package r-autoyas
+    :init
+    (add-hook 'ess-mode-hook 'r-autoyas-ess-activate))
 #+END_SRC
 * Science packages
 ** ess
