@@ -232,8 +232,8 @@ font    pango: Roboto Bold, FontAwesome 8
 # # toggle the bar
 # bindsym $mod+b bar mode toggle
 
-# launch lemonbuddy bar
-exec_always --no-startup-id $HOME/.config/lemonbuddy/launch.sh
+# launch polybar
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 
 #=======================================================================
 #                      Specific program settings
