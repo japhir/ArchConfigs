@@ -520,9 +520,9 @@ very nice search replacement
     :ensure t
     :init
     (yas-global-mode 1))
-  (use-package r-autoyas
-    :init
-    (add-hook 'ess-mode-hook 'r-autoyas-ess-activate))
+  ;; (use-package r-autoyas
+    ;; :init
+    ;; (add-hook 'ess-mode-hook 'r-autoyas-ess-activate))
 #+END_SRC
 * Science packages
 ** ess
