@@ -232,8 +232,8 @@ font    pango: Roboto Bold, FontAwesome 8
 # # toggle the bar
 # bindsym $mod+b bar mode toggle
 
-# launch lemonbuddy bar
-exec_always --no-startup-id $HOME/.config/lemonbuddy/launch.sh
+# launch polybar
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 
 #=======================================================================
 #                      Specific program settings
@@ -311,7 +311,8 @@ exec --no-startup-id compton -bfCG --backend glx --paint-on-overlay --vsync open
 # exec --no-startup-id nm-applet           # NetworkManager applet
 exec --no-startup-id dropbox
 exec --no-startup-id caffeine            # don't sleep when playing youtube
-exec --no-startup-id toggl               # timetracker
+exec --no-startup-id toggl               # time tracker
+exec --no-startup-id rescuetime          # app tracker
 
 # app launcher, launch w/ Control-space
 exec --no-startup-id synapse
