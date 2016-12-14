@@ -228,7 +228,7 @@ client.placeholder       $blk    $mid    $wht
 #     status_command  i3status
 # }
 
-exec_always --no-startup-id $HOME/.config/lemonbuddy/launch.sh
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 
 # toggle the bar
 # bindsym $mod+b bar mode toggle
@@ -318,6 +318,9 @@ exec --no-startup-id synapse
 exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2500
 # Hawai'i
 # exec --no-startup-id redshift-gtk -l 21.3:-157.8211567 -m randr -t 5500:2500
+
+# activity tracker
+exec --no-startup-id rescuetime
 
 #=======================================================================
 #                             Mouse integration
