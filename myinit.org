@@ -212,11 +212,11 @@ also commented out, I can see them in my terminal if desired
     ;; swyper makes refiling amazing!
     ;; the todo-states of my gtd-system
     (setq org-todo-keywords 
-          '((sequence "NEXT(n!/!)" "TODO(t!/!)" "WAITING(w!/!)" "SCHEDULED(a!/!)" "SOMEDAY(s!/!)" "PROJECT(p!/!)" "|" 
-                      "DONE(d)" "CANCELLED(c!/!)")))
+          '((sequence "NEXT(n)" "TODO(t)" "WAITING(w!/!)" "SCHEDULED(a)" "SOMEDAY(s!/!)" "PROJECT(p)" "|" 
+                      "DONE(d)" "CANCELLED(c)")))
     ;; add effort estimate standards
     (add-to-list 'org-global-properties
-                 '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
+		 '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
     ;; prettify the todo keywords
     (setq org-todo-keyword-faces
           '(("NEXT"      . (:foreground "light goldenrod yellow" :background "red" :weight bold))
@@ -300,21 +300,23 @@ also commented out, I can see them in my terminal if desired
     (setq org-deadline-warning-days 14)
     (setf org-tags-column -65)
     (setf org-highlight-latex-and-related '(latex script entities))
+    (setq org-latex-create-formula-image-program 'imagemagick)
     (setq org-latex-default-figure-position 'htbp)
     (setq org-export-with-section-numbers nil)
     (setq org-export-with-toc nil)
+    (add-to-list 'org-latex-packages-alist '("version=4" "mhchem" t))
     (setq org-latex-pdf-process
           (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -f -pdf %f"))
           ;; '("latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -pdf -f %f"))
-         ;; (quote ("texi2dvi -p -b -V %f")))
+	 ;; (quote ("texi2dvi -p -b -V %f")))
           ;; '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -biber -f %f"))
           ;'("latexmk -pdflatex='lualatex -shell-escape -interaction nonstopmode' -pdf -f  %f"))
     (setq org-fontifywhole-heading-line t)
     ;; allow for j/k movement in agenda view
     (add-hook 'org-agenda-mode-hook
               (lambda ()
-                (define-key org-agenda-mode-map "j" 'evil-next-line)
-                (define-key org-agenda-mode-map "k" 'evil-previous-line)))
+		(define-key org-agenda-mode-map "j" 'evil-next-line)
+		(define-key org-agenda-mode-map "k" 'evil-previous-line)))
     (add-to-list 'org-file-apps '("\\.pdf" . "zathura %s")))
 #+end_src
 ** org \latex entities
