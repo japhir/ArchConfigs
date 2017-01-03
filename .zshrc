@@ -99,15 +99,15 @@ alias R='R --quiet'
 # alias sudo='sudo ' # allow root to use the other aliases
 
 # vi-mode cursor indicator
-echo -ne "\e[6 q"  # vertical bar
-zle-keymap-select () {
-    if [ "$TERM" = "rxvt-unicode-256color" ]; then
-        if [ $KEYMAP = vicmd ]; then
-            # the command mode for vi
-            echo -ne "\e[2 q"  # block
-        else
-            # the insert mode for vi
-            echo -ne "\e[6 q"  # bar
-        fi
-    fi
-}
+# echo -ne "\e[6 q"  # vertical bar
+# zle-keymap-select () {
+#     if [ "$TERM" = "rxvt-unicode-256color" ]; then
+#         if [ $KEYMAP = vicmd ]; then
+#             # the command mode for vi
+#             echo -ne "\e[2 q"  # block
+#         else
+#             # the insert mode for vi
+#             echo -ne "\e[6 q"  # bar
+#         fi
+#     fi
+# }
