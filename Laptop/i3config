@@ -259,7 +259,7 @@ for_window [class="Emacs" title="Org-Capture"] floating enable sticky toggle
 for_window [window_role="bubble"] floating enable
 # file manager
 for_window [class="^Nautilus$"] floating enable
-for_window [class="^Toggl Desktop$" title="Toggl Desktop"] move to scratchpad
+for_window [class="^Chromium$" title="^Toggl"] move to scratchpad
 
 ### borders ###
 
@@ -306,7 +306,8 @@ exec --no-startup-id compton -cbfD 5     # composite manager
 exec --no-startup-id nm-applet           # NetworkManager applet
 exec --no-startup-id dropbox
 exec --no-startup-id caffeine            # don't sleep when playing youtube
-exec --no-startup-id toggl               # timetracker
+exec --no-startup-id chromium --app=https://toggl.com/app/timer  # timetracker
+exec --no-startup-id chromium --app=https://play.spotify.com    # music player
 
 # app launcher, launch w/ Control-space
 exec --no-startup-id synapse
