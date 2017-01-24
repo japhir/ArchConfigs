@@ -21,7 +21,7 @@
     ("~/Dropbox/Apps/orgzly/lists.org" "~/Dropbox/MRP/Report/Report.org" "~/Dropbox/MinorRP/LOSCAR/report/report.org" "~/Dropbox/Apps/orgzly/inbox.org" "~/Dropbox/Apps/orgzly/todo.org")))
  '(package-selected-packages
    (quote
-    (ag 2048-game fontawesome latex-extra outline-magic golden-ratio writeroom-mode use-package telephone-line tangotango-theme rainbow-mode rainbow-delimiters powerline-evil polymode pandoc-mode org-ref org-plus-contrib org-pdfview org-pandoc org-gcal org-bullets markdown-mode ivy-bibtex evil-org evil-nerd-commenter evil-magit evil-escape ess dash-functional counsel beacon auto-complete))))
+    (haskell-mode column-marker r-autoyas ag 2048-game fontawesome latex-extra outline-magic golden-ratio writeroom-mode use-package telephone-line tangotango-theme rainbow-mode rainbow-delimiters powerline-evil polymode pandoc-mode org-ref org-plus-contrib org-pdfview org-pandoc org-gcal org-bullets markdown-mode ivy-bibtex evil-org evil-nerd-commenter evil-magit evil-escape ess dash-functional counsel beacon auto-complete))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

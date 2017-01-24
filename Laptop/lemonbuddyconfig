@@ -103,9 +103,10 @@ label-urgent-background = #F44336
 label-urgent-padding = 1
 
 label-visible = %index% %name%
-label-visible-foreground = #212121
+;; label-visible-foreground = #212121
+label-visible-background = #212121
 label-visible-padding = 1
-label-visible-underline = #424242
+label-visible-underline = #8b0000
 
 [module/date]
 type = internal/date
