@@ -31,8 +31,8 @@ padding-right = 2
 module-margin-left = 1
 module-margin-right = 2
 
-font-0 = Source\ Code\ Pro:size=10;1
-font-1 = FontAwesome:size=10;-2
+font-0 = Source\ Code\ Pro:size=12;1
+font-1 = FontAwesome:size=12;-1
 
 modules-left = i3
 modules-center = fuzzyclock
@@ -64,8 +64,8 @@ padding-right = 2
 module-margin-left = 1
 module-margin-right = 2
 
-font-0 = Source\ Code\ Pro:size=10;1
-font-1 = FontAwesome:size=10;-2
+font-0 = Source\ Code\ Pro:size=12;1
+font-1 = FontAwesome:size=12;-1
 
 modules-left = i3
 modules-center = fuzzyclock
