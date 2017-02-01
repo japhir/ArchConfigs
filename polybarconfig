@@ -13,11 +13,12 @@ monitor = DVI-I-2
 dock = false
 ; bottom = true
 width = 100%
-height = 20
+height = 17
 
 background = #212121
 foreground = #FFFFFF
 linecolor = #212121
+line-size = 2
 
 ; border-bottom = 3
 ; border-bottom-color = #000000
@@ -31,8 +32,8 @@ padding-right = 2
 module-margin-left = 1
 module-margin-right = 2
 
-font-0 = Source\ Code\ Pro:size=12;1
-font-1 = FontAwesome:size=12;-1
+font-0 = "Source Code Pro:size=8;1"
+font-1 = "FontAwesome:size=8;1"
 
 modules-left = i3
 modules-center = fuzzyclock
@@ -51,6 +52,7 @@ height = 17
 background = #212121
 foreground = #FFFFFF
 linecolor = #212121
+line-size = 2
 
 ; border-bottom = 3
 ; border-bottom-color = #000000
@@ -64,8 +66,8 @@ padding-right = 2
 module-margin-left = 1
 module-margin-right = 2
 
-font-0 = Source\ Code\ Pro:size=12;1
-font-1 = FontAwesome:size=12;-1
+font-0 = "Source Code Pro:size=8;1"
+font-1 = "FontAwesome:size=8;1"
 
 modules-left = i3
 modules-center = fuzzyclock
