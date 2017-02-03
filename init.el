@@ -20,7 +20,7 @@
  ;; If there is more than one, they won't work right.
  '(org-agenda-files
    (quote
-    ("/mnt/HDD/Dropbox/Apps/orgzly/todo.org" "/mnt/HDD/Dropbox/Apps/orgzly/inbox.org" "/mnt/HDD/Dropbox/MinorRP/LOSCAR/report/report.org" "/mnt/HDD/Dropbox/Apps/orgzly/calendars/IljaKocken.org" "/mnt/HDD/Dropbox/Apps/orgzly/calendars/marinesciences.org" "/mnt/HDD/Dropbox/Apps/orgzly/calendars/assistant.org" "/mnt/HDD/Dropbox/Apps/orgzly/calendars/ubv.org" "/mnt/HDD/Dropbox/Apps/orgzly/calendars/options.org")))
+    ("/mnt/HDD/Dropbox/Apps/orgzly/calendars/university.org" "/mnt/HDD/Dropbox/Apps/orgzly/calendars/sports.org" "/mnt/HDD/Dropbox/Apps/orgzly/calendars/societies.org" "/mnt/HDD/Dropbox/Apps/orgzly/calendars/options.org" "/mnt/HDD/Dropbox/Apps/orgzly/calendars/gcal.org" "/mnt/HDD/Dropbox/Apps/orgzly/todo.org" "/mnt/HDD/Dropbox/Apps/orgzly/inbox.org" "/mnt/HDD/Dropbox/MinorRP/LOSCAR/report/report.org")))
  '(package-selected-packages
    (quote
     (haskell-mode yasnippet flycheck fontawesome writeroom-mode use-package telephone-line tangotango-theme rainbow-mode rainbow-delimiters powerline-evil polymode pandoc-mode org-ref org-plus-contrib org-pdfview org-pandoc org-gcal org-bullets markdown-mode ivy-bibtex golden-ratio evil-org evil-nerd-commenter evil-magit evil-escape ess dash-functional counsel beacon auto-complete))))
