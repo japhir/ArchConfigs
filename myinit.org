@@ -181,6 +181,7 @@ also commented out, I can see them in my terminal if desired
 * GTD 
   Getting Things Done with emacs!
 ** my gtd and inbox files finding functions
+   org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 #+begin_src emacs-lisp
 ;; this function opens my todo-file
 (defun open-gtd-file ()
@@ -312,12 +313,21 @@ also commented out, I can see them in my terminal if desired
           ;; '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -biber -f %f"))
           ;'("latexmk -pdflatex='lualatex -shell-escape -interaction nonstopmode' -pdf -f  %f"))
     (setq org-fontifywhole-heading-line t)
+    (setq org-ellipsis "▼") ;▼ … ◦
     ;; allow for j/k movement in agenda view
     (add-hook 'org-agenda-mode-hook
               (lambda ()
 		(define-key org-agenda-mode-map "j" 'evil-next-line)
 		(define-key org-agenda-mode-map "k" 'evil-previous-line)))
     (add-to-list 'org-file-apps '("\\.pdf" . "zathura %s")))
+#+end_src
+** org-gcal
+#+begin_src emacs-lisp
+  (setq package-check-signature nil)
+  (use-package org-gcal
+    :ensure t) ; config in separate file for privacy
+  (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
+  ;; (add-hook 'org-capture-after-finalize-hook (lambda () (org-gcal-sync) ))
 #+end_src
 ** org \latex entities
    Disable the =\ang= entity in org-mode so that I can use siunit's =\ang= instead.
@@ -327,6 +337,16 @@ also commented out, I can see them in my terminal if desired
         (cl-remove-if (lambda (x) (and (listp x) (equal (car x) "ang"))) org-entities)))
 #+end_src
 ** org-capture
+   customize capture templates, variables are defined in a private file.
+#+begin_src emacs-lisp
+    (setq org-capture-templates
+	  '(("a" "Appointment" entry (file org-cal-file)
+	    "* %?\n\n%^T\n\n:PROPERTIES:\n\n:END:\n\n")
+	    ("t" "Todo" entry (file org-in-file)
+	     "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a")
+	    ("j" "Journal" entry (file+datetree org-journal-file)
+	    "* %?\nEntered on %U\n %i\n %a")))
+#+end_src
    capture from anywhere! hotkey defined in window manager (i3).
    from [[https://lists.gnu.org/archive/html/emacs-orgmode/2011-05/msg00076.html][here]]
 #+begin_src emacs-lisp
@@ -361,7 +381,7 @@ also commented out, I can see them in my terminal if desired
   :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   :config
   (setq org-bullets-bullet-list
-	'("◉" "◎" "⚫" "○" "►" "◇")))
+	'("◉" "●" "○" "♦" "◆" "►" "▸")))
 #+end_src
 * general packages and functions
 ** easy symbol insertion
