@@ -326,7 +326,7 @@ also commented out, I can see them in my terminal if desired
   (setq package-check-signature nil)
   (use-package org-gcal
     :ensure t) ; config in separate file for privacy
-  (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
+  ;; (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
   ;; (add-hook 'org-capture-after-finalize-hook (lambda () (org-gcal-sync) ))
 #+end_src
 ** org \latex entities
