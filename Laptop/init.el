@@ -18,7 +18,7 @@
    ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
  '(org-agenda-files
    (quote
-    ("~/Dropbox/PhD/clumpednotes.org" "~/Dropbox/Apps/orgzly/calendars/uu-periods.org" "~/Dropbox/Apps/orgzly/calendars/sports.org" "~/Dropbox/Apps/orgzly/calendars/options.org" "~/Dropbox/Apps/orgzly/calendars/university.org" "~/Dropbox/Apps/orgzly/calendars/gcal.org" "~/Dropbox/Apps/orgzly/calendars/societies.org" "~/Dropbox/Apps/orgzly/lists.org" "~/Dropbox/MRP/Report/Report.org" "~/Dropbox/MinorRP/LOSCAR/report/report.org" "~/Dropbox/Apps/orgzly/inbox.org" "~/Dropbox/Apps/orgzly/todo.org")))
+    ("~/Nextcloud/PhD/clumpednotes.org" "~/Dropbox/Apps/orgzly/calendars/uu-periods.org" "~/Dropbox/Apps/orgzly/calendars/sports.org" "~/Dropbox/Apps/orgzly/calendars/options.org" "~/Dropbox/Apps/orgzly/calendars/university.org" "~/Dropbox/Apps/orgzly/calendars/gcal.org" "~/Dropbox/Apps/orgzly/calendars/societies.org" "~/Dropbox/Apps/orgzly/lists.org" "~/Dropbox/MRP/Report/Report.org" "~/Dropbox/MinorRP/LOSCAR/report/report.org" "~/Dropbox/Apps/orgzly/inbox.org" "~/Dropbox/Apps/orgzly/todo.org")))
  '(package-selected-packages
    (quote
     (auctex-latexmk latex-math-preview latex-pretty-symbols latex-preview-pane haskell-mode column-marker r-autoyas ag 2048-game fontawesome latex-extra outline-magic golden-ratio writeroom-mode use-package telephone-line tangotango-theme rainbow-mode rainbow-delimiters powerline-evil polymode pandoc-mode org-ref org-plus-contrib org-pdfview org-pandoc org-bullets markdown-mode ivy-bibtex evil-org evil-nerd-commenter evil-magit evil-escape ess dash-functional counsel beacon auto-complete))))
