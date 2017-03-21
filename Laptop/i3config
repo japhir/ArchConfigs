@@ -131,13 +131,14 @@ set $workspace3 "3:"
 set $workspace4 "4:"
 set $workspace5 "5:"
 set $workspace6 "6:"
-set $workspace7 "7:"
+set $workspace7 "7:"
 set $workspace8 "8:"
 set $workspace9 "9:"
 set $workspace10 "10:"
 
 # assign workspaces to screens
 workspace $workspace1 output LVDS1
+workspace $workspace8 output LVDS1
 workspace $workspace9 output LVDS1
 workspace $workspace10 output LVDS1
 workspace $workspace2 output VGA1
@@ -240,12 +241,14 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 ### move programs to specific workspaces ###
 
 assign [class="Mendeley Desktop"] $workspace4  
+assign [class="^Chromium$" instance="solismail.uu.nl__owa"] $workspace7
+assign [class="^Wfica$"] $workspace8
+assign [class="^VirtualBox$" title="^Win10"] $workspace8
+assign [class="R_x11"] $workspace9     # R graphics output
 assign [class="^Google Play Music Desktop Player$"] $workspace10
 # assign [class="Spotify"] $workspace10 # doesn't work so workaround
 # for_window [class="Spotify"] move to workspace $workspace10
-assign [class="^VirtualBox$" title="^Win10"] $workspace8
 for_window [class="^Chromium$" title="^Spotify| - Spotify$"] move to workspace $workspace10
-assign [class="R_x11"] $workspace9     # R graphics output
 
 ### make programs floating ###
 
@@ -308,11 +311,13 @@ exec --no-startup-id nm-applet           # NetworkManager applet
 exec --no-startup-id dropbox		 # personal file sync
 exec --no-startup-id nextcloud           # uni file sync
 exec --no-startup-id caffeine            # don't sleep when playing youtube
-exec --no-startup-id chromium --app=https://toggl.com/app/timer  # timetracker
-exec --no-startup-id chromium --app=https://play.spotify.com    # music player
+# exec --no-startup-id chromium --app=https://toggl.com/app/timer  # timetracker
+exec --no-startup-id chromium --app=https://play.spotify.com     # music player
+exec --no-startup-id chromium --app=https://solismail.uu.nl/owa  # uu mail
 
 # app launcher, launch w/ Control-space
-exec --no-startup-id synapse
+# exec --no-startup-id synapse
+exec --no-startup-id gnome-pie
 
 # f.lux or redshift reduces eye strain at night
 #exec --no-startup-id xflux -l 52.1 -g 5.12 
