@@ -91,9 +91,6 @@ bindsym $mod+Shift+minus move scratchpad
 # cycle if there are multiple
 bindsym $mod+minus scratchpad show
 
-# make the currently focused window sticky
-bindsym $mod+Shift+s sticky toggle
-
 # resize window (you can also use the mouse)
 mode "resize" {
         # These bindings trigger as soon as you enter the resize mode
@@ -306,7 +303,6 @@ exec_always --no-startup-id ~/.screenlayout/desktop2screens.sh
 # backgrounds for two monitors
 exec_always --no-startup-id nitrogen --restore 
 
->>>>>>> 7ea04d75fb6731154af19ea72ddda1a0c21875ad
 exec --no-startup-id pulseaudio --start  # audio
 exec_always --no-startup-id xbindkeys    # alternative keyboard layout
 exec --no-startup-id volnoti             # volume change notification
