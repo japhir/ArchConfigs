@@ -1,0 +1,15 @@
+[Unit]
+Description=SurfDrive
+Requires=network.target
+After=network.target
+After=remote-fs.target
+
+[Mount]
+What="https://surfdrive.surf.nl/files/remote.php/nonshib-webdav/"
+Where="/home/japhir/SurfDrive"
+Type=davfs
+Options=uid=japhir,file_mode=600,dir_mode=700
+TimeoutSec=600
+
+[Install]
+WantedBy=multi-user.target

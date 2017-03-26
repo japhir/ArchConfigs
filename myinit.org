@@ -128,7 +128,7 @@ also commented out, I can see them in my terminal if desired
   :ensure t
   :config 
   (evil-define-key 'normal evil-org-mode-map
-      "J" nil  ; disable J and O
+      "J" nil  ; disable J and O b/c I use them evil-style
       "O" nil) 
   :diminish evil-org-mode)
 #+end_src
@@ -169,8 +169,18 @@ also commented out, I can see them in my terminal if desired
       "p" 'evilnc-comment-or-uncomment-paragraphs
       "r" 'comment-or-uncomment-region
       "v" 'evilnc-toggle-invert-comment-line-by-line
-      "\\" 'evilnc-comment-operator ; if you prefer backslash key
+      "."  'evilnc-copy-and-comment-operator
+      ;; "\\" 'evilnc-comment-operator ; if you prefer backslash key
       ))
+#+end_src
+** evil-leader
+   Keys are set in respective packages
+#+begin_src emacs-lisp
+  (use-package evil-leader  ; default is \
+    :ensure t
+    :config
+    (evil-leader/set-leader "<SPC>")
+    (global-evil-leader-mode))
 #+end_src
 ** evil-magit
    evil keybindings for magit
@@ -319,7 +329,7 @@ also commented out, I can see them in my terminal if desired
               (lambda ()
 		(define-key org-agenda-mode-map "j" 'evil-next-line)
 		(define-key org-agenda-mode-map "k" 'evil-previous-line)))
-    (add-to-list 'org-file-apps '("\\.pdf" . "zathura %s")))
+    (add-to-list 'org-file-apps '("\\.pdf" . "evince %s")))
 #+end_src
 ** org-gcal
 #+begin_src emacs-lisp
@@ -612,17 +622,17 @@ very nice search replacement
 #+end_src
 ** bibtex/ivy-bibtex
    reference manager
-   I use it in conjunction with mendeley, which generates the .bib files.
+   I use it in conjunction with mendeley, which generates the .bib files, and org-ref, to insert citations in org files.
 #+begin_src emacs-lisp
   (use-package ivy-bibtex
     :ensure t
     :config
     (autoload 'ivy-bibtex "ivy-bibtex" "" t)
     (setq bibtex-completion-pdf-field "file"
-          ;; open bibtex links with zathura
+          ;; open bibtex links with evince
           bibtex-completion-pdf-open-function
           (lambda (fpath)
-            (call-process "zathura" nil 0 nil fpath))
+            (call-process "evince" nil 0 nil fpath))
             ;;(setq bibtex-completion-browser-function 'browser-url-chromium)
             ;;(setq bibtex-completion-format-citation-functions
             ;;      '((org-mode      . bibtex-completion-format-citation-cite)
