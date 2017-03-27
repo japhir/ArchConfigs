@@ -239,7 +239,6 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 #=======================================================================
 
 ### move programs to specific workspaces ###
-
 assign [class="Mendeley Desktop"] $workspace4  
 assign [class="^Chromium$" instance="webmail.uu.nl__owa"] $workspace7
 assign [class="^Wfica$"] $workspace8
@@ -249,7 +248,6 @@ assign [class="^Google Play Music Desktop Player$"] $workspace10
 # assign [class="Spotify"] $workspace10 # doesn't work so workaround
 # for_window [class="Spotify"] move to workspace $workspace10
 for_window [class="^Chromium$" title="^Spotify| - Spotify$"] move to workspace $workspace10
-
 ### make programs floating ###
 
 # pop-up windows are always floating

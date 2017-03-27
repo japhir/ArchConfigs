@@ -98,6 +98,5 @@ fi
 #alias emt='emacsclient -t'
 alias R='R --quiet'
 # alias sudo='sudo ' # allow root to use the other aliases
-
 VIM_NORMAL_COLOR="\033]12;#d33682\007\033[2 q"
 VIM_INSERT_COLOR="\033]12;#657b83\007\033[6 q"

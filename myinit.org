@@ -150,14 +150,18 @@ also commented out, I can see them in my terminal if desired
     (setq-default evil-escape-key-sequence "jk"))
 #+end_src
 ** evil-nerd-commenter
-   easy comments in a lot of code formats.
+   easy comments in a lot of code formats. Keys are configured in [[evil-leader]].
 #+begin_src emacs-lisp
-  (use-package evil-nerd-commenter
+(use-package evil-nerd-commenter
+  :ensure t)
+#+end_src
+** evil-leader
+#+begin_src emacs-lisp
+  (use-package evil-leader  ; default is \
     :ensure t
     :config
-    (evil-leader/set-key-for-mode 'org-mode
-      "c" 'evilnc-copy-and-coment-lines
-      "l" 'evilnc-quick-comment-or-uncomment-to-the-line)
+    (evil-leader/set-leader "<SPC>")
+    (global-evil-leader-mode)
     (evil-leader/set-key
       "i" 'evilnc-comment-or-uncomment-lines
       "l" 'evilnc-quick-comment-or-uncomment-to-the-line
@@ -166,7 +170,7 @@ also commented out, I can see them in my terminal if desired
       "r" 'comment-or-uncomment-region
       "v" 'evilnc-toggle-invert-comment-line-by-line
       "."  'evilnc-copy-and-comment-operator
-	; "\\" 'evilnc-comment-operator ; if you prefer backslash key
+      ;; "\\" 'evilnc-comment-operator ; if you prefer backslash key
       ))
 #+end_src
 ** evil-leader
