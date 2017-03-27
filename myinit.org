@@ -466,7 +466,7 @@ very nice search replacement
     ("<f2> u" . counsel-unicode-char)
     ;;("C-c g" . counsel-git) ;; conflicts with my view gtd file command
     ;; ("C-c j" . counsel-git-grep)
-    ("C-c k" . counsel-ag)
+    ("C-c s" . counsel-ag) ; search
     ("C-c u" . swiper-all)
     ("C-c v" . ivy-push-view)
     ("C-c V" . ivy-pop-view)
@@ -606,16 +606,33 @@ very nice search replacement
   :init (add-hook 'markdown-mode-hook 'pandoc-mode))
 #+end_src
 
-** tex 
+** LaTeX (AUCTeX, RefTeX) 
    for working with \LaTeX
 #+begin_src emacs-lisp
-(use-package tex
-  :defer 
-  :config
-  (setq TeX-auto-save t)
-  (setq TeX-parse-self t)
-  (setq-default TeX-master nil))
+    (setq TeX-auto-save t)
+    (setq TeX-parse-self t)
+    (setq-default TeX-master nil)
+    (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+    (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
+    (add-hook 'LaTeX-mode-hook 'prettify-symbols-mode)
+    (setq reftex-plug-into-AUCTeX t)
 #+end_src
+** ispell: spell-checking
+#+begin_src emacs-lisp
+(require 'ispell)
+(setq ispell-dictionary "british-ise-w_accents")
+#+end_src
+** hl-todo
+#+BEGIN_SRC emacs-lisp
+  (use-package hl-todo
+  :ensure t
+  :bind (:map hl-todo-mode-map
+	      ("C-c k" . hl-todo-previous)
+	      ("C-c j" . hl-todo-next))
+  :init
+  (add-hook 'LaTeX-mode-hook 'hl-todo-mode)
+  (add-hook 'ess-mode-hook 'hl-todo-mode))
+#+END_SRC
 ** bibtex/ivy-bibtex
    reference manager
    I use it in conjunction with mendeley, which generates the .bib files, and org-ref, to insert citations in org files.
