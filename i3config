@@ -91,6 +91,9 @@ bindsym $mod+Shift+minus move scratchpad
 # cycle if there are multiple
 bindsym $mod+minus scratchpad show
 
+# make the currently focused window sticky
+bindsym $mod+Shift+s sticky toggle
+
 # resize window (you can also use the mouse)
 mode "resize" {
         # These bindings trigger as soon as you enter the resize mode
@@ -173,9 +176,12 @@ workspace_auto_back_and_forth yes
 #                       Reload/Exit/Lock
 #=======================================================================
 
-# make the currently focused window sticky
-bindsym $mod+Shift+s sticky toggle
-
+# reload the configuration file
+bindsym $mod+Shift+c reload
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+# exit i3 (logs you out of your X session)
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 # Lock the desktop
 bindsym $mod+Delete exec ~/ArchConfigs/launchi3lock.sh #&& sudo sh -c "echo mem > /sys/power/state
 
@@ -183,10 +189,10 @@ bindsym $mod+Delete exec ~/ArchConfigs/launchi3lock.sh #&& sudo sh -c "echo mem 
 #                                 i3bar
 #=======================================================================
 
-# # Set the font
-# font pango: Roboto Bold, FontAwe# some 10
+# Set the font
+font pango: Roboto Bold, FontAwesome 10
 
-# # Colors 
+# Colors 
 # first the main theme colors and the accent color are defined to reuse
 set $light #424242
 set $mid #303030
@@ -202,9 +208,9 @@ client.focused_inactive  $mid    $mid    #c4c4c4
 client.unfocused         $blk    $dark   #5e5e5e
 client.urgent            $acc    $acc    $wht    
 client.placeholder       $blk    $mid    $wht    
-font    pango: Roboto Bold, FontAwesome 8
-# # Start i3bar to display a workspace bar 
-# # (plus the system information i3status finds out, if available)
+
+# Start i3bar to display a workspace bar 
+# (plus the system information i3status finds out, if available)
 # bar {
 #     verbose yes
 #     colors {
@@ -277,14 +283,13 @@ for_window [class="^Emacs$"] border 1pixel
 for_window [class="URxvt"] border 1pixel 
 # chromium 
 for_window [class="^Chromium$" window_role="browser"] border 1pixel
-# toggl
-for_window [class="^Toggl Desktop$" title="Toggl Desktop"] move to scratchpad border 1pixel resize set 480 700
 
 ### Specific software launching keybindings ###
 
 bindsym $mod+c exec chromium 
 bindsym $mod+x exec nautilus 
 bindsym $mod+m exec emacsclient -c 
+# bindsym $mod+d exec chromium --app=https://calendar.google.com    
 
 # org-capture from anywhere, escape with q
 bindsym $mod+z exec emacsclient -d $DISPLAY -e '(my-org-capture-other-frame)'
@@ -311,12 +316,13 @@ exec --no-startup-id compton -bfCG --backend glx --paint-on-overlay --vsync open
 # exec --no-startup-id nm-applet           # NetworkManager applet
 exec --no-startup-id dropbox
 exec --no-startup-id caffeine            # don't sleep when playing youtube
-exec --no-startup-id toggl               # time tracker
-exec --no-startup-id rescuetime          # app tracker
+# exec --no-startup-id toggl               # time tracker
+# exec --no-startup-id rescuetime          # app tracker
 exec --no-startup-id xedgewarp -b        # let mouse shift between screens
 
 # app launcher, launch w/ Control-space
-exec --no-startup-id synapse
+# exec --no-startup-id synapse
+exec --no-startup-id gnome-pie
 
 # f.lux or redshift reduces eye strain at night
 #exec --no-startup-id xflux -l 52.1 -g 5.12 
