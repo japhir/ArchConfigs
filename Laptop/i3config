@@ -137,13 +137,13 @@ set $ws9 "9:"
 set $ws10 "10:"
 
 # assign workspaces to screens
-workspace $ws1 output DVI-I-1
-workspace $ws9 output DVI-I-1
-workspace $ws10 output DVI-I-1
-workspace $ws2 output DVI-I-2
-workspace $ws3 output DVI-I-2
-workspace $ws4 output DVI-I-2
-workspace $ws7 output DVI-I-2
+workspace $ws1 output LVDS1
+workspace $ws9 output LVDS1
+workspace $ws10 output LVDS1
+workspace $ws2 output VGA1
+workspace $ws3 output VGA1
+workspace $ws4 output VGA1
+workspace $ws7 output VGA1
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
