@@ -322,7 +322,8 @@ exec --no-startup-id xedgewarp -b        # let mouse shift between screens
 
 # app launcher, launch w/ Control-space
 # exec --no-startup-id synapse
-exec --no-startup-id gnome-pie
+# exec --no-startup-id gnome-pie
+exec --no-startup-id albert
 
 # f.lux or redshift reduces eye strain at night
 #exec --no-startup-id xflux -l 52.1 -g 5.12 
