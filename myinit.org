@@ -388,8 +388,8 @@ also commented out, I can see them in my terminal if desired
   (setq package-check-signature nil)
   (use-package org-gcal
     :ensure t) ; config in separate file for privacy
-   (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
-   (add-hook 'org-capture-after-finalize-hook (lambda () (org-gcal-sync) ))
+   ;(add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
+   ;(add-hook 'org-capture-after-finalize-hook (lambda () (org-gcal-sync) ))
 #+end_src
 ** org \latex entities
    Disable the =\ang= entity in org-mode so that I can use siunit's =\ang= instead.
@@ -634,7 +634,7 @@ very nice search replacement
     :ensure t)
 #+END_SRC
 ** polymode
-   for orking with .Rmd files etc.
+   for working with .Rmd files etc.
 #+begin_src emacs-lisp
 (use-package polymode
   :ensure t
