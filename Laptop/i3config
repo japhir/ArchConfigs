@@ -131,7 +131,7 @@ set $ws3 "3:"
 set $ws4 "4:"
 set $ws5 "5:"
 set $ws6 "6:"
-set $ws7 "7:"
+set $ws7 "7:"
 set $ws8 "8:"
 set $ws9 "9:"
 set $ws10 "10:"
@@ -241,7 +241,9 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 ### move programs to specific workspaces ###
 
 assign [class="Mendeley Desktop"] $ws4  
+assign [class="Zotero"] $ws4
 assign [class="^Kodi$"] $ws7
+assign [class="Chromium" instance="webmail.uu.nl__owa"] $ws7
 assign [class="^VirtualBox$" title="^Win10"] $ws8
 assign [class="R_x11"] $ws9     # R graphics output
 assign [class="^Google Play Music Desktop Player$"] $ws10
@@ -313,8 +315,10 @@ exec --no-startup-id volnoti             # volume change notification
 exec --no-startup-id cbatticon           # battery indicator
 exec --no-startup-id compton -cbfD 5     # composite manager
 exec --no-startup-id nm-applet           # NetworkManager applet
-exec --no-startup-id dropbox		 # personal file sync
-exec --no-startup-id nextcloud           # uni file sync
+# exec --no-startup-id dropbox		 # personal file sync
+# exec --no-startup-id "HOME=$HOME/.dropbox-alt /usr/bin/dropbox start -i" # uni file sync
+exec --no-startup-id $HOME/ArchConfigs/multidropbox.sh
+exec --no-startup-id nextcloud           # more uni file sync
 exec --no-startup-id caffeine            # don't sleep when playing youtube
 # exec --no-startup-id chromium --app=https://toggl.com/app/timer  # timetracker
 exec --no-startup-id chromium --app=https://play.spotify.com     # music player
@@ -335,7 +339,7 @@ exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2500
 # exec --no-startup-id redshift-gtk -l 21.3:-157.8211567 -m randr -t 5500:2500
 
 # activity tracker
-exec --no-startup-id rescuetime
+# exec --no-startup-id rescuetime
 
 #=======================================================================
 #                             Mouse integration
@@ -352,3 +356,5 @@ bindsym --release button2 kill
 
 # Mouse hovering shouldn't dictate mouse focus
 focus_follows_mouse no 
+
+for_window [urgent=latest] focus

@@ -331,6 +331,70 @@ also commented out, I can see them in my terminal if desired
 		(define-key org-agenda-mode-map "k" 'evil-previous-line)))
     (add-to-list 'org-file-apps '("\\.pdf" . "evince %s")))
 #+end_src
+** mathjax
+#+BEGIN_SRC emacs-lisp
+  (setq org-html-mathjax-options
+    '((path "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
+      (scale "100")
+      (align "center")
+      (indent "2em")
+      (mathml t)))
+  (setq org-html-mathjax-template
+		"
+  <script type=\"text/javascript\" src=\"%PATH\"></script>
+  <script type=\"text/javascript\">
+  <!--/*--><![CDATA[/*><!--*/
+      MathJax.Hub.Config({
+          jax: [\"input/TeX\", \"output/HTML-CSS\"],
+          extensions: [\"tex2jax.js\",\"TeX/AMSmath.js\",\"TeX/AMSsymbols.js\",
+                       \"TeX/noUndefined.js\", \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/mhchem/mhchem.js\"],
+          tex2jax: {
+              inlineMath: [ [\"\\\\(\",\"\\\\)\"] ],
+              displayMath: [ ['$$','$$'], [\"\\\\[\",\"\\\\]\"], [\"\\\\begin{displaymath}\",\"\\\\end{displaymath}\"] ],
+              skipTags: [\"script\",\"noscript\",\"style\",\"textarea\",\"pre\",\"code\"],
+              ignoreClass: \"tex2jax_ignore\",
+              processEscapes: false,
+              processEnvironments: true,
+              preview: \"TeX\"
+          },
+          TeX: {extensions: [\"AMSmath.js\",\"AMSsymbols.js\",  \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/mhchem/mhchem.js\"]},
+          showProcessingMessages: true,
+          displayAlign: \"%ALIGN\",
+          displayIndent: \"%INDENT\",
+
+          \"HTML-CSS\": {
+               scale: %SCALE,
+               availableFonts: [\"STIX\",\"TeX\"],
+               preferredFont: \"TeX\",
+               webFont: \"TeX\",
+               imageFont: \"TeX\",
+               showMathMenu: true,
+          },
+          MMLorHTML: {
+               prefer: {
+                   MSIE:    \"MML\",
+                   Firefox: \"MML\",
+                   Opera:   \"HTML\",
+                   other:   \"HTML\"
+               }
+          }
+      });
+  /*]]>*///-->
+  </script>")
+  ;; (setf org-html-mathjax-options
+  ;; )
+
+  ;; (setf (org-html-mathjax-template
+  ;; "<script type=\"text/x-mathjax-config>
+  ;;  MathJax.Hub.Config({
+  ;;    extensions: [\"tex2jax.js\",\"[Contrib]/siunitx/siunitx.js\"],
+  ;;    jax: [\"input/TeX\",\"output/HTML-CSS\"],
+  ;;    tex2jax: {inlineMath: [[\"$\",\"$\"],[\"\\(\",\"\\)\"]]},
+  ;;    TeX: {extensions: [\"AMSmath.js\",\"AMSsymbols.js\", \"sinuitx.js\"]}
+  ;;  });
+  ;;  </script>"))
+
+#+END_SRC
 ** org-gcal
 #+begin_src emacs-lisp
   (setq package-check-signature nil)
@@ -557,6 +621,15 @@ very nice search replacement
     ;; :init
     ;; (add-hook 'ess-mode-hook 'r-autoyas-ess-activate))
 #+END_SRC
+** notmuch email
+#+BEGIN_SRC emacs-lisp
+(require 'notmuch)
+#+END_SRC
+** chromium as default browser
+#+BEGIN_SRC emacs-lisp
+  (setq browse-url-browser-function 'browse-url-generic
+	browse-url-generic-program "chromium")
+#+END_SRC
 * Science packages
 ** ess
    emacs speaks statistics, work with R etc.
@@ -645,11 +718,15 @@ very nice search replacement
     :ensure t
     :config
     (autoload 'ivy-bibtex "ivy-bibtex" "" t)
-    (setq bibtex-completion-pdf-field "file"
+    (setq bibtex-completion-pdf-field "file")
+    (setq bibtex-completion-pdf-open-function
+	  (lambda (fpath)
+	    (start-process "evince" "*helm-bibtex-evince*" "/usr/bin/evince" fpath))))
+    ;(setq bibtex-completion-pdf-field "file"
           ;; open bibtex links with evince
-          bibtex-completion-pdf-open-function
-          (lambda (fpath)
-            (call-process "evince" nil 0 nil fpath))
+       ;   bibtex-completion-pdf-open-function
+       ;   (lambda (fpath)
+       ;     (call-process "evince" nil 0 nil fpath))
             ;;(setq bibtex-completion-browser-function 'browser-url-chromium)
             ;;(setq bibtex-completion-format-citation-functions
             ;;      '((org-mode      . bibtex-completion-format-citation-cite)
@@ -658,7 +735,7 @@ very nice search replacement
             ;;        (default       . bibtex-completion-format-citation-default)))
             ;;(setq bibtex-completion-cite-default-command "citep")
             ;; no before or after promts
-            bibtex-completion-cite-prompt-for-optional-arguments nil))
+	;    bibtex-completion-cite-prompt-for-optional-arguments nil))
 #+end_src
 ** ox-extra
 org-export ignore headlines with ~:ignore:~ tag
@@ -671,7 +748,5 @@ org-export ignore headlines with ~:ignore:~ tag
   (use-package org-ref
     :init
     (setq org-ref-completion-library 'org-ref-ivy-cite)
-    :ensure t
-    :config
-    (setq org-ref-open-pdf-function 'org-ref-get-mendeley-filename))
+    :ensure t)
 #+END_SRC
