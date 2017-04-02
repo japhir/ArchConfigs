@@ -446,6 +446,12 @@ directory to make multiple eshell windows easier."
 	   '(lambda()
 	      (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
  #+end_src
+** edit with emacs (chromium)
+#+BEGIN_SRC emacs-lisp
+(use-package edit-server
+  :config
+  (edit-server-start))
+#+END_SRC
 ** swiper
 very nice search replacement
 #+begin_src emacs-lisp
@@ -556,6 +562,10 @@ very nice search replacement
   ;; (use-package r-autoyas
     ;; :init
     ;; (add-hook 'ess-mode-hook 'r-autoyas-ess-activate))
+#+END_SRC
+** notmuch
+#+BEGIN_SRC emacs-lisp
+  (require 'notmuch)
 #+END_SRC
 * Science packages
 ** ess
