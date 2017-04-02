@@ -447,10 +447,16 @@ directory to make multiple eshell windows easier."
 	      (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
  #+end_src
 ** edit with emacs (chromium)
+   Edit gmail messages and other input fields in chrome with emacs, markdown.
 #+BEGIN_SRC emacs-lisp
-(use-package edit-server
-  :config
-  (edit-server-start))
+  (use-package edit-server
+    :ensure t
+    :config
+    (edit-server-start))
+  (use-package ham-mode
+    :ensure t)
+  (use-package gmail-message-mode
+    :ensure t)
 #+END_SRC
 ** swiper
 very nice search replacement
