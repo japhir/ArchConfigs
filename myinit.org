@@ -11,7 +11,7 @@
 #+begin_src emacs-lisp
 ;; require
 (eval-when-compile
-  (require 'use-package)) 
+  (require 'use-package))
 (require 'diminish)  ; to omit lines from the mode-line
 (require 'bind-key)  ; for easy keybindings
 #+end_src
@@ -28,28 +28,27 @@
           (replace-match " " nil t))
         (buffer-string)))
 #+end_src
-*** COMMENT in the scratch buffer 
+*** COMMENT in the scratch buffer
 also commented out, I can see them in my terminal if desired
 #+begin_src emacs-lisp
-(setq initial-scratch-message 
-      (format 
-       ";; %s\n\n" 
-       (replace-regexp-in-string  
+(setq initial-scratch-message
+      (format
+       ";; %s\n\n"
+       (replace-regexp-in-string
         "\n" "\n;; " ; comment each line
-        (replace-regexp-in-string 
+        (replace-regexp-in-string
          "\n$" ""    ; remove trailing linebreak
          (shell-command-to-string "cowthink $(fortune showerthoughts)")))))
 #+end_src
 ** turn off UI elements and small tweaks
 #+begin_src emacs-lisp
-  (setq inhibit-splash-screen t) 
+  (setq inhibit-splash-screen t)
   (scroll-bar-mode -1)   ; turn off the scroll bar
   (tool-bar-mode -1)     ; turn off the tool bar
   (menu-bar-mode -1)     ; turn off the menu
   (setq visible-bell 1)        ; turn off beeps, make them flash!
   (setq-default fill-column 80)
   (defalias 'yes-or-no-p 'y-or-n-p)
-  ;(setq mouse-wheel-progressive-speed nil) ; disable scroll acceleration
 #+end_src
 ** play nice with parentheses
 #+begin_src emacs-lisp
@@ -102,7 +101,7 @@ also commented out, I can see them in my terminal if desired
   :ensure t
   :init (beacon-mode 1)
   :diminish beacon-mode
-  :config 
+  :config
   (setq beacon-size 80)
   (setq beacon-color "#ffcccc"))
 (global-hl-line-mode t)
@@ -115,6 +114,7 @@ also commented out, I can see them in my terminal if desired
   :ensure t
   :config
   (evil-mode 1)
+  (setq evil-cross-lines t)
   :bind (:map evil-normal-state-map
 	      ("C-h" . evil-window-left)
 	      ("C-j" . evil-window-down)
@@ -126,10 +126,10 @@ also commented out, I can see them in my terminal if desired
 #+begin_src emacs-lisp
 (use-package evil-org
   :ensure t
-  :config 
+  :config
   (evil-define-key 'normal evil-org-mode-map
       "J" nil  ; disable J and O b/c I use them evil-style
-      "O" nil) 
+      "O" nil)
   :diminish evil-org-mode)
 #+end_src
 ** COMMENT undo tree
@@ -188,7 +188,7 @@ also commented out, I can see them in my terminal if desired
 (use-package evil-magit
   :ensure t)
 #+end_src
-* GTD 
+* GTD
   Getting Things Done with emacs!
 ** my gtd and inbox files finding functions
    org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
@@ -214,7 +214,7 @@ also commented out, I can see them in my terminal if desired
   (use-package org
     :ensure t
     :config
-    (setq org-highlight-latex-and-related '(latex script entities))  
+    (setq org-highlight-latex-and-related '(latex script entities))
     ;; refiling settings
     (setq org-refile-targets '((nil :maxlevel . 9)
                                (org-agenda-files :maxlevel . 9)))
@@ -222,8 +222,8 @@ also commented out, I can see them in my terminal if desired
     (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
     ;; swyper makes refiling amazing!
     ;; the todo-states of my gtd-system
-    (setq org-todo-keywords 
-          '((sequence "NEXT(n)" "TODO(t)" "WAITING(w!/!)" "SCHEDULED(a)" "SOMEDAY(s!/!)" "PROJECT(p)" "|" 
+    (setq org-todo-keywords
+          '((sequence "NEXT(n)" "TODO(t)" "WAITING(w!/!)" "SCHEDULED(a)" "SOMEDAY(s!/!)" "PROJECT(p)" "|"
                       "DONE(d)" "CANCELLED(c)")))
     ;; add effort estimate standards
     (add-to-list 'org-global-properties
@@ -263,13 +263,13 @@ also commented out, I can see them in my terminal if desired
             ("ga" "Agenda" tags-todo "@agenda"
              ((org-agenda-sorting-strategy '(todo-state-up))))
             ;; the following are all avaialable through C-a t r [x]
-            ;;("n" todo "NEXT" nil)   
+            ;;("n" todo "NEXT" nil)
             ;;("c" todo "SCHEDULED" nil)
             ;;("w" todo "WAITING" nil)
             ;;("s" todo "SOMEDAY" nil)
             ;; view agenda + next actions, sorted by category
             ("d" "Agenda + Next actions" ((agenda) (todo "NEXT")))
-            ("w" "Work" tags-todo "Work" 
+            ("w" "Work" tags-todo "Work"
              ((org-agenda-sorting-strategy '(todo-state-up))))
             ("p" "Personal" tags-todo "Personal"
              ((org-agenda-sorting-strategy '(todo-state-up))))))
@@ -278,7 +278,7 @@ also commented out, I can see them in my terminal if desired
                           ("@home" . ?h)
                           ("@uni" . ?u)
                           ("@errands" . ?e)
-                          ("@lab" . ?l)    
+                          ("@lab" . ?l)
                           (:endgroup . nil)
                           (:startgroup . nil)
                           ("@read" . ?r)
@@ -289,10 +289,10 @@ also commented out, I can see them in my terminal if desired
                           ("@computer" . ?c)
                           ("@internet" . ?i)
                           ("@email" . ?m)
-                          ("@call" . ?b) 
+                          ("@call" . ?b)
                           ("@agenda" . ?a)
                           (:endgroup . nil)
-                          (:startgroup . nil) 
+                          (:startgroup . nil)
                           ("Work" . ?W)
                           ("Personal" . ?P)
                           (:endgroup . nil)))
@@ -300,22 +300,25 @@ also commented out, I can see them in my terminal if desired
     (setq org-return-follows-link t)
     (setq org-hide-leading-stars t)
     (setf org-special-ctrl-a/e t)
-    (setq org-fontify-emphasized-text t) 
+    (setq org-fontify-emphasized-text t)
     (setq org-fast-tag-selection-single-key t)
     (setq org-fontify-done-headline t)
     ;(setq org-adapt-indentation t) ; makes todo contents indent at headline level
-    (setq org-agenda-prefix-format "  %-17:c%?-12t% s") 
+    (setq org-agenda-prefix-format "  %-17:c%?-12t% s")
     (setq org-agenda-include-all-todo nil)
     (setq org-log-done 'time)
     (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
     (setq org-deadline-warning-days 14)
     (setf org-tags-column -65)
     (setf org-highlight-latex-and-related '(latex script entities))
-    (setq org-latex-create-formula-image-program 'imagemagick)
+    (setq org-latex-create-formula-image-program 'dvipng)
     (setq org-latex-default-figure-position 'htbp)
-    (setq org-export-with-section-numbers nil)
-    (setq org-export-with-toc nil)
+    ;(setq org-export-with-section-numbers nil)
+    ;(setq org-export-with-toc nil)
     (add-to-list 'org-latex-packages-alist '("version=4" "mhchem" t))
+    (add-to-list 'org-latex-packages-alist '("" "siunitx" t))
+    (add-to-list 'org-latex-packages-alist '("" "biblatex" t))
+    (add-to-list 'org-latex-packages-alist '("" "upgreek" t))
     (setq org-latex-pdf-process
           (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -f -pdf %f"))
           ;; '("latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -pdf -f %f"))
@@ -331,13 +334,64 @@ also commented out, I can see them in my terminal if desired
 		(define-key org-agenda-mode-map "k" 'evil-previous-line)))
     (add-to-list 'org-file-apps '("\\.pdf" . "evince %s")))
 #+end_src
+** mathjax
+#+BEGIN_SRC emacs-lisp
+  (setq org-html-mathjax-options
+    '((path "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
+      (scale "100")
+      (align "center")
+      (indent "2em")
+      (mathml t)))
+  (setq org-html-mathjax-template
+		"
+  <script type=\"text/javascript\" src=\"%PATH\"></script>
+  <script type=\"text/javascript\">
+  <!--/*--><![CDATA[/*><!--*/
+      MathJax.Hub.Config({
+          jax: [\"input/TeX\", \"output/HTML-CSS\"],
+          extensions: [\"tex2jax.js\",\"TeX/AMSmath.js\",\"TeX/AMSsymbols.js\",
+                       \"TeX/noUndefined.js\", \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/mhchem/mhchem.js\"],
+          tex2jax: {
+              inlineMath: [ [\"\\\\(\",\"\\\\)\"] ],
+              displayMath: [ ['$$','$$'], [\"\\\\[\",\"\\\\]\"], [\"\\\\begin{displaymath}\",\"\\\\end{displaymath}\"] ],
+              skipTags: [\"script\",\"noscript\",\"style\",\"textarea\",\"pre\",\"code\"],
+              ignoreClass: \"tex2jax_ignore\",
+              processEscapes: false,
+              processEnvironments: true,
+              preview: \"TeX\"
+          },
+          TeX: {extensions: [\"AMSmath.js\",\"AMSsymbols.js\",  \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/mhchem/mhchem.js\"]},
+          showProcessingMessages: true,
+          displayAlign: \"%ALIGN\",
+          displayIndent: \"%INDENT\",
+
+          \"HTML-CSS\": {
+               scale: %SCALE,
+               availableFonts: [\"STIX\",\"TeX\"],
+               preferredFont: \"TeX\",
+               webFont: \"TeX\",
+               imageFont: \"TeX\",
+               showMathMenu: true,
+          },
+          MMLorHTML: {
+               prefer: {
+                   MSIE:    \"MML\",
+                   Firefox: \"MML\",
+                   Opera:   \"HTML\",
+                   other:   \"HTML\"
+               }
+          }
+      });
+  /*]]>*///-->
+  </script>")
+#+END_SRC
 ** org-gcal
 #+begin_src emacs-lisp
   (setq package-check-signature nil)
   (use-package org-gcal
     :ensure t) ; config in separate file for privacy
-  ;; (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
-  ;; (add-hook 'org-capture-after-finalize-hook (lambda () (org-gcal-sync) ))
+   ;(add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
+   ;(add-hook 'org-capture-after-finalize-hook (lambda () (org-gcal-sync) ))
 #+end_src
 ** org \latex entities
    Disable the =\ang= entity in org-mode so that I can use siunit's =\ang= instead.
@@ -535,7 +589,7 @@ very nice search replacement
    #+BEGIN_SRC emacs-lisp
         (use-package golden-ratio
           :ensure t
-	  :config 
+	  :config
 	  (golden-ratio-mode 1)
 	  (setq golden-ratio-auto-scale t))
    #+END_SRC
@@ -569,15 +623,20 @@ very nice search replacement
     ;; :init
     ;; (add-hook 'ess-mode-hook 'r-autoyas-ess-activate))
 #+END_SRC
-** notmuch
+** COMMENT notmuch email
 #+BEGIN_SRC emacs-lisp
-  (require 'notmuch)
+(require 'notmuch)
+#+END_SRC
+** chromium as default browser
+#+BEGIN_SRC emacs-lisp
+  (setq browse-url-browser-function 'browse-url-generic
+	browse-url-generic-program "chromium")
 #+END_SRC
 * Science packages
 ** ess
    emacs speaks statistics, work with R etc.
 #+begin_src emacs-lisp
-(use-package ess 
+(use-package ess
   :ensure t
   ; :config (setq ess-default-style 'RStudio)
   :commands R)
@@ -589,7 +648,7 @@ very nice search replacement
     :ensure t)
 #+END_SRC
 ** polymode
-   for orking with .Rmd files etc. 
+   for working with .Rmd files etc.
 #+begin_src emacs-lisp
 (use-package polymode
   :ensure t
@@ -602,7 +661,7 @@ very nice search replacement
     ("\\.Rmd" . poly-markdown+r-mode))
 #+end_src
 ** matlab
-   if I'm ever required to work in non-open-source 
+   if I'm ever required to work in non-open-source
 #+begin_src emacs-lisp
 (use-package matlab
   :init (autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
@@ -613,7 +672,7 @@ very nice search replacement
   (setq matlab-indent-function "matlab"))
 #+end_src
 ** markdown-mode
-   markdown mode for writing 
+   markdown mode for writing
 #+begin_src emacs-lisp
 (use-package markdown-mode
   :ensure t)
@@ -622,11 +681,11 @@ very nice search replacement
    exporting markdown
 #+begin_src emacs-lisp
 (use-package pandoc-mode
-  :defer 
+  :defer
   :init (add-hook 'markdown-mode-hook 'pandoc-mode))
 #+end_src
 
-** LaTeX (AUCTeX, RefTeX) 
+** LaTeX (AUCTeX, RefTeX)
    for working with \LaTeX
 #+begin_src emacs-lisp
     (setq TeX-auto-save t)
@@ -661,11 +720,15 @@ very nice search replacement
     :ensure t
     :config
     (autoload 'ivy-bibtex "ivy-bibtex" "" t)
-    (setq bibtex-completion-pdf-field "file"
+    (setq bibtex-completion-pdf-field "file")
+    (setq bibtex-completion-pdf-open-function
+	  (lambda (fpath)
+	    (start-process "evince" "*helm-bibtex-evince*" "/usr/bin/evince" fpath))))
+    ;(setq bibtex-completion-pdf-field "file"
           ;; open bibtex links with evince
-          bibtex-completion-pdf-open-function
-          (lambda (fpath)
-            (call-process "evince" nil 0 nil fpath))
+       ;   bibtex-completion-pdf-open-function
+       ;   (lambda (fpath)
+       ;     (call-process "evince" nil 0 nil fpath))
             ;;(setq bibtex-completion-browser-function 'browser-url-chromium)
             ;;(setq bibtex-completion-format-citation-functions
             ;;      '((org-mode      . bibtex-completion-format-citation-cite)
@@ -674,7 +737,7 @@ very nice search replacement
             ;;        (default       . bibtex-completion-format-citation-default)))
             ;;(setq bibtex-completion-cite-default-command "citep")
             ;; no before or after promts
-            bibtex-completion-cite-prompt-for-optional-arguments nil))
+	;    bibtex-completion-cite-prompt-for-optional-arguments nil))
 #+end_src
 ** ox-extra
 org-export ignore headlines with ~:ignore:~ tag
@@ -687,7 +750,5 @@ org-export ignore headlines with ~:ignore:~ tag
   (use-package org-ref
     :init
     (setq org-ref-completion-library 'org-ref-ivy-cite)
-    :ensure t
-    :config
-    (setq org-ref-open-pdf-function 'org-ref-get-mendeley-filename))
+    :ensure t)
 #+END_SRC
