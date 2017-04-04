@@ -49,7 +49,6 @@ also commented out, I can see them in my terminal if desired
   (setq visible-bell 1)        ; turn off beeps, make them flash!
   (setq-default fill-column 80)
   (defalias 'yes-or-no-p 'y-or-n-p)
-  ;(setq mouse-wheel-progressive-speed nil) ; disable scroll acceleration
 #+end_src
 ** play nice with parentheses
 #+begin_src emacs-lisp
@@ -115,6 +114,7 @@ also commented out, I can see them in my terminal if desired
   :ensure t
   :config
   (evil-mode 1)
+  (setq evil-cross-lines t)
   :bind (:map evil-normal-state-map
 	      ("C-h" . evil-window-left)
 	      ("C-j" . evil-window-down)
@@ -316,7 +316,9 @@ also commented out, I can see them in my terminal if desired
     ;(setq org-export-with-section-numbers nil)
     ;(setq org-export-with-toc nil)
     (add-to-list 'org-latex-packages-alist '("version=4" "mhchem" t))
-    (add-to-list 'org-latex-packages-alist '("siunitx" t))
+    (add-to-list 'org-latex-packages-alist '("" "siunitx" t))
+    (add-to-list 'org-latex-packages-alist '("" "biblatex" t))
+    (add-to-list 'org-latex-packages-alist '("" "upgreek" t))
     (setq org-latex-pdf-process
           (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -f -pdf %f"))
           ;; '("latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -pdf -f %f"))
@@ -609,7 +611,7 @@ very nice search replacement
     ;; :init
     ;; (add-hook 'ess-mode-hook 'r-autoyas-ess-activate))
 #+END_SRC
-** notmuch email
+** COMMENT notmuch email
 #+BEGIN_SRC emacs-lisp
 (require 'notmuch)
 #+END_SRC
