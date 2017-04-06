@@ -10,7 +10,7 @@ export ZSH=/home/japhir/.oh-my-zsh
 # time that oh-my-zsh is loaded.
 # ZSH_THEME="robbyrussell"
 #ZSH_THEME="agnoster"
-ZSH_THEME="pure"
+ZSH_THEME="refined"
 DEFAULT_USER="japhir"
 
 # Uncomment the following line to use case-sensitive completion.
