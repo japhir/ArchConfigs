@@ -1,6 +1,5 @@
 # moo!
-fortune showerthoughts | cowthink
-
+# fortune showerthoughts | cowthink
 # Path to your oh-my-zsh installation.
 export ZSH=/home/japhir/.oh-my-zsh
 
@@ -58,7 +57,6 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 plugins=(emacs vi-mode archlinux)
 
 # User configuration
-
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/home/japhir/.cabal/bin"
 # export MANPATH="/usr/local/man:$MANPATH"
 
