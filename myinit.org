@@ -612,7 +612,7 @@ very nice search replacement
     :init
     (global-flycheck-mode t))
 #+END_SRC
-** yasnippet
+** COMMENT yasnippet
    usefull snippets for me: org-mode (fig_, )
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet

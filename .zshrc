@@ -1,5 +1,5 @@
 # moo!
-fortune showerthoughts | cowthink
+# fortune showerthoughts | cowthink
 
 # Path to your oh-my-zsh installation.
 export ZSH=/home/japhir/.oh-my-zsh
@@ -97,6 +97,7 @@ fi
 #alias em='emacsclient -c -a emacs'
 #alias emt='emacsclient -t'
 alias R='R --quiet'
+alias pb='curl -F c=@- https://ptpb.pw\?u\=1'
 # alias sudo='sudo ' # allow root to use the other aliases
 VIM_NORMAL_COLOR="\033]12;#d33682\007\033[2 q"
 VIM_INSERT_COLOR="\033]12;#657b83\007\033[6 q"
