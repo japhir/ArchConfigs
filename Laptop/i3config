@@ -317,7 +317,7 @@ exec --no-startup-id compton -cbfD 5     # composite manager
 exec --no-startup-id nm-applet           # NetworkManager applet
 # exec --no-startup-id dropbox		 # personal file sync
 # exec --no-startup-id "HOME=$HOME/.dropbox-alt /usr/bin/dropbox start -i" # uni file sync
-exec --no-startup-id $HOME/ArchConfigs/multidropbox.sh
+exec --no-startup-id ~/ArchConfigs/multidropbox.sh
 exec --no-startup-id nextcloud           # more uni file sync
 exec --no-startup-id caffeine            # don't sleep when playing youtube
 # exec --no-startup-id chromium --app=https://toggl.com/app/timer  # timetracker
