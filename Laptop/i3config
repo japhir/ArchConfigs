@@ -305,26 +305,16 @@ bindsym --release Shift+Print exec scrot -s ~/Pictures/Screenshots/%Y-%m-%d-%T-r
 
 # screenlayout created w/ arandr
 exec_always --no-startup-id ~/.screenlayout/atUU.sh 
-
 # backgrounds for two monitors
 exec_always --no-startup-id nitrogen --restore 
-
+exec --no-startup-id xedgewarp -b        # let mouse shift between screens
 exec --no-startup-id pulseaudio --start  # audio
 exec_always --no-startup-id xbindkeys    # alternative keyboard layout
 exec --no-startup-id volnoti             # volume change notification
 exec --no-startup-id cbatticon           # battery indicator
 exec --no-startup-id compton -cbfD 5     # composite manager
 exec --no-startup-id nm-applet           # NetworkManager applet
-# exec --no-startup-id dropbox		 # personal file sync
-# exec --no-startup-id "HOME=$HOME/.dropbox-alt /usr/bin/dropbox start -i" # uni file sync
-exec --no-startup-id ~/ArchConfigs/multidropbox.sh
-exec --no-startup-id nextcloud           # more uni file sync
 exec --no-startup-id caffeine            # don't sleep when playing youtube
-# exec --no-startup-id chromium --app=https://toggl.com/app/timer  # timetracker
-exec --no-startup-id chromium --app=https://play.spotify.com     # music player
-exec --no-startup-id chromium --app=https://webmail.uu.nl/owa  # uu mail
-exec --no-startup-id xedgewarp -b        # let mouse shift between screens
-
 # app launcher, launch w/ Control-space
 # exec --no-startup-id synapse
 # exec --no-startup-id gnome-pie
@@ -335,11 +325,17 @@ exec --no-startup-id albert
 # default is 3000-4000 during night, 5500-6500 during the day.
 # Netherlands
 exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2500
-# Hawai'i
-# exec --no-startup-id redshift-gtk -l 21.3:-157.8211567 -m randr -t 5500:2500
 
-# activity tracker
-# exec --no-startup-id rescuetime
+# file syncs
+exec --no-startup-id "HOME=~/.dropbox-personal ~/.dropbox-dist/dropboxd"
+exec --no-startup-id "HOME=~/.dropbox-work ~/.dropbox-dist/dropboxd"
+# exec --no-startup-id ~/ArchConfigs/multidropbox.sh
+exec --no-startup-id nextcloud           # more uni file sync
+
+# chrome startups
+# exec --no-startup-id chromium --app=https://toggl.com/app/timer  # timetracker
+# exec --no-startup-id chromium --app=https://play.spotify.com     # music player
+# exec --no-startup-id chromium --app=https://webmail.uu.nl/owa  # uu mail
 
 #=======================================================================
 #                             Mouse integration

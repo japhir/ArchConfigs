@@ -118,16 +118,27 @@ also commented out, I can see them in my terminal if desired
 ** evil
    vim emulator
 #+begin_src emacs-lisp
-(use-package evil
-  :ensure t
-  :config
-  (evil-mode 1)
-  (setq evil-cross-lines t)
-  :bind (:map evil-normal-state-map
-	      ("C-h" . evil-window-left)
-	      ("C-j" . evil-window-down)
-	      ("C-k" . evil-window-up)
-	      ("C-l" . evil-window-right)))
+  (use-package evil
+    :ensure t
+    :config
+    (evil-mode 1)
+    (setq evil-cross-lines t)
+    ;; Notmuch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    (evil-define-key 'normal notmuch-search-mode-map
+      (kbd "q") 'notmuch-search-quit
+      (kbd "n") 'notmuch-search-next-thread
+      (kbd "p") 'notmuch-search-previous-thread
+      (kbd "RET") 'notmuch-search-show-thread)
+    ;; Mail ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    (evil-add-hjkl-bindings notmuch-search-mode-map 'emacs)
+    (evil-add-hjkl-bindings notmuch-show-mode-map 'emacs)
+    (evil-set-initial-state 'notmuch-search-mode 'emacs)
+    (evil-set-initial-state 'notmuch-show-mode 'emacs)
+    :bind (:map evil-normal-state-map
+		("C-h" . evil-window-left)
+		("C-j" . evil-window-down)
+		("C-k" . evil-window-up)
+		("C-l" . evil-window-right)))
 #+end_src
 ** evil-org
    evil keymap for org-mode
@@ -239,7 +250,7 @@ also commented out, I can see them in my terminal if desired
     ;; prettify the todo keywords
     (setq org-todo-keyword-faces
           '(("NEXT"      . (:foreground "light goldenrod yellow" :background "red" :weight bold))
-            ("WAITING"   . (:background "yellow"))
+            ("WAITING"   . (:foreground "dim gray" :background "yellow"))
             ("SCHEDULED" . (:background "light slate blue"))
             ("SOMEDAY"   . (:foreground "ghost white"  :background "deep sky blue"))
             ("DONE"      . (:foreground "green4"       :background "pale green"))
@@ -638,7 +649,7 @@ very nice search replacement
 #+END_SRC
 ** COMMENT notmuch email
 #+BEGIN_SRC emacs-lisp
-(require 'notmuch)
+(use-package 'notmuch)
 #+END_SRC
 ** chromium as default browser
 #+BEGIN_SRC emacs-lisp
