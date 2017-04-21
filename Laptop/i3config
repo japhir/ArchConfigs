@@ -328,7 +328,7 @@ exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2500
 
 # file syncs
 exec --no-startup-id "HOME=~/.dropbox-personal ~/.dropbox-dist/dropboxd"
-exec --no-startup-id "HOME=~/.dropbox-work ~/.dropbox-dist/dropboxd"
+# exec --no-startup-id "HOME=~/.dropbox-work ~/.dropbox-dist/dropboxd"
 # exec --no-startup-id ~/ArchConfigs/multidropbox.sh
 exec --no-startup-id nextcloud           # more uni file sync
 

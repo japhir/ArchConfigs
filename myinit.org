@@ -214,11 +214,11 @@ also commented out, I can see them in my terminal if desired
 #+begin_src emacs-lisp
 ;; this function opens my todo-file
 (defun open-gtd-file ()
-  "Open the GTD file"
+  "Open the GTD file."
   (interactive)
   (find-file org-gtd-file))
 (defun open-inbox-file ()
-  "Open the inbox file"
+  "Open the inbox file."
   (interactive)
   (find-file org-in-file))
 (define-key global-map "\C-cg" 'open-gtd-file)
@@ -411,7 +411,7 @@ also commented out, I can see them in my terminal if desired
 #+END_SRC
 ** org-gcal
 #+begin_src emacs-lisp
-  (setq package-check-signature nil)
+  ; (setq package-check-signature nil)
   (use-package org-gcal
     :ensure t) ; config in separate file for privacy
    ;(add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
@@ -647,9 +647,26 @@ very nice search replacement
     ;; :init
     ;; (add-hook 'ess-mode-hook 'r-autoyas-ess-activate))
 #+END_SRC
-** COMMENT notmuch email
+** smtp-multi
 #+BEGIN_SRC emacs-lisp
-(use-package 'notmuch)
+     (use-package smtpmail-multi
+       :ensure t
+       :config
+       (setq smtpmail-auth-credentials "~/.authinfo.gpg")
+       ;; (setq smtpmail-multi-default-account 'gmail)
+       (setq send-mail-function 'smtpmail-multi-send-it)
+       (setq message-send-mail-function 'smtpmail-multi-send-it))
+#+END_SRC
+** notmuch email
+#+BEGIN_SRC emacs-lisp
+  (use-package notmuch
+    :ensure t
+    :config
+    (setq message-kill-buffer-on-exit t)
+    (setq notmuch-fcc-dirs '((".*gmail\.com.*" . "gmail/Sent +sent -inbox")
+			     (".*solismail\.uu\.nl.*" . "solismail/Sent +sent -inbox")))
+    :bind
+    ("C-c m" . notmuch))
 #+END_SRC
 ** chromium as default browser
 #+BEGIN_SRC emacs-lisp
