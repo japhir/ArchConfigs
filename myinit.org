@@ -673,6 +673,18 @@ very nice search replacement
   (setq browse-url-browser-function 'browse-url-generic
 	browse-url-generic-program "chromium")
 #+END_SRC
+* gnus
+#+BEGIN_SRC emacs-lisp
+  (setq gnus-select-method
+	'(nnimap "gmail"
+		 (nnimap-address "imap.gmail.com")
+		 (nnimap-server-port "imaps")
+		 (nnimap-stream ssl)))
+
+  (setq smtpmail-smtp-server "smtp.gmail.com"
+	smtpmail-smtp-service 587
+	gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+#+END_SRC
 * Science packages
 ** ess
    emacs speaks statistics, work with R etc.
