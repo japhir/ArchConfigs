@@ -244,6 +244,7 @@ assign [class="Mendeley Desktop"] $ws4
 assign [class="Zotero"] $ws4
 assign [class="^Kodi$"] $ws7
 assign [class="Chromium" instance="webmail.uu.nl__owa"] $ws7
+assign [class="Evolution"] $ws7
 assign [class="^VirtualBox$" title="^Win10"] $ws8
 assign [class="R_x11"] $ws9     # R graphics output
 assign [class="^Google Play Music Desktop Player$"] $ws10
@@ -284,6 +285,8 @@ for_window [class="^Emacs$"] border 1pixel
 for_window [class="URxvt"] border 1pixel 
 # chromium 
 for_window [class="^Chromium$" window_role="browser"] border 1pixel
+# evolution
+for_window [class="^Evolution$"] border 1pixel 
 
 ### Specific software launching keybindings ###
 
@@ -336,6 +339,8 @@ exec --no-startup-id nextcloud           # more uni file sync
 # exec --no-startup-id chromium --app=https://toggl.com/app/timer  # timetracker
 # exec --no-startup-id chromium --app=https://play.spotify.com     # music player
 # exec --no-startup-id chromium --app=https://webmail.uu.nl/owa  # uu mail
+
+exec --no-startup-id evolution # email
 
 #=======================================================================
 #                             Mouse integration

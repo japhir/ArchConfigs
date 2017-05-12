@@ -55,9 +55,10 @@ URxvt*scrollBar:        false
 
 ! Fonts
 ! URxvt*font: xft:Terminus:pixelsize=12,xft:Terminess\ Powerline:pixelsize=12
-URxvt.font:             xft:Source Code Pro for Powerline-12:hinting=True;antialias:True,xft:WenQuanYi Bitmap Song-12:medium;antialias=False,xft:WenQuanYi Zen Hei-12:medium;antialias=True,xft:HanaMinA-12:medium;antialias:True,xft:HanaMinB-12:medium;antialias:True,xft:HanaMinPlus-12:medium;antialias:True
-URxvt.boldFont:         xft:Source Code Pro for Powerline-12:bold;hinting=True;antialias:True,xft:WenQuanYi Bitmap Song-12:bold;antialias=False,xft:WenQuanYi Zen Hei-12:bold;antialias=True,xft:HanaMinA-12:bold;antialias:True,xft:HanaMinB-12:bold;antialias:True,xft:HanaMinPlus-12:bold;antialias:True
+! URxvt.font:             xft:Source Code Pro for Powerline-12:hinting=True;antialias:True,xft:WenQuanYi Bitmap Song-12:medium;antialias=False,xft:WenQuanYi Zen Hei-12:medium;antialias=True,xft:HanaMinA-12:medium;antialias:True,xft:HanaMinB-12:medium;antialias:True,xft:HanaMinPlus-12:medium;antialias:True
+! URxvt.boldFont:         xft:Source Code Pro for Powerline-12:bold;hinting=True;antialias:True,xft:WenQuanYi Bitmap Song-12:bold;antialias=False,xft:WenQuanYi Zen Hei-12:bold;antialias=True,xft:HanaMinA-12:bold;antialias:True,xft:HanaMinB-12:bold;antialias:True,xft:HanaMinPlus-12:bold;antialias:True
 
+URxvt*font:             xft:Source Code Pro:hinting=True:antialias=True:pixelsize=16
 URxvt.allow_bold:       true
 URxvt.letterSpace:	0
 

@@ -112,7 +112,7 @@ label-visible-underline = #8b0000
 
 [module/date]
 type = internal/date
-date = %Y-%m-%d 
+date = %A %F
 date-alt = %%{F#e60053}%H:%M:%S%%{F#cc}
 interval = 1
 
