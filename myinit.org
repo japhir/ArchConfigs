@@ -263,22 +263,35 @@ also commented out, I can see them in my terminal if desired
              ((org-agenda-sorting-strategy '(todo-state-up))))
             ("gu" "University" tags-todo "@uni"
              ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("gw" "Write" tags-todo "@write"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("gr" "Read" tags-todo "@read"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ;("gw" "Write" tags-todo "@write"
+             ;((org-agenda-sorting-strategy '(todo-state-up))))
+            ;("gr" "Read" tags-todo "@read"
+            ; ((org-agenda-sorting-strategy '(todo-state-up))))
             ("ge" "Errands" tags-todo "@errands"
              ((org-agenda-sorting-strategy '(todo-state-up))))
             ("gl" "Laboratory" tags-todo "@lab"
              ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("gc" "Computer" tags-todo "@computer"
+	    ("gs" "Short Dashes" tags-todo "@shortdashes"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ("gb" "Brain Dead" tags-todo "@braindead"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ("gr" "Routines" tags-todo "@routines"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ("gf" "Full Focus" tags-todo "@fullfocus"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ("gt" "Thinking" tags-todo "@thinking"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+            ;("gc" "Computer" tags-todo "@computer"
+            ; ((org-agenda-sorting-strategy '(todo-state-up))))
+            ;("gi" "Internet" tags-todo "@internet"
+            ; ((org-agenda-sorting-strategy '(todo-state-up))))
+            ;("gm" "Email" tags-todo "@email"
+            ; ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("gc" "Call" tags-todo "@call"
              ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("gi" "Internet" tags-todo "@internet"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("gm" "Email" tags-todo "@email"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("gb" "Call" tags-todo "@call"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ("gn" "Hanging Around" tags-todo "@hangingaround"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+            ;("gc" "Computer" tags-todo "@computer"
             ("ga" "Agenda" tags-todo "@agenda"
              ((org-agenda-sorting-strategy '(todo-state-up))))
             ;; the following are all avaialable through C-a t r [x]
@@ -300,17 +313,23 @@ also commented out, I can see them in my terminal if desired
                           ("@lab" . ?l)
                           (:endgroup . nil)
                           (:startgroup . nil)
-                          ("@read" . ?r)
-                          ("@write" . ?w)
-                          (:endgroup . nil)
-                          (:startgroup . nil)
-                          ("@R" . ?R)
-                          ("@computer" . ?c)
-                          ("@internet" . ?i)
-                          ("@email" . ?m)
-                          ("@call" . ?b)
+			  ("@shortdashes" . ?s)
+			  ("@braindead" . ?b)
+			  ("@routines" . ?r)
+			  ("@fullfocus" . ?f)
+			  ("@thinking" . ?t)
+                          ("@call" . ?c)
+			  ("@hangingaround" . ?n)
+                          ;("@read" . ?r)
+                          ;("@write" . ?w)
                           ("@agenda" . ?a)
                           (:endgroup . nil)
+                          ;(:startgroup . nil)
+                          ;("@R" . ?R)
+                          ;("@computer" . ?c)
+                          ;("@internet" . ?i)
+                          ;("@email" . ?m)
+                          ;(:endgroup . nil)
                           (:startgroup . nil)
                           ("Work" . ?W)
                           ("Personal" . ?P)

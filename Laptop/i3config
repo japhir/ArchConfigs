@@ -120,6 +120,12 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
+# media keys
+bindsym XF86AudioPlay exec playerctl play-pause
+# bindsym XF86AudioPause exec playerctl pause
+bindsym XF86AudioNext exec playerctl next
+bindsym XF86AudioPrev exec playerctl previous
+
 #=======================================================================
 #                              Workspaces
 #=======================================================================
@@ -242,15 +248,15 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 
 assign [class="Mendeley Desktop"] $ws4  
 assign [class="Zotero"] $ws4
-assign [class="^Kodi$"] $ws7
-assign [class="Chromium" instance="webmail.uu.nl__owa"] $ws7
-assign [class="Evolution"] $ws7
+# assign [class="^Kodi$"] $ws7
+# assign [class="Chromium" instance="webmail.uu.nl__owa"] $ws7
+# assign [class="Evolution"] $ws7
 assign [class="^VirtualBox$" title="^Win10"] $ws8
 assign [class="R_x11"] $ws9     # R graphics output
-assign [class="^Google Play Music Desktop Player$"] $ws10
-# for_window [class="Spotify"] move to workspace $ws10
+# assign [class="^Google Play Music Desktop Player$"] $ws10
+for_window [class="^Spotify$"] move to workspace $ws10
 # assign [class="Spotify"] $ws10 # doesn't work so workaround
-for_window [class="^Chromium$" title="^Spotify| - Spotify$"] move to workspace $ws10
+# for_window [class="^Chromium$" title="^Spotify| - Spotify$"] move to workspace $ws10
 
 ### make programs floating ###
 
@@ -275,9 +281,9 @@ for_window [class="Lxappearance"] floating enable sticky enable border normal
 ### borders ###
 
 # Mendeley splash screen
-for_window [class="Mendeley Desktop" instance="mendeleydesktop.x86_64" title="mendeleydesktop.x86_64"] border none
-for_window [class="^Chromium$" title="^Spotify| - Spotify$"] border none
-for_window [class="^Zathura$"] border none
+for_window [class="Mendeley Desktop" instance="mendeleydesktop.x86_64" title="mendeleydesktop.x86_64"] border 1pixel
+for_window [class="^Chromium$" title="^Spotify| - Spotify$"] border 1pixel
+for_window [class="^Zathura$"] border 1pixel
 for_window [class="^VirtualBox$" title="^Win10"] border none
 # emacs
 for_window [class="^Emacs$"] border 1pixel
@@ -330,7 +336,8 @@ exec --no-startup-id albert
 exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2500
 
 # file syncs
-exec --no-startup-id "HOME=~/.dropbox-personal ~/.dropbox-dist/dropboxd"
+exec --no-startup-id "HOME=~/.dropbox-personal; dropbox start -i"
+# exec --no-startup-id "HOME=~/.dropbox-work; dropbox start -i"
 # exec --no-startup-id "HOME=~/.dropbox-work ~/.dropbox-dist/dropboxd"
 # exec --no-startup-id ~/ArchConfigs/multidropbox.sh
 exec --no-startup-id nextcloud           # more uni file sync
@@ -340,7 +347,7 @@ exec --no-startup-id nextcloud           # more uni file sync
 # exec --no-startup-id chromium --app=https://play.spotify.com     # music player
 # exec --no-startup-id chromium --app=https://webmail.uu.nl/owa  # uu mail
 
-exec --no-startup-id evolution # email
+# exec --no-startup-id evolution # email
 
 #=======================================================================
 #                             Mouse integration
