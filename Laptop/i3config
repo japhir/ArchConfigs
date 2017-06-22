@@ -16,7 +16,7 @@ set $mod Mod4
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec i3-sensible-terminal
+bindsym $mod+Return exec urxvt -e tmux
 
 # smart dmenu
 # bindsym $mod+d exec i3-dmenu-desktop 
@@ -293,6 +293,8 @@ for_window [class="URxvt"] border 1pixel
 for_window [class="^Chromium$" window_role="browser"] border 1pixel
 # evolution
 for_window [class="^Evolution$"] border 1pixel 
+# tmux terminal
+for_window [class="URxvt" instance="^Scratch$"] move window to scratchpad, border 1pixel
 
 ### Specific software launching keybindings ###
 
@@ -348,6 +350,9 @@ exec --no-startup-id nextcloud           # more uni file sync
 # exec --no-startup-id chromium --app=https://webmail.uu.nl/owa  # uu mail
 
 # exec --no-startup-id evolution # email
+
+# scratchpad terminal with tmux
+exec "urxvt -name Scratch -e tmux new-session -s Scratch"
 
 #=======================================================================
 #                             Mouse integration

@@ -118,22 +118,23 @@ also commented out, I can see them in my terminal if desired
 ** evil
    vim emulator
 #+begin_src emacs-lisp
+  (setq evil-want-C-u-scroll t) ; C-u scrolls up half page
   (use-package evil
     :ensure t
     :config
     (evil-mode 1)
     (setq evil-cross-lines t)
     ;; Notmuch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    (evil-define-key 'normal notmuch-search-mode-map
-      (kbd "q") 'notmuch-search-quit
-      (kbd "n") 'notmuch-search-next-thread
-      (kbd "p") 'notmuch-search-previous-thread
-      (kbd "RET") 'notmuch-search-show-thread)
+    ;(evil-define-key 'normal notmuch-search-mode-map
+    ;  (kbd "q") 'notmuch-search-quit
+    ;  (kbd "n") 'notmuch-search-next-thread
+    ;  (kbd "p") 'notmuch-search-previous-thread
+    ;  (kbd "RET") 'notmuch-search-show-thread)
     ;; Mail ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    (evil-add-hjkl-bindings notmuch-search-mode-map 'emacs)
-    (evil-add-hjkl-bindings notmuch-show-mode-map 'emacs)
-    (evil-set-initial-state 'notmuch-search-mode 'emacs)
-    (evil-set-initial-state 'notmuch-show-mode 'emacs)
+    ;(evil-add-hjkl-bindings notmuch-search-mode-map 'emacs)
+    ;(evil-add-hjkl-bindings notmuch-show-mode-map 'emacs)
+    ;(evil-set-initial-state 'notmuch-search-mode 'emacs)
+    ;(evil-set-initial-state 'notmuch-show-mode 'emacs)
     :bind (:map evil-normal-state-map
 		("C-h" . evil-window-left)
 		("C-j" . evil-window-down)
@@ -146,9 +147,9 @@ also commented out, I can see them in my terminal if desired
 (use-package evil-org
   :ensure t
   :config
-  (evil-define-key 'normal evil-org-mode-map
-      "J" nil  ; disable J and O b/c I use them evil-style
-      "O" nil)
+  ;(evil-define-key 'normal evil-org-mode-map
+  ;    "J" nil  ; disable J and O b/c I use them evil-style
+  ;    "O" nil)
   :diminish evil-org-mode)
 #+end_src
 ** COMMENT undo tree
@@ -543,6 +544,11 @@ directory to make multiple eshell windows easier."
 	   '(lambda()
 	      (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
  #+end_src
+** COMMENT ranger
+#+BEGIN_SRC emacs-lisp
+  (use-package ranger
+    :ensure t)
+#+END_SRC
 ** edit with emacs (chromium)
    Edit gmail messages and other input fields in chrome with emacs, markdown.
 #+BEGIN_SRC emacs-lisp
