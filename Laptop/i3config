@@ -16,7 +16,7 @@ set $mod Mod4
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec urxvt -e tmux
+bindsym $mod+Return exec terminology
 
 # smart dmenu
 # bindsym $mod+d exec i3-dmenu-desktop 
@@ -289,12 +289,13 @@ for_window [class="^VirtualBox$" title="^Win10"] border none
 for_window [class="^Emacs$"] border 1pixel
 # terminal
 for_window [class="URxvt"] border 1pixel 
+for_window [class="terminology"] border 1pixel
 # chromium 
 for_window [class="^Chromium$" window_role="browser"] border 1pixel
 # evolution
 for_window [class="^Evolution$"] border 1pixel 
 # tmux terminal
-for_window [class="URxvt" instance="^Scratch$"] move window to scratchpad, border 1pixel
+# for_window [class="URxvt" instance="^Scratch$"] move window to scratchpad, border 1pixel
 
 ### Specific software launching keybindings ###
 
@@ -352,7 +353,7 @@ exec --no-startup-id nextcloud           # more uni file sync
 # exec --no-startup-id evolution # email
 
 # scratchpad terminal with tmux
-exec "urxvt -name Scratch -e tmux new-session -s Scratch"
+# exec "urxvt -name Scratch -e tmux new-session -s Scratch"
 
 #=======================================================================
 #                             Mouse integration

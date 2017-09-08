@@ -16,8 +16,8 @@
 (require 'bind-key)  ; for easy keybindings
 #+end_src
 * Interface and appearance
-** fortune cookies
-*** COMMENT in the frame title
+** COMMENT fortune cookies
+*** in the frame title
     currently commented out, I prefer scratch
 #+begin_src emacs-lisp
 (setf frame-title-format
@@ -28,7 +28,7 @@
           (replace-match " " nil t))
         (buffer-string)))
 #+end_src
-*** COMMENT in the scratch buffer
+*** in the scratch buffer
 also commented out, I can see them in my terminal if desired
 #+begin_src emacs-lisp
 (setq initial-scratch-message
@@ -42,18 +42,59 @@ also commented out, I can see them in my terminal if desired
 #+end_src
 ** turn off UI elements and small tweaks
 #+begin_src emacs-lisp
-  (setq inhibit-splash-screen t)
-  (scroll-bar-mode -1)   ; turn off the scroll bar
-  (tool-bar-mode -1)     ; turn off the tool bar
-  (menu-bar-mode -1)     ; turn off the menu
-  (setq visible-bell 1)        ; turn off beeps, make them flash!
-  (setq-default fill-column 80)
-  (defalias 'yes-or-no-p 'y-or-n-p)
+   (autoload 'ibuffer "ibuffer")
+   (setq inhibit-splash-screen t)
+   (scroll-bar-mode -1)   ; turn off the scroll bar
+   (tool-bar-mode -1)     ; turn off the tool bar
+   (menu-bar-mode -1)     ; turn off the menu
+   (setq visible-bell 1)  ; turn off beeps, make them flash!
+   (setq-default fill-column 79)
+
+    ;; 20MB of memory before calling garbage collection
+   (setq gc-cons-threshold 20000000)
+
+   ;; typed text will replace highlighted region
+   (delete-selection-mode 1)
+
+   ;; backspace deletes one character instead of one column
+   (global-set-key (kbd "DEL") 'backward-delete-char)
+
+   ;; enable `downcase-region' and `upcase-region'
+   (put 'downcase-region 'disabled nil)
+   (put 'upcase-region 'disabled nil)
+   (defalias 'yes-or-no-p 'y-or-n-p)
+
+   ;; always follow symlinks w/o asking
+   (require 'vc-hooks)
+   (setq vc-follow-symlinks t)
+
+   ;; no tab indentation?
+   (setq-default indent-tabs-mode nil)
+
+   ;; remove trailing whitespace before save
+   (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+end_src
+** don't make a mess of my folders
+#+BEGIN_SRC emacs-lisp
+  (setq
+   auto-save-default nil
+   backup-inhibited t
+   confirm-nonexistent-file-or-buffer nil
+   create-lockfiles nil
+   mouse-wheel-progressive-speed nil)
+#+END_SRC
+** dired should play nice
+#+BEGIN_SRC emacs-lisp
+  (define-key global-map [remap list-buffers] 'ibuffer)
+
+  (require 'dired)
+  ;; move cursor to beginning of line when it makes sense
+  (setq wdired-use-dired-vertical-movement 'sometimes)
+#+END_SRC
 ** play nice with parentheses
 #+begin_src emacs-lisp
-(electric-pair-mode 1) ; auto-insert matching bracket
-(show-paren-mode 1)    ; turn on paren match highlighting
+  (electric-pair-mode 1) ; auto-insert matching bracket
+  (show-paren-mode 1)    ; turn on paren match highlighting
 #+end_src
 ** rainbow-delimiters
    matching parenthesis are highlighted with rainbow colours.
@@ -67,24 +108,23 @@ also commented out, I can see them in my terminal if desired
 ** telephone-line
    very nice powerline-based status line
 #+begin_src emacs-lisp
-(use-package telephone-line
-  :ensure t
-  :config
-  (setq telephone-line-lhs     ; left hand side
-  	'((evil   .  (telephone-line-evil-tag-segment))
-  	  (accent .  (telephone-line-vc-segment
-  		      telephone-line-erc-modified-channels-segment
-  		      telephone-line-process-segment))
-  	  (nil    .  (telephone-line-misc-info-segment
-  		      telephone-line-buffer-segment))))
-  (setq telephone-line-rhs     ; right hand side
-  	'((nil    . (telephone-line-misc-info-segment))
-  	  (accent . (telephone-line-major-mode-segment))
-  	  (evil   . (telephone-line-airline-position-segment))))
-  (telephone-line-mode t))
+  (use-package telephone-line
+    :ensure t
+    :init
+    (setq telephone-line-lhs     ; left hand side
+	  '((evil   .  (telephone-line-evil-tag-segment))
+	    (accent .  (telephone-line-vc-segment
+			telephone-line-erc-modified-channels-segment
+			telephone-line-process-segment))
+	    (nil    .  (telephone-line-misc-info-segment
+			telephone-line-buffer-segment))))
+    (setq telephone-line-rhs     ; right hand side
+	  '((nil    . (telephone-line-misc-info-segment))
+	    (accent . (telephone-line-major-mode-segment))
+	    (evil   . (telephone-line-airline-position-segment))))
+    :config (telephone-line-mode t))
 #+end_src
 ** set the theme
-
 # #+begin_src emacs-lisp
 # (use-package leuven-dark
 #   :init
@@ -105,14 +145,14 @@ also commented out, I can see them in my terminal if desired
 ** beacon
    Highlight the current line when scrolling
 #+begin_src emacs-lisp
-(use-package beacon
-  :ensure t
-  :init (beacon-mode 1)
-  :diminish beacon-mode
-  :config
-  (setq beacon-size 80)
-  (setq beacon-color "#ffcccc"))
-(global-hl-line-mode t)
+  (use-package beacon
+    :ensure t
+    :init (beacon-mode 1)
+    :diminish beacon-mode
+    :config
+    (setq beacon-size 80)
+    (setq beacon-color "#ffcccc"))
+  (global-hl-line-mode t)
 #+end_src
 * evil
 ** evil
@@ -146,10 +186,6 @@ also commented out, I can see them in my terminal if desired
 #+begin_src emacs-lisp
 (use-package evil-org
   :ensure t
-  :config
-  ;(evil-define-key 'normal evil-org-mode-map
-  ;    "J" nil  ; disable J and O b/c I use them evil-style
-  ;    "O" nil)
   :diminish evil-org-mode)
 #+end_src
 ** COMMENT undo tree
@@ -165,15 +201,14 @@ also commented out, I can see them in my terminal if desired
   (use-package evil-escape
     :ensure t
     :diminish evil-escape-mode
-    :config
-    (evil-escape-mode 1)
+    :config (evil-escape-mode 1)
     (setq-default evil-escape-key-sequence "jk"))
 #+end_src
 ** evil-nerd-commenter
    easy comments in a lot of code formats. Keys are configured in [[evil-leader]].
 #+begin_src emacs-lisp
-(use-package evil-nerd-commenter
-  :ensure t)
+  (use-package evil-nerd-commenter
+    :ensure t)
 #+end_src
 ** evil-leader
 #+begin_src emacs-lisp
@@ -192,15 +227,6 @@ also commented out, I can see them in my terminal if desired
       "."  'evilnc-copy-and-comment-operator
       ;; "\\" 'evilnc-comment-operator ; if you prefer backslash key
       ))
-#+end_src
-** evil-leader
-   Keys are set in respective packages
-#+begin_src emacs-lisp
-  (use-package evil-leader  ; default is \
-    :ensure t
-    :config
-    (evil-leader/set-leader "<SPC>")
-    (global-evil-leader-mode))
 #+end_src
 ** evil-magit
    evil keybindings for magit
@@ -714,10 +740,11 @@ very nice search replacement
 ** ess
    emacs speaks statistics, work with R etc.
 #+begin_src emacs-lisp
-(use-package ess
-  :ensure t
-  ; :config (setq ess-default-style 'RStudio)
-  :commands R)
+  (use-package ess
+    :ensure t
+    :config
+    (setq ess-default-style 'RStudio)
+    :commands R)
 #+end_src
 ** rainbow-mode
    Highlight hex colours!
@@ -728,39 +755,39 @@ very nice search replacement
 ** polymode
    for working with .Rmd files etc.
 #+begin_src emacs-lisp
-(use-package polymode
-  :ensure t
-  :mode
-    ;; MARKDOWN
-    ("\\.md" . poly-markdown-mode)
-    ;; R modes
-    ("\\.Snw" . poly-noweb+r-mode)
-    ("\\.Rnw" . poly-noweb+r-mode)
-    ("\\.Rmd" . poly-markdown+r-mode))
+  (use-package polymode
+    :ensure t
+    :mode
+      ;; MARKDOWN
+      ("\\.md" . poly-markdown-mode)
+      ;; R modes
+      ("\\.Snw" . poly-noweb+r-mode)
+      ("\\.Rnw" . poly-noweb+r-mode)
+      ("\\.Rmd" . poly-markdown+r-mode))
 #+end_src
 ** matlab
    if I'm ever required to work in non-open-source
 #+begin_src emacs-lisp
-(use-package matlab
-  :init (autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
-  :mode ("\\.m\\'" . matlab-mode)
-  :interpreter "matlab"
-  :config
-  (setq matlab-indent-function t)
-  (setq matlab-indent-function "matlab"))
+  (use-package matlab
+    :init (autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
+    :mode ("\\.m\\'" . matlab-mode)
+    :interpreter "matlab"
+    :config
+    (setq matlab-indent-function t)
+    (setq matlab-indent-function "matlab"))
 #+end_src
 ** markdown-mode
    markdown mode for writing
 #+begin_src emacs-lisp
-(use-package markdown-mode
-  :ensure t)
+  (use-package markdown-mode
+    :ensure t)
 #+end_src
 ** COMMENT pandoc-mode
    exporting markdown
 #+begin_src emacs-lisp
-(use-package pandoc-mode
-  :defer
-  :init (add-hook 'markdown-mode-hook 'pandoc-mode))
+  (use-package pandoc-mode
+    :defer
+    :init (add-hook 'markdown-mode-hook 'pandoc-mode))
 #+end_src
 
 ** LaTeX (AUCTeX, RefTeX)
@@ -776,8 +803,8 @@ very nice search replacement
 #+end_src
 ** ispell: spell-checking
 #+begin_src emacs-lisp
-(require 'ispell)
-(setq ispell-dictionary "british-ise-w_accents")
+  (require 'ispell)
+  (setq ispell-dictionary "british-ize-w_accents")
 #+end_src
 ** hl-todo
 #+BEGIN_SRC emacs-lisp
