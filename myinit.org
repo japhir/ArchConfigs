@@ -239,20 +239,20 @@ also commented out, I can see them in my terminal if desired
 ** my gtd and inbox files finding functions
    org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 #+begin_src emacs-lisp
-;; this function opens my todo-file
-(defun open-gtd-file ()
-  "Open the GTD file."
-  (interactive)
-  (find-file org-gtd-file))
-(defun open-inbox-file ()
-  "Open the inbox file."
-  (interactive)
-  (find-file org-in-file))
-(define-key global-map "\C-cg" 'open-gtd-file)
-(define-key global-map "\C-ci" 'open-inbox-file)
-(define-key global-map "\C-cl" 'org-store-link)
-(define-key global-map "\C-ca" 'org-agenda)
-(define-key global-map "\C-cc" 'org-capture)
+  ;; this function opens my todo-file
+  (defun open-gtd-file ()
+    "Open the GTD file."
+    (interactive)
+    (find-file org-gtd-file))
+  (defun open-inbox-file ()
+    "Open the inbox file."
+    (interactive)
+    (find-file org-in-file))
+  (define-key global-map "\C-cg" 'open-gtd-file)
+  (define-key global-map "\C-ci" 'open-inbox-file)
+  (define-key global-map "\C-cl" 'org-store-link)
+  (define-key global-map "\C-ca" 'org-agenda)
+  (define-key global-map "\C-cc" 'org-capture)
 #+end_src
 ** org
    note-taking, todo system, calendar, everything
@@ -698,7 +698,12 @@ very nice search replacement
     ;; :init
     ;; (add-hook 'ess-mode-hook 'r-autoyas-ess-activate))
 #+END_SRC
-** smtp-multi
+** chromium as default browser
+#+BEGIN_SRC emacs-lisp
+  (setq browse-url-browser-function 'browse-url-generic
+	browse-url-generic-program "chromium")
+#+END_SRC
+** COMMENT smtp-multi
 #+BEGIN_SRC emacs-lisp
      (use-package smtpmail-multi
        :ensure t
@@ -708,7 +713,8 @@ very nice search replacement
        (setq send-mail-function 'smtpmail-multi-send-it)
        (setq message-send-mail-function 'smtpmail-multi-send-it))
 #+END_SRC
-** notmuch email
+* email
+** COMMENT notmuch email
 #+BEGIN_SRC emacs-lisp
   (use-package notmuch
     :ensure t
@@ -719,23 +725,36 @@ very nice search replacement
     :bind
     ("C-c m" . notmuch))
 #+END_SRC
-** chromium as default browser
+** mu4e
 #+BEGIN_SRC emacs-lisp
-  (setq browse-url-browser-function 'browse-url-generic
-	browse-url-generic-program "chromium")
+  (use-package mu4e
+    :ensure t
+    :config
+    (setq mu4e-view-show-images t)
+    (setq mu4e-drafts-folder "/Drafts")
+    (setq mu4e-sent-folder "/Sent Items")
+    (setq mu4e-trash-folder "/Deleted Items")
+    (setq mu4e-maildir-shortcuts
+          '(("/inbox" . ?i)
+            ("/NEXT" . ?n)
+            ("/Waiting" . ?w)
+            ("/Deferred" . ?d)
+            ("/Important backlog" . ?l)
+            ("/Sent Items" . ?s)))
+    (setq mu4e-get-mail-command "mbsync -a"))
 #+END_SRC
-* gnus
-#+BEGIN_SRC emacs-lisp
-  (setq gnus-select-method
-	'(nnimap "gmail"
-		 (nnimap-address "imap.gmail.com")
-		 (nnimap-server-port "imaps")
-		 (nnimap-stream ssl)))
+** COMMENT gnus
+ #+BEGIN_SRC emacs-lisp
+   (setq gnus-select-method
+	 '(nnimap "gmail"
+		  (nnimap-address "imap.gmail.com")
+		  (nnimap-server-port "imaps")
+		  (nnimap-stream ssl)))
 
-  (setq smtpmail-smtp-server "smtp.gmail.com"
-	smtpmail-smtp-service 587
-	gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
-#+END_SRC
+   (setq smtpmail-smtp-server "smtp.gmail.com"
+	 smtpmail-smtp-service 587
+	 gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+ #+END_SRC
 * Science packages
 ** ess
    emacs speaks statistics, work with R etc.
