@@ -164,17 +164,6 @@ also commented out, I can see them in my terminal if desired
     :config
     (evil-mode 1)
     (setq evil-cross-lines t)
-    ;; Notmuch ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;(evil-define-key 'normal notmuch-search-mode-map
-    ;  (kbd "q") 'notmuch-search-quit
-    ;  (kbd "n") 'notmuch-search-next-thread
-    ;  (kbd "p") 'notmuch-search-previous-thread
-    ;  (kbd "RET") 'notmuch-search-show-thread)
-    ;; Mail ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;(evil-add-hjkl-bindings notmuch-search-mode-map 'emacs)
-    ;(evil-add-hjkl-bindings notmuch-show-mode-map 'emacs)
-    ;(evil-set-initial-state 'notmuch-search-mode 'emacs)
-    ;(evil-set-initial-state 'notmuch-show-mode 'emacs)
     :bind (:map evil-normal-state-map
 		("C-h" . evil-window-left)
 		("C-j" . evil-window-down)
@@ -224,9 +213,7 @@ also commented out, I can see them in my terminal if desired
       "p" 'evilnc-comment-or-uncomment-paragraphs
       "r" 'comment-or-uncomment-region
       "v" 'evilnc-toggle-invert-comment-line-by-line
-      "."  'evilnc-copy-and-comment-operator
-      ;; "\\" 'evilnc-comment-operator ; if you prefer backslash key
-      ))
+      "."  'evilnc-copy-and-comment-operator))
 #+end_src
 ** evil-magit
    evil keybindings for magit
@@ -273,7 +260,7 @@ also commented out, I can see them in my terminal if desired
                       "DONE(d)" "CANCELLED(c)")))
     ;; add effort estimate standards
     (add-to-list 'org-global-properties
-		 '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
+                 '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
     ;; prettify the todo keywords
     (setq org-todo-keyword-faces
           '(("NEXT"      . (:foreground "light goldenrod yellow" :background "red" :weight bold))
@@ -282,7 +269,7 @@ also commented out, I can see them in my terminal if desired
             ("SOMEDAY"   . (:foreground "ghost white"  :background "deep sky blue"))
             ("DONE"      . (:foreground "green4"       :background "pale green"))
             ("CANCELLED" . (:foreground "dim gray"     :background "gray"))
-	    ("PROJECT"   . (:foreground "navajo white" :background "saddle brown"))))
+            ("PROJECT"   . (:foreground "navajo white" :background "saddle brown"))))
     ;; view tasks by context (sorted by todo state)
     (setq org-agenda-custom-commands
           '(("g" . "GTD contexts")
@@ -290,35 +277,24 @@ also commented out, I can see them in my terminal if desired
              ((org-agenda-sorting-strategy '(todo-state-up))))
             ("gu" "University" tags-todo "@uni"
              ((org-agenda-sorting-strategy '(todo-state-up))))
-            ;("gw" "Write" tags-todo "@write"
-             ;((org-agenda-sorting-strategy '(todo-state-up))))
-            ;("gr" "Read" tags-todo "@read"
-            ; ((org-agenda-sorting-strategy '(todo-state-up))))
             ("ge" "Errands" tags-todo "@errands"
              ((org-agenda-sorting-strategy '(todo-state-up))))
             ("gl" "Laboratory" tags-todo "@lab"
              ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gs" "Short Dashes" tags-todo "@shortdashes"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gb" "Brain Dead" tags-todo "@braindead"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gr" "Routines" tags-todo "@routines"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gf" "Full Focus" tags-todo "@fullfocus"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gt" "Thinking" tags-todo "@thinking"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-            ;("gc" "Computer" tags-todo "@computer"
-            ; ((org-agenda-sorting-strategy '(todo-state-up))))
-            ;("gi" "Internet" tags-todo "@internet"
-            ; ((org-agenda-sorting-strategy '(todo-state-up))))
-            ;("gm" "Email" tags-todo "@email"
-            ; ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("gs" "Short Dashes" tags-todo "@shortdashes"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("gb" "Brain Dead" tags-todo "@braindead"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("gr" "Routines" tags-todo "@routines"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("gf" "Full Focus" tags-todo "@fullfocus"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
+            ("gt" "Thinking" tags-todo "@thinking"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
             ("gc" "Call" tags-todo "@call"
              ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gn" "Hanging Around" tags-todo "@hangingaround"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-            ;("gc" "Computer" tags-todo "@computer"
+            ("gn" "Hanging Around" tags-todo "@hangingaround"
+             ((org-agenda-sorting-strategy '(todo-state-up))))
             ("ga" "Agenda" tags-todo "@agenda"
              ((org-agenda-sorting-strategy '(todo-state-up))))
             ;; the following are all avaialable through C-a t r [x]
@@ -340,23 +316,15 @@ also commented out, I can see them in my terminal if desired
                           ("@lab" . ?l)
                           (:endgroup . nil)
                           (:startgroup . nil)
-			  ("@shortdashes" . ?s)
-			  ("@braindead" . ?b)
-			  ("@routines" . ?r)
-			  ("@fullfocus" . ?f)
-			  ("@thinking" . ?t)
+                          ("@shortdashes" . ?s)
+                          ("@braindead" . ?b)
+                          ("@routines" . ?r)
+                          ("@fullfocus" . ?f)
+                          ("@thinking" . ?t)
                           ("@call" . ?c)
-			  ("@hangingaround" . ?n)
-                          ;("@read" . ?r)
-                          ;("@write" . ?w)
+                          ("@hangingaround" . ?n)
                           ("@agenda" . ?a)
                           (:endgroup . nil)
-                          ;(:startgroup . nil)
-                          ;("@R" . ?R)
-                          ;("@computer" . ?c)
-                          ;("@internet" . ?i)
-                          ;("@email" . ?m)
-                          ;(:endgroup . nil)
                           (:startgroup . nil)
                           ("Work" . ?W)
                           ("Personal" . ?P)
@@ -369,7 +337,6 @@ also commented out, I can see them in my terminal if desired
     (setq org-fast-tag-selection-single-key t)
     (setq org-fontify-done-headline t)
     (setq org-pretty-entities t)
-    ;(setq org-adapt-indentation t) ; makes todo contents indent at headline level
     (setq org-agenda-prefix-format "  %-17:c%?-12t% s")
     (setq org-agenda-include-all-todo nil)
     (setq org-log-done 'time)
@@ -379,25 +346,19 @@ also commented out, I can see them in my terminal if desired
     (setf org-highlight-latex-and-related '(latex script entities))
     (setq org-latex-create-formula-image-program 'dvipng)
     (setq org-latex-default-figure-position 'htbp)
-    ;(setq org-export-with-section-numbers nil)
-    ;(setq org-export-with-toc nil)
     (add-to-list 'org-latex-packages-alist '("version=4" "mhchem" t))
     (add-to-list 'org-latex-packages-alist '("" "siunitx" t))
     (add-to-list 'org-latex-packages-alist '("" "biblatex" t))
     (add-to-list 'org-latex-packages-alist '("" "upgreek" t))
     (setq org-latex-pdf-process
-          (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -f -pdf %f"))
-          ;; '("latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -pdf -f %f"))
-	 ;; (quote ("texi2dvi -p -b -V %f")))
-          ;; '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -biber -f %f"))
-          ;'("latexmk -pdflatex='lualatex -shell-escape -interaction nonstopmode' -pdf -f  %f"))
+        (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
     (setq org-fontifywhole-heading-line t)
     (setq org-ellipsis "▼") ;▼ … ◦
     ;; allow for j/k movement in agenda view
     (add-hook 'org-agenda-mode-hook
               (lambda ()
-		(define-key org-agenda-mode-map "j" 'evil-next-line)
-		(define-key org-agenda-mode-map "k" 'evil-previous-line)))
+                (define-key org-agenda-mode-map "j" 'evil-next-line)
+                (define-key org-agenda-mode-map "k" 'evil-previous-line)))
     (add-to-list 'org-file-apps '("\\.pdf" . "evince %s"))
     ;; org-babel loads r
     (org-babel-do-load-languages
@@ -457,11 +418,8 @@ also commented out, I can see them in my terminal if desired
 #+END_SRC
 ** org-gcal
 #+begin_src emacs-lisp
-  ; (setq package-check-signature nil)
   (use-package org-gcal
     :ensure t) ; config in separate file for privacy
-   ;(add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
-   ;(add-hook 'org-capture-after-finalize-hook (lambda () (org-gcal-sync) ))
 #+end_src
 ** org \latex entities
    Disable the =\ang= entity in org-mode so that I can use siunit's =\ang= instead.
@@ -477,7 +435,7 @@ also commented out, I can see them in my terminal if desired
 	  '(("a" "Appointment" entry (file org-cal-file)
 	    "* %?\n\n%^T\n\n:PROPERTIES:\n\n:END:\n\n")
 	    ("t" "Todo" entry (file org-in-file)
-	     "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a")
+	     "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
 	    ("j" "Journal" entry (file+datetree org-journal-file)
 	    "* %?\nEntered on %U\n %i\n %a")))
 #+end_src
@@ -609,14 +567,11 @@ very nice search replacement
     ("<f1> l" . counsel-load-library)
     ("<f2> i" . counsel-info-lookup-symbol)
     ("<f2> u" . counsel-unicode-char)
-    ;;("C-c g" . counsel-git) ;; conflicts with my view gtd file command
-    ;; ("C-c j" . counsel-git-grep)
     ("C-c s" . counsel-ag) ; search
     ("C-c u" . swiper-all)
     ("C-c v" . ivy-push-view)
     ("C-c V" . ivy-pop-view)
     ("C-x l" . counsel-locate))
-    ;;("C-S-o" . counsel-rhythmbox))
 #+end_src
 ** COMMENT ace-window
    Move to other buffers
@@ -703,16 +658,6 @@ very nice search replacement
   (setq browse-url-browser-function 'browse-url-generic
 	browse-url-generic-program "chromium")
 #+END_SRC
-** COMMENT smtp-multi
-#+BEGIN_SRC emacs-lisp
-     (use-package smtpmail-multi
-       :ensure t
-       :config
-       (setq smtpmail-auth-credentials "~/.authinfo.gpg")
-       ;; (setq smtpmail-multi-default-account 'gmail)
-       (setq send-mail-function 'smtpmail-multi-send-it)
-       (setq message-send-mail-function 'smtpmail-multi-send-it))
-#+END_SRC
 * email
 ** COMMENT notmuch email
 #+BEGIN_SRC emacs-lisp
@@ -741,8 +686,20 @@ very nice search replacement
             ("/Deferred" . ?d)
             ("/Important backlog" . ?l)
             ("/Sent Items" . ?s)))
+    (setq mu4e-change-filenames-when-moving t) ; important for isync
     (setq mu4e-get-mail-command "mbsync -a"))
+  (require 'org-mu4e)
+  (setq org-mu4e-link-query-in-headers-mode nil)
+  (global-set-key (kbd "\C-c m") 'mu4e)
 #+END_SRC
+** COMMENT mu4e notifications
+   #+BEGIN_SRC emacs-lisp
+   (use-package mu4e-alert
+     :ensure t
+     :config
+     (mu4e-alert-set-default-style 'libnotify)
+     (add-hook 'after-init-hook #'mu4e-alert-enable-notifications))
+   #+END_SRC
 ** COMMENT gnus
  #+BEGIN_SRC emacs-lisp
    (setq gnus-select-method
@@ -777,8 +734,6 @@ very nice search replacement
   (use-package polymode
     :ensure t
     :mode
-      ;; MARKDOWN
-      ("\\.md" . poly-markdown-mode)
       ;; R modes
       ("\\.Snw" . poly-noweb+r-mode)
       ("\\.Rnw" . poly-noweb+r-mode)
@@ -801,7 +756,7 @@ very nice search replacement
   (use-package markdown-mode
     :ensure t)
 #+end_src
-** COMMENT pandoc-mode
+** pandoc-mode
    exporting markdown
 #+begin_src emacs-lisp
   (use-package pandoc-mode
@@ -848,20 +803,6 @@ very nice search replacement
     (setq bibtex-completion-pdf-open-function
 	  (lambda (fpath)
 	    (start-process "evince" "*helm-bibtex-evince*" "/usr/bin/evince" fpath))))
-    ;(setq bibtex-completion-pdf-field "file"
-          ;; open bibtex links with evince
-       ;   bibtex-completion-pdf-open-function
-       ;   (lambda (fpath)
-       ;     (call-process "evince" nil 0 nil fpath))
-            ;;(setq bibtex-completion-browser-function 'browser-url-chromium)
-            ;;(setq bibtex-completion-format-citation-functions
-            ;;      '((org-mode      . bibtex-completion-format-citation-cite)
-            ;;        (latex-mode    . bibtex-completion-format-citation-cite)
-            ;;        (markdown-mode . bibtex-completion-format-citation-pandoc-citeproc)
-            ;;        (default       . bibtex-completion-format-citation-default)))
-            ;;(setq bibtex-completion-cite-default-command "citep")
-            ;; no before or after promts
-	;    bibtex-completion-cite-prompt-for-optional-arguments nil))
 #+end_src
 ** ox-extra
 org-export ignore headlines with ~:ignore:~ tag
