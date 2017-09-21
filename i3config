@@ -245,9 +245,9 @@ assign [class="^Kodi$"] $ws7
 assign [class="^VirtualBox$" title="^Win10"] $ws8
 assign [class="R_x11"] $ws9     # R graphics output
 assign [class="^Google Play Music Desktop Player$"] $ws10
-# for_window [class="Spotify"] move to workspace $ws10
+for_window [class="Spotify"] move to workspace $ws10
 # assign [class="Spotify"] $ws10 # doesn't work so workaround
-for_window [class="^Chromium$" title="^Spotify| - Spotify$"] move to workspace $ws10
+# for_window [class="^Chromium$" title="^Spotify| - Spotify$"] move to workspace $ws10
 
 ### make programs floating ###
 
