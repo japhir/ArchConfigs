@@ -96,6 +96,7 @@ fi
 #alias em='emacsclient -c -a emacs'
 #alias emt='emacsclient -t'
 alias R='R --quiet'
+alias o='xdg-open'
 alias pb='curl -F c=@- https://ptpb.pw\?u\=1'
 # alias sudo='sudo ' # allow root to use the other aliases
 VIM_NORMAL_COLOR="\033]12;#d33682\007\033[2 q"
