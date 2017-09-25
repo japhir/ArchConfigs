@@ -15,7 +15,7 @@ set $mod Mod4
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec terminology
+bindsym $mod+Return exec gnome-terminal
 
 # smart dmenu
 # bindsym $mod+d exec i3-dmenu-desktop
@@ -287,12 +287,9 @@ for_window [class="^VirtualBox$" title="^Win10"] border none
 # emacs
 for_window [class="^Emacs$"] border 1pixel
 # terminal
-for_window [class="URxvt"] border 1pixel
-for_window [class="terminology"] border 1pixel
+for_window [class="^Gnome-terminal$"] border 1pixel
 # chromium
 for_window [class="^Chromium$" window_role="browser"] border 1pixel
-# evolution
-for_window [class="^Evolution$"] border 1pixel
 # tmux terminal
 # for_window [class="URxvt" instance="^Scratch$"] move window to scratchpad, border 1pixel
 
