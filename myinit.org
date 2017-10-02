@@ -68,11 +68,11 @@ also commented out, I can see them in my terminal if desired
    (require 'vc-hooks)
    (setq vc-follow-symlinks t)
 
-   ;; no tab indentation?
-   (setq-default indent-tabs-mode nil)
-
    ;; remove trailing whitespace before save
    (add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+   ;; prefer utf-8
+   (prefer-coding-system 'utf-8-unix)
 #+end_src
 ** don't make a mess of my folders
 #+BEGIN_SRC emacs-lisp
@@ -140,7 +140,7 @@ also commented out, I can see them in my terminal if desired
 ** default font
 #+begin_src emacs-lisp
   (set-face-attribute 'default nil
-                      :family "Source Code Pro" :height 130)
+		      :family "Source Code Pro" :height 130)
 #+end_src
 ** beacon
    Highlight the current line when scrolling
@@ -675,7 +675,6 @@ very nice search replacement
   (use-package mu4e
     :ensure t
     :config
-    (setq mu4e-view-show-images t)
     (setq mu4e-drafts-folder "/Drafts")
     (setq mu4e-sent-folder "/Sent Items")
     (setq mu4e-trash-folder "/Deleted Items")
@@ -692,7 +691,7 @@ very nice search replacement
   (setq org-mu4e-link-query-in-headers-mode nil)
   (global-set-key (kbd "\C-c m") 'mu4e)
 #+END_SRC
-** COMMENT mu4e notifications
+** mu4e notifications
    #+BEGIN_SRC emacs-lisp
    (use-package mu4e-alert
      :ensure t
@@ -719,7 +718,7 @@ very nice search replacement
   (use-package ess
     :ensure t
     :config
-    (setq ess-default-style 'RStudio)
+    (setq ess-default-style 'RStudio-)
     :commands R)
 #+end_src
 ** rainbow-mode
@@ -810,7 +809,7 @@ org-export ignore headlines with ~:ignore:~ tag
 (require 'ox-extra)
 (ox-extras-activate '(latex-header-blocks ignore-headlines))
 #+END_SRC
-** org-ref
+** COMMENT org-ref
 #+BEGIN_SRC emacs-lisp
   (use-package org-ref
     :init

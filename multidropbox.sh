@@ -9,5 +9,5 @@ do
         ln -s "$HOME/.Xauthority" "$HOME/$dropbox/" 2> /dev/null
     fi
     HOME="$HOME/$dropbox"
-    /home/$USER/.dropbox-dist/dropboxd 2> /dev/null &
+    /home/$USER/$dropbox/.dropbox-dist/dropboxd 2> /dev/null &
 done

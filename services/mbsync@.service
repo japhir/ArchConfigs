@@ -1,0 +1,10 @@
+[Unit]
+Description=Mailbox synchronisation service for user %I
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/mbsync -Va
+ExecStartPost=/usr/bin/emacsclient -e '(mu4e-update-index)'
+User=%i
+StandardOutput=syslog
+StandardError=syslog
