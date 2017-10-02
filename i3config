@@ -309,6 +309,7 @@ exec --no-startup-id volnoti             # volume change notification
 exec --no-startup-id compton -bfCG --backend glx --paint-on-overlay --vsync opengl-swc -D 5 --shadow-exclude argb    # composite manager
 exec --no-startup-id dropbox
 exec --no-startup-id caffeine            # don't sleep when playing youtube
+exec --no-startup-id menutray            # graphical menu for when I don't want to touch kb
 exec --no-startup-id xedgewarp -b        # let mouse shift between screens
 
 # app launcher, launch w/ Control-space
