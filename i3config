@@ -259,8 +259,6 @@ for_window [window_role="task_dialog"] floating enable
 for_window [window_role="dialog"] floating enable
 for_window [window_role="menu"] floating enable
 for_window [window_role="Preferences"] floating enable
-# file manager
-for_window [class="^Nautilus$"] floating enable
 for_window [class="^Gnome-calculator"] floating enable sticky enable
 for_window [class="Lxappearance"] floating enable sticky enable border normal
 
@@ -309,6 +307,7 @@ exec --no-startup-id volnoti             # volume change notification
 exec --no-startup-id compton -bfCG --backend glx --paint-on-overlay --vsync opengl-swc -D 5 --shadow-exclude argb    # composite manager
 exec --no-startup-id dropbox
 exec --no-startup-id caffeine            # don't sleep when playing youtube
+exec --no-startup-id menutray            # graphical menu for when I don't want to touch kb
 exec --no-startup-id xedgewarp -b        # let mouse shift between screens
 
 # app launcher, launch w/ Control-space
