@@ -679,17 +679,24 @@ very nice search replacement
     (setq mu4e-sent-folder "/Sent Items")
     (setq mu4e-trash-folder "/Deleted Items")
     (setq mu4e-maildir-shortcuts
-          '(("/inbox" . ?i)
-            ("/NEXT" . ?n)
-            ("/Waiting" . ?w)
-            ("/Deferred" . ?d)
-            ("/Important backlog" . ?l)
-            ("/Sent Items" . ?s)))
+	  '(("/inbox" . ?i)
+	    ("/NEXT" . ?n)
+	    ("/Waiting" . ?w)
+	    ("/Deferred" . ?d)
+	    ("/Important backlog" . ?l)
+	    ("/Sent Items" . ?s)))
     (setq mu4e-change-filenames-when-moving t) ; important for isync
+    (setq  mu4e-headers-date-format "%Y-%m-%d %H:%M")
+    (setq mu4e-headers-fields
+    '((:date          .  17)
+      (:flags         .   5)
+      (:from          .  22)
+      (:subject       .  nil)))
     (setq mu4e-get-mail-command "mbsync -a"))
   (require 'org-mu4e)
   (setq org-mu4e-link-query-in-headers-mode nil)
   (global-set-key (kbd "\C-c m") 'mu4e)
+
 #+END_SRC
 ** mu4e notifications
    #+BEGIN_SRC emacs-lisp
