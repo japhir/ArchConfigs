@@ -590,12 +590,15 @@ very nice search replacement
 (use-package counsel
   :ensure t)
 #+end_src
-** COMMENT avy
+** avy
    jump to next chararcter. Slightly redundant b/c of evil's =f= and =t=.
 #+begin_src emacs-lisp
-(use-package avy
-  :ensure t
-  :bind ("M-s" . avy-goto-char))
+  (use-package avy
+    :ensure t
+    :bind
+    ("C-:" . avy-goto-char)
+    ("C-'" . avy-goto-char-2)
+    ("M-w" . avy-goto-word-1))
 #+end_src
 ** magit
    git management
