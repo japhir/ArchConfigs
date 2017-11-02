@@ -10,7 +10,8 @@ export ZSH=/home/japhir/.oh-my-zsh
 # time that oh-my-zsh is loaded.
 # ZSH_THEME="robbyrussell"
 #ZSH_THEME="agnoster"
-ZSH_THEME="refined"
+#ZSH_THEME="refined"
+ZSH_THEME="random"
 DEFAULT_USER="japhir"
 
 # Uncomment the following line to use case-sensitive completion.
@@ -55,7 +56,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(emacs vi-mode archlinux)
+plugins=(emacs vi-mode)
 
 # User configuration
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/home/japhir/.cabal/bin"
