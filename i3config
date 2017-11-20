@@ -15,8 +15,8 @@ set $mod Mod4
 floating_modifier $mod
 
 # start a terminal
-#bindsym $mod+Return exec i3-sensible-terminal
-bindsym $mod+Return exec tilix
+set $term tilix
+bindsym $mod+Return exec $term
 
 # smart dmenu
 # bindsym $mod+d exec i3-dmenu-desktop
@@ -137,13 +137,16 @@ set $ws9 "9:"
 set $ws10 "10:"
 
 # assign workspaces to screens
-workspace $ws1 output DVI-I-1
-workspace $ws9 output DVI-I-1
-workspace $ws10 output DVI-I-1
-workspace $ws2 output DVI-I-2
-workspace $ws3 output DVI-I-2
-workspace $ws4 output DVI-I-2
-workspace $ws7 output DVI-I-2
+set $smallscreen DVI-I-1
+set $bigscreen DVI-I-2
+
+workspace $ws1 output $smallscreen
+workspace $ws9 output $smallscreen
+workspace $ws10 output $smallscreen
+workspace $ws2 output $bigscreen
+workspace $ws3 output $bigscreen
+workspace $ws4 output $bigscreen
+workspace $ws7 output $bigscreen
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
@@ -242,10 +245,10 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 ### move programs to specific workspaces ###
 
 assign [class="Mendeley Desktop"] $ws4
+assign [class="Zotero"] $ws4
 assign [class="^Kodi$"] $ws7
 assign [class="^VirtualBox$" title="^Win10"] $ws8
 assign [class="R_x11"] $ws9     # R graphics output
-assign [class="^Google Play Music Desktop Player$"] $ws10
 # assign [class="Spotify"] $ws10 # doesn't work so workaround
 for_window [class="Spotify"] move to workspace $ws10
 
@@ -265,9 +268,8 @@ for_window [class="Lxappearance"] floating enable sticky enable border normal
 
 ### borders ###
 
-# Mendeley splash screen
 for_window [class="Mendeley Desktop" instance="mendeleydesktop.x86_64" title="mendeleydesktop.x86_64"] border none
-for_window [class="^Chromium$" title="^Spotify| - Spotify$"] border none
+for_window [class="^Spotify"] border none
 for_window [class="^Zathura$"] border none
 for_window [class="^VirtualBox$" title="^Win10"] border none
 for_window [class="^Kodi$"] fullscreen enable
@@ -277,13 +279,14 @@ for_window [class="^Emacs$"] border 1pixel
 for_window [class="URxvt"] border 1pixel
 # chromium
 for_window [class="^Chromium$" window_role="browser"] border 1pixel
+for_window [class="^Firefox" window_role="browser"] border 1pixel
 
 ### Specific software launching keybindings ###
 
-bindsym $mod+c exec chromium
+set $browser firefox-beta
+bindsym $mod+c exec $browser
 bindsym $mod+x exec nautilus
 bindsym $mod+m exec emacsclient -c
-bindsym $mod+d exec chromium --app=https://calendar.google.com
 
 # org-capture from anywhere, escape with q
 bindsym $mod+z exec emacsclient -d $DISPLAY -e '(my-org-capture-other-frame)'
@@ -335,3 +338,6 @@ bindsym --release button2 kill
 
 # Mouse hovering shouldn't dictate mouse focus
 focus_follows_mouse no
+
+# i3-gnome
+exec --no-startup-id /usr/lib/gnome-settings-daemon/gsd-xsettings
