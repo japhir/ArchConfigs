@@ -290,12 +290,13 @@ for_window [class="^Emacs$"] border 1pixel
 for_window [class="^Gnome-terminal$"] border 1pixel
 # chromium
 for_window [class="^Chromium$" window_role="browser"] border 1pixel
+for_window [class="^Firefox" window_role="browser"] border 1pixel
 # tmux terminal
 # for_window [class="URxvt" instance="^Scratch$"] move window to scratchpad, border 1pixel
 
 ### Specific software launching keybindings ###
 
-bindsym $mod+c exec chromium
+bindsym $mod+c exec firefox-beta
 bindsym $mod+x exec nautilus
 bindsym $mod+m exec emacsclient -c
 # bindsym $mod+d exec chromium --app=https://calendar.google.com
@@ -311,22 +312,23 @@ bindsym --release Shift+Print exec scrot -s ~/Pictures/Screenshots/%Y-%m-%d-%T-r
 #                            Startup software
 #=======================================================================
 
+# test: see which are started by gnome
 # screenlayout created w/ arandr
 exec_always --no-startup-id ~/.screenlayout/atUU.sh
 # backgrounds for two monitors
 exec_always --no-startup-id nitrogen --restore
 exec --no-startup-id xedgewarp -b        # let mouse shift between screens
-exec --no-startup-id pulseaudio --start  # audio
+# exec --no-startup-id pulseaudio --start  # audio
 exec_always --no-startup-id xbindkeys    # alternative keyboard layout
 exec --no-startup-id volnoti             # volume change notification
 exec --no-startup-id cbatticon           # battery indicator
 exec --no-startup-id compton -cbfD 5     # composite manager
 exec --no-startup-id nm-applet           # NetworkManager applet
-exec --no-startup-id caffeine            # don't sleep when playing youtube
+# exec --no-startup-id caffeine          # don't sleep when playing youtube
 # app launcher, launch w/ Control-space
 # exec --no-startup-id synapse
 # exec --no-startup-id gnome-pie
-exec --no-startup-id albert
+# exec --no-startup-id albert            # autostarted?
 
 # f.lux or redshift reduces eye strain at night
 #exec --no-startup-id xflux -l 52.1 -g 5.12
@@ -355,3 +357,8 @@ bindsym --release button2 kill
 focus_follows_mouse no
 
 for_window [urgent=latest] focus
+
+# GNOME integration with i3-gnome
+
+exec --no-startup-id /usr/lib/gnome-settings-daemon/gsd-xsettings
+# exec_always --no-startup-id gnome-power-manager

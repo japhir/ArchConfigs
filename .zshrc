@@ -11,7 +11,8 @@ export ZSH=/home/japhir/.oh-my-zsh
 # ZSH_THEME="robbyrussell"
 #ZSH_THEME="agnoster"
 #ZSH_THEME="refined"
-ZSH_THEME="random"
+#ZSH_THEME="random"
+ZSH_THEME="norm"
 DEFAULT_USER="japhir"
 
 # Uncomment the following line to use case-sensitive completion.

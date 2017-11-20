@@ -482,6 +482,7 @@ also commented out, I can see them in my terminal if desired
 (global-set-key (kbd "C-x 8 a") (lambda () (interactive) (insert "α")))
 (global-set-key (kbd "C-x 8 b") (lambda () (interactive) (insert "β")))
 (global-set-key (kbd "C-x 8 d") (lambda () (interactive) (insert "δ")))
+(global-set-key (kbd "C-x 8 D") (lambda () (interactive) (insert "Δ")))
 #+end_src
 ** revert buffer
 #+begin_src emacs-lisp
@@ -645,6 +646,13 @@ very nice search replacement
     :init
     (global-flycheck-mode t))
 #+END_SRC
+** web dictionary
+#+BEGIN_SRC emacs-lisp
+  (use-package define-word
+    :ensure t
+    :config
+    (global-set-key (kbd "C-c d") 'define-word))
+#+END_SRC
 ** COMMENT yasnippet
    usefull snippets for me: org-mode (fig_, )
 #+BEGIN_SRC emacs-lisp
@@ -656,10 +664,10 @@ very nice search replacement
     ;; :init
     ;; (add-hook 'ess-mode-hook 'r-autoyas-ess-activate))
 #+END_SRC
-** chromium as default browser
+** firefox as default browser
 #+BEGIN_SRC emacs-lisp
   (setq browse-url-browser-function 'browse-url-generic
-	browse-url-generic-program "chromium")
+	browse-url-generic-program "firefox")
 #+END_SRC
 * email
 ** COMMENT notmuch email
@@ -686,6 +694,7 @@ very nice search replacement
 	    ("/NEXT" . ?n)
 	    ("/Waiting" . ?w)
 	    ("/Deferred" . ?d)
+	    ("/news" . ?m)
 	    ("/Important backlog" . ?l)
 	    ("/Sent Items" . ?s)))
     (setq mu4e-change-filenames-when-moving t) ; important for isync
@@ -701,7 +710,7 @@ very nice search replacement
   (global-set-key (kbd "\C-c m") 'mu4e)
 
 #+END_SRC
-** mu4e notifications
+** COMMENT mu4e notifications
    #+BEGIN_SRC emacs-lisp
    (use-package mu4e-alert
      :ensure t
