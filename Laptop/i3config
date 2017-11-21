@@ -139,7 +139,7 @@ set $ws6 "6:"
 set $ws7 "7:"
 set $ws8 "8:"
 set $ws9 "9:"
-set $ws10 "10:"
+set $ws10 "10:"
 
 # assign workspaces to screens
 workspace $ws1 output LVDS1
@@ -255,7 +255,7 @@ for_window [class="Slack"] border 1pixel move to workpsace $ws5
 assign [class="^VirtualBox$" title="^Win10"] $ws8
 assign [class="R_x11"] $ws9     # R graphics output
 # assign [class="^Google Play Music Desktop Player$"] $ws10
-for_window [class="^Spotify$"] move to workspace $ws10
+for_window [class="^Spotify$"] border 1pixel move to workspace $ws10
 # assign [class="Spotify"] $ws10 # doesn't work so workaround
 # for_window [class="^Chromium$" title="^Spotify| - Spotify$"] move to workspace $ws10
 
@@ -264,7 +264,6 @@ for_window [class="^Spotify$"] move to workspace $ws10
 # pop-up windows are always floating
 #for_window [window_role="pop-up"] floating enable
 # popup windows by distraction-free chrome extension
-for_window [title="^StayFocusd$"] floating enable
 # org-capture frame
 for_window [class="Emacs" title="Org-Capture"] floating enable sticky toggle
 # Bubble windows (chrome notifications) are always floating
@@ -278,6 +277,7 @@ for_window [window_role="Preferences"] floating enable
 # for_window [class="^Nautilus$"] floating enable
 for_window [class="^Gnome-calculator"] floating enable sticky enable
 for_window [class="Lxappearance"] floating enable sticky enable border normal
+for_window [class="Arandr"] floating enable
 
 ### borders ###
 
