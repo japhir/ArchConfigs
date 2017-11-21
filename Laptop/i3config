@@ -134,7 +134,7 @@ set $ws1 "1:"
 set $ws2 "2:"
 set $ws3 "3:"
 set $ws4 "4:"
-set $ws5 "5:"
+set $ws5 "5:"
 set $ws6 "6:"
 set $ws7 "7:"
 set $ws8 "8:"
@@ -247,6 +247,8 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 
 assign [class="Mendeley Desktop"] $ws4
 assign [class="Zotero"] $ws4
+assign [class="Slack"] $ws5  # this only moves the first instance
+for_window [class="Slack"] border 1pixel move to workpsace $ws5
 # assign [class="^Kodi$"] $ws7
 # assign [class="Chromium" instance="webmail.uu.nl__owa"] $ws7
 # assign [class="Evolution"] $ws7
@@ -287,7 +289,7 @@ for_window [class="^VirtualBox$" title="^Win10"] border none
 # emacs
 for_window [class="^Emacs$"] border 1pixel
 # terminal
-for_window [class="^Gnome-terminal$"] border 1pixel
+for_window [class="^URxvt"] border 1pixel
 # chromium
 for_window [class="^Chromium$" window_role="browser"] border 1pixel
 for_window [class="^Firefox" window_role="browser"] border 1pixel
