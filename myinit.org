@@ -689,6 +689,7 @@ very nice search replacement
     (setq mu4e-drafts-folder "/Drafts")
     (setq mu4e-sent-folder "/Sent Items")
     (setq mu4e-trash-folder "/Deleted Items")
+    (setq mu4e-compose-format-flowed t)
     (setq mu4e-maildir-shortcuts
 	  '(("/inbox" . ?i)
 	    ("/NEXT" . ?n)

@@ -19,6 +19,9 @@ bindsym $mod+Return exec i3-sensible-terminal
 
 # smart dmenu
 # bindsym $mod+d exec i3-dmenu-desktop
+hide_edge_borders both
+gaps inner 15
+gaps outer 15
 
 #=======================================================================
 #                          Window management
@@ -67,7 +70,6 @@ bindsym $mod+v split v;exec notify-send 'tile vertically'
 bindsym $mod+f fullscreen toggle
 
 # change container layout (stacked, tabbed, toggle split)
-bindsym $mod+s layout stacking
 bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
 
@@ -91,33 +93,21 @@ bindsym $mod+Shift+minus move scratchpad
 bindsym $mod+minus scratchpad show
 
 # make the currently focused window sticky
-bindsym $mod+Shift+s sticky toggle
+# bindsym $mod+Shift+s sticky toggle
 
-# resize window (you can also use the mouse)
-mode "resize" {
-        # These bindings trigger as soon as you enter the resize mode
+# resize window (you can also use the mouse on a border)
+bindsym $mod+Shift+y resize shrink width  10 px or 10 ppt
+bindsym $mod+Shift+u resize grow   height 10 px or 10 ppt
+bindsym $mod+Shift+i resize shrink height 10 px or 10 ppt
+bindsym $mod+Shift+o resize grow   width  10 px or 10 ppt
 
-        # Pressing left will shrink the window’s width.
-        # Pressing right will grow the window’s width.
-        # Pressing up will shrink the window’s height.
-        # Pressing down will grow the window’s height.
-        bindsym $left  resize shrink width  10 px or 10 ppt
-        bindsym $down  resize grow   height 10 px or 10 ppt
-        bindsym $up    resize shrink height 10 px or 10 ppt
-        bindsym $right resize grow   width  10 px or 10 ppt
-
-        # same bindings, but for the arrow keys
-        bindsym Left  resize shrink width  10 px or 10 ppt
-        bindsym Down  resize grow   height 10 px or 10 ppt
-        bindsym Up    resize shrink height 10 px or 10 ppt
-        bindsym Right resize grow   width  10 px or 10 ppt
-
-        # back to normal: Enter or Escape
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
-}
-
-bindsym $mod+r mode "resize"
+# gaps
+bindsym $mod+Shift+t gaps inner current set 15; gaps outer current set 15
+bindsym $mod+s gaps inner current plus 5
+bindsym $mod+Shift+s gaps inner current minus 5
+bindsym $mod+Shift+d gaps inner current set 0; gaps outer current set 0
+bindsym $mod+z gaps outer current plus 5
+bindsym $mod+Shift+z gaps outer current minus 5
 
 # media keys
 bindsym XF86AudioPlay exec playerctl play-pause
@@ -248,7 +238,11 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 assign [class="Mendeley Desktop"] $ws4
 assign [class="Zotero"] $ws4
 assign [class="Slack"] $ws5  # this only moves the first instance
-for_window [class="Slack"] border 1pixel move to workpsace $ws5
+for_window [class="Slack"] border 1pixel move to workspace $ws5
+# really annoying UU-specific popup window when using selfsurvice HR portal
+assign [instance="Navigator" title="^SAP NetWeaver Por"] $ws9
+# TODO: doesn't work yet
+
 # assign [class="^Kodi$"] $ws7
 # assign [class="Chromium" instance="webmail.uu.nl__owa"] $ws7
 # assign [class="Evolution"] $ws7
@@ -304,7 +298,7 @@ bindsym $mod+m exec emacsclient -c
 # bindsym $mod+d exec chromium --app=https://calendar.google.com
 
 # org-capture from anywhere, escape with q
-bindsym $mod+z exec emacsclient -d $DISPLAY -e '(my-org-capture-other-frame)'
+# bindsym $mod+z exec emacsclient -d $DISPLAY -e '(my-org-capture-other-frame)'
 
 # Take a screenshot with scrot
 bindsym Print exec scrot -b ~/Pictures/Screenshots/%Y-%m-%d-%T.png
