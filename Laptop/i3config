@@ -22,6 +22,7 @@ bindsym $mod+Return exec i3-sensible-terminal
 hide_edge_borders both
 gaps inner 15
 gaps outer 15
+for_window [class="^.*"] border pixel 0
 
 #=======================================================================
 #                          Window management
@@ -42,29 +43,11 @@ bindsym $mod+$down  focus down
 bindsym $mod+$up    focus up
 bindsym $mod+$right focus right
 
-# alternatively, you can use the cursor keys:
-bindsym $mod+Left  focus left
-bindsym $mod+Down  focus down
-bindsym $mod+Up    focus up
-bindsym $mod+Right focus right
-
 # move focused window
 bindsym $mod+Shift+$left  move left 30
 bindsym $mod+Shift+$down  move down 30
 bindsym $mod+Shift+$up    move up 30
 bindsym $mod+Shift+$right move right 30
-
-# alternatively, you can use the cursor keys:
-bindsym $mod+Shift+Left  move left
-bindsym $mod+Shift+Down  move down
-bindsym $mod+Shift+Up    move up
-bindsym $mod+Shift+Right move right
-
-# split toggle
-bindsym $mod+t split toggle;exec notify-send 'toggle split'
-
-# split in vertical orientation
-bindsym $mod+v split v;exec notify-send 'tile vertically'
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
@@ -72,6 +55,8 @@ bindsym $mod+f fullscreen toggle
 # change container layout (stacked, tabbed, toggle split)
 bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
+# split toggle
+bindsym $mod+t split toggle;exec notify-send 'toggle split'
 
 # toggle tiling / floating
 bindsym $mod+Shift+space floating toggle
@@ -103,10 +88,10 @@ bindsym $mod+Shift+o resize grow   width  10 px or 10 ppt
 
 # gaps
 bindsym $mod+Shift+t gaps inner current set 15; gaps outer current set 15
-bindsym $mod+s gaps inner current plus 5
+bindsym $mod+s       gaps inner current plus 5
 bindsym $mod+Shift+s gaps inner current minus 5
 bindsym $mod+Shift+d gaps inner current set 0; gaps outer current set 0
-bindsym $mod+z gaps outer current plus 5
+bindsym $mod+z       gaps outer current plus 5
 bindsym $mod+Shift+z gaps outer current minus 5
 
 # media keys
@@ -205,25 +190,7 @@ client.unfocused         $blk    $dark   #5e5e5e
 client.urgent            $acc    $acc    $wht
 client.placeholder       $blk    $mid    $wht
 
-# Start i3bar to display a workspace bar
-# (plus the system information i3status finds out, if available)
-# bar {
-#     verbose yes
-#     font    pango: Roboto Bold, FontAwesome 8
-#     colors {
-#         background $blk
-#         statusline #b0b0b0
-#         separator  #1c1c1c
-#         #                   class   border  backgr    text
-#         focused_workspace   $light  $light  $wht
-#         active_workspace    $light  $light  #c4c4c4
-#         inactive_workspace  $mid    $mid    #696969
-#         urgent_workspace    $acc    $acc    $wht
-#     }
-#     position        top
-#     status_command  i3status
-# }
-
+# use polybar
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 
 # toggle the bar
@@ -235,70 +202,39 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 
 ### move programs to specific workspaces ###
 
-assign [class="Mendeley Desktop"] $ws4
-assign [class="Zotero"] $ws4
-assign [class="Slack"] $ws5  # this only moves the first instance
-for_window [class="Slack"] border 1pixel move to workspace $ws5
+assign [class="^Mendeley Desktop$"] → $ws4
+assign [class="^Zotero$"] → $ws4
+assign [class="^Slack$"] → $ws5
+assign [class="^Trello$"] → $ws5
+
 # really annoying UU-specific popup window when using selfsurvice HR portal
-assign [instance="Navigator" title="^SAP NetWeaver Por"] $ws9
+# assign [instance="Navigator" title="^SAP NetWeaver"] $ws9
 # TODO: doesn't work yet
 
-# assign [class="^Kodi$"] $ws7
-# assign [class="Chromium" instance="webmail.uu.nl__owa"] $ws7
-# assign [class="Evolution"] $ws7
 assign [class="^VirtualBox$" title="^Win10"] $ws8
 assign [class="R_x11"] $ws9     # R graphics output
-# assign [class="^Google Play Music Desktop Player$"] $ws10
-for_window [class="^Spotify$"] border 1pixel move to workspace $ws10
 # assign [class="Spotify"] $ws10 # doesn't work so workaround
-# for_window [class="^Chromium$" title="^Spotify| - Spotify$"] move to workspace $ws10
+for_window [class="^Spotify$"] border 1pixel move to workspace $ws10
 
 ### make programs floating ###
 
 # pop-up windows are always floating
 #for_window [window_role="pop-up"] floating enable
-# popup windows by distraction-free chrome extension
-# org-capture frame
-for_window [class="Emacs" title="Org-Capture"] floating enable sticky toggle
 # Bubble windows (chrome notifications) are always floating
 for_window [window_role="bubble"] floating enable
-# for_window [window_role="pop-up"] floating enable
 for_window [window_role="task_dialog"] floating enable
 for_window [window_role="dialog"] floating enable
 for_window [window_role="menu"] floating enable
 for_window [window_role="Preferences"] floating enable
-# file manager
-# for_window [class="^Nautilus$"] floating enable
 for_window [class="^Gnome-calculator"] floating enable sticky enable
 for_window [class="Lxappearance"] floating enable sticky enable border normal
 for_window [class="Arandr"] floating enable
 
-### borders ###
-
-# Mendeley splash screen
-for_window [class="Mendeley Desktop" instance="mendeleydesktop.x86_64" title="mendeleydesktop.x86_64"] border 1pixel
-for_window [class="^Chromium$" title="^Spotify| - Spotify$"] border 1pixel
-for_window [class="^Zathura$"] border 1pixel
-for_window [class="^VirtualBox$" title="^Win10"] border none
-# emacs
-for_window [class="^Emacs$"] border 1pixel
-# terminal
-for_window [class="^URxvt"] border 1pixel
-# chromium
-for_window [class="^Chromium$" window_role="browser"] border 1pixel
-for_window [class="^Firefox" window_role="browser"] border 1pixel
-# tmux terminal
-# for_window [class="URxvt" instance="^Scratch$"] move window to scratchpad, border 1pixel
-
 ### Specific software launching keybindings ###
 
-bindsym $mod+c exec firefox-beta
+bindsym $mod+c exec $BROWSER  # defined in .zshrc with export
 bindsym $mod+x exec nautilus
 bindsym $mod+m exec emacsclient -c
-# bindsym $mod+d exec chromium --app=https://calendar.google.com
-
-# org-capture from anywhere, escape with q
-# bindsym $mod+z exec emacsclient -d $DISPLAY -e '(my-org-capture-other-frame)'
 
 # Take a screenshot with scrot
 bindsym Print exec scrot -b ~/Pictures/Screenshots/%Y-%m-%d-%T.png
@@ -308,7 +244,6 @@ bindsym --release Shift+Print exec scrot -s ~/Pictures/Screenshots/%Y-%m-%d-%T-r
 #                            Startup software
 #=======================================================================
 
-# test: see which are started by gnome
 # screenlayout created w/ arandr
 exec_always --no-startup-id ~/.screenlayout/atUU.sh
 # backgrounds for two monitors
@@ -322,9 +257,7 @@ exec --no-startup-id compton -cbfD 5     # composite manager
 exec --no-startup-id nm-applet           # NetworkManager applet
 # exec --no-startup-id caffeine          # don't sleep when playing youtube
 # app launcher, launch w/ Control-space
-# exec --no-startup-id synapse
-# exec --no-startup-id gnome-pie
-# exec --no-startup-id albert            # autostarted?
+# exec --no-startup-id albert            # pretty launcher
 
 # f.lux or redshift reduces eye strain at night
 #exec --no-startup-id xflux -l 52.1 -g 5.12
@@ -352,9 +285,6 @@ bindsym --release button2 kill
 # Mouse hovering shouldn't dictate mouse focus
 focus_follows_mouse no
 
-for_window [urgent=latest] focus
-
 # GNOME integration with i3-gnome
-
 exec --no-startup-id /usr/lib/gnome-settings-daemon/gsd-xsettings
 # exec_always --no-startup-id gnome-power-manager
