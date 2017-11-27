@@ -1,5 +1,5 @@
 #=======================================================================
-#                              i3 config file
+#                           i3 config file
 #=======================================================================
 
 # put it in ~/.config/i3/ or ~/.i3/config
@@ -55,8 +55,6 @@ bindsym $mod+f fullscreen toggle
 # change container layout (stacked, tabbed, toggle split)
 bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
-# split toggle
-bindsym $mod+t split toggle;exec notify-send 'toggle split'
 
 # toggle tiling / floating
 bindsym $mod+Shift+space floating toggle
@@ -69,6 +67,11 @@ bindsym $mod+a focus parent
 
 # focus the child container
 #bindsym $mod+d focus child
+
+# change gaps
+bindsym $mod+s gaps inner current plus 5
+bindsym $mod+Shift+s gaps inner current minus 5
+bindsym $mod+Shift+d gaps inner current set 0; gaps outer current set 0
 
 # move the currently focused window to the scratchpad
 bindsym $mod+Shift+minus move scratchpad
@@ -111,19 +114,22 @@ set $ws3 "3:"
 set $ws4 "4:"
 set $ws5 "5:"
 set $ws6 "6:"
-set $ws7 "7:"
+set $ws7 "7:"
 set $ws8 "8:"
 set $ws9 "9:"
 set $ws10 "10:"
 
 # assign workspaces to screens
-workspace $ws1 output LVDS1
-workspace $ws9 output LVDS1
-workspace $ws10 output LVDS1
-workspace $ws2 output VGA1
-workspace $ws3 output VGA1
-workspace $ws4 output VGA1
-workspace $ws7 output VGA1
+set $smallscreen VGA1
+set $bigscreen LVDS1
+
+workspace $ws1 output $smallscreen
+workspace $ws9 output $smallscreen
+workspace $ws10 output $smallscreen
+workspace $ws2 output $bigscreen
+workspace $ws3 output $bigscreen
+workspace $ws4 output $bigscreen
+workspace $ws7 output $bigscreen
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
@@ -162,7 +168,6 @@ bindsym $mod+Shift+c reload
 bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
-
 # Lock the desktop
 bindsym $mod+Delete exec ~/ArchConfigs/launchi3lock.sh #&& sudo sh -c "echo mem > /sys/power/state
 
@@ -190,11 +195,8 @@ client.unfocused         $blk    $dark   #5e5e5e
 client.urgent            $acc    $acc    $wht
 client.placeholder       $blk    $mid    $wht
 
-# use polybar
+# launch polybar
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
-
-# toggle the bar
-# bindsym $mod+b bar mode toggle
 
 #=======================================================================
 #                      Specific program settings
@@ -237,8 +239,8 @@ bindsym $mod+x exec nautilus
 bindsym $mod+m exec emacsclient -c
 
 # Take a screenshot with scrot
-bindsym Print exec scrot -b ~/Pictures/Screenshots/%Y-%m-%d-%T.png
-bindsym --release Shift+Print exec scrot -s ~/Pictures/Screenshots/%Y-%m-%d-%T-region.png
+bindsym Print exec scrot -b /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T.png
+bindsym --release Shift+Print exec scrot -s /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T-region.png
 
 #=======================================================================
 #                            Startup software
@@ -257,7 +259,7 @@ exec --no-startup-id compton -cbfD 5     # composite manager
 exec --no-startup-id nm-applet           # NetworkManager applet
 # exec --no-startup-id caffeine          # don't sleep when playing youtube
 # app launcher, launch w/ Control-space
-# exec --no-startup-id albert            # pretty launcher
+exec --no-startup-id albert
 
 # f.lux or redshift reduces eye strain at night
 #exec --no-startup-id xflux -l 52.1 -g 5.12
@@ -285,6 +287,6 @@ bindsym --release button2 kill
 # Mouse hovering shouldn't dictate mouse focus
 focus_follows_mouse no
 
-# GNOME integration with i3-gnome
+# i3-gnome
 exec --no-startup-id /usr/lib/gnome-settings-daemon/gsd-xsettings
 # exec_always --no-startup-id gnome-power-manager

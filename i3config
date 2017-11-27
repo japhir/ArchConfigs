@@ -2,7 +2,7 @@
 #                           i3 config file
 #=======================================================================
 
-# symlink it to ~/.config/i3/ or ~/.i3/config
+# put it in ~/.config/i3/ or ~/.i3/config
 
 #=======================================================================
 #                                Basics
@@ -15,15 +15,14 @@ set $mod Mod4
 floating_modifier $mod
 
 # start a terminal
-set $term urxvt
-bindsym $mod+Return exec $term
+bindsym $mod+Return exec i3-sensible-terminal
 
 # smart dmenu
 # bindsym $mod+d exec i3-dmenu-desktop
-
 hide_edge_borders both
 gaps inner 15
 gaps outer 15
+for_window [class="^.*"] border pixel 0
 
 #=======================================================================
 #                          Window management
@@ -44,38 +43,16 @@ bindsym $mod+$down  focus down
 bindsym $mod+$up    focus up
 bindsym $mod+$right focus right
 
-# alternatively, you can use the cursor keys:
-bindsym $mod+Left  focus left
-bindsym $mod+Down  focus down
-bindsym $mod+Up    focus up
-bindsym $mod+Right focus right
-
 # move focused window
 bindsym $mod+Shift+$left  move left 30
 bindsym $mod+Shift+$down  move down 30
 bindsym $mod+Shift+$up    move up 30
 bindsym $mod+Shift+$right move right 30
 
-# alternatively, you can use the cursor keys:
-bindsym $mod+Shift+Left  move left 30
-bindsym $mod+Shift+Down  move down 30
-bindsym $mod+Shift+Up    move up 30
-bindsym $mod+Shift+Right move right 30
-
-# split toggle
-bindsym $mod+t split toggle;exec notify-send 'toggle split'
-
-# reset gaps
-bindsym $mod+Shift+t gaps inner current set 15; gaps outer current set 15
-
-# split in vertical orientation
-bindsym $mod+v split v;exec notify-send 'tile vertically'
-
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
 
 # change container layout (stacked, tabbed, toggle split)
-#bindsym $mod+s layout stacking
 bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
 
@@ -104,13 +81,27 @@ bindsym $mod+Shift+minus move scratchpad
 bindsym $mod+minus scratchpad show
 
 # make the currently focused window sticky
-#bindsym $mod+Shift+s sticky toggle
+# bindsym $mod+Shift+s sticky toggle
 
-# resize window (you can also use the mouse)
-bindsym $mod+Shift+y resize shrink width 10 px or 10 ppt
-bindsym $mod+Shift+u resize shrink height 10 px or 10 ppt
-bindsym $mod+Shift+i resize grow height 10 px or 10 ppt
-bindsym $mod+Shift+o resize grow width 10 px or 10 ppt
+# resize window (you can also use the mouse on a border)
+bindsym $mod+Shift+y resize shrink width  10 px or 10 ppt
+bindsym $mod+Shift+u resize grow   height 10 px or 10 ppt
+bindsym $mod+Shift+i resize shrink height 10 px or 10 ppt
+bindsym $mod+Shift+o resize grow   width  10 px or 10 ppt
+
+# gaps
+bindsym $mod+Shift+t gaps inner current set 15; gaps outer current set 15
+bindsym $mod+s       gaps inner current plus 5
+bindsym $mod+Shift+s gaps inner current minus 5
+bindsym $mod+Shift+d gaps inner current set 0; gaps outer current set 0
+bindsym $mod+z       gaps outer current plus 5
+bindsym $mod+Shift+z gaps outer current minus 5
+
+# media keys
+bindsym XF86AudioPlay exec playerctl play-pause
+# bindsym XF86AudioPause exec playerctl pause
+bindsym XF86AudioNext exec playerctl next
+bindsym XF86AudioPrev exec playerctl previous
 
 #=======================================================================
 #                              Workspaces
@@ -121,12 +112,12 @@ set $ws1 "1:"
 set $ws2 "2:"
 set $ws3 "3:"
 set $ws4 "4:"
-set $ws5 "5:"
+set $ws5 "5:"
 set $ws6 "6:"
 set $ws7 "7:"
 set $ws8 "8:"
 set $ws9 "9:"
-set $ws10 "10:"
+set $ws10 "10:"
 
 # assign workspaces to screens
 set $smallscreen DVI-I-1
@@ -204,29 +195,6 @@ client.unfocused         $blk    $dark   #5e5e5e
 client.urgent            $acc    $acc    $wht
 client.placeholder       $blk    $mid    $wht
 
-# i3bar is now replaced with polybar
-# Start i3bar to display a workspace bar
-# (plus the system information i3status finds out, if available)
-# bar {
-#     verbose yes
-#     colors {
-#         background $blk
-#         statusline #b0b0b0
-#         separator  #1c1c1c
-#         #                   class   border  backgr    text
-#         focused_workspace   $light  $light  $wht
-#         active_workspace    $light  $light  #c4c4c4
-#         inactive_workspace  $mid    $mid    #696969
-#         urgent_workspace    $acc    $acc    $wht
-#     }
-#     position        top
-#     status_command  i3status
-#     mode invisible
-# }
-
-# # toggle the bar
-# bindsym $mod+b bar mode toggle
-
 # launch polybar
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 
@@ -236,52 +204,39 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 
 ### move programs to specific workspaces ###
 
-assign [class="Mendeley Desktop"] $ws4
-assign [class="Zotero"] $ws4
-assign [class="^Kodi$"] $ws7
+assign [class="^Mendeley Desktop$"] → $ws4
+assign [class="^Zotero$"] → $ws4
+assign [class="^Slack$"] → $ws5
+assign [class="^Trello$"] → $ws5
+
+# really annoying UU-specific popup window when using selfsurvice HR portal
+# assign [instance="Navigator" title="^SAP NetWeaver"] $ws9
+# TODO: doesn't work yet
+
 assign [class="^VirtualBox$" title="^Win10"] $ws8
 assign [class="R_x11"] $ws9     # R graphics output
 # assign [class="Spotify"] $ws10 # doesn't work so workaround
-for_window [class="Spotify"] move to workspace $ws10
+for_window [class="^Spotify$"] border 1pixel move to workspace $ws10
 
 ### make programs floating ###
 
-# org-capture frame
-for_window [class="Emacs" title="Org-Capture"] floating enable sticky toggle
+# pop-up windows are always floating
+#for_window [window_role="pop-up"] floating enable
 # Bubble windows (chrome notifications) are always floating
 for_window [window_role="bubble"] floating enable
-# for_window [window_role="pop-up"] floating enable
 for_window [window_role="task_dialog"] floating enable
 for_window [window_role="dialog"] floating enable
 for_window [window_role="menu"] floating enable
 for_window [window_role="Preferences"] floating enable
 for_window [class="^Gnome-calculator"] floating enable sticky enable
 for_window [class="Lxappearance"] floating enable sticky enable border normal
-
-### borders ###
-
-for_window [class="Mendeley Desktop" instance="mendeleydesktop.x86_64" title="mendeleydesktop.x86_64"] border none
-for_window [class="^Spotify"] border none
-for_window [class="^Zathura$"] border none
-for_window [class="^VirtualBox$" title="^Win10"] border none
-for_window [class="^Kodi$"] fullscreen enable
-# emacs
-for_window [class="^Emacs$"] border 1pixel
-# terminal
-for_window [class="URxvt"] border 1pixel
-# chromium
-for_window [class="^Chromium$" window_role="browser"] border 1pixel
-for_window [class="^Firefox" window_role="browser"] border 1pixel
+for_window [class="Arandr"] floating enable
 
 ### Specific software launching keybindings ###
 
-set $browser firefox-beta
-bindsym $mod+c exec $browser
+bindsym $mod+c exec $BROWSER  # defined in .zshrc with export
 bindsym $mod+x exec nautilus
 bindsym $mod+m exec emacsclient -c
-
-# org-capture from anywhere, escape with q
-bindsym $mod+z exec emacsclient -d $DISPLAY -e '(my-org-capture-other-frame)'
 
 # Take a screenshot with scrot
 bindsym Print exec scrot -b /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T.png
@@ -296,15 +251,13 @@ exec_always --no-startup-id ~/.screenlayout/desktop2screens.sh
 
 # backgrounds for two monitors
 exec_always --no-startup-id nitrogen --restore
-
-exec --no-startup-id pulseaudio --start  # audio
+exec --no-startup-id xedgewarp -b        # let mouse shift between screens
+# exec --no-startup-id pulseaudio --start  # audio
 exec_always --no-startup-id xbindkeys    # alternative keyboard layout
 exec --no-startup-id volnoti             # volume change notification
 exec --no-startup-id compton -bfCG --backend glx --paint-on-overlay --vsync opengl-swc -D 5 --shadow-exclude argb    # composite manager
-exec --no-startup-id dropbox
 exec --no-startup-id caffeine            # don't sleep when playing youtube
 exec --no-startup-id menutray            # graphical menu for when I don't want to touch kb
-exec --no-startup-id xedgewarp -b        # let mouse shift between screens
 
 # app launcher, launch w/ Control-space
 exec --no-startup-id albert
@@ -314,6 +267,9 @@ exec --no-startup-id albert
 # default is 3000-4000 during night, 5500-6500 during the day.
 # Netherlands
 exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2500
+
+# file syncs
+exec --no-startup-id dropbox
 
 #=======================================================================
 #                             Mouse integration
@@ -333,3 +289,4 @@ focus_follows_mouse no
 
 # i3-gnome
 exec --no-startup-id /usr/lib/gnome-settings-daemon/gsd-xsettings
+# exec_always --no-startup-id gnome-power-manager
