@@ -1,6 +1,8 @@
 # moo!
 # fortune showerthoughts | cowthink
 
+# reload pywal colorscheme
+(wal -r &)
 # Path to your oh-my-zsh installation.
 export ZSH=/home/japhir/.oh-my-zsh
 
@@ -57,11 +59,12 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(emacs vi-mode)
+plugins=(vi-mode)
 
 # User configuration
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/home/japhir/.cabal/bin"
 # export MANPATH="/usr/local/man:$MANPATH"
+export BROWSER=firefox-beta
 
 source $ZSH/oh-my-zsh.sh
 
@@ -95,11 +98,6 @@ fi
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-#alias em='emacsclient -c -a emacs'
-#alias emt='emacsclient -t'
 alias R='R --quiet'
 alias o='xdg-open'
-alias pb='curl -F c=@- https://ptpb.pw\?u\=1'
-# alias sudo='sudo ' # allow root to use the other aliases
-VIM_NORMAL_COLOR="\033]12;#d33682\007\033[2 q"
-VIM_INSERT_COLOR="\033]12;#657b83\007\033[6 q"
+alias pb='curl -F c=@- https://ptpb.pw\?u\=1' # neat pastebin
