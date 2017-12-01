@@ -9,9 +9,8 @@
 
 ;; bars
 [bar/laptop]
-monitor = LVDS1
-dock = false
-; bottom = true
+override-redirect = false
+bottom = false
 width = 100%
 height = 17
 
@@ -44,7 +43,7 @@ tray-position = right
 
 [bar/external]
 monitor = VGA1
-dock = false
+override-redirect = false
 ; bottom = true
 width = 100%
 height = 17
