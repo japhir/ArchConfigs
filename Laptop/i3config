@@ -115,8 +115,8 @@ set $ws9 "9:"
 set $ws10 "10:"
 
 # assign workspaces to screens
-set $smallscreen VGA1
-set $bigscreen LVDS1
+set $smallscreen LVDS1
+set $bigscreen VGA1
 
 workspace $ws1 output $smallscreen
 workspace $ws9 output $smallscreen

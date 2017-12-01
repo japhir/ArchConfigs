@@ -75,8 +75,8 @@ export LANG=en_US.UTF-8
 if [[ -n $SSH_CONNECTION ]]; then
     export EDITOR='vim'
 else
-    export EDITOR='emacsclient -t'
-    export SUDO_EDITOR='emacsclient -c -a emacs'
+    export EDITOR='vim'
+    export SUDO_EDITOR='vim'
     export VISUAL='emacsclient -c -a emacs'
     # export WINEPREFIX=$HOME/.win32
     # export WINARCH=win32
