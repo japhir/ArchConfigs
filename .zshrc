@@ -4,7 +4,7 @@
 # reload pywal colorscheme
 (wal -r &)
 # Path to your oh-my-zsh installation.
-export ZSH=/home/japhir/.oh-my-zsh
+export ZSH=/usr/share/oh-my-zsh
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -77,7 +77,7 @@ if [[ -n $SSH_CONNECTION ]]; then
 else
     export EDITOR='vim'
     export SUDO_EDITOR='vim'
-    export VISUAL='emacsclient -c -a emacs'
+    export VISUAL='vim'
     # export WINEPREFIX=$HOME/.win32
     # export WINARCH=win32
     # export PATH=$PATH/.cabal/bin

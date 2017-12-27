@@ -26,18 +26,4 @@
      (:name "all mail" :query "*" :key "a")
      (:name "next" :query "tag:next")
      (:name "waiting" :query "tag:waiting")
-     (:name "survival" :query "tag:survival"))))
- '(org-agenda-files
-   (quote
-    ("~/Nextcloud/PhD/clumpednotes.org" "~/.dropbox-personal/Dropbox/Apps/orgzly/calendars/uu-periods.org" "~/.dropbox-personal/Dropbox/Apps/orgzly/calendars/sports.org" "~/.dropbox-personal/Dropbox/Apps/orgzly/calendars/options.org" "~/.dropbox-personal/Dropbox/Apps/orgzly/calendars/university.org" "~/.dropbox-personal/Dropbox/Apps/orgzly/calendars/gcal.org" "~/.dropbox-personal/Dropbox/Apps/orgzly/calendars/societies.org" "~/.dropbox-personal/Dropbox/Apps/orgzly/lists.org" "~/.dropbox-personal/Dropbox/MRP/Report/Report.org" "~/.dropbox-personal/Dropbox/MinorRP/LOSCAR/report/report.org" "~/.dropbox-personal/Dropbox/Apps/orgzly/inbox.org" "~/.dropbox-personal/Dropbox/Apps/orgzly/todo.org")))
- '(package-selected-packages
-   (quote
-    (define-word avy systemd mu4e-alert mu4e org-gcal matlab-mode ranger smtpmail-multi notmuch monokai-theme monokai smooth-scrolling hl-todo auctex-latexmk latex-math-preview latex-pretty-symbols latex-preview-pane column-marker ag fontawesome latex-extra outline-magic golden-ratio writeroom-mode use-package telephone-line rainbow-mode rainbow-delimiters polymode pandoc-mode org-ref org-plus-contrib org-pdfview org-pandoc org-bullets markdown-mode ivy-bibtex evil-org evil-nerd-commenter evil-magit evil-escape ess dash-functional counsel beacon auto-complete)))
- '(smtpmail-smtp-server "solismail.uu.nl")
- '(smtpmail-smtp-service 587))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 2.0)))))
+     (:name "survival" :query "tag:survival")))))

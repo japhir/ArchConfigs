@@ -1,27 +1,19 @@
+*background: #1b1918
+
 ! Meta modifier for keybindings 
 URxvt.modifier: super
 
 !! perl extensions
-URxvt.perl-ext:		default,url-select,clipboard
+URxvt.perl-ext:		default
+URxvt.perl-ext-common:  default,matcher
+URxvt.matcher.button:   1
 
 ! url-select (part of urxvt-perls package)
 URxvt.keysym.M-u:           perl:url-select:select_next
 URxvt.url-select.autocopy:  true
+URxvt.url-Launcher:         firefox
 URxvt.url-select.button:    2
-URxvt.url-select.launcher:  chromium
 URxvt.url-select.underline: true
-
-! Copy and paste
-URxvt.keysym.Shift-Control-V: perl:clipboard:paste
-URxvt.keysym.Shift-Control-C: perl:clipboard:copy
-
-! disable the stupid ctrl+shift 'feature'
-URxvt.iso14755:         false
-URxvt.iso14755_52:      false
-
-!-------------------------------------------------------------------------------
-! Xft settings
-!-------------------------------------------------------------------------------
 
 Xft.dpi:                96
 Xft.antialias:          true
@@ -29,18 +21,8 @@ Xft.rgba:               rgb
 Xft.hinting:            true
 Xft.hintstyle:          hintslight
 
-!-------------------------------------------------------------------------------
-! URxvt settings
-! Colours lifted from Solarized (http://ethanschoonover.com/solarized)
-! More info at:
-! http://pod.tst.eu/http://cvs.schmorp.de/rxvt-unicode/doc/rxvt.1.pod
-!-------------------------------------------------------------------------------
-
-URxvt.depth:            32
 URxvt.geometry:         90x30
-URxvt.transparent:      true
-URxvt.fading:           0
-URxvt*.shading: 	10
+URxvt*fading:           -1
 URxvt.urgentOnBell:     true
 URxvt.visualBell:       true
 URxvt.loginShell:       true
@@ -48,28 +30,20 @@ URxvt*saveLines:  	2000
 URxvt.internalBorder:   3
 URxvt.lineSpace:        0
 
-URxvt*depth:            24
 URxvt*borderless: 	1
 URxvt*scrollBar:        false
 
+URxvt*depth:            32
+!URxvt*background:	
+URxvt*transparent:      true
+URxvt*shading: 		30
 
-! Fonts
-! URxvt*font: xft:Terminus:pixelsize=12,xft:Terminess\ Powerline:pixelsize=12
-! URxvt.font:             xft:Source Code Pro for Powerline-12:hinting=True;antialias:True,xft:WenQuanYi Bitmap Song-12:medium;antialias=False,xft:WenQuanYi Zen Hei-12:medium;antialias=True,xft:HanaMinA-12:medium;antialias:True,xft:HanaMinB-12:medium;antialias:True,xft:HanaMinPlus-12:medium;antialias:True
-! URxvt.boldFont:         xft:Source Code Pro for Powerline-12:bold;hinting=True;antialias:True,xft:WenQuanYi Bitmap Song-12:bold;antialias=False,xft:WenQuanYi Zen Hei-12:bold;antialias=True,xft:HanaMinA-12:bold;antialias:True,xft:HanaMinB-12:bold;antialias:True,xft:HanaMinPlus-12:bold;antialias:True
-
-URxvt*font:             xft:Source Code Pro:hinting=True:antialias=True:pixelsize=16
+URxvt*font:             xft:Source Code Pro:hinting=True:antialias=True:pixelsize=16,xft:Font Awesome:size=16;antialias=True
 URxvt.allow_bold:       true
 URxvt.letterSpace:	0
 
-! Perl extensions
-URxvt.perl-ext-common:  default,matcher
-URxvt.matcher.button:   1
-URxvt.url-Launcher:     firefox-beta
-
 ! Cursor
 URxvt.cursorBlink:      false
-URxvt.cursorColor:      #657b83
 URxvt.cursorUnderline:  false
 
 ! Pointer

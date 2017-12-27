@@ -9,6 +9,7 @@
 
 ;; bars
 [bar/laptop]
+monitor = eDP-1
 override-redirect = false
 bottom = false
 width = 100%
@@ -42,7 +43,7 @@ tray-position = right
 
 
 [bar/external]
-monitor = VGA1
+monitor = HDMI-2
 override-redirect = false
 ; bottom = true
 width = 100%

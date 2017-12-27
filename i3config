@@ -284,5 +284,5 @@ bindsym --release button2 kill
 focus_follows_mouse no
 
 # i3-gnome
-exec --no-startup-id /usr/lib/gnome-settings-daemon/gsd-xsettings
+# exec --no-startup-id /usr/lib/gnome-settings-daemon/gsd-xsettings
 # exec_always --no-startup-id gnome-power-manager

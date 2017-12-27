@@ -1,10 +1,3 @@
-* local directories
-  These are all the settings that require directories, such as my org agenda
-  files etc. They require different setup between desktop and laptop and are
-  thus moved to these separate files which are symlinked to the below directory.
-#+BEGIN_SRC emacs-lisp
-  (load "~/.emacs.d/emacsdirs.el" t)
-#+END_SRC
 * use-package
   Use-package is an amazing resource to clean up my init file and have it play
   nice on both my desktop and laptop.
@@ -15,6 +8,14 @@
 (require 'diminish)  ; to omit lines from the mode-line
 (require 'bind-key)  ; for easy keybindings
 #+end_src
+* local directories
+  These are all the settings that require directories, such as my org agenda
+  files etc. They require different setup between desktop and laptop and are
+  thus moved to these separate files which are symlinked to the below directory.
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package emacsdirs)
+  (load "~/.emacs.d/emacsdirs.el" t)
+#+END_SRC
 * Interface and appearance
 ** COMMENT fortune cookies
 *** in the frame title
@@ -226,7 +227,7 @@ also commented out, I can see them in my terminal if desired
 ** my gtd and inbox files finding functions
    org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 #+begin_src emacs-lisp
-  ;; this function opens my todo-file
+  ;; TODO: figure out how to do this in a less stupid way
   (defun open-gtd-file ()
     "Open the GTD file."
     (interactive)
@@ -235,8 +236,13 @@ also commented out, I can see them in my terminal if desired
     "Open the inbox file."
     (interactive)
     (find-file org-in-file))
+  (defun open-clumped-file ()
+     "Open the clumped file."
+     (interactive)
+     (find-file org-clumped-file))
   (define-key global-map "\C-cg" 'open-gtd-file)
   (define-key global-map "\C-ci" 'open-inbox-file)
+  (define-key global-map "\C-ct" 'open-clumped-file)
   (define-key global-map "\C-cl" 'org-store-link)
   (define-key global-map "\C-ca" 'org-agenda)
   (define-key global-map "\C-cc" 'org-capture)
@@ -574,7 +580,7 @@ very nice search replacement
     ("C-c V" . ivy-pop-view)
     ("C-x l" . counsel-locate))
 #+end_src
-** COMMENT ace-window
+** ace-window
    Move to other buffers
 #+BEGIN_SRC emacs-lisp
   (use-package ace-window
@@ -619,7 +625,7 @@ very nice search replacement
   (ac-config-default)
   (global-auto-complete-mode t))
 #+end_src
-** golden-ratio
+** COMMENT golden-ratio
    #+BEGIN_SRC emacs-lisp
         (use-package golden-ratio
           :ensure t
@@ -682,34 +688,39 @@ very nice search replacement
     ("C-c m" . notmuch))
 #+END_SRC
 ** mu4e
+   install it with package mu from repo
 #+BEGIN_SRC emacs-lisp
-  (use-package mu4e
+  (use-package evil-mu4e
+    :ensure t)  ; evil keybindings
+  (global-set-key (kbd "\C-c m") 'mu4e)
+  (use-package org-mu4e  ; allows linking to emails
     :ensure t
     :config
-    (setq mu4e-drafts-folder "/Drafts")
-    (setq mu4e-sent-folder "/Sent Items")
-    (setq mu4e-trash-folder "/Deleted Items")
-    (setq mu4e-compose-format-flowed t)
-    (setq mu4e-maildir-shortcuts
-	  '(("/inbox" . ?i)
-	    ("/NEXT" . ?n)
-	    ("/Waiting" . ?w)
-	    ("/Deferred" . ?d)
-	    ("/news" . ?m)
-	    ("/Important backlog" . ?l)
-	    ("/Sent Items" . ?s)))
-    (setq mu4e-change-filenames-when-moving t) ; important for isync
-    (setq  mu4e-headers-date-format "%Y-%m-%d %H:%M")
-    (setq mu4e-headers-fields
-    '((:date          .  17)
-      (:flags         .   5)
-      (:from          .  22)
-      (:subject       .  nil)))
-    (setq mu4e-get-mail-command "mbsync -a"))
-  (require 'org-mu4e)
-  (setq org-mu4e-link-query-in-headers-mode nil)
-  (global-set-key (kbd "\C-c m") 'mu4e)
-
+    (setq org-mu4e-link-query-in-headers-mode nil))
+  (setq mu4e-drafts-folder "/Drafts"
+        mu4e-sent-folder "/Sent Items"
+        mu4e-trash-folder "/Deleted Items")
+  (setq mu4e-compose-format-flowed t)  ; plain-text nice to read on phone
+  (setq mu4e-maildir-shortcuts
+	'(("/inbox" . ?i)
+	  ("/NEXT" . ?n)
+	  ("/Waiting" . ?w)
+	  ("/Deferred" . ?d)
+	  ("/news" . ?m)
+	  ("/Important backlog" . ?l)
+	  ("/Sent Items" . ?s)))
+  (setq mu4e-change-filenames-when-moving t) ; important for isync
+  (setq mu4e-headers-date-format "%Y-%m-%d %H:%M")
+  (setq mu4e-headers-fields
+	'((:date          .  17)
+	  (:flags         .   5)
+	  (:from          .  22)
+	  (:subject       .  nil)))
+  (setq mu4e-get-mail-command "mbsync -a")
+  (setq mu4e-view-show-images t)
+#+END_SRC
+*** pdf preview
+#+BEGIN_SRC emacs-lisp
 #+END_SRC
 ** COMMENT mu4e notifications
    #+BEGIN_SRC emacs-lisp
