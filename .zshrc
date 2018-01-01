@@ -2,7 +2,7 @@
 # fortune showerthoughts | cowthink
 
 # reload pywal colorscheme
-(wal -r &)
+(cat /home/japhir/.cache/wal/sequences &)
 # Path to your oh-my-zsh installation.
 export ZSH=/usr/share/oh-my-zsh
 
