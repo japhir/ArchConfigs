@@ -249,7 +249,7 @@ for_window [window_role="Preferences"] floating enable
 for_window [class="^Gnome-calculator"] floating enable sticky enable
 for_window [class="Lxappearance"] floating enable sticky enable border normal
 for_window [class="Arandr"] floating enable
-for_window [class="albert"] move absolute position center
+for_window [class="albert"] move position center
 
 ### Specific software launching keybindings ###
 bindsym $mod+c exec firefox

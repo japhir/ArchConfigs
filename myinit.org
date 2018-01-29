@@ -112,19 +112,20 @@ also commented out, I can see them in my terminal if desired
   (use-package telephone-line
     :ensure t
     :init
-    (setq telephone-line-lhs     ; left hand side
-	  '((evil   .  (telephone-line-evil-tag-segment))
-	    (accent .  (telephone-line-vc-segment
-			telephone-line-erc-modified-channels-segment
-			telephone-line-process-segment))
-	    (nil    .  (telephone-line-misc-info-segment
-			telephone-line-buffer-segment))))
-    (setq telephone-line-rhs     ; right hand side
+    (setq telephone-line-lhs
+	  '((evil   . (telephone-line-evil-tag-segment))
+	    (accent . (telephone-line-vc-segment
+		       telephone-line-erc-modified-channels-segment
+		       telephone-line-process-segment))
+	    (nil    . (telephone-line-minor-mode-segment
+		       telephone-line-buffer-segment))))
+    (setq telephone-line-rhs
 	  '((nil    . (telephone-line-misc-info-segment))
 	    (accent . (telephone-line-major-mode-segment))
-	    (evil   . (telephone-line-airline-position-segment))))
-    :config (telephone-line-mode t))
-#+end_src
+	  (evil   . (telephone-line-airline-position-segment))))
+    :config
+    (telephone-line-evil-config))
+#+end_srC
 ** set the theme
 # #+begin_src emacs-lisp
 # (use-package leuven-dark
@@ -222,8 +223,7 @@ also commented out, I can see them in my terminal if desired
 (use-package evil-magit
   :ensure t)
 #+end_src
-* GTD
-  Getting Things Done with emacs!
+* org-mode
 ** my gtd and inbox files finding functions
    org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 #+begin_src emacs-lisp
@@ -250,91 +250,91 @@ also commented out, I can see them in my terminal if desired
 ** org
    note-taking, todo system, calendar, everything
 #+begin_src emacs-lisp
+  (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
   (use-package org
     :ensure t
     :config
-    (setq org-highlight-latex-and-related '(latex script entities))
     ;; refiling settings
     (setq org-refile-targets '((nil :maxlevel . 9)
-                               (org-agenda-files :maxlevel . 9)))
+			       (org-agenda-files :maxlevel . 9)))
     (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
     (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
     ;; swyper makes refiling amazing!
     ;; the todo-states of my gtd-system
     (setq org-todo-keywords
-          '((sequence "NEXT(n)" "TODO(t)" "WAITING(w!/!)" "SCHEDULED(a)" "SOMEDAY(s!/!)" "PROJECT(p)" "|"
-                      "DONE(d)" "CANCELLED(c)")))
+	  '((sequence "NEXT(n)" "TODO(t)" "WAITING(w!/!)" "SCHEDULED(a)" "SOMEDAY(s!/!)" "PROJECT(p)" "|"
+		      "DONE(d)" "CANCELLED(c)")))
     ;; add effort estimate standards
     (add-to-list 'org-global-properties
-                 '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
+		 '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
     ;; prettify the todo keywords
     (setq org-todo-keyword-faces
-          '(("NEXT"      . (:foreground "light goldenrod yellow" :background "red" :weight bold))
-            ("WAITING"   . (:foreground "dim gray" :background "yellow"))
-            ("SCHEDULED" . (:background "light slate blue"))
-            ("SOMEDAY"   . (:foreground "ghost white"  :background "deep sky blue"))
-            ("DONE"      . (:foreground "green4"       :background "pale green"))
-            ("CANCELLED" . (:foreground "dim gray"     :background "gray"))
-            ("PROJECT"   . (:foreground "navajo white" :background "saddle brown"))))
+	  '(("NEXT"      . (:foreground "light goldenrod yellow" :background "red" :weight bold))
+	    ("WAITING"   . (:foreground "dim gray" :background "yellow"))
+	    ("SCHEDULED" . (:background "light slate blue"))
+	    ("SOMEDAY"   . (:foreground "ghost white"  :background "deep sky blue"))
+	    ("DONE"      . (:foreground "green4"       :background "pale green"))
+	    ("CANCELLED" . (:foreground "dim gray"     :background "gray"))
+	    ("PROJECT"   . (:foreground "navajo white" :background "saddle brown"))))
     ;; view tasks by context (sorted by todo state)
     (setq org-agenda-custom-commands
-          '(("g" . "GTD contexts")
-            ("gh" "Home" tags-todo "@home"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("gu" "University" tags-todo "@uni"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("ge" "Errands" tags-todo "@errands"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("gl" "Laboratory" tags-todo "@lab"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("gs" "Short Dashes" tags-todo "@shortdashes"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("gb" "Brain Dead" tags-todo "@braindead"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("gr" "Routines" tags-todo "@routines"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("gf" "Full Focus" tags-todo "@fullfocus"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("gt" "Thinking" tags-todo "@thinking"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("gc" "Call" tags-todo "@call"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("gn" "Hanging Around" tags-todo "@hangingaround"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("ga" "Agenda" tags-todo "@agenda"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
-            ;; the following are all avaialable through C-a t r [x]
-            ;;("n" todo "NEXT" nil)
-            ;;("c" todo "SCHEDULED" nil)
-            ;;("w" todo "WAITING" nil)
-            ;;("s" todo "SOMEDAY" nil)
-            ;; view agenda + next actions, sorted by category
-            ("d" "Agenda + Next actions" ((agenda) (todo "NEXT")))
-            ("w" "Work" tags-todo "Work"
-             ((org-agenda-sorting-strategy '(todo-state-up))))
-            ("p" "Personal" tags-todo "Personal"
-             ((org-agenda-sorting-strategy '(todo-state-up))))))
+	  '(("g" . "GTD contexts")
+	    ("gh" "Home" tags-todo "@home"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ("gu" "University" tags-todo "@uni"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ("ge" "Errands" tags-todo "@errands"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ("gl" "Laboratory" tags-todo "@lab"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ("gs" "Short Dashes" tags-todo "@shortdashes"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ("gb" "Brain Dead" tags-todo "@braindead"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ("gr" "Routines" tags-todo "@routines"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ("gf" "Full Focus" tags-todo "@fullfocus"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ("gt" "Thinking" tags-todo "@thinking"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ("gc" "Call" tags-todo "@call"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ("gn" "Hanging Around" tags-todo "@hangingaround"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ("ga" "Agenda" tags-todo "@agenda"
+	     ((org-agenda-sorting-strategy '(todo-state-up))))
+	    ;; the following are all avaialable through C-a t r [x]
+	    ;;("n" todo "NEXT" nil)
+	    ;;("c" todo "SCHEDULED" nil)
+	    ;;("w" todo "WAITING" nil)
+	    ;;("s" todo "SOMEDAY" nil)
+	    ;; view agenda + next actions, sorted by category
+	    ("d" "Agenda + Next actions" ((agenda) (todo "NEXT")))
+	    ("w" "Work" tags-todo "Work"
+	     ((org-agenda-sorting-strategy '(todo-state-up time-up priority-down))))
+	    ("p" "Personal" tags-todo "Personal"
+	     ((org-agenda-sorting-strategy '(todo-state-up time-up priority-down))))))
     ;; set up the context tags
     (setq org-tag-alist '((:startgroup . nil)
-                          ("@home" . ?h)
-                          ("@uni" . ?u)
-                          ("@errands" . ?e)
-                          ("@lab" . ?l)
-                          (:endgroup . nil)
-                          (:startgroup . nil)
-                          ("@shortdashes" . ?s)
-                          ("@braindead" . ?b)
-                          ("@routines" . ?r)
-                          ("@fullfocus" . ?f)
-                          ("@thinking" . ?t)
-                          ("@call" . ?c)
-                          ("@hangingaround" . ?n)
-                          ("@agenda" . ?a)
-                          (:endgroup . nil)
-                          (:startgroup . nil)
-                          ("Work" . ?W)
-                          ("Personal" . ?P)
-                          (:endgroup . nil)))
+			  ("@home" . ?h)
+			  ("@uni" . ?u)
+			  ("@errands" . ?e)
+			  ("@lab" . ?l)
+			  (:endgroup . nil)
+			  (:startgroup . nil)
+			  ("@shortdashes" . ?s)
+			  ("@braindead" . ?b)
+			  ("@routines" . ?r)
+			  ("@fullfocus" . ?f)
+			  ("@thinking" . ?t)
+			  ("@call" . ?c)
+			  ("@hangingaround" . ?n)
+			  ("@agenda" . ?a)
+			  (:endgroup . nil)
+			  (:startgroup . nil)
+			  ("Work" . ?W)
+			  ("Personal" . ?P)
+			  (:endgroup . nil)))
     ;; extra org settings
     (setq org-return-follows-link t)
     (setq org-hide-leading-stars t)
@@ -349,90 +349,17 @@ also commented out, I can see them in my terminal if desired
     (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
     (setq org-deadline-warning-days 14)
     (setf org-tags-column -65)
-    (setf org-highlight-latex-and-related '(latex script entities))
-    (setq org-latex-create-formula-image-program 'dvipng)
-    (setq org-latex-default-figure-position 'htbp)
-    (add-to-list 'org-latex-packages-alist '("version=4" "mhchem" t))
-    (add-to-list 'org-latex-packages-alist '("" "siunitx" t))
-    (add-to-list 'org-latex-packages-alist '("" "biblatex" t))
-    (add-to-list 'org-latex-packages-alist '("" "upgreek" t))
-    (setq org-latex-pdf-process
-        (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
     (setq org-fontifywhole-heading-line t)
     (setq org-ellipsis "▼") ;▼ … ◦
     ;; allow for j/k movement in agenda view
     (add-hook 'org-agenda-mode-hook
-              (lambda ()
-                (define-key org-agenda-mode-map "j" 'evil-next-line)
-                (define-key org-agenda-mode-map "k" 'evil-previous-line)))
-    (add-to-list 'org-file-apps '("\\.pdf" . "evince %s"))
+	      (lambda ()
+		(define-key org-agenda-mode-map "j" 'evil-next-line)
+		(define-key org-agenda-mode-map "k" 'evil-previous-line)))
     ;; org-babel loads r
     (org-babel-do-load-languages
      'org-babel-load-languages
      '((R . t))))
-#+end_src
-** mathjax
-#+BEGIN_SRC emacs-lisp
-  (setq org-html-mathjax-options
-    '((path "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
-      (scale "100")
-      (align "center")
-      (indent "2em")
-      (mathml t)))
-  (setq org-html-mathjax-template
-		"
-  <script type=\"text/javascript\" src=\"%PATH\"></script>
-  <script type=\"text/javascript\">
-  <!--/*--><![CDATA[/*><!--*/
-      MathJax.Hub.Config({
-          jax: [\"input/TeX\", \"output/HTML-CSS\"],
-          extensions: [\"tex2jax.js\",\"TeX/AMSmath.js\",\"TeX/AMSsymbols.js\",
-                       \"TeX/noUndefined.js\", \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/mhchem/mhchem.js\"],
-          tex2jax: {
-              inlineMath: [ [\"\\\\(\",\"\\\\)\"] ],
-              displayMath: [ ['$$','$$'], [\"\\\\[\",\"\\\\]\"], [\"\\\\begin{displaymath}\",\"\\\\end{displaymath}\"] ],
-              skipTags: [\"script\",\"noscript\",\"style\",\"textarea\",\"pre\",\"code\"],
-              ignoreClass: \"tex2jax_ignore\",
-              processEscapes: false,
-              processEnvironments: true,
-              preview: \"TeX\"
-          },
-          TeX: {extensions: [\"AMSmath.js\",\"AMSsymbols.js\",  \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/mhchem/mhchem.js\"]},
-          showProcessingMessages: true,
-          displayAlign: \"%ALIGN\",
-          displayIndent: \"%INDENT\",
-
-          \"HTML-CSS\": {
-               scale: %SCALE,
-               availableFonts: [\"STIX\",\"TeX\"],
-               preferredFont: \"TeX\",
-               webFont: \"TeX\",
-               imageFont: \"TeX\",
-               showMathMenu: true,
-          },
-          MMLorHTML: {
-               prefer: {
-                   MSIE:    \"MML\",
-                   Firefox: \"MML\",
-                   Opera:   \"HTML\",
-                   other:   \"HTML\"
-               }
-          }
-      });
-  /*]]>*///-->
-  </script>")
-#+END_SRC
-** org-gcal
-#+begin_src emacs-lisp
-  (use-package org-gcal
-    :ensure t) ; config in separate file for privacy
-#+end_src
-** org \latex entities
-   Disable the =\ang= entity in org-mode so that I can use siunit's =\ang= instead.
-#+begin_src emacs-lisp
-(with-eval-after-load 'org-entities
-  (setq org-entities
-        (cl-remove-if (lambda (x) (and (listp x) (equal (car x) "ang"))) org-entities)))
 #+end_src
 ** org-capture
    customize capture templates, variables are defined in a private file.
@@ -445,6 +372,7 @@ also commented out, I can see them in my terminal if desired
 	    ("j" "Journal" entry (file+datetree org-journal-file)
 	    "* %?\nEntered on %U\n %i\n %a")))
 #+end_src
+** COMMENT capture from anywhere
    capture from anywhere! hotkey defined in window manager (i3).
    from [[https://lists.gnu.org/archive/html/emacs-orgmode/2011-05/msg00076.html][here]]
 #+begin_src emacs-lisp
@@ -474,13 +402,155 @@ also commented out, I can see them in my terminal if desired
 ** org-bullets
    prettify org mode
 #+begin_src emacs-lisp
-(use-package org-bullets
-  :ensure t
-  :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-  :config
-  (setq org-bullets-bullet-list
-	'("◉" "●" "○" "♦" "◆" "►" "▸")))
+  (use-package org-bullets
+    :ensure t
+    :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+    :config
+    (setq org-bullets-bullet-list
+	  '("◉" "●" "○" "♦" "◆" "►" "▸")))
 #+end_src
+** org-gcal
+   synchronize google calendar with org
+#+begin_src emacs-lisp
+  (use-package org-gcal
+    :ensure t) ; config in separate file for privacy
+#+end_src
+** mathjax
+   #+BEGIN_SRC html
+
+   #+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-html-mathjax-options
+    '((path "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
+      (scale "100")
+      (align "center")
+      (indent "2em")
+      (mathml t)))
+  (setq org-html-mathjax-template
+  "
+ <script type=\"text/x-mathjax-config\">
+    MathJax.Ajax.config.path[\"mhchem\"] =
+      \"https://cdnjs.cloudflare.com/ajax/libs/mathjax-mhchem/3.2.0\";
+    MathJax.Ajax.config.path[\"siunitx\"] =
+      \"https://cdn.rawgit.com/burnpanck/MathJax-siunitx/f0f03a29\";
+    MathJax.Hub.Config({
+      extensions: [\"[mhchem]/mhchem.js\", \"[siunitx]/siunitx.js\"],
+      jax: [\"input/TeX\", \"output/HTML-CSS\"],
+      TeX: {
+        extensions: [\"[mhchem]/mhchem.js\",\"[siunitx]/siunitx.js\"]
+      },
+      tex2jax: {
+        inlineMath: [ ['$','$'], [\"\\(\",\"\\)\"] ],
+        displayMath: [ ['$$','$$'], [\"\\[\",\"\\]\"] ],
+        processEscapes: true
+      },
+      \"HTML-CSS\": { availableFonts: [\"TeX\"] }
+    });
+  </script>
+  <script type=\"text/javascript\" async
+          src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML\">
+</script>
+")
+  ;;       "
+  ;; <script type=\"text/javascript\" src=\"%PATH\"></script>
+  ;; <script type=\"text/javascript\">
+  ;; <!--/*--><![CDATA[/*><!--*/
+  ;;     MathJax.Hub.Config({
+  ;; 	jax: [\"input/TeX\", \"output/HTML-CSS\"],
+  ;; 	extensions: [\"tex2jax.js\",\"TeX/AMSmath.js\",\"TeX/AMSsymbols.js\",
+  ;; 		     \"TeX/noUndefined.js\", \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/mhchem/mhchem.js\"],
+  ;; 	tex2jax: {
+  ;; 	    inlineMath: [ [\"\\\\(\",\"\\\\)\"] ],
+  ;; 	    displayMath: [ ['$$','$$'], [\"\\\\[\",\"\\\\]\"], [\"\\\\begin{displaymath}\",\"\\\\end{displaymath}\"] ],
+  ;; 	    skipTags: [\"script\",\"noscript\",\"style\",\"textarea\",\"pre\",\"code\"],
+  ;; 	    ignoreClass: \"tex2jax_ignore\",
+  ;; 	    processEscapes: false,
+  ;; 	    processEnvironments: true,
+  ;; 	    preview: \"TeX\"
+  ;; 	},
+  ;; 	TeX: {extensions: [\"AMSmath.js\",\"AMSsymbols.js\",  \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/mhchem/mhchem.js\"]},
+  ;; 	showProcessingMessages: true,
+  ;; 	displayAlign: \"%ALIGN\",
+  ;; 	displayIndent: \"%INDENT\",
+
+  ;; 	\"HTML-CSS\": {
+  ;; 	     scale: %SCALE,
+  ;; 	     availableFonts: [\"STIX\",\"TeX\"],
+  ;; 	     preferredFont: \"TeX\",
+  ;; 	     webFont: \"TeX\",
+  ;; 	     imageFont: \"TeX\",
+  ;; 	     showMathMenu: true,
+  ;; 	},
+  ;; 	MMLorHTML: {
+  ;; 	     prefer: {
+  ;; 		 MSIE:    \"MML\",
+  ;; 		 Firefox: \"MML\",
+  ;; 		 Opera:   \"HTML\",
+  ;; 		 other:   \"HTML\"
+  ;; 	     }
+  ;; 	}
+  ;;     });
+  ;; /*]]>*///-->
+  ;; </script>")
+#+END_SRC
+**
+** org-latex export settings
+   basic latex settings
+#+BEGIN_SRC emacs-lisp
+    (add-to-list 'org-file-apps '("\\.pdf" . "evince %s"))
+    (setq org-highlight-latex-and-related '(latex script entities))
+    (setq org-latex-create-formula-image-program 'dvipng)
+    (setq org-latex-default-figure-position 'htbp)
+    ;(setq org-latex-pdf-process
+;	  '("pdflatex -interaction nonstopmode -output-directory %o %f"
+;	    "bibtex %b"
+;	    "pdflatex -interaction nonstopmode -output-directory %o %f"
+;	    "pdflatex -interaction nonstopmode -output-directory %o %f"))
+    (setq org-latex-pdf-process
+  	(list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
+    (setq org-latex-prefer-user-labels t)
+    ;; disable the ang preview entity, because it conflicts with \ang from siunitx
+    (with-eval-after-load 'org-entities
+      (setq org-entities
+	    (cl-remove-if (lambda (x) (and (listp x) (equal (car x) "ang"))) org-entities)))
+#+END_SRC
+   latex class =ijkarticle=
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'org-latex-classes
+       '("ijkarticle"
+	 "\\documentclass{article}
+\\usepackage[citestyle=authoryear,bibstyle=authoryear,hyperref=true,maxcitenames=3,url=true,backend=biber,natbib=true]{biblatex}
+\\usepackage[version=4]{mhchem} % for chemical equations with `\ce{}'
+\\usepackage{siunitx} % for SI units
+\\usepackage[Symbol]{upgreek} % to allow for upright delta symbol
+\\sisetup{
+  separate-uncertainty = true,
+  multi-part-units = single,
+  list-units = single,
+  range-units = single
+}%
+%% new units
+\\DeclareSIUnit\\permil{\\text{\\textperthousand}} % per mille
+\\DeclareSIUnit\\pmVPDB{\\permil~\\text{VPDB}}     % Vienna Pee Dee Belumnite
+\\DeclareSIUnit\\annus{\\text{a}}                 % /annum, latin for one year
+\\DeclareSIUnit\\Ma{\\mega\\annus}                 % million years ago
+\\DeclareSIUnit\\ka{\\kilo\\annus}                 % thousand years ago
+\\DeclareSIUnit\\year{\\text{yr}}                 % unit for duration
+\\DeclareSIUnit\\Myr{\\mega\\year}                 % million year
+\\DeclareSIUnit\\kyr{\\kilo\\year}                 % thousand year
+\\DeclareSIUnit\\ppmv{\\text{ppmv}}               % parts per million volume
+\\DeclareSIUnit\\mbsf{\\metre\\text{bsf}}          % metre below sea floor
+
+%% aliases for clearer document
+\\newcommand{\\appr}{\\raise.17ex\\hbox{$\\scriptstyle\\sim$}} % approximately symbol
+"
+		 ("\\section{%s}" . "\\section*{%s}")
+		 ("\\subsection{%s}" . "\\subsection*{%s}")
+		 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+		 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+		 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+END_SRC
 * general packages and functions
 ** easy symbol insertion
    By default C-x 8 o = ° and C-x 8 m = µ. So:
@@ -540,7 +610,7 @@ directory to make multiple eshell windows easier."
   (use-package ranger
     :ensure t)
 #+END_SRC
-** edit with emacs (chromium)
+** COMMENT edit with emacs (chromium)
    Edit gmail messages and other input fields in chrome with emacs, markdown.
 #+BEGIN_SRC emacs-lisp
   (use-package edit-server
@@ -615,6 +685,28 @@ very nice search replacement
   :bind
   ("M-g" . magit-status))
 #+end_src
+** COMMENT hydra
+file bookmarks
+#+BEGIN_SRC emacs-lisp
+    (use-package hydra
+      :config
+      (global-set-key
+       (kbd "C-c j")
+       (defhydra hydra-jump (:color blue)
+	 "jump"
+	 ("d" (counsel-find-file "~/Documents") "Documents")
+	 ("D" (counsel-find-file "~/Downloads") "Downloads")
+	 ("p" (counsel-find-file "~/SurfDrive/PhD/projects") "projects")
+	 ;; this doesn't work
+	 ;("pt" (counsel-find-file "~/SurfDrive/PhD/presentations") "presentations")
+	 ))
+	 ;; what could be a good way to do this?
+      (global-set-key
+       (kbd "C-c p")
+       (defhydra hydra-projects (:color blue)
+	 "projects"
+	 ("s" (counsel-find-file "~/SurfDrive/PhD/projects/standardstats") "standardstats"))))
+#+END_SRC
 ** auto-complete
    auto complete everything
 #+begin_src emacs-lisp
@@ -641,6 +733,7 @@ very nice search replacement
         (append '(
                   ("i3config" . conf-mode)
                   ("i3status" . conf-mode)
+		  (".*rc\\'" . conf-mode)
                   ("\\.inp\\'" . conf-mode)
                   )
                 auto-mode-alist-init))
@@ -675,6 +768,11 @@ very nice search replacement
   (setq browse-url-browser-function 'browse-url-generic
 	browse-url-generic-program "firefox")
 #+END_SRC
+** COMMENT writeroom-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package writeroom-mode
+    :ensure t)
+#+END_SRC
 * email
 ** COMMENT notmuch email
 #+BEGIN_SRC emacs-lisp
@@ -700,7 +798,7 @@ very nice search replacement
   (setq mu4e-drafts-folder "/Drafts"
         mu4e-sent-folder "/Sent Items"
         mu4e-trash-folder "/Deleted Items")
-  (setq mu4e-compose-format-flowed t)  ; plain-text nice to read on phone
+  ;;(setq mu4e-compose-format-flowed t)  ; plain-text nice to read on phone
   (setq mu4e-maildir-shortcuts
 	'(("/inbox" . ?i)
 	  ("/NEXT" . ?n)
@@ -718,9 +816,6 @@ very nice search replacement
 	  (:subject       .  nil)))
   (setq mu4e-get-mail-command "mbsync -a")
   (setq mu4e-view-show-images t)
-#+END_SRC
-*** pdf preview
-#+BEGIN_SRC emacs-lisp
 #+END_SRC
 ** COMMENT mu4e notifications
    #+BEGIN_SRC emacs-lisp
@@ -797,13 +892,15 @@ very nice search replacement
 ** LaTeX (AUCTeX, RefTeX)
    for working with \LaTeX
 #+begin_src emacs-lisp
-    (setq TeX-auto-save t)
-    (setq TeX-parse-self t)
-    (setq-default TeX-master nil)
-    (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-    (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
-    (add-hook 'LaTeX-mode-hook 'prettify-symbols-mode)
-    (setq reftex-plug-into-AUCTeX t)
+  (use-package auctex
+    :ensure t)
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq-default TeX-master nil)
+  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+  (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
+  (add-hook 'LaTeX-mode-hook 'prettify-symbols-mode)
+  (setq reftex-plug-into-AUCTeX t)
 #+end_src
 ** ispell: spell-checking
 #+begin_src emacs-lisp
@@ -840,7 +937,7 @@ org-export ignore headlines with ~:ignore:~ tag
 (require 'ox-extra)
 (ox-extras-activate '(latex-header-blocks ignore-headlines))
 #+END_SRC
-** COMMENT org-ref
+** org-ref
 #+BEGIN_SRC emacs-lisp
   (use-package org-ref
     :init
