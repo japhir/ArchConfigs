@@ -124,21 +124,32 @@ also commented out, I can see them in my terminal if desired
 	    (accent . (telephone-line-major-mode-segment))
 	  (evil   . (telephone-line-airline-position-segment))))
     :config
+    (require 'telephone-line-config)
     (telephone-line-evil-config))
 #+end_srC
 ** set the theme
-# #+begin_src emacs-lisp
-# (use-package leuven-dark
-#   :init
-#   (load-theme 'leuven t))
-# #+end_src
-
+*** leuven
+#+begin_src emacs-lisp
+(use-package leuven-theme
+  :init
+  (load-theme 'leuven t)
+  :config
+  (setq org-fontify-whole-heading-line t))
+#+end_src
+*** leuven-dark
+#+begin_src emacs-lisp
+(use-package leuven-dark
+  :init
+  (load-theme 'leuven t))
+#+end_src
+*** COMMENT monokai
 #+BEGIN_SRC emacs-lisp
   (use-package monokai-theme
     :ensure t
     :init
     (load-theme 'monokai t))
 #+END_SRC
+
 ** default font
 #+begin_src emacs-lisp
   (set-face-attribute 'default nil
