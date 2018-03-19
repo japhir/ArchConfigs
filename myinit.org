@@ -136,7 +136,7 @@ also commented out, I can see them in my terminal if desired
   :config
   (setq org-fontify-whole-heading-line t))
 #+end_src
-*** leuven-dark
+*** COMMENT leuven-dark
 #+begin_src emacs-lisp
 (use-package leuven-dark
   :init
@@ -183,6 +183,14 @@ also commented out, I can see them in my terminal if desired
 		("C-k" . evil-window-up)
 		("C-l" . evil-window-right)))
 #+end_src
+** evil-collection
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-collection
+    :after evil
+    :ensure t
+    :config
+    (evil-collection-init))
+#+END_SRC
 ** evil-org
    evil keymap for org-mode
 #+begin_src emacs-lisp
@@ -360,7 +368,7 @@ also commented out, I can see them in my terminal if desired
     (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
     (setq org-deadline-warning-days 14)
     (setf org-tags-column -65)
-    (setq org-fontifywhole-heading-line t)
+    ;(setq org-fontifywhole-heading-line t)
     (setq org-ellipsis "▼") ;▼ … ◦
     ;; allow for j/k movement in agenda view
     (add-hook 'org-agenda-mode-hook
@@ -427,10 +435,6 @@ also commented out, I can see them in my terminal if desired
     :ensure t) ; config in separate file for privacy
 #+end_src
 ** mathjax
-   #+BEGIN_SRC html
-
-   #+END_SRC
-
 #+BEGIN_SRC emacs-lisp
   (setq org-html-mathjax-options
     '((path "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
@@ -463,49 +467,7 @@ also commented out, I can see them in my terminal if desired
           src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML\">
 </script>
 ")
-  ;;       "
-  ;; <script type=\"text/javascript\" src=\"%PATH\"></script>
-  ;; <script type=\"text/javascript\">
-  ;; <!--/*--><![CDATA[/*><!--*/
-  ;;     MathJax.Hub.Config({
-  ;; 	jax: [\"input/TeX\", \"output/HTML-CSS\"],
-  ;; 	extensions: [\"tex2jax.js\",\"TeX/AMSmath.js\",\"TeX/AMSsymbols.js\",
-  ;; 		     \"TeX/noUndefined.js\", \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/mhchem/mhchem.js\"],
-  ;; 	tex2jax: {
-  ;; 	    inlineMath: [ [\"\\\\(\",\"\\\\)\"] ],
-  ;; 	    displayMath: [ ['$$','$$'], [\"\\\\[\",\"\\\\]\"], [\"\\\\begin{displaymath}\",\"\\\\end{displaymath}\"] ],
-  ;; 	    skipTags: [\"script\",\"noscript\",\"style\",\"textarea\",\"pre\",\"code\"],
-  ;; 	    ignoreClass: \"tex2jax_ignore\",
-  ;; 	    processEscapes: false,
-  ;; 	    processEnvironments: true,
-  ;; 	    preview: \"TeX\"
-  ;; 	},
-  ;; 	TeX: {extensions: [\"AMSmath.js\",\"AMSsymbols.js\",  \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/mhchem/mhchem.js\"]},
-  ;; 	showProcessingMessages: true,
-  ;; 	displayAlign: \"%ALIGN\",
-  ;; 	displayIndent: \"%INDENT\",
-
-  ;; 	\"HTML-CSS\": {
-  ;; 	     scale: %SCALE,
-  ;; 	     availableFonts: [\"STIX\",\"TeX\"],
-  ;; 	     preferredFont: \"TeX\",
-  ;; 	     webFont: \"TeX\",
-  ;; 	     imageFont: \"TeX\",
-  ;; 	     showMathMenu: true,
-  ;; 	},
-  ;; 	MMLorHTML: {
-  ;; 	     prefer: {
-  ;; 		 MSIE:    \"MML\",
-  ;; 		 Firefox: \"MML\",
-  ;; 		 Opera:   \"HTML\",
-  ;; 		 other:   \"HTML\"
-  ;; 	     }
-  ;; 	}
-  ;;     });
-  ;; /*]]>*///-->
-  ;; </script>")
 #+END_SRC
-**
 ** org-latex export settings
    basic latex settings
 #+BEGIN_SRC emacs-lisp
@@ -526,7 +488,17 @@ also commented out, I can see them in my terminal if desired
       (setq org-entities
 	    (cl-remove-if (lambda (x) (and (listp x) (equal (car x) "ang"))) org-entities)))
 #+END_SRC
-   latex class =ijkarticle=
+** org-beamer
+#+BEGIN_SRC emacs-lisp
+  (require 'ox-latex)
+  (add-to-list 'org-latex-classes
+	       '("beamer"
+		 "\\documentclass\[presentation\]\{beamer\}"
+		 ("\\section\{%s\}" . "\\section*\{%s\}")
+		 ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
+		 ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
+#+END_SRC
+** latex class =ijkarticle=
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'org-latex-classes
        '("ijkarticle"
