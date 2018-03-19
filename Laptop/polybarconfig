@@ -33,8 +33,9 @@ module-margin-left = 1
 module-margin-right = 2
 
 font-0 = "Source Code Pro:size=8;1"
-font-1 = "FontAwesome5Free:style=Solid:size=10;1"
-font-2 = "FontAwesome5Brands:style=Solid:size=10;1"
+font-1 = "Font Awesome 5 Free:pixelsize=10;1"
+font-2 = "Font Awesome 5 Free Solid:pixelsize=10;1"
+font-3 = "Font Awesome 5 Brands:style=Solid:size=10;1"
 
 modules-left = i3
 modules-center = fuzzyclock
@@ -68,8 +69,9 @@ module-margin-left = 1
 module-margin-right = 2
 
 font-0 = "Source Code Pro:size=8;1"
-font-1 = "FontAwesome5Free:style=Solid:size=10;1"
-font-2 = "FontAwesome5Brands:style=Solid:size=10;1"
+font-1 = "Font Awesome 5 Free:pixelsize=10;1"
+font-2 = "Font Awesome 5 Free Solid:pixelsize=10;1"
+font-3 = "Font Awesome 5 Brands:pixelsize=10;1"
 
 modules-left = i3
 modules-center = fuzzyclock
