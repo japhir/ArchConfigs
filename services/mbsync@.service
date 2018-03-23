@@ -1,5 +1,6 @@
 [Unit]
 Description=Mailbox synchronisation service for user %I
+After=network.target network-online.target dbus.socket
 
 [Service]
 Type=oneshot
