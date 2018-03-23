@@ -588,10 +588,14 @@ directory to make multiple eshell windows easier."
 	   '(lambda()
 	      (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
  #+end_src
-** COMMENT ranger
+** ranger
 #+BEGIN_SRC emacs-lisp
   (use-package ranger
-    :ensure t)
+    :ensure t
+    :bind
+    ("C-c r" . ranger)
+    :config
+    (ranger-override-dired-mode t))
 #+END_SRC
 ** COMMENT edit with emacs (chromium)
    Edit gmail messages and other input fields in chrome with emacs, markdown.
