@@ -84,7 +84,7 @@ also commented out, I can see them in my terminal if desired
    create-lockfiles nil
    mouse-wheel-progressive-speed nil)
 #+END_SRC
-** dired should play nice
+** COMMENT dired should play nice
 #+BEGIN_SRC emacs-lisp
   (define-key global-map [remap list-buffers] 'ibuffer)
 
@@ -106,27 +106,6 @@ also commented out, I can see them in my terminal if desired
     (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
     (add-hook 'LaTeX-mode-hook 'rainbow-delimiters-mode))
 #+end_src
-** telephone-line
-   very nice powerline-based status line
-#+begin_src emacs-lisp
-  (use-package telephone-line
-    :ensure t
-    :init
-    (setq telephone-line-lhs
-	  '((evil   . (telephone-line-evil-tag-segment))
-	    (accent . (telephone-line-vc-segment
-		       telephone-line-erc-modified-channels-segment
-		       telephone-line-process-segment))
-	    (nil    . (telephone-line-minor-mode-segment
-		       telephone-line-buffer-segment))))
-    (setq telephone-line-rhs
-	  '((nil    . (telephone-line-misc-info-segment))
-	    (accent . (telephone-line-major-mode-segment))
-	  (evil   . (telephone-line-airline-position-segment))))
-    :config
-    (require 'telephone-line-config)
-    (telephone-line-evil-config))
-#+end_srC
 ** set the theme
 *** leuven
 #+begin_src emacs-lisp
@@ -171,6 +150,7 @@ also commented out, I can see them in my terminal if desired
 ** evil
    vim emulator
 #+begin_src emacs-lisp
+  (setq evil-want-integration nil)
   (setq evil-want-C-u-scroll t) ; C-u scrolls up half page
   (use-package evil
     :ensure t
@@ -188,15 +168,15 @@ also commented out, I can see them in my terminal if desired
   (use-package evil-collection
     :after evil
     :ensure t
-    :config
+    :init
     (evil-collection-init))
 #+END_SRC
 ** evil-org
    evil keymap for org-mode
 #+begin_src emacs-lisp
-(use-package evil-org
-  :ensure t
-  :diminish evil-org-mode)
+  (use-package evil-org
+    :ensure t
+    :diminish evil-org-mode)
 #+end_src
 ** COMMENT undo tree
 #+begin_src emacs-lisp
@@ -211,7 +191,8 @@ also commented out, I can see them in my terminal if desired
   (use-package evil-escape
     :ensure t
     :diminish evil-escape-mode
-    :config (evil-escape-mode 1)
+    :config
+    (evil-escape-mode 1)
     (setq-default evil-escape-key-sequence "jk"))
 #+end_src
 ** evil-nerd-commenter
@@ -239,9 +220,30 @@ also commented out, I can see them in my terminal if desired
 ** evil-magit
    evil keybindings for magit
 #+begin_src emacs-lisp
-(use-package evil-magit
-  :ensure t)
+  (use-package evil-magit
+    :ensure t)
 #+end_src
+** telephone-line
+   very nice powerline-based status line
+#+begin_src emacs-lisp
+  (use-package telephone-line
+    :ensure t
+    :init
+    (setq telephone-line-lhs
+	  '((evil   . (telephone-line-evil-tag-segment))
+	    (accent . (telephone-line-vc-segment
+		       telephone-line-erc-modified-channels-segment
+		       telephone-line-process-segment))
+	    (nil    . (telephone-line-minor-mode-segment
+		       telephone-line-buffer-segment))))
+    (setq telephone-line-rhs
+	  '((nil    . (telephone-line-misc-info-segment))
+	    (accent . (telephone-line-major-mode-segment))
+	  (evil   . (telephone-line-airline-position-segment))))
+    :config
+    (require 'telephone-line-config)
+    (telephone-line-evil-config))
+#+end_srC
 * org-mode
 ** my gtd and inbox files finding functions
    org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
@@ -281,20 +283,20 @@ also commented out, I can see them in my terminal if desired
     ;; swyper makes refiling amazing!
     ;; the todo-states of my gtd-system
     (setq org-todo-keywords
-	  '((sequence "NEXT(n)" "TODO(t)" "WAITING(w!/!)" "SCHEDULED(a)" "SOMEDAY(s!/!)" "PROJECT(p)" "|"
-		      "DONE(d)" "CANCELLED(c)")))
+	  '((sequence "TICK(t)" "NEXT(n)" "WAIT(w!/!)" "SOME(s!/!)" "PROJ(p)" "|"
+		      "DONE(d)" "CANC(c)")))
     ;; add effort estimate standards
     (add-to-list 'org-global-properties
 		 '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
     ;; prettify the todo keywords
     (setq org-todo-keyword-faces
-	  '(("NEXT"      . (:foreground "light goldenrod yellow" :background "red" :weight bold))
-	    ("WAITING"   . (:foreground "dim gray" :background "yellow"))
-	    ("SCHEDULED" . (:background "light slate blue"))
-	    ("SOMEDAY"   . (:foreground "ghost white"  :background "deep sky blue"))
-	    ("DONE"      . (:foreground "green4"       :background "pale green"))
-	    ("CANCELLED" . (:foreground "dim gray"     :background "gray"))
-	    ("PROJECT"   . (:foreground "navajo white" :background "saddle brown"))))
+	  '(("TICK" . (:background "light slate blue"))
+	    ("NEXT" . (:foreground "light goldenrod yellow" :background "red" :weight bold))
+	    ("WAIT" . (:foreground "dim gray" :background "yellow"))
+	    ("SOME" . (:foreground "ghost white"  :background "deep sky blue"))
+	    ("DONE" . (:foreground "green4"       :background "pale green"))
+	    ("CANC" . (:foreground "dim gray"     :background "gray"))
+	    ("PROJ" . (:foreground "navajo white" :background "saddle brown"))))
     ;; view tasks by context (sorted by todo state)
     (setq org-agenda-custom-commands
 	  '(("g" . "GTD contexts")
@@ -306,19 +308,11 @@ also commented out, I can see them in my terminal if desired
 	     ((org-agenda-sorting-strategy '(todo-state-up))))
 	    ("gl" "Laboratory" tags-todo "@lab"
 	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gs" "Short Dashes" tags-todo "@shortdashes"
+	    ("gp" "Phone" tags-todo "@phone"
 	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gb" "Brain Dead" tags-todo "@braindead"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gr" "Routines" tags-todo "@routines"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gf" "Full Focus" tags-todo "@fullfocus"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gt" "Thinking" tags-todo "@thinking"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gc" "Call" tags-todo "@call"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gn" "Hanging Around" tags-todo "@hangingaround"
+	    ("gb" "Bank" tags-todo "@bank"
+             ((org-agenda-sorting-strategy '(todo-state-up)))
+	    ("gm" "e-mail" tags-todo "@email"
 	     ((org-agenda-sorting-strategy '(todo-state-up))))
 	    ("ga" "Agenda" tags-todo "@agenda"
 	     ((org-agenda-sorting-strategy '(todo-state-up))))
@@ -328,33 +322,23 @@ also commented out, I can see them in my terminal if desired
 	    ;;("w" todo "WAITING" nil)
 	    ;;("s" todo "SOMEDAY" nil)
 	    ;; view agenda + next actions, sorted by category
-	    ("d" "Agenda + Next actions" ((agenda) (todo "NEXT")))
+	    ;; ("d" "Agenda + Next actions" ((agenda) (todo "NEXT")))
 	    ("w" "Work" tags-todo "Work"
 	     ((org-agenda-sorting-strategy '(todo-state-up time-up priority-down))))
 	    ("p" "Personal" tags-todo "Personal"
-	     ((org-agenda-sorting-strategy '(todo-state-up time-up priority-down))))))
+	     ((org-agenda-sorting-strategy '(todo-state-up time-up priority-down)))))))
     ;; set up the context tags
-    (setq org-tag-alist '((:startgroup . nil)
-			  ("@home" . ?h)
-			  ("@uni" . ?u)
-			  ("@errands" . ?e)
-			  ("@lab" . ?l)
-			  (:endgroup . nil)
-			  (:startgroup . nil)
-			  ("@shortdashes" . ?s)
-			  ("@braindead" . ?b)
-			  ("@routines" . ?r)
-			  ("@fullfocus" . ?f)
-			  ("@thinking" . ?t)
-			  ("@call" . ?c)
-			  ("@hangingaround" . ?n)
-			  ("@agenda" . ?a)
-			  (:endgroup . nil)
-			  (:startgroup . nil)
-			  ("Work" . ?W)
-			  ("Personal" . ?P)
-			  (:endgroup . nil)))
+    (setq org-tag-alist '((:startgroup . nil) ("@home" . ?h) ("@uni" . ?u) ("@errands" . ?e) ("@lab" . ?l) ("@phone" . ?p) ("@email" . ?m) ("@computer" . ?c) ("@bank" . ?b) (:endgroup . nil)
+			  (:startgroup . nil) ("@agenda" . ?a) ("@write" . ?w) ("@research" . ?r) (:endgroup . nil)
+			  (:startgroup . nil) ("morning" . ?1) ("afternoon" .?2) ("evening" .?3) (:endgroup . nil)
+			  (:startgroup . nil) ("Work" . ?W) ("Personal" . ?P) (:endgroup . nil)
+			  ("Martin". ?M) ("Anne" . ?A) ("Inigo". ?I) ("Robin" . ?R) ("RobinV" . ?V)
+			  ("Margot" . ?C) ("Appy" . ?S) ("Richard" . ?Z) ("Lucas" . ?L) ("Nele". ?N) ("Holger". ?H)))
     ;; extra org settings
+    (setq org-agenda-todo-ignore-scheduled t)
+    (setq org-agenda-todo-ignore-deadlines t)
+    (setq org-agenda-todo-ignore-timestamp t)
+    (setq org-agenda-todo-ignore-with-date t)
     (setq org-return-follows-link t)
     (setq org-hide-leading-stars t)
     (setf org-special-ctrl-a/e t)
@@ -380,43 +364,35 @@ also commented out, I can see them in my terminal if desired
      'org-babel-load-languages
      '((R . t))))
 #+end_src
-** org-capture
+** org-fancy-capture attempt
+#+BEGIN_SRC emacs-lisp
+    ;;;; Thank you random guy from StackOverflow
+    ;;;; http://stackoverflow.com/questions/23517372/hook-or-advice-when-aborting-org-capture-before-template-selection
+  (require 'org-capture)
+  (require 'org-protocol)
+  (defadvice org-capture
+      (after make-full-window-frame activate)
+    "Advise capture to be the only window when used as a popup"
+    (if (equal "emacs-popup" (frame-parameter nil 'name))
+	(delete-other-windows)))
+  (defadvice org-capture-finalize
+      (after delete-capture-frame activate)
+    "Advise capture-finalize to close the frame"
+    (if (equal "emacs-popup" (frame-parameter nil 'name))
+	(delete-frame)))
+#+END_SRC
+** org-capture templates
    customize capture templates, variables are defined in a private file.
 #+begin_src emacs-lisp
-    (setq org-capture-templates
-	  '(("a" "Appointment" entry (file org-cal-file)
-	    "* %?\n\n%^T\n\n:PROPERTIES:\n\n:END:\n\n")
-	    ("t" "Todo" entry (file org-in-file)
-	     "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
-	    ("j" "Journal" entry (file+datetree org-journal-file)
-	    "* %?\nEntered on %U\n %i\n %a")))
-#+end_src
-** COMMENT capture from anywhere
-   capture from anywhere! hotkey defined in window manager (i3).
-   from [[https://lists.gnu.org/archive/html/emacs-orgmode/2011-05/msg00076.html][here]]
-#+begin_src emacs-lisp
-(defun my-org-capture-other-frame ()
-  "Create a new frame and run org-capture."
-  (interactive)
-  (make-frame '((name . "Org-Capture")
-                (width  .  70)
-                (height .  20)
-                (menu-bar-lines . 0)
-                (tool-bar-lines . 0)
-                (auto-lower . nil)
-                (auto-raise . t)))
-  (select-frame-by-name "Org-Capture")
-  (if (condition-case nil
-          (progn (org-capture) t)
-        (error nil))
-      (delete-other-windows)
-    (my-org-capture-other-frame-cleanup)))
-
-(defun my-org-capture-other-frame-cleanup ()
-  "Close the Org-Capture frame."
-  (if (equal "Org-Capture" (frame-parameter nil 'name))
-      (delete-frame)))
-(add-hook 'org-capture-after-finalize-hook 'my-org-capture-other-frame-cleanup)
+  (setq org-capture-templates
+	'(("a" "Appointment" entry (file org-cal-file)
+	  "* %?\n\n%^T\n\n:PROPERTIES:\n\n:END:\n\n")
+	  ("t" "Todo" entry (file org-in-file)
+	   "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
+	  ("w" "Website" entry (file org-in-file)
+	   "* %?\nEntered on %U\n \%i\n %a")
+	  ("j" "Journal" entry (file+datetree org-journal-file)
+	  "* %?\nEntered on %U\n %i\n %a")))
 #+end_src
 ** org-bullets
    prettify org mode
@@ -651,8 +627,8 @@ very nice search replacement
 ** counsel
    Required for swiper
 #+begin_src emacs-lisp
-(use-package counsel
-  :ensure t)
+  (use-package counsel
+    :ensure t)
 #+end_src
 ** avy
    jump to next chararcter. Slightly redundant b/c of evil's =f= and =t=.
@@ -675,55 +651,55 @@ very nice search replacement
 ** COMMENT hydra
 file bookmarks
 #+BEGIN_SRC emacs-lisp
-    (use-package hydra
-      :config
-      (global-set-key
-       (kbd "C-c j")
-       (defhydra hydra-jump (:color blue)
-	 "jump"
-	 ("d" (counsel-find-file "~/Documents") "Documents")
-	 ("D" (counsel-find-file "~/Downloads") "Downloads")
-	 ("p" (counsel-find-file "~/SurfDrive/PhD/projects") "projects")
-	 ;; this doesn't work
-	 ;("pt" (counsel-find-file "~/SurfDrive/PhD/presentations") "presentations")
-	 ))
-	 ;; what could be a good way to do this?
-      (global-set-key
-       (kbd "C-c p")
-       (defhydra hydra-projects (:color blue)
-	 "projects"
-	 ("s" (counsel-find-file "~/SurfDrive/PhD/projects/standardstats") "standardstats"))))
+  (use-package hydra
+    :config
+    (global-set-key
+     (kbd "C-c j")
+     (defhydra hydra-jump (:color blue)
+       "jump"
+       ("d" (counsel-find-file "~/Documents") "Documents")
+       ("D" (counsel-find-file "~/Downloads") "Downloads")
+       ("p" (counsel-find-file "~/SurfDrive/PhD/projects") "projects")
+       ;; this doesn't work
+       ;("pt" (counsel-find-file "~/SurfDrive/PhD/presentations") "presentations")
+       ))
+       ;; what could be a good way to do this?
+    (global-set-key
+     (kbd "C-c p")
+     (defhydra hydra-projects (:color blue)
+       "projects"
+       ("s" (counsel-find-file "~/SurfDrive/PhD/projects/standardstats") "standardstats"))))
 #+END_SRC
 ** auto-complete
    auto complete everything
 #+begin_src emacs-lisp
-(use-package auto-complete
-  :ensure t
-  :diminish auto-complete-mode
-  :init
-  (ac-config-default)
-  (global-auto-complete-mode t))
+  (use-package auto-complete
+    :ensure t
+    :diminish auto-complete-mode
+    :init
+    (ac-config-default)
+    (global-auto-complete-mode t))
 #+end_src
 ** COMMENT golden-ratio
    #+BEGIN_SRC emacs-lisp
-        (use-package golden-ratio
-          :ensure t
-	  :config
-	  (golden-ratio-mode 1)
-	  (setq golden-ratio-auto-scale t))
+     (use-package golden-ratio
+       :ensure t
+       :config
+       (golden-ratio-mode 1)
+       (setq golden-ratio-auto-scale t))
    #+END_SRC
 ** file extension modes
 #+BEGIN_SRC emacs-lisp
   (defvar auto-mode-alist-init
     auto-mode-alist "emacs default value for `auto-mode-alist'.")
   (setq auto-mode-alist
-        (append '(
-                  ("i3config" . conf-mode)
-                  ("i3status" . conf-mode)
+	(append '(
+		  ("i3config" . conf-mode)
+		  ("i3status" . conf-mode)
 		  (".*rc\\'" . conf-mode)
-                  ("\\.inp\\'" . conf-mode)
-                  )
-                auto-mode-alist-init))
+		  ("\\.inp\\'" . conf-mode)
+		  )
+		auto-mode-alist-init))
 #+END_SRC
 ** flycheck
 #+BEGIN_SRC emacs-lisp
@@ -759,6 +735,15 @@ file bookmarks
 #+BEGIN_SRC emacs-lisp
   (use-package writeroom-mode
     :ensure t)
+#+END_SRC
+** COMMENT erc
+   I use weechat on command line now
+#+BEGIN_SRC emacs-lisp
+  (use-package erc
+    :config
+    (setq erc-hide-list '("JOIN" "PART" "QUIT"))
+    (setq erc-track-exclude-types '("JOIN" "MODE"
+      "NICK" "PART" "QUIT" "305" "306" "324" "329" "332" "333" "353" "477")))
 #+END_SRC
 * email
 ** COMMENT notmuch email
@@ -802,9 +787,11 @@ file bookmarks
 	  (:from          .  22)
 	  (:subject       .  nil)))
   (setq mu4e-get-mail-command "mbsync -a")
+  (setq mu4e-headers-include-related nil)
+  (setq mu4e-confirm-quit nil)
   (setq mu4e-view-show-images t)
 #+END_SRC
-** COMMENT mu4e notifications
+** mu4e notifications
    #+BEGIN_SRC emacs-lisp
    (use-package mu4e-alert
      :ensure t
@@ -921,8 +908,9 @@ file bookmarks
 ** ox-extra
 org-export ignore headlines with ~:ignore:~ tag
 #+BEGIN_SRC emacs-lisp
-(require 'ox-extra)
-(ox-extras-activate '(latex-header-blocks ignore-headlines))
+  ;; (add-to-list 'load-path "~/path/to/orgdir/contrib/lisp" t)
+  (require 'ox-extra)
+  (ox-extras-activate '(latex-header-blocks ignore-headlines))
 #+END_SRC
 ** org-ref
 #+BEGIN_SRC emacs-lisp

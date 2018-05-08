@@ -180,7 +180,7 @@ workspace_auto_back_and_forth yes
 #=======================================================================
 
 # reload the configuration file
-bindsym $mod+Shift+c reload
+# bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
@@ -250,12 +250,15 @@ for_window [class="^Gnome-calculator"] floating enable sticky enable
 for_window [class="Lxappearance"] floating enable sticky enable border normal
 for_window [class="Arandr"] floating enable
 for_window [class="albert"] move position center
+for_window [instance="emacs-popup"] floating enable
 
 ### Specific software launching keybindings ###
 bindsym $mod+c exec firefox
 bindsym $mod+x exec nautilus
 bindsym $mod+m exec emacsclient -c
 bindsym $mod+r exec i3-sensible-terminal -e ranger
+#bindsym $mod+shift+w exec emacs-popup --eval '(org-capture nil "w")'
+#bindsym $mod+Shift+c exec emacs-popup --eval '(org-capture nil "t")'
 
 # Take a screenshot with scrot
 bindsym Print exec scrot -b ~/Pictures/Screenshots/%Y-%m-%d-%T.png
