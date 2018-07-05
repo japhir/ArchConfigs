@@ -1,15 +1,15 @@
-yes# Increase volume
-"sh /home/japhir/ArchConfigs/soundwithvolnoti.sh up"
+# Increase volume
+"amixer set Master 5%+ && volnoti-show $(amixer get Master | grep -Po "[0-9]+(?=%)" | tail -1)"
     m:0x0 + c:123
     XF86AudioRaiseVolume
 
 # Decrease volume
-"sh /home/japhir/ArchConfigs/soundwithvolnoti.sh down"
+"amixer set Master 5%- && volnoti-show $(amixer get Master | grep -Po "[0-9]+(?=%)" | tail -1)"
     m:0x0 + c:122
     XF86AudioLowerVolume
 
 # Toggle mute
-"sh /home/japhir/ArchConfigs/soundwithvolnoti.sh mute"
+"amixer set Master toggle; if amixer get Master | grep -Fq "[off]"; then volnoti-show -m; else volnoti-show $(amixer get Master | grep -pO "[0-9]+(?=%)" | tail -1); fi"
     m:0x0 + c:121
     XF86AudioMute
 

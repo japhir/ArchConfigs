@@ -107,11 +107,12 @@ also commented out, I can see them in my terminal if desired
     (add-hook 'LaTeX-mode-hook 'rainbow-delimiters-mode))
 #+end_src
 ** set the theme
-*** leuven
+*** COMMENT leuven
 #+begin_src emacs-lisp
 (use-package leuven-theme
   :init
   (load-theme 'leuven t)
+  ;; (load-theme 'leuven-dark t)
   :config
   (setq org-fontify-whole-heading-line t))
 #+end_src
@@ -121,7 +122,7 @@ also commented out, I can see them in my terminal if desired
   :init
   (load-theme 'leuven t))
 #+end_src
-*** COMMENT monokai
+*** monokai
 #+BEGIN_SRC emacs-lisp
   (use-package monokai-theme
     :ensure t
@@ -150,18 +151,20 @@ also commented out, I can see them in my terminal if desired
 ** evil
    vim emulator
 #+begin_src emacs-lisp
-  (setq evil-want-integration nil)
-  (setq evil-want-C-u-scroll t) ; C-u scrolls up half page
   (use-package evil
     :ensure t
+    :init
+    (setq evil-want-integration nil)
+    (setq evil-cross-lines t)
+    (setq evil-want-C-u-scroll t) ; C-u scrolls up half page
     :config
     (evil-mode 1)
-    (setq evil-cross-lines t)
     :bind (:map evil-normal-state-map
 		("C-h" . evil-window-left)
 		("C-j" . evil-window-down)
 		("C-k" . evil-window-up)
 		("C-l" . evil-window-right)))
+
 #+end_src
 ** evil-collection
 #+BEGIN_SRC emacs-lisp
@@ -270,99 +273,170 @@ also commented out, I can see them in my terminal if desired
 #+end_src
 ** org
    note-taking, todo system, calendar, everything
+
+*** setup
 #+begin_src emacs-lisp
-  (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
-  (use-package org
-    :ensure t
-    :config
-    ;; refiling settings
-    (setq org-refile-targets '((nil :maxlevel . 9)
-			       (org-agenda-files :maxlevel . 9)))
-    (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
-    (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
-    ;; swyper makes refiling amazing!
-    ;; the todo-states of my gtd-system
-    (setq org-todo-keywords
-	  '((sequence "TICK(t)" "NEXT(n)" "WAIT(w!/!)" "SOME(s!/!)" "PROJ(p)" "|"
-		      "DONE(d)" "CANC(c)")))
-    ;; add effort estimate standards
-    (add-to-list 'org-global-properties
-		 '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
-    ;; prettify the todo keywords
-    (setq org-todo-keyword-faces
-	  '(("TICK" . (:background "light slate blue"))
-	    ("NEXT" . (:foreground "light goldenrod yellow" :background "red" :weight bold))
-	    ("WAIT" . (:foreground "dim gray" :background "yellow"))
-	    ("SOME" . (:foreground "ghost white"  :background "deep sky blue"))
-	    ("DONE" . (:foreground "green4"       :background "pale green"))
-	    ("CANC" . (:foreground "dim gray"     :background "gray"))
-	    ("PROJ" . (:foreground "navajo white" :background "saddle brown"))))
-    ;; view tasks by context (sorted by todo state)
-    (setq org-agenda-custom-commands
-	  '(("g" . "GTD contexts")
-	    ("gh" "Home" tags-todo "@home"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gu" "University" tags-todo "@uni"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("ge" "Errands" tags-todo "@errands"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gl" "Laboratory" tags-todo "@lab"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gp" "Phone" tags-todo "@phone"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("gb" "Bank" tags-todo "@bank"
-             ((org-agenda-sorting-strategy '(todo-state-up)))
-	    ("gm" "e-mail" tags-todo "@email"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ("ga" "Agenda" tags-todo "@agenda"
-	     ((org-agenda-sorting-strategy '(todo-state-up))))
-	    ;; the following are all avaialable through C-a t r [x]
-	    ;;("n" todo "NEXT" nil)
-	    ;;("c" todo "SCHEDULED" nil)
-	    ;;("w" todo "WAITING" nil)
-	    ;;("s" todo "SOMEDAY" nil)
-	    ;; view agenda + next actions, sorted by category
-	    ;; ("d" "Agenda + Next actions" ((agenda) (todo "NEXT")))
-	    ("w" "Work" tags-todo "Work"
-	     ((org-agenda-sorting-strategy '(todo-state-up time-up priority-down))))
-	    ("p" "Personal" tags-todo "Personal"
-	     ((org-agenda-sorting-strategy '(todo-state-up time-up priority-down)))))))
-    ;; set up the context tags
-    (setq org-tag-alist '((:startgroup . nil) ("@home" . ?h) ("@uni" . ?u) ("@errands" . ?e) ("@lab" . ?l) ("@phone" . ?p) ("@email" . ?m) ("@computer" . ?c) ("@bank" . ?b) (:endgroup . nil)
-			  (:startgroup . nil) ("@agenda" . ?a) ("@write" . ?w) ("@research" . ?r) (:endgroup . nil)
-			  (:startgroup . nil) ("morning" . ?1) ("afternoon" .?2) ("evening" .?3) (:endgroup . nil)
-			  (:startgroup . nil) ("Work" . ?W) ("Personal" . ?P) (:endgroup . nil)
-			  ("Martin". ?M) ("Anne" . ?A) ("Inigo". ?I) ("Robin" . ?R) ("RobinV" . ?V)
-			  ("Margot" . ?C) ("Appy" . ?S) ("Richard" . ?Z) ("Lucas" . ?L) ("Nele". ?N) ("Holger". ?H)))
-    ;; extra org settings
-    (setq org-agenda-todo-ignore-scheduled t)
-    (setq org-agenda-todo-ignore-deadlines t)
-    (setq org-agenda-todo-ignore-timestamp t)
-    (setq org-agenda-todo-ignore-with-date t)
-    (setq org-return-follows-link t)
-    (setq org-hide-leading-stars t)
-    (setf org-special-ctrl-a/e t)
-    (setq org-fontify-emphasized-text t)
-    (setq org-fast-tag-selection-single-key t)
-    (setq org-fontify-done-headline t)
-    (setq org-pretty-entities t)
-    (setq org-agenda-prefix-format "  %-17:c%?-12t% s")
-    (setq org-agenda-include-all-todo nil)
-    (setq org-log-done 'time)
-    (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
-    (setq org-deadline-warning-days 14)
-    (setf org-tags-column -65)
-    ;(setq org-fontifywhole-heading-line t)
-    (setq org-ellipsis "▼") ;▼ … ◦
-    ;; allow for j/k movement in agenda view
-    (add-hook 'org-agenda-mode-hook
-	      (lambda ()
-		(define-key org-agenda-mode-map "j" 'evil-next-line)
-		(define-key org-agenda-mode-map "k" 'evil-previous-line)))
-    ;; org-babel loads r
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((R . t))))
+    (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+    (use-package org
+      :ensure t
+      :config
+#+end_src
+
+*** basics
+#+begin_src emacs-lisp
+      (setq org-agenda-todo-ignore-scheduled t)
+      (setq org-agenda-todo-ignore-deadlines t)
+      (setq org-agenda-todo-ignore-timestamp t)
+      (setq org-agenda-todo-ignore-with-date t)
+      (setq org-return-follows-link t)
+      (setq org-hide-leading-stars t)
+      (setf org-special-ctrl-a/e t)
+      (setq org-fontify-emphasized-text t)
+      (setq org-fast-tag-selection-single-key t)
+      (setq org-fontify-done-headline t)
+      (setq org-pretty-entities t)
+      (setq org-agenda-prefix-format "  %-17:c%?-12t% s")
+      (setq org-agenda-include-all-todo nil)
+      (setq org-log-done 'time)
+      (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
+      (setq org-deadline-warning-days 14)
+      (setf org-tags-column -65)
+      (setq org-ellipsis "▼") ;▼ … ◦
+      ;; allow for j/k movement in agenda view
+      (add-hook 'org-agenda-mode-hook
+		(lambda ()
+		  (define-key org-agenda-mode-map "j" 'evil-next-line)
+		  (define-key org-agenda-mode-map "k" 'evil-previous-line)))
+      ;; org-babel loads r
+      (org-babel-do-load-languages
+       'org-babel-load-languages
+       '((R . t)))
+      (setq org-M-RET-may-split-line '((default . nil))) ; folded drawers no longer ruin new entries
+#+end_src
+
+*** capture templates
+    customize capture templates, variables are defined in a private file.
+ #+begin_src emacs-lisp
+   (setq org-capture-templates
+	 '(("a" "Appointment" entry (file org-cal-file)
+	   "* %?\n\n%^T\n\n:PROPERTIES:\n\n:END:\n\n")
+	   ("t" "Todo" entry (file org-in-file)
+	    "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
+	   ("w" "Website" entry (file org-in-file)
+	    "* %?\nEntered on %U\n \%i\n %a")
+	   ("j" "Journal" entry (file+datetree org-journal-file)
+	   "* %?\nEntered on %U\n %i\n %a")))
+ #+end_src
+
+*** TODO states
+#+begin_src emacs-lisp
+      ;; the todo-states of my gtd-system
+      (setq org-todo-keywords
+	    '((sequence "TICK(t)" "NEXT(n)" "WAIT(w!/!)" "SOME(s!/!)" "PROJ(p)" "|"
+			"DONE(d)" "CANC(c)")))
+      ;; prettify the todo keywords
+      (setq org-todo-keyword-faces
+	    '(("TICK" . (:background "light slate blue"))
+	      ("NEXT" . (:foreground "light goldenrod yellow" :background "red" :weight bold))
+	      ("WAIT" . (:foreground "dim gray" :background "yellow"))
+	      ("SOME" . (:foreground "ghost white"  :background "deep sky blue"))
+	      ("DONE" . (:foreground "green4"       :background "pale green"))
+	      ("CANC" . (:foreground "dim gray"     :background "gray"))
+	      ("PROJ" . (:foreground "navajo white" :background "saddle brown"))))
+#+end_src
+
+*** effort estimates
+#+begin_src emacs-lisp
+      ;; add effort estimate standards
+      (add-to-list 'org-global-properties
+		   '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
+#+end_src
+*** context tags
+#+begin_src emacs-lisp
+      (setq org-tag-alist '((:startgroup . nil) ("@home" . ?h) ("@uni" . ?u) ("@errands" . ?e) ("@lab" . ?l) ("@phone" . ?p) ("@email" . ?m) ("@computer" . ?c) ("@bank" . ?b) (:endgroup . nil)
+			    (:startgroup . nil) ("@agenda" . ?a) ("@write" . ?w) ("@research" . ?r) (:endgroup . nil)
+			    (:startgroup . nil) ("morning" . ?1) ("afternoon" .?2) ("evening" .?3) (:endgroup . nil)
+			    (:startgroup . nil) ("Work" . ?W) ("Personal" . ?P) (:endgroup . nil)
+			    ("Martin". ?M) ("Anne" . ?A) ("Inigo". ?I) ("Robin" . ?R) ("RobinV" . ?V)
+			    ("Margot" . ?C) ("Appy" . ?S) ("Richard" . ?Z) ("Lucas" . ?L) ("Nele". ?N) ("Holger". ?H)))
+#+end_src
+
+*** refiling
+    swyper makes refiling amazing!
+#+begin_src emacs-lisp
+      ;; refiling settings
+      (setq org-refile-targets '((nil :maxlevel . 9)
+				 (org-agenda-files :maxlevel . 9)))
+      (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
+      (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
+#+end_src
+
+*** agenda filters
+      Filter tasks by context (sorted by todo state)
+#+begin_src emacs-lisp
+      (setq org-agenda-custom-commands
+	    '(("g" . "GTD contexts")
+	      ("gh" "Home" tags-todo "@home"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("gu" "University" tags-todo "@uni"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("ge" "Errands" tags-todo "@errands"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("gl" "Laboratory" tags-todo "@lab"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("gp" "Phone" tags-todo "@phone"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("gm" "e-mail" tags-todo "@email"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("gc" "Computer" tags-todo "@computer"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("gb" "Bank" tags-todo "@bank"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("ga" "Agenda" tags-todo "@agenda"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("gw" "Write" tags-todo "@write"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("gr" "Research" tags-todo "@research"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("E" . "Energy")
+	      ("E1" "Morning" tags-todo "morning"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("E2" "Afternoon" tags-todo "afternoon"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("E3" "Evening" tags-todo "evening"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("p" . "People")
+	      ("pM" "Martin" tags-todo "Martin"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("pA" "Anne" tags-todo "Anne"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("pI" "Inigo" tags-todo "Inigo"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("pR" "Robin" tags-todo "Robin"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("pV" "RobinV" tags-todo "RobinV"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("pC" "Margot" tags-todo "Margot"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("pS" "Appy" tags-todo "Appy"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("pZ" "Richard" tags-todo "Richard"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("pL" "Lucas" tags-todo "Lucas"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("pN" "Nele" tags-todo "Nele"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("pH" "Holger" tags-todo "Holger"
+	       ((org-agenda-sorting-strategy '(todo-state-up))))
+	      ("W" "Work" tags-todo "Work"
+	       ((org-agenda-sorting-strategy '(todo-state-up time-up priority-down))))
+	      ("P" "Personal" tags-todo "Personal"
+	       ((org-agenda-sorting-strategy '(todo-state-up time-up priority-down))))))
+#+end_src
+
+*** close org
+#+BEGIN_SRC emacs-lisp
+  )
 #+end_src
 ** org-fancy-capture attempt
 #+BEGIN_SRC emacs-lisp
@@ -381,19 +455,6 @@ also commented out, I can see them in my terminal if desired
     (if (equal "emacs-popup" (frame-parameter nil 'name))
 	(delete-frame)))
 #+END_SRC
-** org-capture templates
-   customize capture templates, variables are defined in a private file.
-#+begin_src emacs-lisp
-  (setq org-capture-templates
-	'(("a" "Appointment" entry (file org-cal-file)
-	  "* %?\n\n%^T\n\n:PROPERTIES:\n\n:END:\n\n")
-	  ("t" "Todo" entry (file org-in-file)
-	   "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
-	  ("w" "Website" entry (file org-in-file)
-	   "* %?\nEntered on %U\n \%i\n %a")
-	  ("j" "Journal" entry (file+datetree org-journal-file)
-	  "* %?\nEntered on %U\n %i\n %a")))
-#+end_src
 ** org-bullets
    prettify org mode
 #+begin_src emacs-lisp
@@ -482,7 +543,7 @@ also commented out, I can see them in my terminal if desired
 \\usepackage[citestyle=authoryear,bibstyle=authoryear,hyperref=true,maxcitenames=3,url=true,backend=biber,natbib=true]{biblatex}
 \\usepackage[version=4]{mhchem} % for chemical equations with `\ce{}'
 \\usepackage{siunitx} % for SI units
-\\usepackage[Symbol]{upgreek} % to allow for upright delta symbol
+%% \\usepackage[Symbol]{upgreek} % to allow for upright delta symbol
 \\sisetup{
   separate-uncertainty = true,
   multi-part-units = single,
@@ -760,8 +821,8 @@ file bookmarks
 ** mu4e
    install it with package mu from repo
 #+BEGIN_SRC emacs-lisp
-  (use-package evil-mu4e
-    :ensure t)  ; evil keybindings
+;; (use-package evil-mu4e
+;;  :ensure t)  ; evil keybindings -> now a part of evil-collection
   (global-set-key (kbd "\C-c m") 'mu4e)
   (use-package org-mu4e  ; allows linking to emails
     :ensure t
