@@ -26,7 +26,7 @@
     ("43c1a8090ed19ab3c0b1490ce412f78f157d69a29828aa977dae941b994b4147" default)))
  '(package-selected-packages
    (quote
-    (org-mu4e use-package telephone-line ranger rainbow-mode rainbow-delimiters polymode ox-tufte org-ref org-plus-contrib org-noter org-gcal org-bullets openwith mu4e-alert monokai-theme leuven-theme ivy-bibtex hl-todo gmail-message-mode fontawesome flycheck evil-org evil-nerd-commenter evil-mu4e evil-magit evil-leader evil-escape evil-collection ess edit-server diminish define-word counsel beacon auto-complete auctex ace-window))))
+    (counsel-projectile projectile org-mu4e use-package telephone-line ranger rainbow-mode rainbow-delimiters polymode ox-tufte org-ref org-plus-contrib org-noter org-gcal org-bullets openwith mu4e-alert monokai-theme leuven-theme ivy-bibtex hl-todo gmail-message-mode fontawesome flycheck evil-org evil-nerd-commenter evil-mu4e evil-magit evil-leader evil-escape evil-collection ess edit-server diminish define-word counsel beacon auto-complete auctex ace-window))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

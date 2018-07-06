@@ -704,11 +704,25 @@ very nice search replacement
 ** magit
    git management
 #+begin_src emacs-lisp
-(use-package magit
-  :ensure t
-  :bind
-  ("M-g" . magit-status))
+  (use-package magit
+    :ensure t
+    :bind
+    ("M-g" . magit-status))
 #+end_src
+** projectile
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :ensure t
+    :config
+    (projectile-mode))
+#+END_SRC
+*** counsel-projectile
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel-projectile
+    :ensure t
+    :config
+    (counsel-projectile-mode))
+#+END_SRC
 ** COMMENT hydra
 file bookmarks
 #+BEGIN_SRC emacs-lisp
