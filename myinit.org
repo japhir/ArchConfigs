@@ -504,6 +504,11 @@ also commented out, I can see them in my terminal if desired
   (use-package org-gcal
     :ensure t) ; config in separate file for privacy
 #+end_src
+** org-pdfview
+#+BEGIN_SRC emacs-lisp
+(use-package org-pdfview
+  :ensure t)
+#+END_SRC
 ** mathjax
 #+BEGIN_SRC emacs-lisp
   (setq org-html-mathjax-options
@@ -650,6 +655,14 @@ directory to make multiple eshell windows easier."
     ("C-c r" . ranger)
     :config
     (ranger-override-dired-mode t))
+#+END_SRC
+** pdf-tools
+#+BEGIN_SRC emacs-lisp
+  (use-package pdf-tools
+    :config
+    (pdf-tools-install)
+    (setq-default pdf-view-display-size 'fit-page)
+    :ensure t)
 #+END_SRC
 ** COMMENT edit with emacs (chromium)
    Edit gmail messages and other input fields in chrome with emacs, markdown.
@@ -992,10 +1005,7 @@ file bookmarks
     :ensure t
     :config
     (autoload 'ivy-bibtex "ivy-bibtex" "" t)
-    (setq bibtex-completion-pdf-field "file")
-    (setq bibtex-completion-pdf-open-function
-	  (lambda (fpath)
-	    (start-process "evince" "*helm-bibtex-evince*" "/usr/bin/evince" fpath))))
+    (setq bibtex-completion-pdf-field "file"))
 #+end_src
 ** ox-extra
 org-export ignore headlines with ~:ignore:~ tag

@@ -1,9 +1,10 @@
 [Desktop Entry]
-Name=Emacs
+Name=Emacsclient
 GenericName=Text Editor
 Comment=GNU Emacs Client
-Exec=/usr/bin/emacsclient -c %F
+Exec=/usr/bin/emacsclient -c %U
 Icon=emacs
 Type=Application
 Terminal=false
 StartupWMClass=Emacs
+MimeType=application/pdf;
