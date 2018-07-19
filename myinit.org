@@ -204,7 +204,7 @@ also commented out, I can see them in my terminal if desired
   (use-package evil-nerd-commenter
     :ensure t)
 #+end_src
-** evil-leader
+** COMMENT evil-leader
 #+begin_src emacs-lisp
   (use-package evil-leader  ; default is \
     :ensure t
@@ -281,95 +281,46 @@ also commented out, I can see them in my terminal if desired
       :ensure t
       :config
 #+end_src
-
 *** basics
 #+begin_src emacs-lisp
+      (setq org-return-follows-link t)
+      (setf org-special-ctrl-a/e t)
+      (setq org-fast-tag-selection-single-key t)
+      (setq org-M-RET-may-split-line '((default . nil))) ; folded drawers no longer ruin new entries
+#+end_src
+*** theming
+#+BEGIN_SRC emacs-lisp
+      (setq org-startup-indented t)
+      ;(setq org-hide-leading-stars t)
+      (setf org-tags-column -65)
+      (setq org-fontify-emphasized-text t)
+      (setq org-fontify-done-headline t)
+      (setq org-pretty-entities t)
+      (setq org-ellipsis "▼") ;▼ … ◦
+
+#+END_SRC
+*** file associations
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-file-apps '("\\.pdf" . (lambda (file link) ; "zathura %s"))
+                                                   (org-pdfview-open link))))
+#+END_SRC
+*** org-agenda
+#+BEGIN_SRC emacs-lisp
+      (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
+      (setq org-deadline-warning-days 14)
       (setq org-agenda-todo-ignore-scheduled t)
       (setq org-agenda-todo-ignore-deadlines t)
       (setq org-agenda-todo-ignore-timestamp t)
       (setq org-agenda-todo-ignore-with-date t)
-      (setq org-return-follows-link t)
-      (setq org-hide-leading-stars t)
-      (setf org-special-ctrl-a/e t)
-      (setq org-fontify-emphasized-text t)
-      (setq org-fast-tag-selection-single-key t)
-      (setq org-fontify-done-headline t)
-      (setq org-pretty-entities t)
       (setq org-agenda-prefix-format "  %-17:c%?-12t% s")
       (setq org-agenda-include-all-todo nil)
       (setq org-log-done 'time)
-      (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
-      (setq org-deadline-warning-days 14)
-      (setf org-tags-column -65)
-      (setq org-ellipsis "▼") ;▼ … ◦
       ;; allow for j/k movement in agenda view
       (add-hook 'org-agenda-mode-hook
 		(lambda ()
 		  (define-key org-agenda-mode-map "j" 'evil-next-line)
 		  (define-key org-agenda-mode-map "k" 'evil-previous-line)))
-      ;; org-babel loads r
-      (org-babel-do-load-languages
-       'org-babel-load-languages
-       '((R . t)))
-      (setq org-M-RET-may-split-line '((default . nil))) ; folded drawers no longer ruin new entries
-#+end_src
-
-*** capture templates
-    customize capture templates, variables are defined in a private file.
- #+begin_src emacs-lisp
-   (setq org-capture-templates
-	 '(("a" "Appointment" entry (file org-cal-file)
-	   "* %?\n\n%^T\n\n:PROPERTIES:\n\n:END:\n\n")
-	   ("t" "Todo" entry (file org-in-file)
-	    "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
-	   ("w" "Website" entry (file org-in-file)
-	    "* %?\nEntered on %U\n \%i\n %a")
-	   ("j" "Journal" entry (file+datetree org-journal-file)
-	   "* %?\nEntered on %U\n %i\n %a")))
- #+end_src
-
-*** TODO states
-#+begin_src emacs-lisp
-      ;; the todo-states of my gtd-system
-      (setq org-todo-keywords
-	    '((sequence "TICK(t)" "NEXT(n)" "WAIT(w!/!)" "SOME(s!/!)" "PROJ(p)" "|"
-			"DONE(d)" "CANC(c)")))
-      ;; prettify the todo keywords
-      (setq org-todo-keyword-faces
-	    '(("TICK" . (:background "light slate blue"))
-	      ("NEXT" . (:foreground "light goldenrod yellow" :background "red" :weight bold))
-	      ("WAIT" . (:foreground "dim gray" :background "yellow"))
-	      ("SOME" . (:foreground "ghost white"  :background "deep sky blue"))
-	      ("DONE" . (:foreground "green4"       :background "pale green"))
-	      ("CANC" . (:foreground "dim gray"     :background "gray"))
-	      ("PROJ" . (:foreground "navajo white" :background "saddle brown"))))
-#+end_src
-
-*** effort estimates
-#+begin_src emacs-lisp
-      ;; add effort estimate standards
-      (add-to-list 'org-global-properties
-		   '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
-#+end_src
-*** context tags
-#+begin_src emacs-lisp
-      (setq org-tag-alist '((:startgroup . nil) ("@home" . ?h) ("@uni" . ?u) ("@errands" . ?e) ("@lab" . ?l) ("@phone" . ?p) ("@email" . ?m) ("@computer" . ?c) ("@bank" . ?b) (:endgroup . nil)
-			    (:startgroup . nil) ("@agenda" . ?a) ("@write" . ?w) ("@research" . ?r) (:endgroup . nil)
-			    (:startgroup . nil) ("morning" . ?1) ("afternoon" .?2) ("evening" .?3) (:endgroup . nil)
-			    (:startgroup . nil) ("Work" . ?W) ("Personal" . ?P) (:endgroup . nil)
-			    ("Martin". ?M) ("Anne" . ?A) ("Inigo". ?I) ("Robin" . ?R) ("RobinV" . ?V)
-			    ("Margot" . ?C) ("Appy" . ?S) ("Richard" . ?Z) ("Lucas" . ?L) ("Nele". ?N) ("Holger". ?H)))
-#+end_src
-
-*** refiling
-    swyper makes refiling amazing!
-#+begin_src emacs-lisp
-      ;; refiling settings
-      (setq org-refile-targets '((nil :maxlevel . 9)
-				 (org-agenda-files :maxlevel . 9)))
-      (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
-      (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
-#+end_src
+#+END_SRC
 
 *** agenda filters
       Filter tasks by context (sorted by todo state)
@@ -433,6 +384,88 @@ also commented out, I can see them in my terminal if desired
 	      ("P" "Personal" tags-todo "Personal"
 	       ((org-agenda-sorting-strategy '(todo-state-up time-up priority-down))))))
 #+end_src
+*** capture templates
+    customize capture templates, variables are defined in a private file.
+ #+begin_src emacs-lisp
+   (setq org-capture-templates
+	 '(("a" "Appointment" entry (file org-cal-file)
+	   "* %?\n\n%^T\n\n:PROPERTIES:\n\n:END:\n\n")
+	   ("t" "Todo" entry (file org-in-file)
+	    "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
+	   ("w" "Website" entry (file org-in-file)
+	    "* %?\nEntered on %U\n \%i\n %a")
+	   ("j" "Journal" entry (file+datetree org-journal-file)
+	   "* %?\nEntered on %U\n %i\n %a")))
+ #+end_src
+
+*** TODO states
+#+begin_src emacs-lisp
+      ;; the todo-states of my gtd-system
+      (setq org-todo-keywords
+	    '((sequence "TICK(t)" "NEXT(n)" "WAIT(w!/!)" "SOME(s!/!)" "PROJ(p)" "|"
+			"DONE(d)" "CANC(c)")))
+      ;; prettify the todo keywords
+      (setq org-todo-keyword-faces
+	    '(("TICK" . (:background "light slate blue"))
+	      ("NEXT" . (:foreground "light goldenrod yellow" :background "red" :weight bold))
+	      ("WAIT" . (:foreground "dim gray" :background "yellow"))
+	      ("SOME" . (:foreground "ghost white"  :background "deep sky blue"))
+	      ("DONE" . (:foreground "green4"       :background "pale green"))
+	      ("CANC" . (:foreground "dim gray"     :background "gray"))
+	      ("PROJ" . (:foreground "navajo white" :background "saddle brown"))))
+#+end_src
+
+*** effort estimates
+#+begin_src emacs-lisp
+      ;; add effort estimate standards
+      (add-to-list 'org-global-properties
+		   '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
+#+end_src
+*** context tags
+#+begin_src emacs-lisp
+      (setq org-tag-alist '((:startgroup . nil) ("@home" . ?h) ("@uni" . ?u) ("@errands" . ?e) ("@lab" . ?l) ("@phone" . ?p) ("@email" . ?m) ("@computer" . ?c) ("@bank" . ?b) (:endgroup . nil)
+			    (:startgroup . nil) ("@agenda" . ?a) ("@write" . ?w) ("@research" . ?r) (:endgroup . nil)
+			    (:startgroup . nil) ("morning" . ?1) ("afternoon" .?2) ("evening" .?3) (:endgroup . nil)
+			    (:startgroup . nil) ("Work" . ?W) ("Personal" . ?P) (:endgroup . nil)
+			    ("Martin". ?M) ("Anne" . ?A) ("Inigo". ?I) ("Robin" . ?R) ("RobinV" . ?V)
+			    ("Margot" . ?C) ("Appy" . ?S) ("Richard" . ?Z) ("Lucas" . ?L) ("Nele". ?N) ("Holger". ?H)))
+#+end_src
+
+*** refiling
+    swyper makes refiling amazing!
+#+begin_src emacs-lisp
+      ;; refiling settings
+      (setq org-refile-targets '((nil :maxlevel . 9)
+				 (org-agenda-files :maxlevel . 9)))
+      (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
+      (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
+#+end_src
+*** org-babel
+#+BEGIN_SRC emacs-lisp
+  ;; org-babel loads r
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((R . t)))
+#+END_SRC
+*** org-latex export settings
+   basic latex settings
+#+BEGIN_SRC emacs-lisp
+      (setq org-highlight-latex-and-related '(latex script entities))
+      (setq org-latex-create-formula-image-program 'dvipng)
+      (setq org-latex-default-figure-position 'htbp)
+      ;(setq org-latex-pdf-process
+  ;	  '("pdflatex -interaction nonstopmode -output-directory %o %f"
+  ;	    "bibtex %b"
+  ;	    "pdflatex -interaction nonstopmode -output-directory %o %f"
+  ;	    "pdflatex -interaction nonstopmode -output-directory %o %f"))
+      (setq org-latex-pdf-process
+          (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
+      (setq org-latex-prefer-user-labels t)
+      ;; disable the ang preview entity, because it conflicts with \ang from siunitx
+      (with-eval-after-load 'org-entities
+        (setq org-entities
+              (cl-remove-if (lambda (x) (and (listp x) (equal (car x) "ang"))) org-entities)))
+#+END_SRC
 
 *** close org
 #+BEGIN_SRC emacs-lisp
@@ -505,26 +538,6 @@ also commented out, I can see them in my terminal if desired
 </script>
 ")
 #+END_SRC
-** org-latex export settings
-   basic latex settings
-#+BEGIN_SRC emacs-lisp
-    (add-to-list 'org-file-apps '("\\.pdf" . "evince %s"))
-    (setq org-highlight-latex-and-related '(latex script entities))
-    (setq org-latex-create-formula-image-program 'dvipng)
-    (setq org-latex-default-figure-position 'htbp)
-    ;(setq org-latex-pdf-process
-;	  '("pdflatex -interaction nonstopmode -output-directory %o %f"
-;	    "bibtex %b"
-;	    "pdflatex -interaction nonstopmode -output-directory %o %f"
-;	    "pdflatex -interaction nonstopmode -output-directory %o %f"))
-    (setq org-latex-pdf-process
-  	(list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
-    (setq org-latex-prefer-user-labels t)
-    ;; disable the ang preview entity, because it conflicts with \ang from siunitx
-    (with-eval-after-load 'org-entities
-      (setq org-entities
-	    (cl-remove-if (lambda (x) (and (listp x) (equal (car x) "ang"))) org-entities)))
-#+END_SRC
 ** org-beamer
 #+BEGIN_SRC emacs-lisp
   (require 'ox-latex)
@@ -570,6 +583,10 @@ also commented out, I can see them in my terminal if desired
 		 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
 		 ("\\paragraph{%s}" . "\\paragraph*{%s}")
 		 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+END_SRC
+** org-export
+#+BEGIN_SRC emacs-lisp
+(require 'ob-org)
 #+END_SRC
 * general packages and functions
 ** easy symbol insertion
@@ -790,7 +807,7 @@ file bookmarks
     :config
     (global-set-key (kbd "C-c d") 'define-word))
 #+END_SRC
-** COMMENT yasnippet
+** yasnippet
    usefull snippets for me: org-mode (fig_, )
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
