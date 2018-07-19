@@ -867,11 +867,10 @@ file bookmarks
 #+BEGIN_SRC emacs-lisp
 ;; (use-package evil-mu4e
 ;;  :ensure t)  ; evil keybindings -> now a part of evil-collection
+  (require 'mu4e)
   (global-set-key (kbd "\C-c m") 'mu4e)
-  (use-package org-mu4e  ; allows linking to emails
-    :ensure t
-    :config
-    (setq org-mu4e-link-query-in-headers-mode nil))
+  (require 'org-mu4e)
+  (setq org-mu4e-link-query-in-headers-mode nil)
   (setq mu4e-drafts-folder "/Drafts"
         mu4e-sent-folder "/Sent Items"
         mu4e-trash-folder "/Deleted Items")
@@ -892,9 +891,16 @@ file bookmarks
 	  (:from          .  22)
 	  (:subject       .  nil)))
   (setq mu4e-get-mail-command "mbsync -a")
-  (setq mu4e-headers-include-related nil)
+  (setq mu4e-headers-include-related t)
   (setq mu4e-confirm-quit nil)
   (setq mu4e-view-show-images t)
+#+END_SRC
+** mu4e-conversation
+#+BEGIN_SRC emacs-lisp
+  (use-package mu4e-conversation
+    :ensure t
+    :config
+    (global-mu4e-conversation-mode))
 #+END_SRC
 ** mu4e notifications
    #+BEGIN_SRC emacs-lisp
