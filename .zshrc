@@ -101,3 +101,5 @@ fi
 alias R='R --quiet'
 alias o='xdg-open'
 alias pb='curl -F c=@- https://ptpb.pw\?u\=1' # neat pastebin
+alias yt="youtube-dl --add-metadata -ic" # Download video link
+alias yta="youtube-dl --add-metadata -xic" # Download only audio
