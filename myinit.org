@@ -454,7 +454,8 @@ also commented out, I can see them in my terminal if desired
   ;; org-babel loads r
   (org-babel-do-load-languages
    'org-babel-load-languages
-   '((R . t)))
+   '((stan . t)
+     (R . t)))
 #+END_SRC
 *** org-latex export settings
    basic latex settings
