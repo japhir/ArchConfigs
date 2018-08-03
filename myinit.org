@@ -185,8 +185,16 @@ also commented out, I can see them in my terminal if desired
 #+begin_src emacs-lisp
   (use-package evil-org
     :ensure t
+    :after org
+    :config
+    (add-hook 'org-mode-hook 'evil-org-mode)
+    (add-hook 'evil-org-mode-hook
+              (lambda ()
+                (evil-org-set-key-theme)))
+    (add-hook 'org-capture-mode-hook 'evil-insert-state)
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys)
     :diminish evil-org-mode)
-  (add-hook 'org-capture-mode-hook 'evil-insert-state)
 #+end_src
 ** COMMENT undo tree
 #+begin_src emacs-lisp
@@ -320,95 +328,63 @@ also commented out, I can see them in my terminal if desired
 #+END_SRC
 *** org-agenda
 #+BEGIN_SRC emacs-lisp
-      (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
-      (setq org-deadline-warning-days 14)
-      (setq org-agenda-todo-ignore-scheduled t)
-      (setq org-agenda-todo-ignore-deadlines t)
-      (setq org-agenda-todo-ignore-timestamp t)
-      (setq org-agenda-todo-ignore-with-date t)
-      (setq org-agenda-prefix-format "  %-17:c%?-12t% s")
-      (setq org-agenda-include-all-todo nil)
-      (setq org-log-done 'time)
-      ;; allow for j/k movement in agenda view
-      (add-hook 'org-agenda-mode-hook
-		(lambda ()
-		  (define-key org-agenda-mode-map "j" 'evil-next-line)
-		  (define-key org-agenda-mode-map "k" 'evil-previous-line)))
+  (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
+  (setq org-deadline-warning-days 14)
+  (setq org-agenda-todo-ignore-scheduled t)
+  (setq org-agenda-todo-ignore-deadlines t)
+  (setq org-agenda-todo-ignore-timestamp t)
+  (setq org-agenda-todo-ignore-with-date t)
+  (setq org-agenda-prefix-format "  %-17:c%?-12t% s")
+  (setq org-agenda-include-all-todo nil)
+  (setq org-log-done 'time)
 #+END_SRC
-
 *** agenda filters
       Filter tasks by context (sorted by todo state)
 #+begin_src emacs-lisp
+  (setq org-agenda-sorting-strategy '(todo-state-up))
   (setq org-agenda-custom-commands
-        '(("i" "Inbox" tags-todo "in"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
+        '(("i" "Inbox" tags-todo "in")
           ("g" . "GTD contexts")
-          ("gh" "Home" tags-todo "@home"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("gu" "University" tags-todo "@uni"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("ge" "Errands" tags-todo "@errands"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("gl" "Laboratory" tags-todo "@lab"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("gp" "Phone" tags-todo "@phone"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("gm" "e-mail" tags-todo "@email"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("gc" "Computer" tags-todo "@computer"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("gb" "Bank" tags-todo "@bank"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("ga" "Agenda" tags-todo "@agenda"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("gw" "Write" tags-todo "@write"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("gr" "Research" tags-todo "@research"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("gh" "Home" tags-todo "@home")
+          ("gu" "University" tags-todo "@uni")
+          ("ge" "Errands" tags-todo "@errands")
+          ("gl" "Laboratory" tags-todo "@lab")
+          ("gp" "Phone" tags-todo "@phone")
+          ("gm" "e-mail" tags-todo "@email")
+          ("gc" "Computer" tags-todo "@computer")
+          ("gb" "Bank" tags-todo "@bank")
+          ("ga" "Agenda" tags-todo "@agenda")
+          ("gw" "Write" tags-todo "@write")
+          ("gr" "Research" tags-todo "@research")
           ("E" . "Energy")
-          ("E1" "Morning" tags-todo "morning"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("E2" "Afternoon" tags-todo "afternoon"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("E3" "Evening" tags-todo "evening"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("E1" "Morning" tags-todo "morning")
+          ("E2" "Afternoon" tags-todo "afternoon")
+          ("E3" "Evening" tags-todo "evening")
           ("p" . "People")
-          ("pM" "Martin" tags-todo "Martin"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("pA" "Anne" tags-todo "Anne"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("pI" "Inigo" tags-todo "Inigo"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("pR" "Robin" tags-todo "Robin"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("pV" "RobinV" tags-todo "RobinV"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("pC" "Margot" tags-todo "Margot"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("pS" "Appy" tags-todo "Appy"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("pZ" "Richard" tags-todo "Richard"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("pL" "Lucas" tags-todo "Lucas"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("pN" "Nele" tags-todo "Nele"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("pH" "Holger" tags-todo "Holger"
-           ((org-agenda-sorting-strategy '(todo-state-up))))
-          ("W" "Work" tags-todo "Work"
-           ((org-agenda-sorting-strategy '(todo-state-up time-up priority-down))))
-          ("P" "Personal" tags-todo "Personal"
-           ((org-agenda-sorting-strategy '(todo-state-up time-up priority-down))))))
+          ("pM" "Martin" tags-todo "Martin")
+          ("pA" "Anne" tags-todo "Anne")
+          ("pI" "Inigo" tags-todo "Inigo")
+          ("pR" "Robin" tags-todo "Robin")
+          ("pV" "RobinV" tags-todo "RobinV")
+          ("pC" "Margot" tags-todo "Margot")
+          ("pS" "Appy" tags-todo "Appy")
+          ("pZ" "Richard" tags-todo "Richard")
+          ("pL" "Lucas" tags-todo "Lucas")
+          ("pN" "Nele" tags-todo "Nele")
+          ("pH" "Holger" tags-todo "Holger")
+          ("W" "Work" tags-todo "Work")
+          ("P" "Personal" tags-todo "Personal")))
 #+end_src
 *** capture templates
     customize capture templates, variables are defined in a private file.
  #+begin_src emacs-lisp
    (setq org-capture-templates
-   ;; I capture appointments to the inbox and then org-gcal-post-at-point
          '(("a" "Appointment" entry (file org-in-file)
-           "* %?\n  %^T\n")
+            "* %?\n  %^T\n")
            ("t" "Todo" entry (file org-in-file)
             "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
+           ("T" "Todo-nolink-tag" entry (file org-in-file)
+            "* %? %^G\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n")
            ("m" "Email" entry (file org-in-file)
             "* %? :@email:\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
            ("w" "Website" entry (file org-in-file)
