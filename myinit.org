@@ -16,7 +16,7 @@
   ;; (use-package emacsdirs)
   (load "~/.emacs.d/emacsdirs.el" t)
 #+END_SRC
-* Interface and appearance
+* interface and appearance
 ** COMMENT fortune cookies
 *** in the frame title
     currently commented out, I prefer scratch
@@ -147,6 +147,12 @@ also commented out, I can see them in my terminal if desired
     (setq beacon-color "#ffcccc"))
   (global-hl-line-mode t)
 #+end_src
+** rainbow-mode
+   Highlight hex colours!
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-mode
+    :ensure t)
+#+END_SRC
 * evil
 ** evil
    vim emulator
@@ -603,6 +609,20 @@ also commented out, I can see them in my terminal if desired
 #+BEGIN_SRC emacs-lisp
 (require 'ob-org)
 #+END_SRC
+** ox-extra
+org-export ignore headlines with ~:ignore:~ tag
+#+BEGIN_SRC emacs-lisp
+  ;; (add-to-list 'load-path "~/path/to/orgdir/contrib/lisp" t)
+  (require 'ox-extra)
+  (ox-extras-activate '(latex-header-blocks ignore-headlines))
+#+END_SRC
+** org-ref
+#+BEGIN_SRC emacs-lisp
+  (use-package org-ref
+    :init
+    (setq org-ref-completion-library 'org-ref-ivy-cite)
+    :ensure t)
+#+END_SRC
 * general packages and functions
 ** easy symbol insertion
    By default C-x 8 o = ° and C-x 8 m = µ. So:
@@ -664,6 +684,10 @@ directory to make multiple eshell windows easier."
     :bind
     ("C-c r" . ranger)
     :config
+    (setq ranger-show-hidden nil)
+    (setq ranger-show-literal nil)
+    (setq ranger-show-preview t)
+    (setq ranger-width-preview 0.55)
     (ranger-override-dired-mode t))
 #+END_SRC
 ** pdf-tools
@@ -846,6 +870,17 @@ file bookmarks
   (setq browse-url-browser-function 'browse-url-generic
 	browse-url-generic-program "firefox")
 #+END_SRC
+** emacs-pkgbuild-mode
+Install it with Pacman
+#+BEGIN_SRC bash :results none :exports code
+sudo pacman -S emacs-pkgbuild-mode
+#+END_SRC
+
+Then load it into emacs when opening a PKGBUILD file
+#+BEGIN_SRC emacs-lisp
+(autoload 'pkgbuild-mode "pkgbuild-mode.el" "PKGBUILD mode." t)
+(setq auto-mode-alist (append '(("/PKGBUILD$" . pkgbuild-mode)) auto-mode-alist))
+#+END_SRC
 ** COMMENT writeroom-mode
 #+BEGIN_SRC emacs-lisp
   (use-package writeroom-mode
@@ -905,7 +940,7 @@ file bookmarks
   (setq mu4e-confirm-quit nil)
   (setq mu4e-view-show-images t)
 #+END_SRC
-** mu4e-conversation
+** COMMENT mu4e-conversation
 #+BEGIN_SRC emacs-lisp
   (use-package mu4e-conversation
     :ensure t
@@ -942,12 +977,6 @@ file bookmarks
     (setq ess-default-style 'RStudio-)
     :commands R)
 #+end_src
-** rainbow-mode
-   Highlight hex colours!
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-mode
-    :ensure t)
-#+END_SRC
 ** polymode
    for working with .Rmd files etc.
 #+begin_src emacs-lisp
@@ -1005,17 +1034,17 @@ file bookmarks
 ** hl-todo
 #+BEGIN_SRC emacs-lisp
   (use-package hl-todo
-  :ensure t
-  :bind (:map hl-todo-mode-map
-	      ("C-c k" . hl-todo-previous)
-	      ("C-c j" . hl-todo-next))
-  :init
-  (add-hook 'LaTeX-mode-hook 'hl-todo-mode)
-  (add-hook 'ess-mode-hook 'hl-todo-mode))
+    :ensure t
+    :bind (:map hl-todo-mode-map
+                ("C-c k" . hl-todo-previous)
+                ("C-c j" . hl-todo-next))
+    :init
+    (add-hook 'LaTeX-mode-hook 'hl-todo-mode)
+    (add-hook 'ess-mode-hook 'hl-todo-mode))
 #+END_SRC
 ** bibtex/ivy-bibtex
-   reference manager
-   I use it in conjunction with mendeley, which generates the .bib files, and org-ref, to insert citations in org files.
+   reference manager I use it in conjunction with zotero, which generates the
+   .bib files, and org-ref, to insert citations in org files.
 #+begin_src emacs-lisp
   (use-package ivy-bibtex
     :ensure t
@@ -1023,17 +1052,3 @@ file bookmarks
     (autoload 'ivy-bibtex "ivy-bibtex" "" t)
     (setq bibtex-completion-pdf-field "file"))
 #+end_src
-** ox-extra
-org-export ignore headlines with ~:ignore:~ tag
-#+BEGIN_SRC emacs-lisp
-  ;; (add-to-list 'load-path "~/path/to/orgdir/contrib/lisp" t)
-  (require 'ox-extra)
-  (ox-extras-activate '(latex-header-blocks ignore-headlines))
-#+END_SRC
-** org-ref
-#+BEGIN_SRC emacs-lisp
-  (use-package org-ref
-    :init
-    (setq org-ref-completion-library 'org-ref-ivy-cite)
-    :ensure t)
-#+END_SRC
