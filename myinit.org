@@ -332,64 +332,66 @@ also commented out, I can see them in my terminal if desired
 *** agenda filters
       Filter tasks by context (sorted by todo state)
 #+begin_src emacs-lisp
-      (setq org-agenda-custom-commands
-	    '(("g" . "GTD contexts")
-	      ("gh" "Home" tags-todo "@home"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("gu" "University" tags-todo "@uni"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("ge" "Errands" tags-todo "@errands"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("gl" "Laboratory" tags-todo "@lab"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("gp" "Phone" tags-todo "@phone"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("gm" "e-mail" tags-todo "@email"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("gc" "Computer" tags-todo "@computer"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("gb" "Bank" tags-todo "@bank"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("ga" "Agenda" tags-todo "@agenda"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("gw" "Write" tags-todo "@write"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("gr" "Research" tags-todo "@research"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("E" . "Energy")
-	      ("E1" "Morning" tags-todo "morning"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("E2" "Afternoon" tags-todo "afternoon"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("E3" "Evening" tags-todo "evening"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("p" . "People")
-	      ("pM" "Martin" tags-todo "Martin"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("pA" "Anne" tags-todo "Anne"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("pI" "Inigo" tags-todo "Inigo"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("pR" "Robin" tags-todo "Robin"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("pV" "RobinV" tags-todo "RobinV"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("pC" "Margot" tags-todo "Margot"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("pS" "Appy" tags-todo "Appy"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("pZ" "Richard" tags-todo "Richard"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("pL" "Lucas" tags-todo "Lucas"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("pN" "Nele" tags-todo "Nele"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("pH" "Holger" tags-todo "Holger"
-	       ((org-agenda-sorting-strategy '(todo-state-up))))
-	      ("W" "Work" tags-todo "Work"
-	       ((org-agenda-sorting-strategy '(todo-state-up time-up priority-down))))
-	      ("P" "Personal" tags-todo "Personal"
-	       ((org-agenda-sorting-strategy '(todo-state-up time-up priority-down))))))
+  (setq org-agenda-custom-commands
+        '(("i" "Inbox" tags-todo "in"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("g" . "GTD contexts")
+          ("gh" "Home" tags-todo "@home"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("gu" "University" tags-todo "@uni"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("ge" "Errands" tags-todo "@errands"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("gl" "Laboratory" tags-todo "@lab"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("gp" "Phone" tags-todo "@phone"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("gm" "e-mail" tags-todo "@email"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("gc" "Computer" tags-todo "@computer"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("gb" "Bank" tags-todo "@bank"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("ga" "Agenda" tags-todo "@agenda"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("gw" "Write" tags-todo "@write"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("gr" "Research" tags-todo "@research"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("E" . "Energy")
+          ("E1" "Morning" tags-todo "morning"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("E2" "Afternoon" tags-todo "afternoon"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("E3" "Evening" tags-todo "evening"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("p" . "People")
+          ("pM" "Martin" tags-todo "Martin"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("pA" "Anne" tags-todo "Anne"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("pI" "Inigo" tags-todo "Inigo"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("pR" "Robin" tags-todo "Robin"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("pV" "RobinV" tags-todo "RobinV"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("pC" "Margot" tags-todo "Margot"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("pS" "Appy" tags-todo "Appy"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("pZ" "Richard" tags-todo "Richard"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("pL" "Lucas" tags-todo "Lucas"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("pN" "Nele" tags-todo "Nele"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("pH" "Holger" tags-todo "Holger"
+           ((org-agenda-sorting-strategy '(todo-state-up))))
+          ("W" "Work" tags-todo "Work"
+           ((org-agenda-sorting-strategy '(todo-state-up time-up priority-down))))
+          ("P" "Personal" tags-todo "Personal"
+           ((org-agenda-sorting-strategy '(todo-state-up time-up priority-down))))))
 #+end_src
 *** capture templates
     customize capture templates, variables are defined in a private file.
