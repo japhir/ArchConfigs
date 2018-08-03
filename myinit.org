@@ -301,8 +301,15 @@ also commented out, I can see them in my terminal if desired
 #+END_SRC
 *** file associations
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'org-file-apps '("\\.pdf" . (lambda (file link) ; "zathura %s"))
-                                                   (org-pdfview-open link))))
+  (setq org-file-apps
+        '((auto-mode . emacs)
+          ("\\.x?html?\\'" . "xdg-open %s")
+          ("\\.pdf\\'" . (lambda (file link)
+                           (org-pdfview-open link)))
+          ("\\.mp4\\'" . "xdg-open %s")
+          ("\\.webm\\'" . "xdg-open %s")
+          ("\\.mkv\\'" . "xdg-open %s")
+          ("\\.pdf.xoj" . "xournal %s")))
 #+END_SRC
 *** org-agenda
 #+BEGIN_SRC emacs-lisp
