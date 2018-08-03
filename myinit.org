@@ -186,6 +186,7 @@ also commented out, I can see them in my terminal if desired
   (use-package evil-org
     :ensure t
     :diminish evil-org-mode)
+  (add-hook 'org-capture-mode-hook 'evil-insert-state)
 #+end_src
 ** COMMENT undo tree
 #+begin_src emacs-lisp
@@ -403,14 +404,17 @@ also commented out, I can see them in my terminal if desired
     customize capture templates, variables are defined in a private file.
  #+begin_src emacs-lisp
    (setq org-capture-templates
-	 '(("a" "Appointment" entry (file org-cal-file)
-	   "* %?\n\n%^T\n\n:PROPERTIES:\n\n:END:\n\n")
-	   ("t" "Todo" entry (file org-in-file)
-	    "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
-	   ("w" "Website" entry (file org-in-file)
-	    "* %?\nEntered on %U\n \%i\n %a")
-	   ("j" "Journal" entry (file+datetree org-journal-file)
-	   "* %?\nEntered on %U\n %i\n %a")))
+   ;; I capture appointments to the inbox and then org-gcal-post-at-point
+         '(("a" "Appointment" entry (file org-in-file)
+           "* %?\n  %^T\n")
+           ("t" "Todo" entry (file org-in-file)
+            "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
+           ("m" "Email" entry (file org-in-file)
+            "* %? :@email:\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
+           ("w" "Website" entry (file org-in-file)
+            "* %?\nEntered on %U\n %i\n %a")
+           ("j" "Journal" entry (file+datetree org-journal-file)
+            "* %?\nEntered on %U\n %i\n %a")))
  #+end_src
 
 *** TODO states
@@ -910,35 +914,38 @@ Then load it into emacs when opening a PKGBUILD file
 ** mu4e
    install it with package mu from repo
 #+BEGIN_SRC emacs-lisp
-;; (use-package evil-mu4e
-;;  :ensure t)  ; evil keybindings -> now a part of evil-collection
   (require 'mu4e)
   (global-set-key (kbd "\C-c m") 'mu4e)
-  (require 'org-mu4e)
-  (setq org-mu4e-link-query-in-headers-mode nil)
   (setq mu4e-drafts-folder "/Drafts"
         mu4e-sent-folder "/Sent Items"
         mu4e-trash-folder "/Deleted Items")
   ;;(setq mu4e-compose-format-flowed t)  ; plain-text nice to read on phone
   (setq mu4e-maildir-shortcuts
-	'(("/inbox" . ?i)
-	  ("/NEXT" . ?n)
-	  ("/Waiting" . ?w)
-	  ("/Deferred" . ?d)
-	  ("/news" . ?m)
-	  ("/Important backlog" . ?l)
-	  ("/Sent Items" . ?s)))
+        '(("/inbox" . ?i)
+          ("/NEXT" . ?n)
+          ("/Waiting" . ?w)
+          ("/Deferred" . ?d)
+          ("/news" . ?m)
+          ("/Important backlog" . ?l)
+          ("/Sent Items" . ?s)))
   (setq mu4e-change-filenames-when-moving t) ; important for isync
   (setq mu4e-headers-date-format "%Y-%m-%d %H:%M")
   (setq mu4e-headers-fields
-	'((:date          .  17)
-	  (:flags         .   5)
-	  (:from          .  22)
-	  (:subject       .  nil)))
+        '((:date          .  17)
+          (:flags         .   5)
+          (:from          .  22)
+          (:subject       .  nil)))
   (setq mu4e-get-mail-command "mbsync -a")
   (setq mu4e-headers-include-related t)
   (setq mu4e-confirm-quit nil)
   (setq mu4e-view-show-images t)
+#+END_SRC
+** org-mu4e
+#+BEGIN_SRC emacs-lisp
+  (require 'org-mu4e)
+  (define-key mu4e-headers-mode-map (kbd "C-c c") 'org-mu4e-store-and-capture)
+  (define-key mu4e-view-mode-map    (kbd "C-c c") 'org-mu4e-store-and-capture)
+  (setq org-mu4e-link-query-in-headers-mode nil)
 #+END_SRC
 ** COMMENT mu4e-conversation
 #+BEGIN_SRC emacs-lisp
