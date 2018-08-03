@@ -298,21 +298,20 @@ also commented out, I can see them in my terminal if desired
 #+end_src
 *** basics
 #+begin_src emacs-lisp
-      (setq org-return-follows-link t)
-      (setf org-special-ctrl-a/e t)
-      (setq org-fast-tag-selection-single-key t)
-      (setq org-M-RET-may-split-line '((default . nil))) ; folded drawers no longer ruin new entries
+  (setq org-return-follows-link t)
+  (setf org-special-ctrl-a/e t)
+  (setq org-fast-tag-selection-single-key t)
+  (setq org-M-RET-may-split-line '((default . nil))) ; folded drawers no longer ruin new entries
 #+end_src
 *** theming
 #+BEGIN_SRC emacs-lisp
-      (setq org-startup-indented t)
-      ;(setq org-hide-leading-stars t)
-      (setf org-tags-column -65)
-      (setq org-fontify-emphasized-text t)
-      (setq org-fontify-done-headline t)
-      (setq org-pretty-entities t)
-      (setq org-ellipsis "▼") ;▼ … ◦
-
+  (setq org-startup-indented t)
+  ;(setq org-hide-leading-stars t)
+  (setf org-tags-column -65)
+  (setq org-fontify-emphasized-text t)
+  (setq org-fontify-done-headline t)
+  (setq org-pretty-entities t)
+  (setq org-ellipsis "▼") ;▼ … ◦
 #+END_SRC
 *** file associations
 #+BEGIN_SRC emacs-lisp
@@ -395,49 +394,45 @@ also commented out, I can see them in my terminal if desired
 
 *** TODO states
 #+begin_src emacs-lisp
-      ;; the todo-states of my gtd-system
-      (setq org-todo-keywords
-	    '((sequence "TICK(t)" "NEXT(n)" "WAIT(w!/!)" "SOME(s!/!)" "PROJ(p)" "|"
-			"DONE(d)" "CANC(c)")))
-      ;; prettify the todo keywords
-      (setq org-todo-keyword-faces
-	    '(("TICK" . (:background "light slate blue"))
-	      ("NEXT" . (:foreground "light goldenrod yellow" :background "red" :weight bold))
-	      ("WAIT" . (:foreground "dim gray" :background "yellow"))
-	      ("SOME" . (:foreground "ghost white"  :background "deep sky blue"))
-	      ("DONE" . (:foreground "green4"       :background "pale green"))
-	      ("CANC" . (:foreground "dim gray"     :background "gray"))
-	      ("PROJ" . (:foreground "navajo white" :background "saddle brown"))))
+  (setq org-todo-keywords
+        '((sequence "TICK(t)" "NEXT(n)" "WAIT(w!/!)" "SOME(s!/!)" "PROJ(p)" "|"
+                    "DONE(d)" "CANC(c)")))
+  ;; prettify the todo keywords
+  (setq org-todo-keyword-faces
+        '(("TICK" . (:background "light slate blue"))
+          ("NEXT" . (:foreground "light goldenrod yellow" :background "red" :weight bold))
+          ("WAIT" . (:foreground "dim gray" :background "yellow"))
+          ("SOME" . (:foreground "ghost white"  :background "deep sky blue"))
+          ("DONE" . (:foreground "green4"       :background "pale green"))
+          ("CANC" . (:foreground "dim gray"     :background "gray"))
+          ("PROJ" . (:foreground "navajo white" :background "saddle brown"))))
 #+end_src
 
 *** effort estimates
 #+begin_src emacs-lisp
-      ;; add effort estimate standards
-      (add-to-list 'org-global-properties
-		   '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
+  (add-to-list 'org-global-properties
+               '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
 #+end_src
 *** context tags
 #+begin_src emacs-lisp
-      (setq org-tag-alist '((:startgroup . nil) ("@home" . ?h) ("@uni" . ?u) ("@errands" . ?e) ("@lab" . ?l) ("@phone" . ?p) ("@email" . ?m) ("@computer" . ?c) ("@bank" . ?b) (:endgroup . nil)
-			    (:startgroup . nil) ("@agenda" . ?a) ("@write" . ?w) ("@research" . ?r) (:endgroup . nil)
-			    (:startgroup . nil) ("morning" . ?1) ("afternoon" .?2) ("evening" .?3) (:endgroup . nil)
-			    (:startgroup . nil) ("Work" . ?W) ("Personal" . ?P) (:endgroup . nil)
-			    ("Martin". ?M) ("Anne" . ?A) ("Inigo". ?I) ("Robin" . ?R) ("RobinV" . ?V)
-			    ("Margot" . ?C) ("Appy" . ?S) ("Richard" . ?Z) ("Lucas" . ?L) ("Nele". ?N) ("Holger". ?H)))
+  (setq org-tag-alist '((:startgroup . nil) ("@home" . ?h) ("@uni" . ?u) ("@errands" . ?e) ("@lab" . ?l) ("@phone" . ?p) ("@email" . ?m) ("@computer" . ?c) ("@bank" . ?b) (:endgroup . nil)
+                        (:startgroup . nil) ("@agenda" . ?a) ("@write" . ?w) ("@research" . ?r) (:endgroup . nil)
+                        (:startgroup . nil) ("morning" . ?1) ("afternoon" .?2) ("evening" .?3) (:endgroup . nil)
+                        (:startgroup . nil) ("Work" . ?W) ("Personal" . ?P) (:endgroup . nil)
+                        ("Martin". ?M) ("Anne" . ?A) ("Inigo". ?I) ("Robin" . ?R) ("RobinV" . ?V)
+                        ("Margot" . ?C) ("Appy" . ?S) ("Richard" . ?Z) ("Lucas" . ?L) ("Nele". ?N) ("Holger". ?H)))
 #+end_src
-
 *** refiling
     swyper makes refiling amazing!
 #+begin_src emacs-lisp
-      ;; refiling settings
-      (setq org-refile-targets '((nil :maxlevel . 9)
-				 (org-agenda-files :maxlevel . 9)))
-      (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
-      (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
+  ;; TODO: refile without the annoying ^ regex
+  (setq org-refile-targets '((nil :maxlevel . 9)
+                             (org-agenda-files :maxlevel . 9)))
+  (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
+  (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
 #+end_src
 *** org-babel
 #+BEGIN_SRC emacs-lisp
-  ;; org-babel loads r
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((stan . t)
@@ -446,53 +441,48 @@ also commented out, I can see them in my terminal if desired
 *** org-latex export settings
    basic latex settings
 #+BEGIN_SRC emacs-lisp
-      (setq org-highlight-latex-and-related '(latex script entities))
-      (setq org-latex-create-formula-image-program 'dvipng)
-      (setq org-latex-default-figure-position 'htbp)
-      ;(setq org-latex-pdf-process
-  ;	  '("pdflatex -interaction nonstopmode -output-directory %o %f"
-  ;	    "bibtex %b"
-  ;	    "pdflatex -interaction nonstopmode -output-directory %o %f"
-  ;	    "pdflatex -interaction nonstopmode -output-directory %o %f"))
-      (setq org-latex-pdf-process
-          (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
-      (setq org-latex-prefer-user-labels t)
-      ;; disable the ang preview entity, because it conflicts with \ang from siunitx
-      (with-eval-after-load 'org-entities
-        (setq org-entities
-              (cl-remove-if (lambda (x) (and (listp x) (equal (car x) "ang"))) org-entities)))
+  (setq org-highlight-latex-and-related '(latex script entities))
+  (setq org-latex-create-formula-image-program 'dvipng)
+  (setq org-latex-default-figure-position 'htbp)
+  (setq org-latex-pdf-process
+        (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
+  (setq org-latex-prefer-user-labels t)
+  ;; disable the ang preview entity, because it conflicts with \ang from siunitx
+  (with-eval-after-load 'org-entities
+    (setq org-entities
+          (cl-remove-if (lambda (x) (and (listp x) (equal (car x) "ang"))) org-entities)))
 #+END_SRC
-
 *** close org
 #+BEGIN_SRC emacs-lisp
   )
 #+end_src
 ** org-fancy-capture attempt
 #+BEGIN_SRC emacs-lisp
-    ;;;; Thank you random guy from StackOverflow
-    ;;;; http://stackoverflow.com/questions/23517372/hook-or-advice-when-aborting-org-capture-before-template-selection
+  ;;;; Thank you random guy from StackOverflow
+  ;;;; http://stackoverflow.com/questions/23517372/hook-or-advice-when-aborting-org-capture-before-template-selection
   (require 'org-capture)
   (require 'org-protocol)
   (defadvice org-capture
       (after make-full-window-frame activate)
     "Advise capture to be the only window when used as a popup"
     (if (equal "emacs-popup" (frame-parameter nil 'name))
-	(delete-other-windows)))
+        (delete-other-windows)))
   (defadvice org-capture-finalize
       (after delete-capture-frame activate)
     "Advise capture-finalize to close the frame"
     (if (equal "emacs-popup" (frame-parameter nil 'name))
-	(delete-frame)))
+        (delete-frame)))
 #+END_SRC
 ** org-bullets
    prettify org mode
 #+begin_src emacs-lisp
   (use-package org-bullets
     :ensure t
-    :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+    :init
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
     :config
     (setq org-bullets-bullet-list
-	  '("◉" "●" "○" "♦" "◆" "►" "▸")))
+          '("◉" "●" "○" "♦" "◆" "►" "▸")))
 #+end_src
 ** org-gcal
    synchronize google calendar with org
@@ -502,52 +492,52 @@ also commented out, I can see them in my terminal if desired
 #+end_src
 ** org-pdfview
 #+BEGIN_SRC emacs-lisp
-(use-package org-pdfview
-  :ensure t)
+  (use-package org-pdfview
+    :ensure t)
 #+END_SRC
 ** mathjax
 #+BEGIN_SRC emacs-lisp
   (setq org-html-mathjax-options
-    '((path "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
-      (scale "100")
-      (align "center")
-      (indent "2em")
-      (mathml t)))
+        '((path "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
+          (scale "100")
+          (align "center")
+          (indent "2em")
+          (mathml t)))
   (setq org-html-mathjax-template
   "
- <script type=\"text/x-mathjax-config\">
-    MathJax.Ajax.config.path[\"mhchem\"] =
-      \"https://cdnjs.cloudflare.com/ajax/libs/mathjax-mhchem/3.2.0\";
-    MathJax.Ajax.config.path[\"siunitx\"] =
-      \"https://cdn.rawgit.com/burnpanck/MathJax-siunitx/f0f03a29\";
-    MathJax.Hub.Config({
-      extensions: [\"[mhchem]/mhchem.js\", \"[siunitx]/siunitx.js\"],
-      jax: [\"input/TeX\", \"output/HTML-CSS\"],
-      TeX: {
-        extensions: [\"[mhchem]/mhchem.js\",\"[siunitx]/siunitx.js\"]
-      },
-      tex2jax: {
-        inlineMath: [ ['$','$'], [\"\\(\",\"\\)\"] ],
-        displayMath: [ ['$$','$$'], [\"\\[\",\"\\]\"] ],
-        processEscapes: true
-      },
-      \"HTML-CSS\": { availableFonts: [\"TeX\"] }
-    });
+   <script type=\"text/x-mathjax-config\">
+      MathJax.Ajax.config.path[\"mhchem\"] =
+        \"https://cdnjs.cloudflare.com/ajax/libs/mathjax-mhchem/3.2.0\";
+      MathJax.Ajax.config.path[\"siunitx\"] =
+        \"https://cdn.rawgit.com/burnpanck/MathJax-siunitx/f0f03a29\";
+      MathJax.Hub.Config({
+        extensions: [\"[mhchem]/mhchem.js\", \"[siunitx]/siunitx.js\"],
+        jax: [\"input/TeX\", \"output/HTML-CSS\"],
+        TeX: {
+          extensions: [\"[mhchem]/mhchem.js\",\"[siunitx]/siunitx.js\"]
+        },
+        tex2jax: {
+          inlineMath: [ ['$','$'], [\"\\(\",\"\\)\"] ],
+          displayMath: [ ['$$','$$'], [\"\\[\",\"\\]\"] ],
+          processEscapes: true
+        },
+        \"HTML-CSS\": { availableFonts: [\"TeX\"] }
+      });
+    </script>
+    <script type=\"text/javascript\" async
+            src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML\">
   </script>
-  <script type=\"text/javascript\" async
-          src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML\">
-</script>
-")
+  ")
 #+END_SRC
 ** org-beamer
 #+BEGIN_SRC emacs-lisp
   (require 'ox-latex)
   (add-to-list 'org-latex-classes
-	       '("beamer"
-		 "\\documentclass\[presentation\]\{beamer\}"
-		 ("\\section\{%s\}" . "\\section*\{%s\}")
-		 ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-		 ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
+               '("beamer"
+                 "\\documentclass\[presentation\]\{beamer\}"
+                 ("\\section\{%s\}" . "\\section*\{%s\}")
+                 ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
+                 ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
 #+END_SRC
 ** latex class =ijkarticle=
 #+BEGIN_SRC emacs-lisp
@@ -592,7 +582,6 @@ also commented out, I can see them in my terminal if desired
 ** ox-extra
 org-export ignore headlines with ~:ignore:~ tag
 #+BEGIN_SRC emacs-lisp
-  ;; (add-to-list 'load-path "~/path/to/orgdir/contrib/lisp" t)
   (require 'ox-extra)
   (ox-extras-activate '(latex-header-blocks ignore-headlines))
 #+END_SRC
