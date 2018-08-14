@@ -2,11 +2,10 @@
   Use-package is an amazing resource to clean up my init file and have it play
   nice on both my desktop and laptop.
 #+begin_src emacs-lisp
-;; require
-(eval-when-compile
-  (require 'use-package))
-(require 'diminish)  ; to omit lines from the mode-line
-(require 'bind-key)  ; for easy keybindings
+  (eval-when-compile
+    (require 'use-package))
+  (require 'diminish)  ; to omit lines from the mode-line
+  (require 'bind-key)  ; for easy keybindings
 #+end_src
 * local directories
   These are all the settings that require directories, such as my org agenda
@@ -21,59 +20,59 @@
 *** in the frame title
     currently commented out, I prefer scratch
 #+begin_src emacs-lisp
-(setf frame-title-format
-      (with-temp-buffer
-        (call-process "fortune" nil t)
-        (setf (point) (point-min))
-        (while (re-search-forward "[ \n\t]+" nil t)
-          (replace-match " " nil t))
-        (buffer-string)))
+  (setf frame-title-format
+        (with-temp-buffer
+          (call-process "fortune" nil t)
+          (setf (point) (point-min))
+          (while (re-search-forward "[ \n\t]+" nil t)
+            (replace-match " " nil t))
+          (buffer-string)))
 #+end_src
 *** in the scratch buffer
 also commented out, I can see them in my terminal if desired
 #+begin_src emacs-lisp
-(setq initial-scratch-message
-      (format
-       ";; %s\n\n"
-       (replace-regexp-in-string
-        "\n" "\n;; " ; comment each line
-        (replace-regexp-in-string
-         "\n$" ""    ; remove trailing linebreak
-         (shell-command-to-string "cowthink $(fortune showerthoughts)")))))
+  (setq initial-scratch-message
+        (format
+         ";; %s\n\n"
+         (replace-regexp-in-string
+          "\n" "\n;; " ; comment each line
+          (replace-regexp-in-string
+           "\n$" ""    ; remove trailing linebreak
+           (shell-command-to-string "cowthink $(fortune showerthoughts)")))))
 #+end_src
 ** turn off UI elements and small tweaks
 #+begin_src emacs-lisp
-   (autoload 'ibuffer "ibuffer")
-   (setq inhibit-splash-screen t)
-   (scroll-bar-mode -1)   ; turn off the scroll bar
-   (tool-bar-mode -1)     ; turn off the tool bar
-   (menu-bar-mode -1)     ; turn off the menu
-   (setq visible-bell 1)  ; turn off beeps, make them flash!
-   (setq-default fill-column 79)
+  (autoload 'ibuffer "ibuffer")
+  (setq inhibit-splash-screen t)
+  (scroll-bar-mode -1)   ; turn off the scroll bar
+  (tool-bar-mode -1)     ; turn off the tool bar
+  (menu-bar-mode -1)     ; turn off the menu
+  (setq visible-bell 1)  ; turn off beeps, make them flash!
+  (setq-default fill-column 79)
 
-    ;; 20MB of memory before calling garbage collection
-   (setq gc-cons-threshold 20000000)
+   ;; 20MB of memory before calling garbage collection
+  (setq gc-cons-threshold 20000000)
 
-   ;; typed text will replace highlighted region
-   (delete-selection-mode 1)
+  ;; typed text will replace highlighted region
+  (delete-selection-mode 1)
 
-   ;; backspace deletes one character instead of one column
-   (global-set-key (kbd "DEL") 'backward-delete-char)
+  ;; backspace deletes one character instead of one column
+  (global-set-key (kbd "DEL") 'backward-delete-char)
 
-   ;; enable `downcase-region' and `upcase-region'
-   (put 'downcase-region 'disabled nil)
-   (put 'upcase-region 'disabled nil)
-   (defalias 'yes-or-no-p 'y-or-n-p)
+  ;; enable `downcase-region' and `upcase-region'
+  (put 'downcase-region 'disabled nil)
+  (put 'upcase-region 'disabled nil)
+  (defalias 'yes-or-no-p 'y-or-n-p)
 
-   ;; always follow symlinks w/o asking
-   (require 'vc-hooks)
-   (setq vc-follow-symlinks t)
+  ;; always follow symlinks w/o asking
+  (require 'vc-hooks)
+  (setq vc-follow-symlinks t)
 
-   ;; remove trailing whitespace before save
-   (add-hook 'before-save-hook 'delete-trailing-whitespace)
+  ;; remove trailing whitespace before save
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
-   ;; prefer utf-8
-   (prefer-coding-system 'utf-8-unix)
+  ;; prefer utf-8
+  (prefer-coding-system 'utf-8-unix)
 #+end_src
 ** don't make a mess of my folders
 #+BEGIN_SRC emacs-lisp
@@ -85,6 +84,7 @@ also commented out, I can see them in my terminal if desired
    mouse-wheel-progressive-speed nil)
 #+END_SRC
 ** COMMENT dired should play nice
+I no longer use dired, but switched to ranger
 #+BEGIN_SRC emacs-lisp
   (define-key global-map [remap list-buffers] 'ibuffer)
 
@@ -103,24 +103,23 @@ also commented out, I can see them in my terminal if desired
   (use-package rainbow-delimiters
     :ensure t
     :config
-    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
-    (add-hook 'LaTeX-mode-hook 'rainbow-delimiters-mode))
+    :hook ((prog-mode LaTeX-mode) . rainbow-delimiters-mode))
 #+end_src
 ** set the theme
 *** COMMENT leuven
 #+begin_src emacs-lisp
-(use-package leuven-theme
-  :init
-  (load-theme 'leuven t)
-  ;; (load-theme 'leuven-dark t)
-  :config
-  (setq org-fontify-whole-heading-line t))
+  (use-package leuven-theme
+    :init
+    (load-theme 'leuven t)
+    ;; (load-theme 'leuven-dark t)
+    :config
+    (setq org-fontify-whole-heading-line t))
 #+end_src
 *** COMMENT leuven-dark
 #+begin_src emacs-lisp
-(use-package leuven-dark
-  :init
-  (load-theme 'leuven t))
+  (use-package leuven-dark
+    :init
+    (load-theme 'leuven t))
 #+end_src
 *** monokai
 #+BEGIN_SRC emacs-lisp
@@ -133,7 +132,7 @@ also commented out, I can see them in my terminal if desired
 ** default font
 #+begin_src emacs-lisp
   (set-face-attribute 'default nil
-		      :family "Source Code Pro" :height 130)
+                      :family "Source Code Pro" :height 130)
 #+end_src
 ** beacon
    Highlight the current line when scrolling
@@ -170,7 +169,6 @@ also commented out, I can see them in my terminal if desired
 		("C-j" . evil-window-down)
 		("C-k" . evil-window-up)
 		("C-l" . evil-window-right)))
-
 #+end_src
 ** evil-collection
 #+BEGIN_SRC emacs-lisp
@@ -186,22 +184,19 @@ also commented out, I can see them in my terminal if desired
   (use-package evil-org
     :ensure t
     :after org
+    :hook ((org-mode . evil-org-mode)
+           (evil-org-mode . (lambda () (evil-org-set-key-theme)))
+           (org-capture-mode . evil-insert-state))
     :config
-    (add-hook 'org-mode-hook 'evil-org-mode)
-    (add-hook 'evil-org-mode-hook
-              (lambda ()
-                (evil-org-set-key-theme)))
-    (add-hook 'org-capture-mode-hook 'evil-insert-state)
     (require 'evil-org-agenda)
-    (evil-org-agenda-set-keys)
-    :diminish evil-org-mode)
+    (evil-org-agenda-set-keys))
 #+end_src
 ** COMMENT undo tree
 #+begin_src emacs-lisp
-(use-package undo-tree
-   :ensure t
-   :config (global-undo-tree-mode)
-   :diminish undo-tree-mode)
+  (use-package undo-tree
+     :ensure t
+     :config (global-undo-tree-mode)
+     :diminish undo-tree-mode)
 #+end_src
 ** evil-escape
    escape from everything using =jk=
@@ -213,7 +208,7 @@ also commented out, I can see them in my terminal if desired
     (evil-escape-mode 1)
     (setq-default evil-escape-key-sequence "jk"))
 #+end_src
-** evil-nerd-commenter
+** COMMENT evil-nerd-commenter
    easy comments in a lot of code formats. Keys are configured in [[evil-leader]].
 #+begin_src emacs-lisp
   (use-package evil-nerd-commenter
@@ -224,7 +219,7 @@ also commented out, I can see them in my terminal if desired
   (use-package evil-leader  ; default is \
     :ensure t
     :config
-    (evil-leader/set-leader "<SPC>")
+    (evil-leader/set-leader "SPC>")
     (global-evil-leader-mode)
     (evil-leader/set-key
       "i" 'evilnc-comment-or-uncomment-lines
@@ -288,13 +283,13 @@ also commented out, I can see them in my terminal if desired
 #+end_src
 ** org
    note-taking, todo system, calendar, everything
-
 *** setup
 #+begin_src emacs-lisp
-    (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
-    (use-package org
-      :ensure t
-      :config
+  ;; get latest org-mode from other repo than elpa
+  (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+  (use-package org
+    :ensure org-plus-contrib
+    :config
 #+end_src
 *** basics
 #+begin_src emacs-lisp
@@ -338,7 +333,7 @@ also commented out, I can see them in my terminal if desired
   (setq org-log-done 'time)
 #+END_SRC
 *** agenda filters
-      Filter tasks by context (sorted by todo state)
+Filter tasks by context (sorted by todo state)
 #+begin_src emacs-lisp
   (setq org-agenda-sorting-strategy '(todo-state-up))
   (setq org-agenda-custom-commands
@@ -350,6 +345,7 @@ also commented out, I can see them in my terminal if desired
           ("gl" "Laboratory" tags-todo "@lab")
           ("gp" "Phone" tags-todo "@phone")
           ("gm" "e-mail" tags-todo "@email")
+          ("gs" "Slack" tags-todo "@slack")
           ("gc" "Computer" tags-todo "@computer")
           ("gb" "Bank" tags-todo "@bank")
           ("ga" "Agenda" tags-todo "@agenda")
@@ -415,15 +411,33 @@ also commented out, I can see them in my terminal if desired
 #+end_src
 *** context tags
 #+begin_src emacs-lisp
-  (setq org-tag-alist '((:startgroup . nil) ("@home" . ?h) ("@uni" . ?u) ("@errands" . ?e) ("@lab" . ?l) ("@phone" . ?p) ("@email" . ?m) ("@computer" . ?c) ("@bank" . ?b) (:endgroup . nil)
-                        (:startgroup . nil) ("@agenda" . ?a) ("@write" . ?w) ("@research" . ?r) (:endgroup . nil)
-                        (:startgroup . nil) ("morning" . ?1) ("afternoon" .?2) ("evening" .?3) (:endgroup . nil)
-                        (:startgroup . nil) ("Work" . ?W) ("Personal" . ?P) (:endgroup . nil)
-                        ("Martin". ?M) ("Anne" . ?A) ("Inigo". ?I) ("Robin" . ?R) ("RobinV" . ?V)
-                        ("Margot" . ?C) ("Appy" . ?S) ("Richard" . ?Z) ("Lucas" . ?L) ("Nele". ?N) ("Holger". ?H)))
+  (setq org-tag-alist '((:startgroup . nil)
+                        ("@home" . ?h)
+                        ("@uni" . ?u)
+                        ("@errands" . ?e)
+                        ("@lab" . ?l)
+                        ("@phone" . ?p)
+                        ("@email" . ?m)
+                        ("@slack". ?s)
+                        ("@computer" . ?c)
+                        ("@bank" . ?b)
+                        (:endgroup . nil)
+                        (:startgroup . nil)
+                        ("@agenda" . ?a) ("@write" . ?w) ("@research" . ?r)
+                        (:endgroup . nil)
+                        (:startgroup . nil)
+                        ("morning" . ?1) ("afternoon" .?2) ("evening" .?3)
+                        (:endgroup . nil)
+                        (:startgroup . nil)
+                        ("Work" . ?W) ("Personal" . ?P)
+                        (:endgroup . nil)
+                        ("Martin". ?M) ("Anne" . ?A) ("Inigo". ?I)
+                        ("Robin" . ?R) ("RobinV" . ?V) ("Margot" . ?C)
+                        ("Appy" . ?S) ("Richard" . ?Z) ("Lucas" . ?L)
+                        ("Nele". ?N) ("Holger". ?H)))
 #+end_src
 *** refiling
-    swyper makes refiling amazing!
+swyper makes refiling amazing!
 #+begin_src emacs-lisp
   ;; TODO: refile without the annoying ^ regex
   (setq org-refile-targets '((nil :maxlevel . 9)
@@ -450,7 +464,8 @@ also commented out, I can see them in my terminal if desired
   ;; disable the ang preview entity, because it conflicts with \ang from siunitx
   (with-eval-after-load 'org-entities
     (setq org-entities
-          (cl-remove-if (lambda (x) (and (listp x) (equal (car x) "ang"))) org-entities)))
+          (cl-remove-if (lambda (x)
+                          (and (listp x) (equal (car x) "ang"))) org-entities)))
 #+END_SRC
 *** close org
 #+BEGIN_SRC emacs-lisp
@@ -478,8 +493,8 @@ also commented out, I can see them in my terminal if desired
 #+begin_src emacs-lisp
   (use-package org-bullets
     :ensure t
-    :init
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+    :hook
+    (org-mode-hook . (lambda () (org-bullets-mode 1)))
     :config
     (setq org-bullets-bullet-list
           '("◉" "●" "○" "♦" "◆" "►" "▸")))
@@ -577,7 +592,7 @@ also commented out, I can see them in my terminal if desired
 #+END_SRC
 ** org-export
 #+BEGIN_SRC emacs-lisp
-(require 'ob-org)
+  (require 'ob-org)
 #+END_SRC
 ** ox-extra
 org-export ignore headlines with ~:ignore:~ tag
@@ -596,43 +611,43 @@ org-export ignore headlines with ~:ignore:~ tag
 ** easy symbol insertion
    By default C-x 8 o = ° and C-x 8 m = µ. So:
 #+begin_src emacs-lisp
-(global-set-key (kbd "C-x 8 a") (lambda () (interactive) (insert "α")))
-(global-set-key (kbd "C-x 8 b") (lambda () (interactive) (insert "β")))
-(global-set-key (kbd "C-x 8 d") (lambda () (interactive) (insert "δ")))
-(global-set-key (kbd "C-x 8 D") (lambda () (interactive) (insert "Δ")))
+  (global-set-key (kbd "C-x 8 a") (lambda () (interactive) (insert "α")))
+  (global-set-key (kbd "C-x 8 b") (lambda () (interactive) (insert "β")))
+  (global-set-key (kbd "C-x 8 d") (lambda () (interactive) (insert "δ")))
+  (global-set-key (kbd "C-x 8 D") (lambda () (interactive) (insert "Δ")))
 #+end_src
 ** revert buffer
 #+begin_src emacs-lisp
-(global-set-key (kbd "<f5>") 'revert-buffer)
+  (global-set-key (kbd "<f5>") 'revert-buffer)
 #+end_src
 ** eshell
 *** open an eshell here
 #+begin_src emacs-lisp
-(defun eshell-here ()
-  "Opens up a new shell in the directory associated with the
-current buffer's file. The eshell is renamed to match that
-directory to make multiple eshell windows easier."
-  (interactive)
-  (let* ((parent (if (buffer-file-name)
-                     (file-name-directory (buffer-file-name))
-                   default-directory))
-         (height (/ (window-total-height) 3))
-         (name   (car (last (split-string parent "/" t)))))
-    (split-window-vertically (- height))
-    (other-window 1)
-    (eshell "new")
-    (rename-buffer (concat "*eshell: " name "*"))
+  (defun eshell-here ()
+    "Opens up a new shell in the directory associated with the
+  current buffer's file. The eshell is renamed to match that
+  directory to make multiple eshell windows easier."
+    (interactive)
+    (let* ((parent (if (buffer-file-name)
+                       (file-name-directory (buffer-file-name))
+                     default-directory))
+           (height (/ (window-total-height) 3))
+           (name   (car (last (split-string parent "/" t)))))
+      (split-window-vertically (- height))
+      (other-window 1)
+      (eshell "new")
+      (rename-buffer (concat "*eshell: " name "*"))
 
-    (insert (concat "ls"))
-    (eshell-send-input)))
-(global-set-key (kbd "C-!") 'eshell-here)
+      (insert (concat "ls"))
+      (eshell-send-input)))
+  (global-set-key (kbd "C-!") 'eshell-here)
 #+end_src
 *** close current eshell
 #+begin_src emacs-lisp
-(defun eshell/x ()
-  (insert "exit")
-  (eshell-send-input)
-  (delete-window))
+  (defun eshell/x ()
+    (insert "exit")
+    (eshell-send-input)
+    (delete-window))
 #+end_src
 *** C-l clears the eshell buffer
  #+begin_src emacs-lisp
@@ -662,10 +677,13 @@ directory to make multiple eshell windows easier."
 ** pdf-tools
 #+BEGIN_SRC emacs-lisp
   (use-package pdf-tools
+    :pin manual
     :config
     (pdf-tools-install)
-    (setq-default pdf-view-display-size 'fit-page)
-    :ensure t)
+    (setq-default pdf-view-display-size 'fit-width)
+    :bind
+    ;; swiper doesn't play nice with pdf-tools, so I disable it.
+    (:map pdf-view-mode-map ("C-s" . isearch-forward)))
 #+END_SRC
 ** COMMENT edit with emacs (chromium)
    Edit gmail messages and other input fields in chrome with emacs, markdown.
@@ -684,7 +702,6 @@ very nice search replacement
 #+begin_src emacs-lisp
   (use-package swiper
     :init (ivy-mode 1)
-    :diminish ivy-mode
     :ensure t
     :config
     (setq ivy-use-virtual-buffers t)
@@ -693,39 +710,11 @@ very nice search replacement
     :bind
     ("\C-s" . swiper)
     ("C-c C-r" . ivy-resume)
-    ("<f6>" . ivy-resume)
-    ("M-x" . counsel-M-x)
-    ("C-x C-f" . counsel-find-file)
-    ("<f1> f" . counsel-describe-function)
-    ("<f1> v" . counsel-describe-variable)
-    ("<f1> l" . counsel-load-library)
-    ("<f2> i" . counsel-info-lookup-symbol)
-    ("<f2> u" . counsel-unicode-char)
-    ("C-c s" . counsel-ag) ; search
-    ("C-c u" . swiper-all)
     ("C-c v" . ivy-push-view)
-    ("C-c V" . ivy-pop-view)
-    ("C-x l" . counsel-locate))
+    ("C-c V" . ivy-pop-view))
 #+end_src
-** ace-window
-   Move to other buffers
-#+BEGIN_SRC emacs-lisp
-  (use-package ace-window
-    :ensure t
-    :init
-    (global-set-key [remap other-window] 'ace-window)
-    (custom-set-faces
-     '(aw-leading-char-face
-       ((t (:inherit ace-jump-face-foreground :height 2.0))))))
-#+END_SRC
-** counsel
-   Required for swiper
-#+begin_src emacs-lisp
-  (use-package counsel
-    :ensure t)
-#+end_src
-** avy
-   jump to next chararcter. Slightly redundant b/c of evil's =f= and =t=.
+** COMMENT avy
+jump to next chararcter. Slightly redundant b/c of evil's =f= and =t=.
 #+begin_src emacs-lisp
   (use-package avy
     :ensure t
@@ -734,6 +723,24 @@ very nice search replacement
     ("C-'" . avy-goto-char-2)
     ("M-w" . avy-goto-word-1))
 #+end_src
+** counsel
+#+begin_src emacs-lisp
+  (use-package counsel
+    :init (counsel-mode 1)
+    :ensure t
+    :bind
+    ("M-x" . counsel-M-x)
+    ("C-c s" . counsel-rg))
+#+end_src
+** ace-window
+Move to other buffers
+#+BEGIN_SRC emacs-lisp
+  (use-package ace-window
+    :ensure t
+    :bind ([remap other-window] . ace-window)
+    :custom-face
+    (aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 2.0)))))
+#+END_SRC
 ** magit
    git management
 #+begin_src emacs-lisp
@@ -783,19 +790,18 @@ file bookmarks
 #+begin_src emacs-lisp
   (use-package auto-complete
     :ensure t
-    :diminish auto-complete-mode
     :init
     (ac-config-default)
     (global-auto-complete-mode t))
 #+end_src
 ** COMMENT golden-ratio
-   #+BEGIN_SRC emacs-lisp
-     (use-package golden-ratio
-       :ensure t
-       :config
-       (golden-ratio-mode 1)
-       (setq golden-ratio-auto-scale t))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package golden-ratio
+     :ensure t
+     :config
+     (golden-ratio-mode 1)
+     (setq golden-ratio-auto-scale t))
+#+END_SRC
 ** file extension modes
 #+BEGIN_SRC emacs-lisp
   (defvar auto-mode-alist-init
@@ -847,15 +853,15 @@ sudo pacman -S emacs-pkgbuild-mode
 
 Then load it into emacs when opening a PKGBUILD file
 #+BEGIN_SRC emacs-lisp
-(autoload 'pkgbuild-mode "pkgbuild-mode.el" "PKGBUILD mode." t)
-(setq auto-mode-alist (append '(("/PKGBUILD$" . pkgbuild-mode)) auto-mode-alist))
+  (autoload 'pkgbuild-mode "pkgbuild-mode.el" "PKGBUILD mode." t)
+  (setq auto-mode-alist (append '(("/PKGBUILD$" . pkgbuild-mode)) auto-mode-alist))
 #+END_SRC
 ** COMMENT writeroom-mode
 #+BEGIN_SRC emacs-lisp
   (use-package writeroom-mode
     :ensure t)
 #+END_SRC
-** COMMENT erc
+** erc
    I use weechat on command line now
 #+BEGIN_SRC emacs-lisp
   (use-package erc
@@ -879,38 +885,43 @@ Then load it into emacs when opening a PKGBUILD file
 ** mu4e
    install it with package mu from repo
 #+BEGIN_SRC emacs-lisp
-  (require 'mu4e)
-  (global-set-key (kbd "\C-c m") 'mu4e)
-  (setq mu4e-drafts-folder "/Drafts"
-        mu4e-sent-folder "/Sent Items"
-        mu4e-trash-folder "/Deleted Items")
-  ;;(setq mu4e-compose-format-flowed t)  ; plain-text nice to read on phone
-  (setq mu4e-maildir-shortcuts
-        '(("/inbox" . ?i)
-          ("/NEXT" . ?n)
-          ("/Waiting" . ?w)
-          ("/Deferred" . ?d)
-          ("/news" . ?m)
-          ("/Important backlog" . ?l)
-          ("/Sent Items" . ?s)))
-  (setq mu4e-change-filenames-when-moving t) ; important for isync
-  (setq mu4e-headers-date-format "%Y-%m-%d %H:%M")
-  (setq mu4e-headers-fields
-        '((:date          .  17)
-          (:flags         .   5)
-          (:from          .  22)
-          (:subject       .  nil)))
-  (setq mu4e-get-mail-command "mbsync -a")
-  (setq mu4e-headers-include-related t)
-  (setq mu4e-confirm-quit nil)
-  (setq mu4e-view-show-images t)
+  (use-package mu4e
+    :bind ("\C-c m" . mu4e)
+    :config
+    (setq mu4e-drafts-folder "/Drafts"
+          mu4e-sent-folder "/Sent Items"
+          mu4e-trash-folder "/Deleted Items")
+    ;;(setq mu4e-compose-format-flowed t)  ; plain-text nice to read on phone
+    (setq mu4e-maildir-shortcuts
+          '(("/inbox" . ?i)
+            ("/NEXT" . ?n)
+            ("/Waiting" . ?w)
+            ("/Deferred" . ?d)
+            ("/news" . ?m)
+            ("/Important backlog" . ?l)
+            ("/Sent Items" . ?s)
+            ("/archive" . ?r)))
+    (setq mu4e-change-filenames-when-moving t) ; important for isync
+    (setq mu4e-headers-date-format "%Y-%m-%d %H:%M")
+    (setq mu4e-headers-fields
+          '((:date          .  17)
+            (:flags         .   5)
+            (:from          .  22)
+            (:subject       .  nil)))
+    (setq mu4e-get-mail-command "mbsync -a")
+    (setq mu4e-headers-include-related t)
+    (setq mu4e-confirm-quit nil)
+    (setq mu4e-view-show-images t))
 #+END_SRC
 ** org-mu4e
 #+BEGIN_SRC emacs-lisp
-  (require 'org-mu4e)
-  (define-key mu4e-headers-mode-map (kbd "C-c c") 'org-mu4e-store-and-capture)
-  (define-key mu4e-view-mode-map    (kbd "C-c c") 'org-mu4e-store-and-capture)
-  (setq org-mu4e-link-query-in-headers-mode nil)
+  (use-package org-mu4e
+    :bind (:map mu4e-headers-mode-map
+           ("C-c c" . org-mu4e-store-and-capture)
+           :map mu4e-view-mode-map
+           ("C-c c" . org-mu4e-store-and-capture))
+    :config
+    (setq org-mu4e-link-query-in-headers-mode nil))
 #+END_SRC
 ** COMMENT mu4e-conversation
 #+BEGIN_SRC emacs-lisp
@@ -921,11 +932,11 @@ Then load it into emacs when opening a PKGBUILD file
 #+END_SRC
 ** mu4e notifications
    #+BEGIN_SRC emacs-lisp
-   (use-package mu4e-alert
-     :ensure t
-     :config
-     (mu4e-alert-set-default-style 'libnotify)
-     (add-hook 'after-init-hook #'mu4e-alert-enable-notifications))
+     (use-package mu4e-alert
+       :ensure t
+       :config
+       (mu4e-alert-set-default-style 'libnotify)
+       :hook (after-init-hook . #'mu4e-alert-enable-notifications))
    #+END_SRC
 ** COMMENT gnus
  #+BEGIN_SRC emacs-lisp
@@ -941,16 +952,15 @@ Then load it into emacs when opening a PKGBUILD file
  #+END_SRC
 * Science packages
 ** ess
-   emacs speaks statistics, work with R etc.
+emacs speaks statistics, work with R etc.
+installed from AUR for easier maintenance
 #+begin_src emacs-lisp
-  (use-package ess
-    :ensure t
-    :config
-    (setq ess-default-style 'RStudio-)
-    :commands R)
+  (setq load-path (cons "/usr/share/emacs/site-lisp/ess" load-path))
+  (require 'ess-site)
+  (setq ess-default-style 'RStudio-)
 #+end_src
 ** polymode
-   for working with .Rmd files etc.
+for working with .Rmd files etc.
 #+begin_src emacs-lisp
   (use-package polymode
     :ensure t
@@ -961,7 +971,7 @@ Then load it into emacs when opening a PKGBUILD file
       ("\\.Rmd" . poly-markdown+r-mode))
 #+end_src
 ** matlab
-   if I'm ever required to work in non-open-source
+if I'm ever required to work in non-open-source
 #+begin_src emacs-lisp
   (use-package matlab
     :init (autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
@@ -972,13 +982,13 @@ Then load it into emacs when opening a PKGBUILD file
     (setq matlab-indent-function "matlab"))
 #+end_src
 ** markdown-mode
-   markdown mode for writing
+markdown mode for writing
 #+begin_src emacs-lisp
   (use-package markdown-mode
     :ensure t)
 #+end_src
 ** pandoc-mode
-   exporting markdown
+exporting markdown
 #+begin_src emacs-lisp
   (use-package pandoc-mode
     :defer
@@ -986,22 +996,23 @@ Then load it into emacs when opening a PKGBUILD file
 #+end_src
 
 ** LaTeX (AUCTeX, RefTeX)
-   for working with \LaTeX
+for working with \LaTeX
+installed from AUR for ease of use.
 #+begin_src emacs-lisp
   (use-package auctex
-    :ensure t)
-  (setq TeX-auto-save t)
-  (setq TeX-parse-self t)
-  (setq-default TeX-master nil)
-  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-  (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
-  (add-hook 'LaTeX-mode-hook 'prettify-symbols-mode)
-  (setq reftex-plug-into-AUCTeX t)
+    :hook
+   (LaTeX-mode-hook . (turn-on-reftex turn-on-auto-fill prettify-symbols-mode))
+   :config
+   (setq TeX-auto-save t)
+   (setq TeX-parse-self t)
+   (setq-default TeX-master nil)
+   (setq reftex-plug-into-AUCTeX t))
 #+end_src
 ** ispell: spell-checking
 #+begin_src emacs-lisp
-  (require 'ispell)
-  (setq ispell-dictionary "british-ize-w_accents")
+  (use-package ispell
+    :config
+    (setq ispell-dictionary "british-ize-w_accents"))
 #+end_src
 ** hl-todo
 #+BEGIN_SRC emacs-lisp
@@ -1010,9 +1021,8 @@ Then load it into emacs when opening a PKGBUILD file
     :bind (:map hl-todo-mode-map
                 ("C-c k" . hl-todo-previous)
                 ("C-c j" . hl-todo-next))
-    :init
-    (add-hook 'LaTeX-mode-hook 'hl-todo-mode)
-    (add-hook 'ess-mode-hook 'hl-todo-mode))
+    :hook
+    ((LaTeX-mode ess-mode) . hl-todo-mode))
 #+END_SRC
 ** bibtex/ivy-bibtex
    reference manager I use it in conjunction with zotero, which generates the
