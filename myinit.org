@@ -7,13 +7,9 @@
   (require 'diminish)  ; to omit lines from the mode-line
   (require 'bind-key)  ; for easy keybindings
 #+end_src
-* local directories
-  These are all the settings that require directories, such as my org agenda
-  files etc. They require different setup between desktop and laptop and are
-  thus moved to these separate files which are symlinked to the below directory.
+* dirvar
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package emacsdirs)
-  (load "~/.emacs.d/emacsdirs.el" t)
+(load "~/.emacs.d/dirvars.el")
 #+END_SRC
 * interface and appearance
 ** COMMENT fortune cookies
@@ -288,15 +284,18 @@ I no longer use dired, but switched to ranger
   ;; get latest org-mode from other repo than elpa
   (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
   (use-package org
+    :pin org
     :ensure org-plus-contrib
     :config
 #+end_src
 *** basics
 #+begin_src emacs-lisp
+  (setq org-directory "~/Dropbox/Apps/orgzly/")
   (setq org-return-follows-link t)
   (setf org-special-ctrl-a/e t)
   (setq org-fast-tag-selection-single-key t)
-  (setq org-M-RET-may-split-line '((default . nil))) ; folded drawers no longer ruin new entries
+  ;; folded drawers no longer ruin new entries
+  (setq org-M-RET-may-split-line '((default . nil)))
 #+end_src
 *** theming
 #+BEGIN_SRC emacs-lisp
@@ -322,10 +321,12 @@ I no longer use dired, but switched to ranger
 #+END_SRC
 *** org-agenda
 #+BEGIN_SRC emacs-lisp
+  ;; (setq org-agenda-files (list "<file1.org> etc."))
   (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
   (setq org-deadline-warning-days 14)
+  ;; exclude scheduled items from all todo's in list
   (setq org-agenda-todo-ignore-scheduled t)
-  (setq org-agenda-todo-ignore-deadlines t)
+  ;; (setq org-agenda-todo-ignore-deadlines t)
   (setq org-agenda-todo-ignore-timestamp t)
   (setq org-agenda-todo-ignore-with-date t)
   (setq org-agenda-prefix-format "  %-17:c%?-12t% s")
@@ -384,7 +385,7 @@ Filter tasks by context (sorted by todo state)
             "* %? :@email:\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
            ("w" "Website" entry (file org-in-file)
             "* %?\nEntered on %U\n %i\n %a")
-           ("j" "Journal" entry (file+datetree org-journal-file)
+           ("j" "Journal" entry (file+olp+datetree org-journal-file)
             "* %?\nEntered on %U\n %i\n %a")))
  #+end_src
 
@@ -471,7 +472,7 @@ swyper makes refiling amazing!
 #+BEGIN_SRC emacs-lisp
   )
 #+end_src
-** org-fancy-capture attempt
+** COMMENT org-fancy-capture attempt
 #+BEGIN_SRC emacs-lisp
   ;;;; Thank you random guy from StackOverflow
   ;;;; http://stackoverflow.com/questions/23517372/hook-or-advice-when-aborting-org-capture-before-template-selection
@@ -494,7 +495,7 @@ swyper makes refiling amazing!
   (use-package org-bullets
     :ensure t
     :hook
-    (org-mode-hook . (lambda () (org-bullets-mode 1)))
+    (org-mode . (lambda () (org-bullets-mode 1)))
     :config
     (setq org-bullets-bullet-list
           '("◉" "●" "○" "♦" "◆" "►" "▸")))
@@ -503,7 +504,11 @@ swyper makes refiling amazing!
    synchronize google calendar with org
 #+begin_src emacs-lisp
   (use-package org-gcal
-    :ensure t) ; config in separate file for privacy
+    :ensure t
+    :config
+    (setq org-gcal-client-id "<your-client-id>"
+          org-gcal-client-secret "<your-client-secret>"
+          org-gcal-file-alist '(("<link>@group.calendar.google.com>" . "<link-to-org-file>"))))
 #+end_src
 ** org-pdfview
 #+BEGIN_SRC emacs-lisp
@@ -511,6 +516,7 @@ swyper makes refiling amazing!
     :ensure t)
 #+END_SRC
 ** mathjax
+an attempt at getting siunitx and mhchem working in html
 #+BEGIN_SRC emacs-lisp
   (setq org-html-mathjax-options
         '((path "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
@@ -678,6 +684,7 @@ org-export ignore headlines with ~:ignore:~ tag
 #+BEGIN_SRC emacs-lisp
   (use-package pdf-tools
     :pin manual
+    :magic ("%PDF" . pdf-view-mode)
     :config
     (pdf-tools-install)
     (setq-default pdf-view-display-size 'fit-width)
@@ -756,13 +763,14 @@ Move to other buffers
     :config
     (projectile-mode))
 #+END_SRC
-*** counsel-projectile
+*** COMMENT counsel-projectile
 #+BEGIN_SRC emacs-lisp
   (use-package counsel-projectile
     :ensure t
     :config
     (counsel-projectile-mode))
 #+END_SRC
+
 ** COMMENT hydra
 file bookmarks
 #+BEGIN_SRC emacs-lisp
@@ -804,16 +812,8 @@ file bookmarks
 #+END_SRC
 ** file extension modes
 #+BEGIN_SRC emacs-lisp
-  (defvar auto-mode-alist-init
-    auto-mode-alist "emacs default value for `auto-mode-alist'.")
-  (setq auto-mode-alist
-	(append '(
-		  ("i3config" . conf-mode)
-		  ("i3status" . conf-mode)
-		  (".*rc\\'" . conf-mode)
-		  ("\\.inp\\'" . conf-mode)
-		  )
-		auto-mode-alist-init))
+  (use-package conf-mode
+    :mode ("i3config" "i3status" ".*rc\\'" "\\.inp\\'"))
 #+END_SRC
 ** flycheck
 #+BEGIN_SRC emacs-lisp
@@ -829,7 +829,7 @@ file bookmarks
     :config
     (global-set-key (kbd "C-c d") 'define-word))
 #+END_SRC
-** yasnippet
+** COMMENT yasnippet
    usefull snippets for me: org-mode (fig_, )
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
@@ -853,8 +853,14 @@ sudo pacman -S emacs-pkgbuild-mode
 
 Then load it into emacs when opening a PKGBUILD file
 #+BEGIN_SRC emacs-lisp
-  (autoload 'pkgbuild-mode "pkgbuild-mode.el" "PKGBUILD mode." t)
-  (setq auto-mode-alist (append '(("/PKGBUILD$" . pkgbuild-mode)) auto-mode-alist))
+  (use-package pkgbuild-mode
+     :load-path "/usr/share/emacs/site-lisp/"
+     :mode "/PKGBUILD$")
+#+END_SRC
+** systemd
+#+BEGIN_SRC emacs-lisp
+  (use-package systemd
+    :ensure t)
 #+END_SRC
 ** COMMENT writeroom-mode
 #+BEGIN_SRC emacs-lisp
@@ -882,12 +888,32 @@ Then load it into emacs when opening a PKGBUILD file
     :bind
     ("C-c m" . notmuch))
 #+END_SRC
+** smtp
+#+BEGIN_SRC emacs-lisp
+(use-package smtpmail
+  :config
+  (setq message-send-mail-function 'smtpmail-send-it
+	send-mail-function 'smtpmail-send-it
+	user-mail-address "<your-email-address>"
+	smtpmail-default-smtp-server "<your-smtp-server>"
+	smtpmail-smtp-server "<your-smtp-server>"
+	smtpmail-smtp-service 587
+	smtp-stream-type 'starttls
+	smtpmail-smtp-user "<your-user-id>"
+	smtpmail-starttls-credentials
+	'(("<your-smtp-server>" 587 "<possiblly-domain>/<your-user-id>" nil))
+	starttls-use-gnutls t
+	starttls-gnutls-program "gnutls-cli"
+	starttls-extra-args nil))
+#+END_SRC
 ** mu4e
    install it with package mu from repo
 #+BEGIN_SRC emacs-lisp
   (use-package mu4e
-    :bind ("\C-c m" . mu4e)
-    :config
+    :load-path "/usr/share/emacs/site-lisp/mu4e/"
+    :commands mu4e
+    :bind ("C-c m" . mu4e)
+    :init
     (setq mu4e-drafts-folder "/Drafts"
           mu4e-sent-folder "/Sent Items"
           mu4e-trash-folder "/Deleted Items")
@@ -916,11 +942,12 @@ Then load it into emacs when opening a PKGBUILD file
 ** org-mu4e
 #+BEGIN_SRC emacs-lisp
   (use-package org-mu4e
+    :after mu4e
     :bind (:map mu4e-headers-mode-map
            ("C-c c" . org-mu4e-store-and-capture)
            :map mu4e-view-mode-map
            ("C-c c" . org-mu4e-store-and-capture))
-    :config
+    :init
     (setq org-mu4e-link-query-in-headers-mode nil))
 #+END_SRC
 ** COMMENT mu4e-conversation
@@ -931,13 +958,14 @@ Then load it into emacs when opening a PKGBUILD file
     (global-mu4e-conversation-mode))
 #+END_SRC
 ** mu4e notifications
-   #+BEGIN_SRC emacs-lisp
-     (use-package mu4e-alert
-       :ensure t
-       :config
-       (mu4e-alert-set-default-style 'libnotify)
-       :hook (after-init-hook . #'mu4e-alert-enable-notifications))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package mu4e-alert
+    :ensure t
+    :after mu4e
+    :config
+    (mu4e-alert-set-default-style 'libnotify)
+    :hook (after-init . mu4e-alert-enable-notifications))
+#+END_SRC
 ** COMMENT gnus
  #+BEGIN_SRC emacs-lisp
    (setq gnus-select-method
@@ -955,9 +983,12 @@ Then load it into emacs when opening a PKGBUILD file
 emacs speaks statistics, work with R etc.
 installed from AUR for easier maintenance
 #+begin_src emacs-lisp
-  (setq load-path (cons "/usr/share/emacs/site-lisp/ess" load-path))
-  (require 'ess-site)
-  (setq ess-default-style 'RStudio-)
+  (use-package ess-site
+    :load-path "/usr/share/emacs/site-lisp/ess/"
+    :init (require 'ess-site)  ;; I don't know how else to get this working...
+    :commands R
+    :config
+    (setq ess-default-style 'RStudio-))
 #+end_src
 ** polymode
 for working with .Rmd files etc.
@@ -991,22 +1022,26 @@ markdown mode for writing
 exporting markdown
 #+begin_src emacs-lisp
   (use-package pandoc-mode
-    :defer
-    :init (add-hook 'markdown-mode-hook 'pandoc-mode))
+    :hook (markdown-mode . pandoc-mode))
 #+end_src
 
 ** LaTeX (AUCTeX, RefTeX)
 for working with \LaTeX
 installed from AUR for ease of use.
 #+begin_src emacs-lisp
-  (use-package auctex
+  ;(load "auctex.el" nil t t)
+  ;(load "preview-latex.el" nil t t)
+  (use-package tex
+    :load-path "/usr/share/emacs/site-lisp/auctex/"
     :hook
-   (LaTeX-mode-hook . (turn-on-reftex turn-on-auto-fill prettify-symbols-mode))
-   :config
-   (setq TeX-auto-save t)
-   (setq TeX-parse-self t)
-   (setq-default TeX-master nil)
-   (setq reftex-plug-into-AUCTeX t))
+    (LaTeX-mode . turn-on-reftex)
+    (LaTeX-mode . turn-on-auto-fill)
+    (LaTeX-mode . prettify-symbols-mode)
+    :init
+    (setq TeX-auto-save t)
+    (setq TeX-parse-self t)
+    (setq-default TeX-master nil)
+    (setq reftex-plug-into-AUCTeX t))
 #+end_src
 ** ispell: spell-checking
 #+begin_src emacs-lisp
@@ -1034,3 +1069,20 @@ installed from AUR for ease of use.
     (autoload 'ivy-bibtex "ivy-bibtex" "" t)
     (setq bibtex-completion-pdf-field "file"))
 #+end_src
+** org-ref
+#+BEGIN_SRC emacs-lisp
+  (use-package org-ref
+    :config
+    (setq bibtex-completion-bibliography '("~/Documents/References/PhD.bib")
+          bibtex-completion-pdf-field "file"
+          bibtex-completion-notes-path "~/Dropbox/Apps/orgzly/referencenotes.org")
+    (setq org-ref-default-bibliography '("~/Documents/References/PhD.bib")))
+#+END_SRC
+* secret directories
+  These are all the settings that require secret directories, such as my org
+  agenda files and google calendar. They overwrite the settings with "<...>"
+  syntax above.
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package emacsdirs)
+  (load "~/.emacs.d/secretdirs.el" t)
+#+END_SRC
