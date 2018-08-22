@@ -505,6 +505,8 @@ swyper makes refiling amazing!
 #+begin_src emacs-lisp
   (use-package org-gcal
     :ensure t
+    :bind
+    (:map org-agenda-mode-map ("U" . org-gcal-fetch))  ;; same key as mu4e!
     :config
     (setq org-gcal-client-id "<your-client-id>"
           org-gcal-client-secret "<your-client-secret>"
