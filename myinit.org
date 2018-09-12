@@ -683,6 +683,7 @@ org-export ignore headlines with ~:ignore:~ tag
     (ranger-override-dired-mode t))
 #+END_SRC
 ** pdf-tools
+install from AUR `emacs-pdf-tools-git`
 #+BEGIN_SRC emacs-lisp
   (use-package pdf-tools
     :pin manual
@@ -909,7 +910,7 @@ Then load it into emacs when opening a PKGBUILD file
 	starttls-extra-args nil))
 #+END_SRC
 ** mu4e
-   install it with package mu from repo
+   install it with pacman `mu`
 #+BEGIN_SRC emacs-lisp
   (use-package mu4e
     :load-path "/usr/share/emacs/site-lisp/mu4e/"
@@ -983,7 +984,7 @@ Then load it into emacs when opening a PKGBUILD file
 * Science packages
 ** ess
 emacs speaks statistics, work with R etc.
-installed from AUR for easier maintenance
+installed from AUR `emacs-ess`
 #+begin_src emacs-lisp
   (use-package ess-site
     :load-path "/usr/share/emacs/site-lisp/ess/"
@@ -1029,7 +1030,7 @@ exporting markdown
 
 ** LaTeX (AUCTeX, RefTeX)
 for working with \LaTeX
-installed from AUR for ease of use.
+installed with pacman `auctex`
 #+begin_src emacs-lisp
   ;(load "auctex.el" nil t t)
   ;(load "preview-latex.el" nil t t)
