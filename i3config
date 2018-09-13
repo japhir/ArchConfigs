@@ -115,8 +115,8 @@ set $ws9 "9:"
 set $ws10 "10:"
 
 # assign workspaces to screens
-set $smallscreen DVI-I-1
-set $bigscreen DVI-I-2
+set $smallscreen eDP1
+set $bigscreen HDMI2
 
 workspace $ws1 output $smallscreen
 workspace $ws9 output $smallscreen
