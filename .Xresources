@@ -4,22 +4,18 @@
 URxvt.modifier: super
 
 !! perl extensions
-URxvt.perl-ext: default
-URxvt.perl-ext-common: default,matcher,resize-font,url-select,keyboard-select
+!!URxvt.perl-ext: default
+!!URxvt.perl-ext-common: default,matcher,url-select,keyboard-select
 !! url-select (part of urxvt-perls package)
-URxvt.keysym.M-u: perl:url-select:select_next
-URxvt.url-select-launcher: /usr/bin/xdg-open
-URxvt.url-select.underline: true
-URxvt.url-select.autocopy: true
+!!URxvt.keysym.M-u: perl:url-select:select_next
+!!URxvt.url-select-launcher: /usr/bin/xdg-open
+!!URxvt.url-select.underline: true
+!!URxvt.url-select.autocopy: true
 !! keyboard-select
-URxvt.keysym.M-Escape: perl:keyboard-select:activate
-!! resize-font
-URxvt.resize-font-smaller: C-j
-URxvt.resize-font-bigger: C-k
+!!URxvt.keysym.M-Escape: perl:keyboard-select:activate
 !! matcher
-URxvt.matcher.button: 1
+!!URxvt.matcher.button: 1
 URxvt.url-launcher: /usr/bin/xdg-open
-
 
 Xft.dpi:                96
 Xft.antialias:          true
