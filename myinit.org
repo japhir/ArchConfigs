@@ -200,10 +200,11 @@ evil keymap for org-mode
     :ensure t
     :after org
     :hook ((org-mode . evil-org-mode)
-	   (evil-org-mode . (lambda ()
-			      (evil-org-set-key-theme
-			       '(navigation insert return textobjects additional shift todo heading calendar))))
-	   (org-capture-mode . evil-insert-state))
+           (evil-org-mode . (lambda ()
+                              (evil-org-set-key-theme
+                               '(navigation insert return textobjects additional shift todo heading calendar))))
+           (org-capture-mode . evil-insert-state)
+           (yas-before-expand-snippet . evil-insert-state))
     :config
     (require 'evil-org-agenda)
     (evil-org-agenda-set-keys))
@@ -901,7 +902,10 @@ file bookmarks
     :ensure t
     :init
     (ac-config-default)
-    (global-auto-complete-mode t))
+    (global-auto-complete-mode t)
+    :config
+    (setq auto-show-delay nil)
+    (setq-default ac-sources (push 'ac-source-yasnippet ac-sources)))
 #+END_SRC
 ** COMMENT golden-ratio
 #+BEGIN_SRC emacs-lisp
@@ -929,16 +933,21 @@ file bookmarks
     :ensure t
     :bind ("C-c d" . define-word))
 #+END_SRC
-** COMMENT yasnippet
+** yasnippet
    usefull snippets for me: org-mode (fig_, )
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :ensure t
     :init
-    (yas-global-mode 1))
+    (yas-global-mode 1)
+    :config
+    (setq yas-indent-line t))
+
+  ;; (use-package ivy-yasnippet
+    ;; :ensure t)
+  ;; no updates since 2015
   ;; (use-package r-autoyas
-    ;; :init
-    ;; (add-hook 'ess-mode-hook 'r-autoyas-ess-activate))
+  ;;   :hook (ess-mode . r-autoyas-ess-activate))
 #+END_SRC
 ** firefox as default browser
 #+BEGIN_SRC emacs-lisp
