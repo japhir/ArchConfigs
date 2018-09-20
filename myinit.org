@@ -129,6 +129,7 @@ I no longer use dired, but switched to ranger
 ** toggle transparency
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'default-frame-alist '(alpha . (85 . 50)))
+  ;; TODO: this currently only switches, should default to 100 for pdf, png, etc.
   (add-hook 'pdf-view-mode-hook 'toggle-transparency)
   (defun toggle-transparency ()
     (interactive)
@@ -455,7 +456,7 @@ Filter tasks by context (sorted by todo state)
           ("W" "Work" tags-todo "Work")
           ("P" "Personal" tags-todo "Personal")))
 #+END_SRC
-** gapture templates
+** capture templates
     customize capture templates, variables are defined in a private file.
  #+BEGIN_SRC emacs-lisp
    (setq org-capture-templates
