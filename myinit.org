@@ -473,7 +473,6 @@ Filter tasks by context (sorted by todo state)
            ("j" "Journal" entry (file+olp+datetree org-journal-file)
             "* %?\nEntered on %U\n %i\n %a")))
  #+END_SRC
-
 ** TODO states
 #+BEGIN_SRC emacs-lisp
   (setq org-todo-keywords
@@ -844,10 +843,16 @@ jump to next chararcter. Slightly redundant b/c of evil's =f= and =t=.
 #+END_SRC
 ** ace-window
 Move to other buffers
+https://github.com/abo-abo/ace-window
 #+BEGIN_SRC emacs-lisp
   (use-package ace-window
     :ensure t
-    :bind ([remap other-window] . ace-window)
+    :bind (([remap other-window] . ace-window)
+           ("M-o" . ace-window))
+    :config
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+    ;; (setq aw-scope frame) ; disable jumping between frames
+    (setq aw-background nil) ; disable graying out of frames
     :custom-face
     (aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 2.0)))))
 #+END_SRC
