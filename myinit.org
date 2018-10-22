@@ -416,11 +416,10 @@ Filter tasks by context (sorted by todo state)
 #+BEGIN_SRC emacs-lisp
   (setq org-agenda-sorting-strategy '(todo-state-up))
   (setq org-agenda-custom-commands
-        '(("i" "Inbox" tags-todo "in")
-          ;; ("w" "FancyWork" ((agenda "" (org-agenda-span 1))
-          ;; 		  ((tags-todo "Work")
-          ;;                    (todo "NEXT")
-          ;;                    (org-agenda-sorting-strategy '((tags)))))
+        '(("i" "Inbox" tags "in")
+          ("A" agenda*)
+          ("W" "Work" tags-todo "Work")
+          ("P" "Personal" tags-todo "Personal")
           ("g" . "GTD contexts")
           ("gh" "Home" tags-todo "@home")
           ("gu" "University" tags-todo "@uni")
@@ -449,9 +448,7 @@ Filter tasks by context (sorted by todo state)
           ("pZ" "Richard" tags-todo "Richard")
           ("pL" "Lucas" tags-todo "Lucas")
           ("pN" "Nele" tags-todo "Nele")
-          ("pH" "Holger" tags-todo "Holger")
-          ("W" "Work" tags-todo "Work")
-          ("P" "Personal" tags-todo "Personal")))
+          ("pH" "Holger" tags-todo "Holger")))
 #+END_SRC
 ** capture templates
     customize capture templates, variables are defined in a private file.
