@@ -517,37 +517,71 @@ Filter tasks by context (sorted by todo state)
 #+END_SRC
 ** org-babel languages
 #+BEGIN_SRC emacs-lisp
+  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((stan . t)
      (R . t)))
 #+END_SRC
-** org-export odt
+** exporting
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-fontify-natively t
+    org-src-tab-acts-natively t)
+#+END_SRC
+*** org-export odt
 #+BEGIN_SRC emacs-lisp
   (require 'ob-org)
 #+END_SRC
-** ox-extra
+*** ox-extra
 org-export ignore headlines with ~:ignore:~ tag
 #+BEGIN_SRC emacs-lisp
   (require 'ox-extra)
   (ox-extras-activate '(latex-header-blocks ignore-headlines))
 #+END_SRC
-** org-latex export settings
+*** ox-latex
+#+BEGIN_SRC emacs-lisp
+  (require 'ox-latex)
+#+END_SRC
+*** org-latex export settings
    basic latex settings
 #+BEGIN_SRC emacs-lisp
-  (setq org-highlight-latex-and-related '(latex script entities))
-  (setq org-latex-create-formula-image-program 'dvipng)
-  (setq org-latex-default-figure-position 'htbp)
-  (setq org-latex-pdf-process
-        (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
-  (setq org-latex-prefer-user-labels t)
-  ;; disable the ang preview entity, because it conflicts with \ang from siunitx
-  (with-eval-after-load 'org-entities
-    (setq org-entities
-          (cl-remove-if (lambda (x)
-                          (and (listp x) (equal (car x) "ang"))) org-entities)))
+    (setq org-export-latex-listings 'minted)  ; should provide syntax highlighting
+    (setq org-latex-packages-alist '(
+                                     ("" "minted")
+                                     ("" "siunitx")
+                                     ("version=4" "mhchem")))
+    (setq org-highlight-latex-and-related '(latex script entities))
+    (setq org-latex-create-formula-image-program 'dvipng)
+    (setq org-latex-default-figure-position 'htbp)
+    (setq org-latex-pdf-process
+          (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
+    (setq org-latex-prefer-user-labels t)
+    ;; disable the ang preview entity, because it conflicts with \ang from siunitx
+    (with-eval-after-load 'org-entities
+      (setq org-entities
+            (cl-remove-if (lambda (x)
+                            (and (listp x) (equal (car x) "ang"))) org-entities)))
+    ;; (setq org-entities-user
+          ;; ("\ce{\delta^18O}" "\ce{\delta^18O}" nil "δ<sup>18</sup>O" "δ18O" "δ18O" "δ¹⁸O"))
+          ;; ("\celsius" "\celsius" nil "&#x2103;" "℃" "°C")
+    ;; make sure org-mode non-breaking spaces are turned into latex ~
+    (defun my-latex-filter-nobreaks (text backend info)
+      "Ensure \" \" are properly handled in LaTeX export."
+      (when (org-export-derived-backend-p backend 'latex)
+            (replace-regexp-in-string " " "~" text)))
+    (add-to-list 'org-export-filter-plain-text-functions
+                 'my-latex-filter-nobreaks)
 #+END_SRC
-** latex class =ijkarticle=
+*** org-latex-minted
+#+BEGIN_SRC emacs-lisp
+  (setq org-latex-minted-options '(
+                                   ("frame" "lines")
+                                   ("fontsize" "\\scriptsize")
+                                   ("xleftmargin" "\\parindent")
+                                   ("linenos" "")
+                                   ))
+#+END_SRC
+*** latex class =ijkarticle=
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'org-latex-classes
        '("ijkarticle"
