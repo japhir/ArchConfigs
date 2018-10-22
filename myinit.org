@@ -808,6 +808,14 @@ I keep forgetting to clock out, this should help me prevent that.
 	   '(lambda()
 	      (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
  #+END_SRC
+** COMMENT lispy
+file not found!
+https://github.com/abo-abo/lispy
+#+BEGIN_SRC emacs-lisp
+  (use-package lispy
+    ;; :hook (emacs-lisp-mode . (lispy-mode 1))
+    :ensure t)
+#+END_SRC
 ** ranger
 #+BEGIN_SRC emacs-lisp
   (use-package ranger
