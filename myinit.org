@@ -404,6 +404,7 @@ swyper makes refiling amazing!
   (setq org-refile-targets (quote ((nil :maxlevel . 9)  ;; current file
                                    (org-gtd-file :maxlevel . 3)
                                    (org-tickler-file :maxlevel . 2)
+                                   (org-notes-file :maxlevel . 2)
                                    (org-lists-file :maxlevel . 2)
                                    (org-someday-file :maxlevel . 2)
                                    (org-clumped-file :maxlevel . 4))))
