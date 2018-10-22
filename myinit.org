@@ -617,7 +617,7 @@ org-export ignore headlines with ~:ignore:~ tag
 		 ("\\paragraph{%s}" . "\\paragraph*{%s}")
 		 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 #+END_SRC
-** mathjax
+*** mathjax
 an attempt at getting siunitx and mhchem working in html
 #+BEGIN_SRC emacs-lisp
   (setq org-html-mathjax-options
@@ -655,6 +655,13 @@ an attempt at getting siunitx and mhchem working in html
 ** close use-package org
 #+BEGIN_SRC emacs-lisp
   )
+#+END_SRC
+** org-pomodoro
+#+BEGIN_SRC emacs-lisp
+  (use-package org-pomodoro
+    :after org
+    :bind ("M-p" . org-pomodoro)
+    :ensure t)
 #+END_SRC
 ** COMMENT org-fancy-capture attempt
 #+BEGIN_SRC emacs-lisp
