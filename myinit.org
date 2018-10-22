@@ -889,12 +889,16 @@ https://github.com/abo-abo/ace-window
     :ensure t
     :bind (([remap other-window] . ace-window)
            ("M-o" . ace-window))
-    :config
+    :init
     (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-    ;; (setq aw-scope frame) ; disable jumping between frames
+    (setq aw-scope 'frame)   ; disable jumping between frames
     (setq aw-background nil) ; disable graying out of frames
     :custom-face
-    (aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 2.0)))))
+    (aw-leading-char-face
+     ((t (:inherit ace-jump-face-foreground
+                   :height 2.0
+                   :foreground "deep sky blue"
+                   :weight bold)))))
 #+END_SRC
 ** magit
    git management
