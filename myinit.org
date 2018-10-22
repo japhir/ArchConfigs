@@ -908,6 +908,22 @@ https://github.com/abo-abo/ace-window
     :bind
     ("M-g" . magit-status))
 #+END_SRC
+** diff-hl
+#+BEGIN_SRC emacs-lisp
+  (use-package diff-hl
+    :ensure t
+    :init
+    (global-diff-hl-mode)
+    (diff-hl-flydiff-mode +1)
+    :hook (magit-post-refresh . diff-hl-magit-post-refresh))
+#+END_SRC
+** COMMENT git-gutter
+#+BEGIN_SRC emacs-lisp
+  (use-package git-gutter
+    :ensure t
+    :config
+    (global-git-gutter-mode +1))
+#+END_SRC
 ** projectile
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
