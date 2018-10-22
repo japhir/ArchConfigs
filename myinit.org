@@ -174,23 +174,19 @@ I no longer use dired, but switched to ranger
   (use-package evil
     :ensure t
     :init
-    (setq evil-want-integration nil)
-    (setq evil-cross-lines t)
-    (setq evil-want-C-u-scroll t) ; C-u scrolls up half page
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    ;; (setq evil-cross-lines t)
+    ;; (setq evil-want-C-u-scroll t) ; C-u scrolls up half page
     :config
-    (evil-mode 1)
-    :bind (:map evil-normal-state-map
-		("C-h" . evil-window-left)
-		("C-j" . evil-window-down)
-		("C-k" . evil-window-up)
-		("C-l" . evil-window-right)))
+    (evil-mode 1))
 #+END_SRC
 ** evil-collection
 #+BEGIN_SRC emacs-lisp
   (use-package evil-collection
     :after evil
     :ensure t
-    :init
+    :config
     (evil-collection-init))
 #+END_SRC
 ** evil-org
