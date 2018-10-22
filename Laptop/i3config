@@ -145,16 +145,16 @@ workspace $ws10 gaps inner 0
 workspace $ws10 gaps outer 0
 
 # assign workspaces to screens
-set $smallscreen eDP-1
-set $bigscreen HDMI-2
+set $smallscreen eDP1
+set $bigscreen HDMI2
 
 workspace $ws1 output $smallscreen
-workspace $ws9 output $smallscreen
-workspace $ws10 output $smallscreen
 workspace $ws2 output $bigscreen
 workspace $ws3 output $bigscreen
 workspace $ws4 output $bigscreen
 workspace $ws7 output $bigscreen
+workspace $ws9 output $smallscreen
+workspace $ws10 output $smallscreen
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
