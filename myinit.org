@@ -285,7 +285,12 @@ operate on indentation regions, mainly with ~ii~
 evil keybindings for magit
 #+BEGIN_SRC emacs-lisp
   (use-package evil-magit
-    :ensure t)
+    :after magit
+    :hook
+    (git-commit-mode . evil-insert-state)
+    :ensure t
+    :config
+    (evil-set-initial-state 'magit-log-edit-mode 'insert))
 #+END_SRC
 ** telephone-line
    very nice powerline-based status line
