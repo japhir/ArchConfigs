@@ -734,9 +734,27 @@ an attempt at getting siunitx and mhchem working in html
 #+BEGIN_SRC emacs-lisp
   (use-package org-ref
     :ensure t
+    :bind ("C-c j" . org-ref-bibtex-hydra/body)
     :after org
     :init
-    (setq org-ref-completion-library 'org-ref-ivy-cite))
+    (setq org-ref-completion-library 'org-ref-ivy-cite)
+    (setq reftex-default-bibliography '("~/SurfDrive/bibliography/references.bib"))
+    (setq org-ref-bibliography-notes "~/SurfDrive/bibliography/notes.org"
+          org-ref-default-bibliography '("~/SurfDrive/bibliography/references.bib")
+          org-ref-pdf-directory "~/SurfDrive/bibliography/bibtex-pdfs/")
+    (setq bibtex-completion-pdf-open-function 'org-open-file)
+    :config
+    (require 'doi-utils)
+    (setq bibtex-autokey-year-length 4
+          bibtex-autokey-name-year-separator ""
+          bibtex-autokey-year-title-separator "-"
+          bibtex-autokey-titleword-separator "-"
+          bibtex-autokey-titlewords 0
+          bibtex-autokey-titlewords-stretch 1
+          bibtex-autokey-titleword-length 5)
+    (add-to-list 'org-ref-bibtex-journal-abbreviations
+                 '("JIR" "Journal of Irreproducible Research" "J. Irrep. Res."))
+    (require 'org-ref-scopus))
 #+END_SRC
 ** org-clock-query-out
 I keep forgetting to clock out, this should help me prevent that.
