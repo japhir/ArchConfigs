@@ -75,12 +75,9 @@ export LANG=en_US.UTF-8
 if [[ -n $SSH_CONNECTION ]]; then
     export EDITOR='vim'
 else
-    export EDITOR='emacsclient -t'
+    export EDITOR="emacsclient -c -n -e '(switch-to-buffer nil)'"
     export SUDO_EDITOR='vim'
-    export VISUAL='emacsclient'
-    # export WINEPREFIX=$HOME/.win32
-    # export WINARCH=win32
-    # export PATH=$PATH/.cabal/bin
+    export VISUAL="emacsclient -c -n -e '(switch-to-buffer nil)'"
 fi
 
 # Compilation flags
@@ -100,6 +97,7 @@ fi
 
 alias R='R --quiet'
 alias o='xdg-open'
+alias e="emacsclient -c -n"
 alias pb='curl -F c=@- https://ptpb.pw\?u\=1' # neat pastebin
 alias yt="youtube-dl --add-metadata -ic" # Download video link
 alias yta="youtube-dl --add-metadata -xic" # Download only audio

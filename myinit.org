@@ -81,6 +81,13 @@ also commented out, I can see them in my terminal if desired
    create-lockfiles nil
    mouse-wheel-progressive-speed nil)
 #+END_SRC
+** frames-only-mode
+let my window manager handle screen creation
+#+BEGIN_SRC emacs-lisp
+  (use-package frames-only-mode
+    :config (setq frames-only-mode t)
+    :ensure t)
+#+END_SRC
 ** COMMENT dired should play nice
 I no longer use dired, but switched to ranger
 #+BEGIN_SRC emacs-lisp
@@ -909,7 +916,8 @@ jump to next chararcter. Slightly redundant b/c of evil's =f= and =t=.
     ("M-x" . counsel-M-x)
     ("C-c s" . counsel-rg))
 #+END_SRC
-** ace-window
+** COMMENT ace-window
+no longer needed with frames-only-mode! <3
 Move to other buffers
 https://github.com/abo-abo/ace-window
 #+BEGIN_SRC emacs-lisp

@@ -22,7 +22,7 @@
     (("d18O" "\\ce{\\delta^18O}" nil "&delta;<sup>18</sup>O" "δ18O" "δ18O" "δ¹⁸O"))))
  '(package-selected-packages
    (quote
-    (org-pomodoro diff-hl lispy git-gutter writeroom-mode ivy-yasnippet yasnippet evil-numbers evil-indent-plus evil-commentary evil-snipe evil-easymotion webpaste use-package-chords telephone-line systemd stan-mode ranger rainbow-mode rainbow-delimiters polymode ox-tufte org-ref org-plus-contrib org-pdfview org-noter org-gcal org-bullets openwith mu4e-conversation mu4e-alert monokai-theme leuven-theme ivy-bibtex hl-todo gmail-message-mode fontawesome flycheck evil-org evil-nerd-commenter evil-mu4e evil-magit evil-leader evil-escape evil-collection edit-server diminish define-word counsel-projectile bug-hunter beacon auto-complete ace-window)))
+    (frames-only-mode org-ref-pdf org-books org-pomodoro diff-hl lispy git-gutter writeroom-mode ivy-yasnippet yasnippet evil-numbers evil-indent-plus evil-commentary evil-snipe evil-easymotion webpaste use-package-chords telephone-line systemd stan-mode ranger rainbow-mode rainbow-delimiters polymode ox-tufte org-ref org-plus-contrib org-pdfview org-noter org-gcal org-bullets openwith mu4e-conversation mu4e-alert monokai-theme leuven-theme ivy-bibtex hl-todo gmail-message-mode fontawesome flycheck evil-org evil-nerd-commenter evil-mu4e evil-magit evil-leader evil-escape evil-collection edit-server diminish define-word counsel-projectile bug-hunter beacon auto-complete ace-window)))
  '(safe-local-variable-values (quote ((TeX-master . t)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
