@@ -22,16 +22,23 @@ set $term urxvt
 set $menu dmenu_path | rofi -dmenu | xargs swaymsg exec
 
 ### Output configuration
-#
+
+## get colours/bg from pywal
+include "$HOME/.cache/wal/colors-sway"
+client.focused $color0 $color9 $foreground $color7 $color7
+client.focused_inactive $color0 $background $foreground $color7 $color7
+
 # Default wallpaper (more resolutions are available in __DATADIR__/backgrounds/sway/)
-output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
+# output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
+
 Output eDP-1 {
-       background ~/Pictures/wallpapers/Future/1378870852724.jpg fill
+       background $wallpaper fill
        resolution 1920x1080
        position 0 1080
 }
 # HDMI screen above laptop
 output HDMI-A-2 {
+       background $wallpaper fill
        resolution 1920x1080
        position 0 0
 }
@@ -196,7 +203,7 @@ assign [class="^Slack$"] $ws5
 assign [class="^Trello$"] $ws5
 assign [class="^Inkscape$"] $ws6
 assign [class="^VirtualBox$" title="^Win10"] $ws8
-assign [class="R_x11"] $ws9     # R graphics output
+assign [class="R_x11"] $ws9
 assign [class="^Spotify$"] $ws10
 #
 # Layout stuff:
@@ -270,22 +277,23 @@ bindsym $mod+Delete exec ~/ArchConfigs/launchswaylock.sh
 #
 # Read `man 5 sway-bar` for more information about this section.
 
-
 bar {
     position top
     # TODO: battery icon, processor/memory overview
     # WAITING: tray icons
     # When the status_command prints a new line to stdout, swaybar updates.
-    # The default just shows the current date and time.
-    status_command while date +'%Y-%m-%d %l:%M:%S %p'; do sleep 1; done
+    status_command while echo "$(bash-fuzzy-clock) $(date +'%Y-%m-%d %A %H:%M')"; do sleep 30; done
     font Roboto Bold, FontAwesome5Free, FontAwesome5Brands 10
-    # colors {
-        # statusline #ffffff
-        # background #323232
-        # inactive_workspace #323232ff #323232ff #ffffff
-	# focused_workspace #32323200 #32323200 #000000
-	# active_workspace #323232ff #323232ff #5c5c5c
-    # }
+    colors {
+	background $background
+	statusline $foreground
+	# focused_background $color1
+	# focused_statusline $color14
+	focused_workspace $color0 $color2 $color15
+	active_workspace $color0 $color1 $foreground
+	inactive_workspace $color0 $background $foreground
+	urgent_workspace $color0 $color13 $color0
+    }
 }
 
 # include /etc/sway/config.d/*
