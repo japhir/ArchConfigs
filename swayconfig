@@ -1,0 +1,330 @@
+# Default config for sway
+#
+# Copy this to ~/.config/sway/config and edit it to your liking.
+#
+# Read `man 5 sway` for a complete reference.
+
+### Variables
+#
+# Logo key. Use Mod1 for Alt.
+set $mod Mod4
+# Home row direction keys, like vim
+set $left h
+set $down j
+set $up k
+set $right l
+
+exec xrdb ~/.Xresources			# load urxvt customisations
+# Your preferred terminal emulator
+set $term urxvt
+# Your preferred application launcher
+# Note: it's recommended that you pass the final command to sway
+set $menu dmenu_path | rofi -dmenu | xargs swaymsg exec
+
+### Output configuration
+#
+# Default wallpaper (more resolutions are available in __DATADIR__/backgrounds/sway/)
+output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
+Output eDP-1 {
+       background ~/Pictures/wallpapers/Future/1378870852724.jpg fill
+       resolution 1920x1080
+       position 0 1080
+}
+# HDMI screen above laptop
+output HDMI-A-2 {
+       resolution 1920x1080
+       position 0 0
+}
+#
+# You can get the names of your outputs by running: swaymsg -t get_outputs
+
+### Idle configuration
+#
+# Example configuration:
+#
+exec swayidle \
+    timeout 300 'swaylock -c 000000' \
+    timeout 600 'swaymsg "output * dpms off"' \
+       resume 'swaymsg "output * dpms on"' \
+    before-sleep 'swaylock -c 000000'
+#
+# This will lock your screen after 300 seconds of inactivity, then turn off
+# your displays after another 600 seconds, and turn your screens back on when
+# resumed. It will also lock your screen before your computer goes to sleep.
+
+### Input configuration
+#
+input "2:7:SynPS/2_Synaptics_TouchPad" {
+       dwt enabled
+       tap enabled
+       natural_scroll enabled
+       middle_emulation enabled
+       pointer_accel 0.5
+}
+input "1:1:AT_Translated_Set_2_keyboard" {
+    xkb_layout us
+    xkb_options ctrl:nocaps,compose:ralt
+}
+# work external keyboard
+input "9456:320:Metadot_-_Das_Keyboard_Das_Keyboard" {
+      xkb_layout us
+      xkb_options ctrl:nocaps,compose:ralt
+      xkb_numlock enabled
+}
+#
+# You can get the names of your inputs by running: swaymsg -t get_inputs
+# Read `man 5 sway-input` for more information about this section.
+
+### Key bindings
+#
+# Basics:
+#
+    # start a terminal
+    bindsym $mod+Return exec $term
+
+    # kill focused window
+    bindsym $mod+Shift+q kill
+
+    # start your launcher
+    bindsym $mod+d exec $menu
+
+    # Drag floating windows by holding down $mod and left mouse button.
+    # Resize them with right mouse button + $mod.
+    # Despite the name, also works for non-floating windows.
+    # Change normal to inverse to use left mouse button for resizing and right
+    # mouse button for dragging.
+    floating_modifier $mod normal
+
+    # reload the configuration file
+    bindsym $mod+Shift+c reload
+
+    # Exit sway (logs you out of your Wayland session)
+    bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'
+#
+# Moving around:
+#
+    # Move your focus around
+    bindsym $mod+$left focus left
+    bindsym $mod+$down focus down
+    bindsym $mod+$up focus up
+    bindsym $mod+$right focus right
+    # or use $mod+[up|down|left|right]
+    bindsym $mod+Left focus left
+    bindsym $mod+Down focus down
+    bindsym $mod+Up focus up
+    bindsym $mod+Right focus right
+
+    # _move_ the focused window with the same, but add Shift
+    bindsym $mod+Shift+$left move left 30
+    bindsym $mod+Shift+$down move down 30
+    bindsym $mod+Shift+$up move up 30
+    bindsym $mod+Shift+$right move right 30
+    # ditto, with arrow keys
+    bindsym $mod+Shift+Left move left 30
+    bindsym $mod+Shift+Down move down 30
+    bindsym $mod+Shift+Up move up 30
+    bindsym $mod+Shift+Right move right 30
+#
+# Workspaces:
+#
+# workspace gaps
+set $ws1 1:
+set $ws2 2:
+set $ws3 3:
+set $ws4 4:
+set $ws5 5:
+set $ws6 6:
+set $ws7 7:
+set $ws8 8:
+set $ws9 9:
+set $ws10 10:
+
+# # workspace gaps
+# workspace $ws6 gaps inner 0
+# workspace $ws6 gaps outer 0
+# workspace $ws7 gaps inner 0
+# workspace $ws7 gaps outer 0
+# workspace $ws8 gaps inner 0
+# workspace $ws8 gaps outer 0
+# workspace $ws10 gaps inner 0
+# workspace $ws10 gaps outer 0
+
+# # assign workspaces to screens
+# set $smallscreen eDP-1
+# set $bigscreen HDMI-A-2
+# # assign workspaces to screens
+
+# workspace $ws1 output $smallscreen
+# workspace $ws2 output $bigscreen
+# workspace $ws3 output $bigscreen
+# workspace $ws4 output $bigscreen
+# workspace $ws7 output $bigscreen
+# workspace $ws9 output $smallscreen
+# workspace $ws10 output $smallscreen
+
+# switch to workspace
+bindsym $mod+1 workspace $ws1
+bindsym $mod+2 workspace $ws2
+bindsym $mod+3 workspace $ws3
+bindsym $mod+4 workspace $ws4
+bindsym $mod+5 workspace $ws5
+bindsym $mod+6 workspace $ws6
+bindsym $mod+7 workspace $ws7
+bindsym $mod+8 workspace $ws8
+bindsym $mod+9 workspace $ws9
+bindsym $mod+0 workspace $ws10
+
+# move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace $ws1
+bindsym $mod+Shift+2 move container to workspace $ws2
+bindsym $mod+Shift+3 move container to workspace $ws3
+bindsym $mod+Shift+4 move container to workspace $ws4
+bindsym $mod+Shift+5 move container to workspace $ws5
+bindsym $mod+Shift+6 move container to workspace $ws6
+bindsym $mod+Shift+7 move container to workspace $ws7
+bindsym $mod+Shift+8 move container to workspace $ws8
+bindsym $mod+Shift+9 move container to workspace $ws9
+bindsym $mod+Shift+0 move container to workspace $ws10
+
+# switch to previous workspace by repeatedly tapping
+workspace_auto_back_and_forth yes
+
+### move programs to specific workspaces ###
+assign [class="^Mendeley Desktop$"] $ws4
+assign [class="^Zotero$"] $ws4
+assign [class="^Slack$"] $ws5
+assign [class="^Trello$"] $ws5
+assign [class="^Inkscape$"] $ws6
+assign [class="^VirtualBox$" title="^Win10"] $ws8
+assign [class="R_x11"] $ws9     # R graphics output
+assign [class="^Spotify$"] $ws10
+#
+# Layout stuff:
+#
+    # You can "split" the current object of your focus with
+    # $mod+b or $mod+v, for horizontal and vertical splits
+    # respectively.
+    bindsym $mod+b splith
+    bindsym $mod+v splitv
+
+    # Switch the current container between different layout styles
+    bindsym $mod+s layout stacking
+    bindsym $mod+w layout tabbed
+    bindsym $mod+e layout toggle split
+
+    # Make the current focus fullscreen
+    bindsym $mod+f fullscreen
+
+    # Toggle the current focus between tiling and floating mode
+    bindsym $mod+Shift+space floating toggle
+
+    # Swap focus between the tiling area and the floating area
+    bindsym $mod+space focus mode_toggle
+
+    # move focus to the parent container
+    bindsym $mod+a focus parent
+#
+# Scratchpad:
+#
+    # Sway has a "scratchpad", which is a bag of holding for windows.
+    # You can send windows there and get them back later.
+
+    # Move the currently focused window to the scratchpad
+    bindsym $mod+Shift+minus move scratchpad
+
+    # Show the next scratchpad window or hide the focused scratchpad window.
+    # If there are multiple scratchpad windows, this command cycles through them.
+    bindsym $mod+minus scratchpad show
+#
+# Resizing containers:
+#
+## resize window (you can also use the mouse on a border)
+bindsym $mod+Shift+y resize shrink width  20 px or 20 ppt
+bindsym $mod+Shift+u resize grow   height 20 px or 20 ppt
+bindsym $mod+Shift+i resize shrink height 20 px or 20 ppt
+bindsym $mod+Shift+o resize grow   width  20 px or 20 ppt
+
+# media keys
+# Increase volume
+bindsym XF86AudioRaiseVolume exec --no-startup-id "amixer set Master 2%+ && volnoti-show $(amixer get Master | grep -Po '[0-9]+(?=%)' | head -1)"
+bindsym XF86AudioLowerVolume exec --no-startup-id "amixer set Master 2%- && volnoti-show $(amixer get Master | grep -Po '[0-9]+(?=%)' | head -1)"
+bindsym --locked XF86AudioMute exec --no-startup-id "amixer set Master toggle && if amixer get Master | grep -Fq '[off]'; then volnoti-show -m; else volnoti-show $(amixer get Master | grep -Po '[0-9]+(?=%)' | head -1); fi"
+# Suspend also locks
+bindsym XF86Sleep             exec --no-startup-id "systemctl suspend"
+bindsym --locked XF86AudioPlay         exec --no-startup-id playerctl play-pause
+#bindsym XF86AudioPause        exec playerctl pause
+bindsym XF86AudioNext         exec --no-startup-id playerctl next
+bindsym XF86AudioPrev         exec --no-startup-id playerctl previous
+bindsym XF86AudioMicMute      exec --no-startup-id amixer set Capture toggle
+bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 10%-
+bindsym XF86MonBrightnessUp   exec --no-startup-id brightnessctl set +10%
+# bindsym XF86Display           exec --no-startup-id arandr
+bindsym XF86WLAN              exec --no-startup-id sudo systemctl restart NetworkManager
+# bindsym XF86Tools             exec --no-startup-id lxappearance
+# bindsym XF86Bluetooth
+
+# lock screen
+bindsym $mod+Delete exec ~/ArchConfigs/launchswaylock.sh
+
+# Status Bar:
+#
+# Read `man 5 sway-bar` for more information about this section.
+
+
+bar {
+    position top
+    # TODO: battery icon, processor/memory overview
+    # WAITING: tray icons
+    # When the status_command prints a new line to stdout, swaybar updates.
+    # The default just shows the current date and time.
+    status_command while date +'%Y-%m-%d %l:%M:%S %p'; do sleep 1; done
+    font Roboto Bold, FontAwesome5Free, FontAwesome5Brands 10
+    # colors {
+        # statusline #ffffff
+        # background #323232
+        # inactive_workspace #323232ff #323232ff #ffffff
+	# focused_workspace #32323200 #32323200 #000000
+	# active_workspace #323232ff #323232ff #5c5c5c
+    # }
+}
+
+# include /etc/sway/config.d/*
+
+# launch software keybindings
+bindsym $mod+c exec firefox
+bindsym $mod+x exec nautilus
+bindsym $mod+m exec emacsclient -c -n -e '(switch-to-buffer nil)'
+
+bindsym Print exec grim ~/Pictures/Screenshots/$(date +'%F-%T.png')
+bindsym --release Shift+Print exec slurp | grim -g - -c ~/Pictures/Screenshots/$(date +'%F-%T_region.png')
+
+# startup software for the tray doesn't work now!
+# exec --no-startup-id cbatticon           # battery indicator
+# exec --no-startup-id nm-applet           # NetworkManager applet
+# so I use nmtui from terminal for now
+
+exec --no-startup-id volnoti               # volume change notification
+exec --no-startup-id redshift -l 52.1:5.12 -m wayland -t 5500:2500
+
+# app launcher, launch w/ Control-space
+exec --no-startup-id albert
+
+Exec --no-startup-id dropbox
+exec --no-startup-id nextcloud             # more uni file sync
+
+# gaps
+default_border pixel 1
+hide_edge_borders both
+gaps inner 15
+gaps outer 15
+
+# modify gaps
+bindsym $mod+Shift+t gaps inner current set 15; gaps outer current set 15
+bindsym $mod+s       gaps inner current plus 5
+bindsym $mod+Shift+s gaps inner current minus 5
+bindsym $mod+Shift+d gaps inner current set 0; gaps outer current set 0
+bindsym $mod+z       gaps outer current plus 5
+bindsym $mod+Shift+z gaps outer current minus 5
+
+for_window [class="^URxvt"] opacity 0.9
+# for_window [class="^Emacs$"] opacity 0.95

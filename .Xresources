@@ -1,7 +1,7 @@
-*background: #1b1918
+! *background: #1b1918
 
-! Meta modifier for keybindings 
-URxvt.modifier: super
+! Meta modifier for keybindings
+! URxvt.modifier: super
 
 !! perl extensions
 !!URxvt.perl-ext: default
@@ -15,30 +15,31 @@ URxvt.modifier: super
 !!URxvt.keysym.M-Escape: perl:keyboard-select:activate
 !! matcher
 !!URxvt.matcher.button: 1
+
 URxvt.url-launcher: /usr/bin/xdg-open
 
-Xft.dpi:                96
-Xft.antialias:          true
-Xft.rgba:               rgb
-Xft.hinting:            true
-Xft.hintstyle:          hintslight
+! Xft.dpi:                96
+! Xft.antialias:          true
+! Xft.rgba:               rgb
+! Xft.hinting:            true
+! Xft.hintstyle:          hintslight
 
-URxvt.geometry:         90x30
+! URxvt.geometry:         90x30
 URxvt*fading:           -1
 URxvt.urgentOnBell:     true
 URxvt.visualBell:       true
-URxvt.loginShell:       true
+! URxvt.loginShell:       true
 URxvt*saveLines:   2000
-URxvt.internalBorder:   3
+! URxvt.internalBorder:   3
 URxvt.lineSpace:        0
 
-URxvt*borderless:  1
+URxvt*borderless:  	1
 URxvt*scrollBar:        false
 
 URxvt*depth:            32
-!URxvt*background: 
-URxvt*transparent:      true
-URxvt*shading:   30
+URxvt*background: 	rgba:0000/0000/0200/c800
+! URxvt*transparent:      true
+! URxvt*shading:   30
 
 URxvt*font:             xft:Source Code Pro:hinting=True:antialias=True:pixelsize=16,xft:Font Awesome:size=16;antialias=True
 URxvt.allow_bold:       true
@@ -47,6 +48,9 @@ URxvt.letterSpace: 0
 ! Cursor
 URxvt.cursorBlink:      false
 URxvt.cursorUnderline:  false
+
+! somehow the mouse became small on xwayland programs
+Xcursor.size: 16
 
 ! Pointer
 URxvt.pointerBlank:     true
