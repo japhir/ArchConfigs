@@ -448,7 +448,8 @@ Filter tasks by context (sorted by todo state)
           ("gw" "Write" tags-todo "@write")
           ("gp" "Program" tags-todo "@program")
           ("gr" "Read" tags-todo "@read")
-          ("gs" "Research" tags-todo "@research")
+          ("gg" "Research" tags-todo "@research")
+          ("gs" "Schedule" tags-todo "@schedule")
           ("ga" "Agenda" tags-todo "@agenda")
           ("E" . "Energy")
           ("E1" "Morning" tags-todo "morning")
@@ -515,7 +516,8 @@ Filter tasks by context (sorted by todo state)
                         ("@write" . ?w)
                         ("@program" . ?p)
                         ("@read" . ?r)
-                        ("@research" . ?s)
+                        ("@research" . ?g)
+                        ("@schedule" . ?s)
                         ("@agenda" . ?a)    ;; things to discuss
                         (:endgroup . nil)
                         (:startgroup . nil)
@@ -763,12 +765,12 @@ an attempt at getting siunitx and mhchem working in html
                  '("JIR" "Journal of Irreproducible Research" "J. Irrep. Res."))
     (require 'org-ref-scopus))
 #+END_SRC
-** org-clock-query-out
+** COMMENT org-clock-query-out
 I keep forgetting to clock out, this should help me prevent that.
 #+BEGIN_SRC emacs-lisp
   (defun org-clock-query-out ()
     "Check if any clocks are running, jump to the clock and ask to clock it out"
-    (if (org-clocking-p)
+    (when (org-clocking-p)
         (progn
           (org-clock-jump-to-current-clock)
           (if (yes-or-no-p "This clock is still running, want to clock out?")
