@@ -1176,20 +1176,21 @@ Then load it into emacs when opening a PKGBUILD file
 	 smtpmail-smtp-service 587
 	 gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
  #+END_SRC
-* Science packages
+* science packages
 ** ess
 emacs speaks statistics, work with R etc.
 installed from AUR ~emacs-ess~
 #+BEGIN_SRC emacs-lisp
-  (use-package ess-site
+  (use-package ess
     :load-path "/usr/share/emacs/site-lisp/ess/"
-    :init (require 'ess-site)  ;; I don't know how else to get this working...
     :commands R
+    :init (require 'ess-site)
     :config
     (defun my-org-confirm-babel-evaluate (lang body)
       (not (string= lang "R")))  ; don't ask for R
+    (setq ess-default-style 'RStudio-)
     (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
-    (setq ess-default-style 'RStudio-))
+    (setq inferior-R-args "--no-restore-history --no-save"))
 #+END_SRC
 ** polymode
 for working with .Rmd files etc.
