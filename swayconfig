@@ -282,7 +282,7 @@ bar {
     # TODO: battery icon, processor/memory overview
     # WAITING: tray icons
     # When the status_command prints a new line to stdout, swaybar updates.
-    status_command while echo "$(bash-fuzzy-clock) $(date +'%Y-%m-%d %A %H:%M')"; do sleep 30; done
+    status_command while echo "$(bash-fuzzy-clock) $(date +'%A  %Y-%m-%d %H:%M')"; do sleep 30; done
     font Roboto Bold, FontAwesome5Free, FontAwesome5Brands 10
     colors {
 	background $background
@@ -290,7 +290,7 @@ bar {
 	# focused_background $color1
 	# focused_statusline $color14
 	focused_workspace $color0 $color2 $color15
-	active_workspace $color0 $color1 $foreground
+	active_workspace $color0 $color3 $foreground
 	inactive_workspace $color0 $background $foreground
 	urgent_workspace $color0 $color13 $color0
     }
