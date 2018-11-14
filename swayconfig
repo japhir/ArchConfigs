@@ -1,7 +1,3 @@
-# Default config for sway
-#
-# Copy this to ~/.config/sway/config and edit it to your liking.
-#
 # Read `man 5 sway` for a complete reference.
 
 ### Variables
@@ -29,14 +25,14 @@ client.focused $color0 $color9 $foreground $color7 $color7
 client.focused_inactive $color0 $background $foreground $color7 $color7
 
 # Default wallpaper (more resolutions are available in __DATADIR__/backgrounds/sway/)
-# output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
-
+output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
+# main laptop screen
 Output eDP-1 {
        background $wallpaper fill
        resolution 1920x1080
        position 0 1080
 }
-# HDMI screen above laptop
+# HDMI screen at office above laptop
 output HDMI-A-2 {
        background $wallpaper fill
        resolution 1920x1080
@@ -48,12 +44,11 @@ output HDMI-A-2 {
 ### Idle configuration
 #
 # Example configuration:
-#
-exec swayidle \
-    timeout 300 'swaylock -c 000000' \
-    timeout 600 'swaymsg "output * dpms off"' \
-       resume 'swaymsg "output * dpms on"' \
-    before-sleep 'swaylock -c 000000'
+ exec swayidle \
+     timeout 300 'swaylock -c 000000' \
+     timeout 600 'swaymsg "output * dpms off"' \
+        resume 'swaymsg "output * dpms on"' \
+     before-sleep 'swaylock -c 000000'
 #
 # This will lock your screen after 300 seconds of inactivity, then turn off
 # your displays after another 600 seconds, and turn your screens back on when
@@ -281,9 +276,10 @@ bar {
     position top
     # TODO: battery icon, processor/memory overview
     # WAITING: tray icons
+    # mode hide
     # When the status_command prints a new line to stdout, swaybar updates.
-    status_command while echo "$(bash-fuzzy-clock) $(date +'%A  %Y-%m-%d %H:%M')"; do sleep 30; done
-    font Roboto Bold, FontAwesome5Free, FontAwesome5Brands 10
+    status_command SCRIPT_DIR=~/.config/i3blocks i3blocks
+    font Source Code Pro, FontAwesome5Free, FontAwesome5Brands 10
     colors {
 	background $background
 	statusline $foreground
@@ -316,9 +312,8 @@ exec --no-startup-id redshift -l 52.1:5.12 -m wayland -t 5500:2500
 
 # app launcher, launch w/ Control-space
 exec --no-startup-id albert
-
-Exec --no-startup-id dropbox
-exec --no-startup-id nextcloud             # more uni file sync
+exec --no-startup-id dropbox
+#exec --no-startup-id nextcloud             # more uni file sync
 
 # gaps
 default_border pixel 1
