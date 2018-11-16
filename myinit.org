@@ -739,7 +739,7 @@ an attempt at getting siunitx and mhchem working in html
     :after org
     :ensure t
     :bind (:map org-agenda-mode-map
-                ("U" . org-gcal-fetch))  ;; same key as mu4e!
+                ("C-U" . org-gcal-fetch))  ;; same key as mu4e!
     :config
     (setq org-gcal-client-id "<your-client-id>"
           org-gcal-client-secret "<your-client-secret>"
