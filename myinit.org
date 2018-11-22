@@ -1232,12 +1232,11 @@ installed from AUR ~emacs-ess~
 for working with .Rmd files etc.
 #+BEGIN_SRC emacs-lisp
   (use-package polymode
-    :ensure t
-    :mode
-      ;; R modes
-      ("\\.Snw" . poly-noweb+r-mode)
-      ("\\.Rnw" . poly-noweb+r-mode)
-      ("\\.Rmd" . poly-markdown+r-mode))
+    :ensure t)
+  (use-package poly-markdown
+    :ensure t)
+  (use-package poly-R
+    :ensure t)
 #+END_SRC
 ** matlab
 if I'm ever required to work in non-open-source
@@ -1260,6 +1259,7 @@ markdown mode for writing
 exporting markdown
 #+BEGIN_SRC emacs-lisp
   (use-package pandoc-mode
+    :ensure t
     :hook (markdown-mode . pandoc-mode))
 #+END_SRC
 
