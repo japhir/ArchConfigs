@@ -1,0 +1,2 @@
+#!/usr/bin/sh
+sudo sed -e 's/##//' -i /etc/hosts

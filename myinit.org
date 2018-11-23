@@ -895,6 +895,11 @@ install from AUR ~emacs-pdf-tools-git~
     ;; swiper doesn't play nice with pdf-tools, so I disable it.
     (:map pdf-view-mode-map ("C-s" . isearch-forward)))
 #+END_SRC
+** org-noter
+#+BEGIN_SRC emacs-lisp
+  (use-package org-noter
+    :ensure t)
+#+END_SRC
 ** COMMENT edit with emacs (chromium)
    Edit gmail messages and other input fields in chrome with emacs, markdown.
 #+BEGIN_SRC emacs-lisp
