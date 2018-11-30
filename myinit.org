@@ -1221,17 +1221,18 @@ Then load it into emacs when opening a PKGBUILD file
 emacs speaks statistics, work with R etc.
 installed from AUR ~emacs-ess~
 #+BEGIN_SRC emacs-lisp
-  (use-package ess
-    ;; :load-path "/usr/share/emacs/site-lisp/ess/"
-    :ensure t
-    :commands R
-    ;; :init (require 'ess-r-mode)
-    :config
-    (defun my-org-confirm-babel-evaluate (lang body)
-      (not (string= lang "R")))  ; don't ask for R
-    (setq ess-default-style 'RStudio-)
-    (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
-    (setq inferior-R-args "--no-restore-history --no-save"))
+    (use-package ess
+      ;; :load-path "/usr/share/emacs/site-lisp/ess/"
+      :ensure t
+      :commands R
+      ;; :init (require 'ess-r-mode)
+      :config
+      (defun my-org-confirm-babel-evaluate (lang body)
+        (not (string= lang "R")))  ; don't ask for R
+      (setq ess-default-style 'RStudio-)
+      (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+      (setq inferior-R-args "--no-restore-history --no-save")
+      :bind (";" . ess-insert-assign))
 #+END_SRC
 ** polymode
 for working with .Rmd files etc.
