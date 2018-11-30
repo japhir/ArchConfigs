@@ -16,7 +16,7 @@
     ("9a155066ec746201156bb39f7518c1828a73d67742e11271e4f24b7b178c4710" default)))
  '(org-agenda-files
    (quote
-    ("~/SurfDrive/PhD/programming/standardstats/clumpedefficiency.org" "~/org/calendars/uu-periods.org" "~/org/calendars/university.org" "~/org/calendars/sports.org" "~/org/calendars/societies.org" "~/org/calendars/outofoffice.org" "~/org/calendars/options.org" "~/org/calendars/meetings.org" "~/org/calendars/gcal.org" "~/org/calendars/fest.org" "~/org/calendars/balance.org" "~/org/calendars/253plus.org" "~/org/calendars/253.org" "~/org/lists.org" "~/org/clumpednotes.org" "~/org/todo.org" "~/org/inbox.org" "~/SurfDrive/PhD/programming/long-term-etf/long-term-etf.org" "/home/japhir/Dropbox/Apps/orgzly/tickler.org")))
+    ("~/SurfDrive/PhD/programming/dataprocessing/dataprocessing.org" "~/SurfDrive/PhD/programming/standardstats/clumpedefficiency.org" "~/org/calendars/uu-periods.org" "~/org/calendars/university.org" "~/org/calendars/sports.org" "~/org/calendars/societies.org" "~/org/calendars/outofoffice.org" "~/org/calendars/options.org" "~/org/calendars/meetings.org" "~/org/calendars/gcal.org" "~/org/calendars/fest.org" "~/org/calendars/balance.org" "~/org/calendars/253plus.org" "~/org/calendars/253.org" "~/org/lists.org" "~/org/clumpednotes.org" "~/org/todo.org" "~/org/inbox.org" "/home/japhir/Dropbox/Apps/orgzly/tickler.org")))
  '(org-entities-user
    (quote
     (("d18O" "\\ce{\\delta^18O}" nil "&delta;<sup>18</sup>O" "δ18O" "δ18O" "δ¹⁸O"))))
