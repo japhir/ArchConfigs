@@ -137,7 +137,7 @@ I no longer use dired, but switched to ranger
 #+BEGIN_SRC emacs-lisp
   (use-package apropospriate-theme
     :ensure t
-    :config (load-theme 'apropospriate-light t))
+    :config (load-theme 'apropospriate-dark t))
 #+END_SRC
 *** COMMENT xresources
 #+BEGIN_SRC emacs-lisp
