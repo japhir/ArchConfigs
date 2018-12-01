@@ -1,7 +1,3 @@
-# Default config for sway
-#
-# Copy this to ~/.config/sway/config and edit it to your liking.
-#
 # Read `man 5 sway` for a complete reference.
 
 ### Variables
@@ -29,7 +25,6 @@ client.focused $color0 $color9 $foreground $color7 $color7
 client.focused_inactive $color0 $background $foreground $color7 $color7
 
 # Default wallpaper (more resolutions are available in __DATADIR__/backgrounds/sway/)
-# output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 
 # small screen on the left
 Output DVI-I-2 {
@@ -123,16 +118,16 @@ input "1241:6168:USB_Keyboard_Consumer_Control" {
 # Workspaces:
 #
 # workspace gaps
-set $ws1 1:
-set $ws2 2:
-set $ws3 3:
-set $ws4 4:
-set $ws5 5:
-set $ws6 6:
-set $ws7 7:
-set $ws8 8:
-set $ws9 9:
-set $ws10 10:
+set $ws1 1
+set $ws2 2
+set $ws3 3
+set $ws4 4
+set $ws5 5
+set $ws6 6
+set $ws7 7
+set $ws8 8
+set $ws9 9
+set $ws10 10
 
 # # workspace gaps
 # workspace $ws6 gaps inner 0
@@ -203,7 +198,7 @@ assign [class="^Spotify$"] $ws10
     bindsym $mod+v splitv
 
     # Switch the current container between different layout styles
-    bindsym $mod+s layout stacking
+    # bindsym $mod+s layout stacking
     bindsym $mod+w layout tabbed
     bindsym $mod+e layout toggle split
 
@@ -218,6 +213,9 @@ assign [class="^Spotify$"] $ws10
 
     # move focus to the parent container
     bindsym $mod+a focus parent
+    
+    # make current window sticky
+    bindsym $mod+Shift+s sticky toggle
 #
 # Scratchpad:
 #
@@ -265,24 +263,26 @@ bindsym $mod+Delete exec ~/ArchConfigs/launchswaylock.sh
 #
 # Read `man 5 sway-bar` for more information about this section.
 
-bar {
-    position top
-    # TODO: battery icon, processor/memory overview
-    # WAITING: tray icons
-    # When the status_command prints a new line to stdout, swaybar updates.
-    status_command while echo "$(bash-fuzzy-clock) $(date +'%Y-%m-%d %A %H:%M')"; do sleep 30; done
-    font Roboto Bold, FontAwesome5Free, FontAwesome5Brands 10
-    colors {
-	background $background
-	statusline $foreground
-	# focused_background $color1
-	# focused_statusline $color14
-	focused_workspace $color0 $color2 $color15
-	active_workspace $color0 $color1 $foreground
-	inactive_workspace $color0 $background $foreground
-	urgent_workspace $color0 $color13 $color0
-    }
-}
+exec waybar
+# bar {
+#     position top
+#     # TODO: battery icon, processor/memory overview
+#     # WAITING: tray icons
+#     # mode hide
+#     # When the status_command prints a new line to stdout, swaybar updates.
+#     status_command SCRIPT_DIR=~/.config/i3blocks i3blocks
+#     font Source Code Pro, FontAwesome5Free, FontAwesome5Brands 10
+#     colors {
+# 	background $background
+# 	statusline $foreground
+# 	# focused_background $color1
+# 	# focused_statusline $color14
+# 	focused_workspace $color0 $color2 $color15
+# 	active_workspace $color0 $color3 $foreground
+# 	inactive_workspace $color0 $background $foreground
+# 	urgent_workspace $color0 $color13 $color0
+#     }
+# }
 
 # include /etc/sway/config.d/*
 
@@ -317,7 +317,7 @@ gaps outer 15
 # modify gaps
 bindsym $mod+Shift+t gaps inner current set 15; gaps outer current set 15
 bindsym $mod+s       gaps inner current plus 5
-bindsym $mod+Shift+s gaps inner current minus 5
+#bindsym $mod+Shift+s gaps inner current minus 5
 bindsym $mod+Shift+d gaps inner current set 0; gaps outer current set 0
 bindsym $mod+z       gaps outer current plus 5
 bindsym $mod+Shift+z gaps outer current minus 5

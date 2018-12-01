@@ -1,0 +1,14 @@
+# social media
+127.0.0.1	reddit.com
+127.0.0.1	imgur.com
+127.0.0.1	facebook.com
+127.0.0.1	twitter.com
+127.0.0.1	youtube.com
+# distracting programming
+127.0.0.1	github.com
+127.0.0.1	gitlab.com
+127.0.0.1	aur.archlinux.com
+127.0.0.1	emacs.stackexchange.com
+127.0.0.1	orgmode.org
+127.0.0.1	swaywm.org
+127.0.0.1	wiki.archlinux.org
