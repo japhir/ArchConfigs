@@ -304,6 +304,7 @@ exec --no-startup-id redshift -l 52.1:5.12 -m wayland -t 5500:2500
 exec --no-startup-id albert
 #exec --no-startup-id dropbox
 exec --no-startup-id nextcloud             # more uni file sync
+exec --no-startup-id syncthing	           # sync org files
 
 # gaps
 default_border pixel 1
@@ -314,7 +315,7 @@ gaps outer 15
 # modify gaps
 bindsym $mod+Shift+t gaps inner current set 15; gaps outer current set 15
 # bindsym $mod+s       gaps inner current plus 5
-bindsym $mod+Shift+s gaps inner current minus 5
+# bindsym $mod+Shift+s gaps inner current minus 5
 bindsym $mod+Shift+d gaps inner current set 0; gaps outer current set 0
 bindsym $mod+z       gaps outer current plus 5
 bindsym $mod+Shift+z gaps outer current minus 5
