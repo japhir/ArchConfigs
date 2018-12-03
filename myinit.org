@@ -67,7 +67,7 @@ also commented out, I can see them in my terminal if desired
   (setq vc-follow-symlinks t)
 
   ;; remove trailing whitespace before save
-  ;;(add-hook 'before-save-hook 'delete-trailing-whitespace)
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
   ;; prefer utf-8
   (prefer-coding-system 'utf-8-unix)
