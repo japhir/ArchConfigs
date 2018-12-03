@@ -228,7 +228,7 @@ for_window [class="Lxappearance"] floating enable sticky enable border normal
 for_window [class="Arandr"] floating enable
 
 ### Specific software launching keybindings ###
-set $BROWSER firefox
+set $BROWSER firefox-beta
 
 bindsym $mod+c exec $BROWSER  # defined in .zshrc with export
 bindsym $mod+x exec nautilus
