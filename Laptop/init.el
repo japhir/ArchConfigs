@@ -23,7 +23,7 @@
  '(package-selected-packages
    (quote
     (json-mode pandoc-mode poly-R poly-markdown apropospriate-theme apropospriate ess xresources-theme frames-only-mode org-ref-pdf org-books org-pomodoro diff-hl lispy git-gutter writeroom-mode ivy-yasnippet yasnippet evil-numbers evil-indent-plus evil-commentary evil-snipe evil-easymotion webpaste use-package-chords telephone-line systemd stan-mode ranger rainbow-mode rainbow-delimiters polymode ox-tufte org-ref org-plus-contrib org-pdfview org-noter org-gcal org-bullets openwith mu4e-conversation mu4e-alert monokai-theme leuven-theme ivy-bibtex hl-todo gmail-message-mode fontawesome flycheck evil-org evil-nerd-commenter evil-mu4e evil-magit evil-leader evil-escape evil-collection edit-server diminish define-word counsel-projectile bug-hunter beacon auto-complete ace-window)))
- '(safe-local-variable-values (quote ((TeX-master . t)))))
+     '(safe-local-variable-values (quote ((TeX-master . t)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
