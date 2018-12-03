@@ -1,7 +1,7 @@
 * {
     border: none;
     border-radius: 0;
-    font-family: Source Code Pro, fontawesome5;
+    font-family: Source Code Pro, FontAwesome5Free, FontAwesome5Brands;
     font-size: 13px;
     min-height: 0;
 }
