@@ -1,12 +1,13 @@
+// -*- mode: json -*-
 {
     "layer": "top", // Waybar at top layer
-    "position": "bottom", // Waybar at the bottom of your screen
+    // "position": "bottom", // Waybar at the bottom of your screen
     "height": 20, // Waybar height
     "width": 1920, // Waybar width
     // Choose the order of the modules
-    "modules-left": ["sway/workspaces", "sway/mode", "custom/spotify"],
-    "modules-center": ["sway/window"],
-    "modules-right": ["pulseaudio", "network", "cpu", "memory", "battery", "battery#bat2", "clock", "tray"],
+    "modules-left": ["sway/workspaces", "sway/mode", "custom/spotify","sway/window"],
+    "modules-center": ["custom/fuzzyclock"],
+    "modules-right": ["network", "cpu", "memory", "battery", "clock", "tray"], // "pulseaudio",
     // Modules configuration
     "sway/workspaces": {
         "format": "{name}{icon}",
@@ -30,11 +31,19 @@
         "format": "<span style=\"italic\">{}</span>"
     },
     "tray": {
-        "icon-size": 21,
+        //"icon-size": 21,
         "spacing": 10
     },
+    "custom/fuzzyclock": {
+        "format": "{}",
+        "max-length": 40,
+	"interval": 30,
+	"exec": "/usr/bin/bash-fuzzy-clock"
+    },
     "clock": {
-        "format-alt": "{:%Y-%m-%d}"
+	// I prefer it if this shows the date first
+        "format": "{:%Y-%m-%d}",
+        "format-alt": "{:%H:%M:%S}"
     },
     "cpu": {
         "format": "{usage}% "
@@ -54,32 +63,32 @@
         "format-icons": ["", "", "", "", ""]
     },
     "network": {
-        // "interface": "wlp2s0", // (Optional) To force the use of this interface
+        // "interface": "wlp58s0", // (Optional) To force the use of this interface
         "format-wifi": "{essid} ({signalStrength}%) ",
         "format-ethernet": "{ifname}: {ipaddr}/{cidr} ",
         "format-disconnected": "Disconnected ⚠"
     },
-    "pulseaudio": {
-        //"scroll-step": 1,
-        "format": "{volume}% {icon}",
-        "format-bluetooth": "{volume}% {icon}",
-        "format-muted": "",
-        "format-icons": {
-            "headphones": "",
-            "handsfree": "",
-            "headset": "",
-            "phone": "",
-            "portable": "",
-            "car": "",
-            "default": ["", ""]
-        },
-        "on-click": "pavucontrol"
-    },
+    // "pulseaudio": {
+    //     //"scroll-step": 1,
+    //     "format": "{volume}% {icon}",
+    //     "format-bluetooth": "{volume}% {icon}",
+    //     "format-muted": "",
+    //     "format-icons": {
+    //         "headphones": "",
+    //         "handsfree": "",
+    //         "headset": "",
+    //         "phone": "",
+    //         "portable": "",
+    //         "car": "",
+    //         "default": ["", ""]
+    //     },
+    //     "on-click": "pavucontrol"
+    // },
     "custom/spotify": {
         "format": " {}",
         "max-length": 40,
         "interval": 30, // Remove this if your script is endless and write in loop
-        "exec": "$HOME/.config/waybar/mediaplayer.sh 2> /dev/null", // Script in resources folder
+        "exec": "$HOME/.config/waybar/mediaplayer.py 2> /dev/null", // Script in resources folder
         "exec-if": "pgrep spotify"
     }
 }

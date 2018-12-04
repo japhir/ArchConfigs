@@ -1,7 +1,9 @@
+/* -*- mode: css -*- */
 * {
     border: none;
     border-radius: 0;
-    font-family: Source Code Pro, FontAwesome5Free, FontAwesome5Brands;
+    /* FontAwesome5Free, FontAwesome5Brands; */
+    font-family: Source Code Pro, Helvetica, Arial, sans-serif;
     font-size: 13px;
     min-height: 0;
 }
@@ -29,7 +31,7 @@ window#waybar {
     border-bottom: 3px solid white;
 }
 
-#clock, #battery, #cpu, #memory, #network, #pulseaudio, #custom-spotify, #tray, #mode {
+#clock, #battery, #cpu, #memory, #network, #pulseaudio, #custom-spotify, #custom-fuzzyclock, #tray, #mode {
     padding: 0 10px;
     margin: 0 5px;
 }
@@ -93,6 +95,11 @@ window#waybar {
 }
 
 #custom-spotify {
+    background: #66cc99;
+    color: #2a5c45;
+}
+
+#custom-fuzzyclock {
     background: #66cc99;
     color: #2a5c45;
 }
