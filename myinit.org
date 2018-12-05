@@ -739,7 +739,7 @@ an attempt at getting siunitx and mhchem working in html
     :after org
     :ensure t
     :bind (:map org-agenda-mode-map
-                ("C-U" . org-gcal-fetch))  ;; same key as mu4e!
+                ("C-M-u" . org-gcal-fetch))  ;; same key as mu4e!
     :config
     (setq org-gcal-client-id "<your-client-id>"
           org-gcal-client-secret "<your-client-secret>"
@@ -1232,7 +1232,7 @@ installed from AUR ~emacs-ess~
       (setq ess-default-style 'RStudio-)
       (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
       (setq inferior-R-args "--no-restore-history --no-save")
-      :bind (";" . ess-insert-assign))
+      :bind (:map ess-mode-map (";" . ess-insert-assign)))
 #+END_SRC
 ** polymode
 for working with .Rmd files etc.
