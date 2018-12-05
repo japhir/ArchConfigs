@@ -4,49 +4,53 @@
     border-radius: 0;
     /* FontAwesome5Free, FontAwesome5Brands; */
     font-family: Source Code Pro, Helvetica, Arial, sans-serif;
-    font-size: 13px;
+    font-size: 12px;
     min-height: 0;
 }
 
 window#waybar {
+    /* background: rgba(43, 48, 59, 0.5); */
+    /* background: transparent; */
     background: rgba(43, 48, 59, 0.5);
-    border-bottom: 3px solid rgba(100, 114, 125, 0.5);
-    color: white;
+    /* border-bottom: 3px solid rgba(100, 114, 125, 0.5); */
+    color: #e3e3e3;
 }
 
 #workspaces button {
-    padding: 0 5px;
-    background: transparent;
+    padding: 2px 10px;
+    background: rgba(43, 48, 59, 0.5);
+    /* background: transparent; */
     color: white;
     border-bottom: 3px solid transparent;
 }
 
 #workspaces button.focused {
-    background: #64727D;
-    border-bottom: 3px solid white;
+    /* background: #64727D; */
+    background: transparent;
+    border-bottom: 3px solid #BF6F46;
 }
 
 #mode {
-    background: #64727D;
+    background: rgba(43, 48, 59, 0.5);
     border-bottom: 3px solid white;
 }
 
 #clock, #battery, #cpu, #memory, #network, #pulseaudio, #custom-spotify, #custom-fuzzyclock, #tray, #mode {
-    padding: 0 10px;
-    margin: 0 5px;
+    padding: 2px 15px;
+    margin: 0px 0px;
+    background: rgba(43, 48, 59, 0.5);
+    color: #e3e3e3;
 }
 
 #clock {
-    background-color: #64727D;
+    /* background-color: #64727D; */
 }
 
 #battery {
-    background-color: #ffffff;
-    color: black;
+    /* background-color: #ffffff; */
 }
 
 #battery.charging {
-    color: white;
     background-color: #26A65B;
 }
 
@@ -68,16 +72,13 @@ window#waybar {
 }
 
 #cpu {
-    background: #2ecc71;
-    color: #000000;
+    /* background: #2ecc71; */
 }
 
 #memory {
-    background: #9b59b6;
 }
 
 #network {
-    background: #2980b9;
 }
 
 #network.disconnected {
@@ -85,8 +86,6 @@ window#waybar {
 }
 
 #pulseaudio {
-    background: #f1c40f;
-    color: black;
 }
 
 #pulseaudio.muted {
@@ -95,15 +94,14 @@ window#waybar {
 }
 
 #custom-spotify {
-    background: #66cc99;
+    /* background: #66cc99; */
+    background: #64727D;
     color: #2a5c45;
 }
 
 #custom-fuzzyclock {
-    background: #66cc99;
-    color: #2a5c45;
+    background: transparent;
 }
 
 #tray {
-    background-color: #2980b9;
 }

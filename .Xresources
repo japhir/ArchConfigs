@@ -18,11 +18,11 @@
 
 URxvt.url-launcher: /usr/bin/xdg-open
 
-! Xft.dpi:                96
-! Xft.antialias:          true
-! Xft.rgba:               rgb
-! Xft.hinting:            true
-! Xft.hintstyle:          hintslight
+Xft.dpi:                96
+Xft.antialias:          true
+Xft.rgba:               rgb
+Xft.hinting:            true
+Xft.hintstyle:          hintslight
 
 ! URxvt.geometry:         90x30
 URxvt*fading:           -1
@@ -38,10 +38,8 @@ URxvt*scrollBar:        false
 
 URxvt*depth:            32
 URxvt*background: 	rgba:0000/0000/0200/c800
-! URxvt*transparent:      true
-! URxvt*shading:   30
 
-URxvt*font:             xft:Source Code Pro:hinting=True:antialias=True:pixelsize=16,xft:Font Awesome:size=16;antialias=True
+URxvt*font:             xft:Source Code Pro:hinting=True:antialias=True:pixelsize=16,pango:Font Awesome 5 Free,pango:Font Awesome 5 Brands
 URxvt.allow_bold:       true
 URxvt.letterSpace: 0
 

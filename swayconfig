@@ -284,7 +284,7 @@ bar {
 #     # mode hide
 #     # When the status_command prints a new line to stdout, swaybar updates.
 #     status_command SCRIPT_DIR=~/.config/i3blocks i3blocks
-#     font Source Code Pro, FontAwesome5Free, FontAwesome5Brands 10
+    # font pango:Source Code Pro, Font Awesome 5 Free, Font Awesome 5 Brands 10
 #     colors {
 # 	background $background
 # 	statusline $foreground

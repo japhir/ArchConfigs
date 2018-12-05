@@ -2,10 +2,10 @@
 {
     "layer": "top", // Waybar at top layer
     // "position": "bottom", // Waybar at the bottom of your screen
-    "height": 20, // Waybar height
+    "height": 21, // Waybar height
     "width": 1920, // Waybar width
     // Choose the order of the modules
-    "modules-left": ["sway/workspaces", "sway/mode", "custom/spotify","sway/window"],
+    "modules-left": ["sway/workspaces", "sway/mode"], // , "custom/spotify", "sway/window",
     "modules-center": ["custom/fuzzyclock"],
     "modules-right": ["network", "cpu", "memory", "battery", "clock", "tray"], // "pulseaudio",
     // Modules configuration
@@ -28,10 +28,10 @@
         }
     },
     "sway/mode": {
-        "format": "<span style=\"italic\">{}</span>"
+        "format": "{}"
     },
     "tray": {
-        //"icon-size": 21,
+        "icon-size": 21,
         "spacing": 10
     },
     "custom/fuzzyclock": {
@@ -42,14 +42,15 @@
     },
     "clock": {
 	// I prefer it if this shows the date first
-        "format": "{:%Y-%m-%d}",
-        "format-alt": "{:%H:%M:%S}"
+	// format: weekday abbrev, YYYY-MM-DD
+        "format": "{:%a %F, wk %V}",
+        "format-alt": "{:%T}"
     },
     "cpu": {
-        "format": "{usage}% "
+        "format": "cpu: {usage}% "
     },
     "memory": {
-        "format": "{}% "
+        "format": "mem: {}% "
     },
     "battery": {
         "states": {
@@ -57,8 +58,9 @@
             "warning": 30,
             "critical": 15
         },
-        "format": "{capacity}% {icon}",
-        "format-good": "", // An empty format will hide the module
+	"bat": "BAT0",
+	"format": "bat: {capacity}% {icon}",
+        // "format-good": "", // An empty format will hide the module
         "format-full": "",
         "format-icons": ["", "", "", "", ""]
     },
@@ -67,28 +69,5 @@
         "format-wifi": "{essid} ({signalStrength}%) ",
         "format-ethernet": "{ifname}: {ipaddr}/{cidr} ",
         "format-disconnected": "Disconnected ⚠"
-    },
-    // "pulseaudio": {
-    //     //"scroll-step": 1,
-    //     "format": "{volume}% {icon}",
-    //     "format-bluetooth": "{volume}% {icon}",
-    //     "format-muted": "",
-    //     "format-icons": {
-    //         "headphones": "",
-    //         "handsfree": "",
-    //         "headset": "",
-    //         "phone": "",
-    //         "portable": "",
-    //         "car": "",
-    //         "default": ["", ""]
-    //     },
-    //     "on-click": "pavucontrol"
-    // },
-    "custom/spotify": {
-        "format": " {}",
-        "max-length": 40,
-        "interval": 30, // Remove this if your script is endless and write in loop
-        "exec": "$HOME/.config/waybar/mediaplayer.py 2> /dev/null", // Script in resources folder
-        "exec-if": "pgrep spotify"
     }
 }
