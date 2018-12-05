@@ -28,7 +28,7 @@ client.focused_inactive $color0 $background $foreground $color7 $color7
 # Default wallpaper (more resolutions are available in __DATADIR__/backgrounds/sway/)
 output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 # small screen on the left
-Output DVI-I-2 {
+output DVI-I-2 {
        background $wallpaper fill
        resolution 1440x900
        position 0 0
