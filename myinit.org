@@ -185,6 +185,17 @@ I no longer use dired, but switched to ranger
   (use-package rainbow-mode
     :ensure t)
 #+END_SRC
+** COMMENT relative number mode
+#+BEGIN_SRC emacs-lisp
+  (setq-default display-line-numbers 'relative ; or 'relative, but visual is easier for
+                                          ; vim's e.g. 10j jumping
+                display-line-numbers-current-absolute t
+                display-line-numbers-width 4
+                display-line-numbers-widen nil)
+  (add-hook 'text-mode-hook #'display-line-numbers-mode)
+  (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+#+END_SRC
+
 * evil
 ** evil
    vim emulator
