@@ -579,7 +579,11 @@ Filter tasks by context (sorted by todo state)
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
   (org-babel-do-load-languages
    'org-babel-load-languages
-   '((stan . t)
+   '((shell . t)
+     (bash . t)
+     (zsh . t)
+     (sh . t)
+     (stan . t)
      (R . t)))
 #+END_SRC
 ** exporting
