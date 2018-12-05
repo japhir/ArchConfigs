@@ -208,7 +208,7 @@ I no longer use dired, but switched to ranger
                 display-line-numbers-width 4
                 display-line-numbers-widen nil)
   ;;(add-hook 'text-mode-hook #'display-line-numbers-mode)
-  ;;(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+  (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 #+END_SRC
 
 * evil
@@ -759,7 +759,7 @@ an attempt at getting siunitx and mhchem working in html
     (setq org-bullets-bullet-list
           '("◉" "●" "○" "♦" "◆" "►" "▸")))
 #+END_SRC
-** org-gcal
+** COMMENT org-gcal
    synchronize google calendar with org
 #+BEGIN_SRC emacs-lisp
   (use-package org-gcal
