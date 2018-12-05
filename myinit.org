@@ -10,7 +10,22 @@
 * dirvar
 define dirvars 'org-in-file', 'org-gtd-file', etc.
 #+BEGIN_SRC emacs-lisp
-(load "~/.emacs.d/dirvars.el")
+  (defvar org-in-file "~/org/inbox.org"
+    "The inbox file")
+  (defvar org-gtd-file "~/org/todo.org"
+    "The main todo file")
+  (defvar org-tickler-file "~/org/tickler.org"
+    "The tickler file")
+  (defvar org-clumped-file "~/org/clumpednotes.org"
+    "The clumped file")
+  (defvar org-someday-file "~/org/someday.org"
+    "The someday/maybe file")
+  (defvar org-journal-file "~/org/journal.org"
+    "The journal file")
+  (defvar org-lists-file "~/org/lists.org"
+    "The lists file")
+  (defvar org-cal-file "~/org/calendars/gcal.org"
+    "Google calendar")
 #+END_SRC
 * interface and appearance
 ** COMMENT fortune cookies
@@ -185,15 +200,15 @@ I no longer use dired, but switched to ranger
   (use-package rainbow-mode
     :ensure t)
 #+END_SRC
-** COMMENT relative number mode
+** relative number mode
 #+BEGIN_SRC emacs-lisp
-  (setq-default display-line-numbers 'relative ; or 'relative, but visual is easier for
+  (setq-default display-line-numbers 'visual ; or 'relative, but visual is easier for
                                           ; vim's e.g. 10j jumping
                 display-line-numbers-current-absolute t
                 display-line-numbers-width 4
                 display-line-numbers-widen nil)
-  (add-hook 'text-mode-hook #'display-line-numbers-mode)
-  (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+  ;;(add-hook 'text-mode-hook #'display-line-numbers-mode)
+  ;;(add-hook 'prog-mode-hook #'display-line-numbers-mode)
 #+END_SRC
 
 * evil

@@ -1,6 +1,6 @@
 (require 'package)
 (setq package-enable-at-startup nil)
-(add-to-list 'package-archives 
+(add-to-list 'package-archives
 	     '("melpa" . "https://melpa.org/packages/")
 	     '("org"   . "http://orgmode.org/elpa/"))
 (package-initialize)
@@ -20,7 +20,7 @@
  ;; If there is more than one, they won't work right.
  '(org-agenda-files
    (quote
-    ("/mnt/HDD/Dropbox/Apps/orgzly/calendars/university.org" "/mnt/HDD/Dropbox/Apps/orgzly/calendars/sports.org" "/mnt/HDD/Dropbox/Apps/orgzly/calendars/societies.org" "/mnt/HDD/Dropbox/Apps/orgzly/calendars/options.org" "/mnt/HDD/Dropbox/Apps/orgzly/calendars/gcal.org" "/mnt/HDD/Dropbox/Apps/orgzly/todo.org" "/mnt/HDD/Dropbox/Apps/orgzly/inbox.org" "/mnt/HDD/Dropbox/MinorRP/LOSCAR/report/report.org")))
+    ("~/org/calendars/uu-periods.org" "~/org/calendars/university.org" "~/org/calendars/sports.org" "~/org/calendars/societies.org" "~/org/calendars/outofoffice.org" "~/org/calendars/options.org" "~/org/calendars/meetings.org" "~/org/calendars/gcal.org" "~/org/calendars/fest.org" "~/org/calendars/balance.org" "~/org/calendars/253plus.org" "~/org/calendars/253.org_archive" "~/org/calendars/253.org" "~/org/todo.org" "~/org/someday.org" "~/org/notes.org" "~/org/mobin.org" "~/org/lists.org" "~/org/journal.org" "~/org/inbox.org" "~/org/clumpednotes.org")))
  '(package-selected-packages
    (quote
     (weechat edit-server gmail-message-mode haskell-mode yasnippet flycheck fontawesome writeroom-mode use-package telephone-line tangotango-theme rainbow-mode rainbow-delimiters powerline-evil polymode pandoc-mode org-ref org-plus-contrib org-pdfview org-pandoc org-gcal org-bullets markdown-mode ivy-bibtex golden-ratio evil-org evil-nerd-commenter evil-magit evil-escape ess dash-functional counsel beacon auto-complete)))
