@@ -580,9 +580,6 @@ Filter tasks by context (sorted by todo state)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((shell . t)
-     (bash . t)
-     (zsh . t)
-     (sh . t)
      (stan . t)
      (R . t)))
 #+END_SRC
