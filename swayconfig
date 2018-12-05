@@ -27,19 +27,18 @@ client.focused_inactive $color0 $background $foreground $color7 $color7
 
 # Default wallpaper (more resolutions are available in __DATADIR__/backgrounds/sway/)
 output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
-# main laptop screen
-Output eDP-1 {
+# small screen on the left
+Output DVI-I-2 {
        background $wallpaper fill
-       resolution 1920x1080
-       position 0 1080
-}
-# HDMI screen at office above laptop
-output HDMI-A-2 {
-       background $wallpaper fill
-       resolution 1920x1080
+       resolution 1440x900
        position 0 0
 }
-#
+# big screen on the right
+output DVI-I-1 {
+       background $wallpaper fill
+       resolution 1920x1080
+       position 1440 0
+}
 # You can get the names of your outputs by running: swaymsg -t get_outputs
 
 ### Idle configuration
@@ -57,22 +56,10 @@ output HDMI-A-2 {
 
 ### Input configuration
 #
-input "2:7:SynPS/2_Synaptics_TouchPad" {
-       dwt enabled
-       tap enabled
-       natural_scroll enabled
-       middle_emulation enabled
-       pointer_accel 0.5
-}
-input "1:1:AT_Translated_Set_2_keyboard" {
+input "1241:6168:USB_Keyboard" {
     xkb_layout us
     xkb_options ctrl:nocaps,compose:ralt
-}
-# work external keyboard
-input "9456:320:Metadot_-_Das_Keyboard_Das_Keyboard" {
-      xkb_layout us
-      xkb_options ctrl:nocaps,compose:ralt
-      xkb_numlock enabled
+    xkb_numlock enabled
 }
 #
 # You can get the names of your inputs by running: swaymsg -t get_inputs
