@@ -58,10 +58,11 @@
             "warning": 30,
             "critical": 15
         },
-	"bat": "BAT0",
+	"bat": "BAT1",
+	//"on-click": "notify-senacpi",
 	"format": "bat: {capacity}% {icon}",
         // "format-good": "", // An empty format will hide the module
-        "format-full": "",
+        //"format-full": "",
         "format-icons": ["", "", "", "", ""]
     },
     "network": {
