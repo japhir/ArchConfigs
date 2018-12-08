@@ -11,21 +11,23 @@
 define dirvars 'org-in-file', 'org-gtd-file', etc.
 #+BEGIN_SRC emacs-lisp
   (defvar org-in-file "~/org/inbox.org"
-    "The inbox file")
+    "GTD Inbox")
   (defvar org-gtd-file "~/org/todo.org"
-    "The main todo file")
+    "Personal TODO's")
   (defvar org-tickler-file "~/org/tickler.org"
-    "The tickler file")
+    "Tickler")
   (defvar org-clumped-file "~/org/clumpednotes.org"
-    "The clumped file")
+    "Work TODO's")
+  (defvar org-notes-file "~/org/notes.org"
+    "General Notes and Protocols")
   (defvar org-someday-file "~/org/someday.org"
-    "The someday/maybe file")
+    "Someday/Maybe")
   (defvar org-journal-file "~/org/journal.org"
-    "The journal file")
+    "Journal")
   (defvar org-lists-file "~/org/lists.org"
-    "The lists file")
+    "Lists of Movies etc.")
   (defvar org-cal-file "~/org/calendars/gcal.org"
-    "Google calendar")
+    "Google Calendar")
 #+END_SRC
 * interface and appearance
 ** COMMENT fortune cookies
@@ -202,13 +204,11 @@ I no longer use dired, but switched to ranger
 #+END_SRC
 ** relative number mode
 #+BEGIN_SRC emacs-lisp
-  (setq-default display-line-numbers 'visual ; or 'relative, but visual is easier for
-                                          ; vim's e.g. 10j jumping
-                display-line-numbers-current-absolute t
-                display-line-numbers-width 4
-                display-line-numbers-widen nil)
-  ;;(add-hook 'text-mode-hook #'display-line-numbers-mode)
-  (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+  (setq display-line-numbers-type 'visual
+        display-line-numbers-current-absolute t
+        display-line-numbers-width 4
+        display-line-numbers-widen nil)
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 
 * evil
@@ -244,6 +244,7 @@ evil keymap for org-mode
            (evil-org-mode . (lambda ()
                               (evil-org-set-key-theme
                                '(navigation insert return textobjects additional shift todo heading calendar))))
+           (org-log-buffer-setup . evil-insert-state)
            (org-capture-mode . evil-insert-state)
            (yas-before-expand-snippet . evil-insert-state))
     :config
@@ -400,9 +401,14 @@ no longer need this now that I discovered "C-'" shortcut
   :config
   (setq org-return-follows-link t)
   (setf org-special-ctrl-a/e t)
-  (setq org-fast-tag-selection-single-key t)
   ;; folded drawers no longer ruin new entries
   (setq org-M-RET-may-split-line '((default . nil)))
+#+END_SRC
+** clocking
+#+BEGIN_SRC emacs-lisp
+  (setq org-check-running-clock t
+        org-log-note-clock-out t)
+  (setq org-log-done 'time)
 #+END_SRC
 ** theming
 #+BEGIN_SRC emacs-lisp
@@ -438,7 +444,6 @@ no longer need this now that I discovered "C-'" shortcut
   ;; (setq org-agenda-todo-ignore-with-date t)
   (setq org-agenda-prefix-format "  %-17:c%?-12t% s")
   (setq org-agenda-include-all-todo nil)
-  (setq org-log-done 'time)
 #+END_SRC
 ** agenda files
 all the org-files in my org-directory
@@ -543,6 +548,7 @@ Filter tasks by context (sorted by todo state)
 #+END_SRC
 ** context tags
 #+BEGIN_SRC emacs-lisp
+  (setq org-fast-tag-selection-single-key t)
   (setq org-tag-alist '((:startgroup . nil)
                         ("@home" . ?h)
                         ("@office" . ?o)
@@ -759,14 +765,15 @@ an attempt at getting siunitx and mhchem working in html
     (setq org-bullets-bullet-list
           '("◉" "●" "○" "♦" "◆" "►" "▸")))
 #+END_SRC
-** COMMENT org-gcal
-   synchronize google calendar with org
+** org-gcal
+   synchronize google calendar with org. Note that these settings are
+   overwritten by a private file that has my different calendars and IDs.
 #+BEGIN_SRC emacs-lisp
   (use-package org-gcal
     :after org
     :ensure t
     :bind (:map org-agenda-mode-map
-                ("C-M-u" . org-gcal-fetch))  ;; same key as mu4e!
+                ("C-S-u" . org-gcal-fetch))  ;; same key as mu4e!
     :config
     (setq org-gcal-client-id "<your-client-id>"
           org-gcal-client-secret "<your-client-secret>"
