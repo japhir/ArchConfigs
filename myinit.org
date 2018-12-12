@@ -527,18 +527,18 @@ Filter tasks by context (sorted by todo state)
  #+END_SRC
 ** TODO states
 #+BEGIN_SRC emacs-lisp
-  (setq org-todo-keywords
-        '((sequence "TICK(t)" "NEXT(n)" "WAIT(w!/!)" "SOME(s!/!)" "PROJ(p)" "|"
-                    "DONE(d)" "CANC(c)")))
-  ;; prettify the todo keywords
-  (setq org-todo-keyword-faces
-        '(("TICK" . (:background "light slate blue"))
-          ("NEXT" . (:foreground "light goldenrod yellow" :background "red" :weight bold))
-          ("WAIT" . (:foreground "dim gray" :background "yellow"))
-          ("SOME" . (:foreground "ghost white"  :background "deep sky blue"))
-          ("DONE" . (:foreground "green4"       :background "pale green"))
-          ("CANC" . (:foreground "dim gray"     :background "gray"))
-          ("PROJ" . (:foreground "navajo white" :background "saddle brown"))))
+    (setq org-todo-keywords
+          '((sequence "PROJ(p)" "NEXT(n)" "WAIT(w!/!)" "TICK(t)" "SOME(s!/!)" "|"
+                      "DONE(d)" "CANC(c)")))
+    ;; prettify the todo keywords
+    (setq org-todo-keyword-faces
+          '(("NEXT" . (:foreground "light goldenrod yellow" :background "red" :weight bold))
+            ("WAIT" . (:foreground "dim gray" :background "yellow"))
+            ("TICK" . (:background "light slate blue"))
+            ("SOME" . (:foreground "ghost white"  :background "deep sky blue"))
+            ("DONE" . (:foreground "green4"       :background "pale green"))
+            ("CANC" . (:foreground "dim gray"     :background "gray"))
+            ("PROJ" . (:foreground "navajo white" :background "saddle brown"))))
 #+END_SRC
 
 ** effort estimates
@@ -765,7 +765,7 @@ an attempt at getting siunitx and mhchem working in html
     (setq org-bullets-bullet-list
           '("◉" "●" "○" "♦" "◆" "►" "▸")))
 #+END_SRC
-** org-gcal
+** COMMENT org-gcal
    synchronize google calendar with org. Note that these settings are
    overwritten by a private file that has my different calendars and IDs.
 #+BEGIN_SRC emacs-lisp
