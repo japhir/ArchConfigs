@@ -154,7 +154,7 @@ I no longer use dired, but switched to ranger
 #+BEGIN_SRC emacs-lisp
   (use-package apropospriate-theme
     :ensure t
-    :config (load-theme 'apropospriate-dark t))
+    :config (load-theme 'apropospriate-light t))
 #+END_SRC
 *** COMMENT xresources
 #+BEGIN_SRC emacs-lisp
@@ -841,6 +841,11 @@ I keep forgetting to clock out, this should help me prevent that.
   ;; run this everytime I kill emacs
   (add-hook 'kill-emacs-query-functions 'org-clock-query-out)
 #+END_SRC
+** org-noter
+#+BEGIN_SRC emacs-lisp
+  (use-package org-noter
+    :ensure t)
+#+END_SRC
 * general packages and functions
 ** easy symbol insertion
    By default C-x 8 o = ° and C-x 8 m = µ. So:
@@ -928,11 +933,6 @@ install from AUR ~emacs-pdf-tools-git~
     :bind
     ;; swiper doesn't play nice with pdf-tools, so I disable it.
     (:map pdf-view-mode-map ("C-s" . isearch-forward)))
-#+END_SRC
-** org-noter
-#+BEGIN_SRC emacs-lisp
-  (use-package org-noter
-    :ensure t)
 #+END_SRC
 ** COMMENT edit with emacs (chromium)
    Edit gmail messages and other input fields in chrome with emacs, markdown.
@@ -1026,7 +1026,7 @@ https://github.com/abo-abo/ace-window
     :config
     (global-git-gutter-mode +1))
 #+END_SRC
-** projectile
+** COMMENT projectile
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
     :ensure t
@@ -1083,7 +1083,7 @@ file bookmarks
      (golden-ratio-mode 1)
      (setq golden-ratio-auto-scale t))
 #+END_SRC
-** file extension modes
+** COMMENT file extension modes
 #+BEGIN_SRC emacs-lisp
   (use-package conf-mode
     :mode ("i3config" "i3status" "swayconfig" ".*rc\\'" "\\.inp\\'"))
@@ -1152,6 +1152,17 @@ Then load it into emacs when opening a PKGBUILD file
     (setq erc-hide-list '("JOIN" "PART" "QUIT"))
     (setq erc-track-exclude-types '("JOIN" "MODE"
       "NICK" "PART" "QUIT" "305" "306" "324" "329" "332" "333" "353" "477")))
+#+END_SRC
+** calendar
+perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collection/issues/211][evil-collection issue]]
+#+BEGIN_SRC emacs-lisp
+  (use-package calfw
+    :ensure t
+    :config)
+  (use-package calfw-org
+    :ensure t
+    :bind
+    ("C-c o" . cfw:open-org-calendar))
 #+END_SRC
 * email
 ** COMMENT notmuch email
@@ -1263,7 +1274,7 @@ installed from AUR ~emacs-ess~
       :config
       (defun my-org-confirm-babel-evaluate (lang body)
         (not (string= lang "R")))  ; don't ask for R
-      (setq ess-default-style 'RStudio-)
+      (setq ess-default-style 'RStudio)
       (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
       (setq inferior-R-args "--no-restore-history --no-save")
       :bind (:map ess-mode-map (";" . ess-insert-assign)))
