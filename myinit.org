@@ -210,7 +210,11 @@ I no longer use dired, but switched to ranger
         display-line-numbers-widen nil)
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
-
+** helpful
+#+BEGIN_SRC emacs-lisp
+  (use-package helpful
+    :ensure t)
+#+END_SRC
 * evil
 ** evil
    vim emulator
@@ -468,45 +472,49 @@ swyper makes refiling amazing!
 ** agenda filters
 Filter tasks by context (sorted by todo state)
 #+BEGIN_SRC emacs-lisp
-        (setq org-agenda-sorting-strategy '(priority-down todo-state-up))
-        (setq org-agenda-custom-commands
-              '(("i" "Inbox" tags "in")
-                ("I" "Important"
-                 ((tags "PRIORITY=\"A\"/PROJ"
-                        ((org-agenda-overriding-header "High-priority projects:")))
-                  (tags "PRIORITY=\"A\"/!-PROJ"
-                        ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-                         (org-agenda-overriding-header "High-priority unfinished tasks:")))))
-                ("A" agenda*)
-                ("W" "Work" tags-todo "Work")
-                ("P" "Personal" tags-todo "Personal")
-                ("R" "R" tags-todo "R")
-                ("O" "org" tags-todo "org")
-                ("B" "Bayes" tags-todo "bayes")
-                ("g" . "GTD contexts")
-                ("gh" "Home" tags-todo "@home")
-                ("go" "Office" tags-todo "@office")
-                ("ge" "Errands" tags-todo "@errands")
-                ("gl" "Laboratory" tags-todo "@lab")
-                ("gc" "Computer" tags-todo "@computer")
-                ("gb" "Phone" tags-todo "@phone")
-                ("gm" "e-mail" tags-todo "@email")
-                ;; ("gs" "Slack" tags-todo "@slack")
-                ("gb" "Bank" tags-todo "@bank")
-                ("gw" "Write" tags-todo "@write")
-                ("gp" "Program" tags-todo "@program")
-                ("gr" "Read" tags-todo "@read")
-                ("gg" "Research" tags-todo "@research")
-                ("gs" "Schedule" tags-todo "@schedule")
-                ("ga" "Agenda" tags-todo "@agenda")
-                ("E" . "Energy")
-                ("E1" "Morning" tags-todo "morning")
-                ("E2" "Afternoon" tags-todo "afternoon")
-                ("E3" "Evening" tags-todo "evening")
-                ("p" . "People")
-                ("pM" "Martin" tags-todo "Martin")
-                ("pA" "Anne" tags-todo "Anne")
-                ("pI" "Inigo" tags-todo "Inigo")))
+  (setq org-agenda-sorting-strategy
+        '((agenda habit-down time-up priority-down todo-state-up category-keep)
+          (todo todo-state-up priority-down category-keep)
+          (tags priority-down todo-state-up category-keep)
+          (search category-keep)))
+  (setq org-agenda-custom-commands
+        '(("i" "Inbox" tags "in")
+          ("I" "Important"
+           ((tags "PRIORITY=\"A\"/PROJ"
+                  ((org-agenda-overriding-header "High-priority projects:")))
+            (tags "PRIORITY=\"A\"/!-PROJ"
+                  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                   (org-agenda-overriding-header "High-priority unfinished tasks:")))))
+          ("A" agenda*)
+          ("W" "Work" tags-todo "Work")
+          ("P" "Personal" tags-todo "Personal")
+          ("R" "R" tags-todo "R")
+          ("O" "org" tags-todo "org")
+          ("B" "Bayes" tags-todo "bayes")
+          ("g" . "GTD contexts")
+          ("gh" "Home" tags-todo "@home")
+          ("go" "Office" tags-todo "@office")
+          ("ge" "Errands" tags-todo "@errands")
+          ("gl" "Laboratory" tags-todo "@lab")
+          ("gc" "Computer" tags-todo "@computer")
+          ("gb" "Phone" tags-todo "@phone")
+          ("gm" "e-mail" tags-todo "@email")
+          ;; ("gs" "Slack" tags-todo "@slack")
+          ("gb" "Bank" tags-todo "@bank")
+          ("gw" "Write" tags-todo "@write")
+          ("gp" "Program" tags-todo "@program")
+          ("gr" "Read" tags-todo "@read")
+          ("gg" "Research" tags-todo "@research")
+          ("gs" "Schedule" tags-todo "@schedule")
+          ("ga" "Agenda" tags-todo "@agenda")
+          ("E" . "Energy")
+          ("E1" "Morning" tags-todo "morning")
+          ("E2" "Afternoon" tags-todo "afternoon")
+          ("E3" "Evening" tags-todo "evening")
+          ("p" . "People")
+          ("pM" "Martin" tags-todo "Martin")
+          ("pA" "Anne" tags-todo "Anne")
+          ("pI" "Inigo" tags-todo "Inigo")))
 #+END_SRC
 ** capture templates
     customize capture templates, variables are defined in a private file.
