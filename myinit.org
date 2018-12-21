@@ -1248,8 +1248,11 @@ perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collec
             (:subject       .  nil)))
     (setq mu4e-get-mail-command "mbsync -a")
     (setq mu4e-headers-include-related t)
+    (setq mu4e-compose-format-flowed t)
     (setq mu4e-confirm-quit nil)
     (setq mu4e-view-show-images t)
+    (add-to-list 'mu4e-view-actions
+                 '("ViewInBrowser" . mu4e-action-view-in-browser) t)
     (require 'org-mu4e)
     (setq org-mu4e-link-query-in-headers-mode nil))
 #+END_SRC
