@@ -211,9 +211,18 @@ I no longer use dired, but switched to ranger
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 ** helpful
+https://github.com/Wilfred/helpful
 #+BEGIN_SRC emacs-lisp
   (use-package helpful
     :ensure t)
+#+END_SRC
+** demos
+Insert demos after describe function https://github.com/xuchunyang/elisp-demos
+#+BEGIN_SRC emacs-lisp
+  (use-package elisp-demos
+    :ensure t
+    :config
+    (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
 #+END_SRC
 * evil
 ** evil
