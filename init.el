@@ -1,8 +1,10 @@
-(require 'package)
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/")
-	     '("org"   . "http://orgmode.org/elpa/"))
-(package-initialize)
-
-(org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org"))
+(let ((file-name-handler-alist nil))
+  (require 'package)
+  (setq package-enable-at-startup nil)
+  (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
+  (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/") t)
+  (package-initialize)
+  (setq custom-file "~/.emacs.d/emacs-custom.el")
+  (load custom-file)
+  (org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org"))
+)
