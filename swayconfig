@@ -100,7 +100,7 @@ input "9456:320:Metadot_-_Das_Keyboard_Das_Keyboard" {
     # reload the configuration file
     bindsym $mod+Shift+c reload
 
-    # Exit sway (logs you out of your Wayland session)
+    # exit sway (logs you out of your Wayland session)
     bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'
 #
 # Moving around:
@@ -275,16 +275,18 @@ bindsym $mod+Delete exec ~/ArchConfigs/launchswaylock.sh
 #
 # Read `man 5 sway-bar` for more information about this section.
 
-bar {
-    swaybar_command waybar
-#     position top
+exec --no-startup-id waybar
+# bar {
+#    swaybar_command waybar
+#    mode hide
+#    position top
 #     # TODO: battery icon, processor/memory overview
 #     # WAITING: tray icons
 #     # mode hide
 #     # When the status_command prints a new line to stdout, swaybar updates.
-#     status_command SCRIPT_DIR=~/.config/i3blocks i3blocks
-    # font pango:Source Code Pro, Font Awesome 5 Free, Font Awesome 5 Brands 10
-#     colors {
+   # status_command SCRIPT_DIR=~/.config/i3blocks i3blocks
+   # font pango:Source Code Pro, Font Awesome 5 Free, Font Awesome 5 Brands 10
+   # colors {
 # 	background $background
 # 	statusline $foreground
 # 	# focused_background $color1
@@ -293,8 +295,8 @@ bar {
 # 	active_workspace $color0 $color3 $foreground
 # 	inactive_workspace $color0 $background $foreground
 # 	urgent_workspace $color0 $color13 $color0
-#     }
-}
+ #    }
+# }
 # include /etc/sway/config.d/*
 
 # launch software keybindings
@@ -316,7 +318,7 @@ exec --no-startup-id redshift -l 52.1:5.12 -m wayland -t 5500:2500
 # app launcher, launch w/ Control-space
 exec --no-startup-id albert
 exec --no-startup-id dropbox
-#exec --no-startup-id nextcloud             # more uni file sync
+exec --no-startup-id owncloud
 
 # gaps
 default_border pixel 1
@@ -332,5 +334,7 @@ bindsym $mod+Shift+d gaps inner current set 0; gaps outer current set 0
 bindsym $mod+z       gaps outer current plus 5
 bindsym $mod+Shift+z gaps outer current minus 5
 
-for_window [class="^URxvt"] opacity 0.9
+# for_window [class="^URxvt"] opacity 0.9  # see if .Xresources settings work
 # for_window [class="^Emacs$"] opacity 0.95
+
+include /etc/sway/config.d/*
