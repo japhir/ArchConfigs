@@ -1,6 +1,6 @@
 * use-package
-  Use-package is an amazing resource to clean up my init file and have it play
-  nice on both my desktop and laptop.
+Use-package is an amazing resource to clean up my init file and have it play
+nice on both my desktop and laptop.
 #+BEGIN_SRC emacs-lisp
   (eval-when-compile
     (require 'use-package))
@@ -30,73 +30,43 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
     "Google Calendar")
 #+END_SRC
 * interface and appearance
-** COMMENT fortune cookies
-*** in the frame title
-    currently commented out, I prefer scratch
-#+BEGIN_SRC emacs-lisp
-  (setf frame-title-format
-        (with-temp-buffer
-          (call-process "fortune" nil t)
-          (setf (point) (point-min))
-          (while (re-search-forward "[ \n\t]+" nil t)
-            (replace-match " " nil t))
-          (buffer-string)))
-#+END_SRC
-*** in the scratch buffer
-also commented out, I can see them in my terminal if desired
-#+BEGIN_SRC emacs-lisp
-  (setq initial-scratch-message
-        (format
-         ";; %s\n\n"
-         (replace-regexp-in-string
-          "\n" "\n;; " ; comment each line
-          (replace-regexp-in-string
-           "\n$" ""    ; remove trailing linebreak
-           (shell-command-to-string "cowthink $(fortune showerthoughts)")))))
-#+END_SRC
 ** turn off UI elements and small tweaks
 #+BEGIN_SRC emacs-lisp
-  (autoload 'ibuffer "ibuffer")
   (setq inhibit-splash-screen t)
   (scroll-bar-mode -1)   ; turn off the scroll bar
   (tool-bar-mode -1)     ; turn off the tool bar
   (menu-bar-mode -1)     ; turn off the menu
   (setq visible-bell 1)  ; turn off beeps, make them flash!
+  ;; typing
   (setq-default fill-column 79)
   (setq sentence-end-double-space nil)
-
-   ;; 20MB of memory before calling garbage collection
-  (setq gc-cons-threshold 20000000)
-
   ;; typed text will replace highlighted region
   (delete-selection-mode 1)
-
   ;; backspace deletes one character instead of one column
   (global-set-key (kbd "DEL") 'backward-delete-char)
 
-  ;; enable `downcase-region' and `upcase-region'
-  (put 'downcase-region 'disabled nil)
-  (put 'upcase-region 'disabled nil)
+  ;; remove trailing whitespace before save
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
+  ;; prefer utf-8
+  (prefer-coding-system 'utf-8-unix)
+
+  (setq mouse-wheel-progressive-speed nil)
+
+   ;; 20MB of memory before calling garbage collection
+  (setq gc-cons-threshold 100000000)
+
   (defalias 'yes-or-no-p 'y-or-n-p)
 
   ;; always follow symlinks w/o asking
   (require 'vc-hooks)
   (setq vc-follow-symlinks t)
-
-  ;; remove trailing whitespace before save
-  (add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-  ;; prefer utf-8
-  (prefer-coding-system 'utf-8-unix)
 #+END_SRC
 ** don't make a mess of my folders
 #+BEGIN_SRC emacs-lisp
-  (setq
-   auto-save-default nil
-   backup-inhibited t
-   confirm-nonexistent-file-or-buffer nil
-   create-lockfiles nil
-   mouse-wheel-progressive-speed nil)
+  (setq auto-save-default nil
+        backup-inhibited t
+        confirm-nonexistent-file-or-buffer nil
+        create-lockfiles nil)
 #+END_SRC
 ** frames-only-mode
 let my window manager handle screen creation
@@ -105,22 +75,13 @@ let my window manager handle screen creation
     :config (setq frames-only-mode t)
     :ensure t)
 #+END_SRC
-** COMMENT dired should play nice
-I no longer use dired, but switched to ranger
-#+BEGIN_SRC emacs-lisp
-  (define-key global-map [remap list-buffers] 'ibuffer)
-
-  (require 'dired)
-  ;; move cursor to beginning of line when it makes sense
-  (setq wdired-use-dired-vertical-movement 'sometimes)
-#+END_SRC
 ** play nice with parentheses
 #+BEGIN_SRC emacs-lisp
   (electric-pair-mode 1) ; auto-insert matching bracket
   (show-paren-mode 1)    ; turn on paren match highlighting
 #+END_SRC
 ** rainbow-delimiters
-   matching parenthesis are highlighted with rainbow colours.
+matching parenthesis are highlighted with rainbow colours.
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
     :ensure t
@@ -128,64 +89,36 @@ I no longer use dired, but switched to ranger
     :hook ((prog-mode LaTeX-mode) . rainbow-delimiters-mode))
 #+END_SRC
 ** set the theme
-*** COMMENT leuven
+*** clean up previous theme
+from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www.reddit.com/r/emacs/comments/4mzynd/what_emacs_theme_are_you_currently_using/d43c5cw][reddit]]
 #+BEGIN_SRC emacs-lisp
-  (use-package leuven-theme
-    :init
-    (load-theme 'leuven t)
-    ;; (load-theme 'leuven-dark t)
-    :config
-    (setq org-fontify-whole-heading-line t))
-#+END_SRC
-*** COMMENT leuven-dark
-#+BEGIN_SRC emacs-lisp
-  (use-package leuven-dark
-    :init
-    (load-theme 'leuven t))
-#+END_SRC
-*** COMMENT monokai
-#+BEGIN_SRC emacs-lisp
-  (use-package monokai-theme
-    :ensure t
-    :init
-    (load-theme 'monokai t))
+  (defadvice load-theme (before clear-previous-themes activate)
+    "Clear existing theme settings instead of layering them"
+    (mapc #'disable-theme custom-enabled-themes))
 #+END_SRC
 *** apropospriate
 #+BEGIN_SRC emacs-lisp
   (use-package apropospriate-theme
     :ensure t
-    :config (load-theme 'apropospriate-light t))
+    :config (load-theme 'apropospriate-dark t))
 #+END_SRC
-*** COMMENT xresources
+*** COMMENT fonts
 #+BEGIN_SRC emacs-lisp
-  (use-package xresources-theme
-    :ensure t)
+  (set-face-attribute 'default nil :family "Fira Code" :height 130)
+  (set-face-attribute 'fixed-pitch nil :family "Fira Code" :height 130)
+  (set-face-attribute 'variable-pitch nil :family "ETBookOT" :height 150)
+  (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
 #+END_SRC
-** COMMENT toggle transparency
+*** COMMENT padding
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'default-frame-alist '(alpha . (85 . 50)))
-  ;; TODO: this currently only switches, should default to 100 for pdf, png, etc.
-  (add-hook 'pdf-view-mode-hook 'toggle-transparency)
-  (defun toggle-transparency ()
-    (interactive)
-    (let ((alpha (frame-parameter nil 'alpha)))
-      (set-frame-parameter
-       nil 'alpha
-       (if (eql (cond ((numberp alpha) alpha)
-                      ((numberp (cdr alpha)) (cdr alpha))
-                      ;; Also handle undocumented (<active> <inactive>) form.
-                      ((numberp (cadr alpha)) (cadr alpha)))
-                100)
-           '(85 . 50) '(100 . 100)))))
-  (global-set-key (kbd "C-c T") 'toggle-transparency)
-#+END_SRC
-** default font
-#+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil
-                      :family "Source Code Pro" :height 130)
+  (setq line-spacing 0.1)
+  (lambda () (progn
+    (setq left-margin-width 2)
+    (setq right-margin-width 2)
+    (set-window-buffer nil (current-buffer))))
 #+END_SRC
 ** beacon
-   Highlight the current line when scrolling
+Highlight the current line when scrolling
 #+BEGIN_SRC emacs-lisp
   (use-package beacon
     :ensure t
@@ -197,9 +130,10 @@ I no longer use dired, but switched to ranger
   (global-hl-line-mode t)
 #+END_SRC
 ** rainbow-mode
-   Highlight hex colours!
+Highlight hex colours!
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-mode
+    :hook ((html-mode r-mode) . rainbow-mode)
     :ensure t)
 #+END_SRC
 ** relative number mode
@@ -209,6 +143,10 @@ I no longer use dired, but switched to ranger
         display-line-numbers-width 4
         display-line-numbers-widen nil)
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+#+END_SRC
+** compilation window height
+#+BEGIN_SRC emacs-lisp
+  (setq compilation-window-height 15)
 #+END_SRC
 ** helpful
 https://github.com/Wilfred/helpful
@@ -224,9 +162,31 @@ Insert demos after describe function https://github.com/xuchunyang/elisp-demos
     :config
     (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
 #+END_SRC
+** telephone-line
+very nice powerline-based status line
+#+BEGIN_SRC emacs-lisp
+  (use-package telephone-line
+    :ensure t
+    :after evil
+    :init
+    (setq telephone-line-lhs
+          '((evil   . (telephone-line-evil-tag-segment))
+            (accent . (telephone-line-vc-segment
+                       telephone-line-erc-modified-channels-segment
+                       telephone-line-process-segment))
+            (nil    . (;telephone-line-minor-mode-segment
+                       telephone-line-buffer-segment))))
+    (setq telephone-line-rhs
+          '((nil    . (telephone-line-misc-info-segment))
+            (accent . (telephone-line-major-mode-segment))
+          (evil   . (telephone-line-airline-position-segment))))
+    :config
+    (require 'telephone-line-config)
+    (telephone-line-evil-config))
+#+END_SRC
 * evil
 ** evil
-   vim emulator
+vim emulator
 #+BEGIN_SRC emacs-lisp
   (use-package evil
     :ensure t
@@ -263,13 +223,6 @@ evil keymap for org-mode
     :config
     (require 'evil-org-agenda)
     (evil-org-agenda-set-keys))
-#+END_SRC
-** COMMENT undo tree
-#+BEGIN_SRC emacs-lisp
-  (use-package undo-tree
-     :ensure t
-     :config (global-undo-tree-mode)
-     :diminish undo-tree-mode)
 #+END_SRC
 ** evil-escape
 https://github.com/syl20bnr/evil-escape
@@ -317,12 +270,6 @@ operate on indentation regions, mainly with ~ii~
     :config
     (evil-indent-plus-default-bindings))
 #+END_SRC
-** COMMENT evil-nerd-commenter
-   easy comments in a lot of code formats. Keys are configured in [[evil-leader]].
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-nerd-commenter
-    :ensure t)
-#+END_SRC
 ** COMMENT evil-leader
 #+BEGIN_SRC emacs-lisp
   (use-package evil-leader  ; default is \
@@ -350,31 +297,9 @@ evil keybindings for magit
     :config
     (evil-set-initial-state 'magit-log-edit-mode 'insert))
 #+END_SRC
-** telephone-line
-   very nice powerline-based status line
-#+BEGIN_SRC emacs-lisp
-  (use-package telephone-line
-    :ensure t
-    :init
-    (setq telephone-line-lhs
-          '((evil   . (telephone-line-evil-tag-segment))
-            (accent . (telephone-line-vc-segment
-                       telephone-line-erc-modified-channels-segment
-                       telephone-line-process-segment))
-            (nil    . (;telephone-line-minor-mode-segment
-                       telephone-line-buffer-segment))))
-    (setq telephone-line-rhs
-          '((nil    . (telephone-line-misc-info-segment))
-            (accent . (telephone-line-major-mode-segment))
-          (evil   . (telephone-line-airline-position-segment))))
-    :config
-    (require 'telephone-line-config)
-    (telephone-line-evil-config))
-#+END_SRC
 * org-mode
 ** my gtd and inbox files finding functions
-no longer need this now that I discovered "C-'" shortcut
-   org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
+org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 #+BEGIN_SRC emacs-lisp
   ;; TODO: figure out how to do this in a less stupid way
   (defun open-gtd-file ()
@@ -398,6 +323,10 @@ no longer need this now that I discovered "C-'" shortcut
     :pin org
     :ensure org-plus-contrib
 #+END_SRC
+** COMMENT hooks
+#+BEGIN_SRC emacs-lisp
+  :hook (org-mode . variable-pitch-mode)
+#+END_SRC
 ** keybindings
 #+BEGIN_SRC emacs-lisp
   :bind
@@ -416,6 +345,7 @@ no longer need this now that I discovered "C-'" shortcut
   (setf org-special-ctrl-a/e t)
   ;; folded drawers no longer ruin new entries
   (setq org-M-RET-may-split-line '((default . nil)))
+  (setq org-startup-with-inline-images t)
 #+END_SRC
 ** clocking
 #+BEGIN_SRC emacs-lisp
@@ -425,13 +355,28 @@ no longer need this now that I discovered "C-'" shortcut
 #+END_SRC
 ** theming
 #+BEGIN_SRC emacs-lisp
-  (setq org-startup-indented t)
-  ;(setq org-hide-leading-stars t)
   (setf org-tags-column -65)
-  (setq org-fontify-emphasized-text t)
-  (setq org-fontify-done-headline t)
-  (setq org-pretty-entities t)
-  (setq org-ellipsis "▼") ;▼ … ◦
+  (setq org-startup-indented t
+        org-agenda-block-separator ""
+        org-fontify-emphasized-text t
+        org-fontify-whole-heading-line t
+        org-fontify-done-headline t
+        org-fontify-quote-and-verse-blocks t
+        org-pretty-entities t
+        org-ellipsis " ▼ " ;▼ … ◦
+        org-hide-emphasis-markers t)
+#+END_SRC
+*** org-bullets
+prettify org mode
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :hook
+    (org-mode . (lambda () (org-bullets-mode 1)))
+    :config
+    (setq org-bullets-bullet-list
+          '("◉" "●" "○" "♦" "◆" "►" "▸")))
+          ;; '(" ")))
 #+END_SRC
 ** file associations
 #+BEGIN_SRC emacs-lisp
@@ -445,7 +390,8 @@ no longer need this now that I discovered "C-'" shortcut
           ("\\.mkv\\'" . "xdg-open %s")
           ("\\.pdf.xoj\\'" . "xournal %s")))
 #+END_SRC
-** org-agenda
+** GTD stuff
+*** org-agenda
 #+BEGIN_SRC emacs-lisp
   ;; (setq org-agenda-files (list "<file1.org> etc."))
   (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
@@ -458,13 +404,13 @@ no longer need this now that I discovered "C-'" shortcut
   (setq org-agenda-prefix-format "  %-17:c%?-12t% s")
   (setq org-agenda-include-all-todo nil)
 #+END_SRC
-** agenda files
+*** agenda files
 all the org-files in my org-directory
 #+BEGIN_SRC emacs-lisp
   (setq org-directory "~/org/")
   (setq org-agenda-files (directory-files-recursively org-directory "\\.org$"))
 #+END_SRC
-** refile targets
+*** refile targets
 swyper makes refiling amazing!
 #+BEGIN_SRC emacs-lisp
   ;; TODO: refile without the annoying ^ regex
@@ -478,7 +424,7 @@ swyper makes refiling amazing!
   (setq org-outline-path-complete-in-steps nil)   ;; Refile in a single go
   (setq org-refile-use-outline-path t)            ;; Show full paths for refiling
 #+END_SRC
-** agenda filters
+*** agenda filters
 Filter tasks by context (sorted by todo state)
 #+BEGIN_SRC emacs-lisp
   (setq org-agenda-sorting-strategy
@@ -525,8 +471,8 @@ Filter tasks by context (sorted by todo state)
           ("pA" "Anne" tags-todo "Anne")
           ("pI" "Inigo" tags-todo "Inigo")))
 #+END_SRC
-** capture templates
-    customize capture templates, variables are defined in a private file.
+*** capture templates
+customize capture templates
  #+BEGIN_SRC emacs-lisp
    (setq org-capture-templates
          '(("a" "Appointment" entry (file org-in-file)
@@ -542,7 +488,7 @@ Filter tasks by context (sorted by todo state)
            ("j" "Journal" entry (file+olp+datetree org-journal-file)
             "* %?\nEntered on %U\n %i\n %a")))
  #+END_SRC
-** TODO states
+*** TODO states
 #+BEGIN_SRC emacs-lisp
     (setq org-todo-keywords
           '((sequence "PROJ(p)" "NEXT(n)" "WAIT(w!/!)" "TICK(t)" "SOME(s!/!)" "|"
@@ -557,18 +503,16 @@ Filter tasks by context (sorted by todo state)
             ("CANC" . (:foreground "dim gray"     :background "gray"))
             ("PROJ" . (:foreground "navajo white" :background "saddle brown"))))
 #+END_SRC
-
-** effort estimates
+*** effort estimates
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'org-global-properties
                '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
 #+END_SRC
-
-** habits
+*** habits
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'org-modules 'org-habit t)
 #+END_SRC
-** context tags
+*** context tags
 #+BEGIN_SRC emacs-lisp
   (setq org-fast-tag-selection-single-key t)
   (setq org-tag-alist '((:startgroup . nil)
@@ -602,19 +546,23 @@ Filter tasks by context (sorted by todo state)
                         ;; tags to accompany the @agenda context
                         ("Martin" . ?M) ("Inigo" . ?I) ("Anne" . ?A) ("Appy") ("FEST")))
 #+END_SRC
-** org-babel languages
+** exporting
+*** source code block settings
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-fontify-natively t
+        org-src-tab-acts-natively t)
+#+END_SRC
+*** org-babel languages
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
   (org-babel-do-load-languages
    'org-babel-load-languages
-   '((shell . t)
+   '((emacs-lisp . t)
+     (dot . t)
+     (python . t)
+     (shell . t)
      (stan . t)
      (R . t)))
-#+END_SRC
-** exporting
-#+BEGIN_SRC emacs-lisp
-  (setq org-src-fontify-natively t
-    org-src-tab-acts-natively t)
 #+END_SRC
 *** org-export odt
 #+BEGIN_SRC emacs-lisp
@@ -631,7 +579,7 @@ org-export ignore headlines with ~:ignore:~ tag
   (require 'ox-latex)
 #+END_SRC
 *** org-latex export settings
-   basic latex settings
+basic latex settings
 #+BEGIN_SRC emacs-lisp
   (setq org-highlight-latex-and-related '(latex script entities))
   (setq org-latex-create-formula-image-program 'dvipng)
@@ -639,28 +587,6 @@ org-export ignore headlines with ~:ignore:~ tag
   (setq org-latex-pdf-process
         (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
   (setq org-latex-prefer-user-labels t)
-#+END_SRC
-*** COMMENT convert utf-8 to latex entries
-This works, but is obviated by my new custom entities.
-#+BEGIN_SRC emacs-lisp
-  (defun my-latex-filter-nobreaks (text backend info)
-    "Ensure \" \" are properly handled in LaTeX export."
-    (when (org-export-derived-backend-p backend 'latex)
-      (replace-regexp-in-string " " "~" text)))
-  (defun my-latex-filter-delta (text backend info)
-    "Ensure \"δ\" are converted to \"\\delta\" in LaTeX export."
-    (when (org-export-derived-backend-p backend 'latex)
-      (replace-regexp-in-string "δ" "\\delta" text t t)))
-  (defun my-latex-filter-Delta (text backend info)
-    "Ensure \"Δ\" are converted to \"\\Delta\" in LaTeX export."
-    (when (org-export-derived-backend-p backend 'latex)
-      (replace-regexp-in-string "Δ" "\\Delta" text t t)))
-  (add-to-list 'org-export-filter-plain-text-functions
-               'my-latex-filter-nobreaks)
-  (add-to-list 'org-export-filter-plain-text-functions
-               'my-latex-filter-delta)
-  (add-to-list 'org-export-filter-plain-text-functions
-               'my-latex-filter-Delta)
 #+END_SRC
 *** org-entities-user
 These are nice shorthands for commands I use often. In org-source they look
@@ -675,7 +601,7 @@ possible.
           ("tC" "\\({}^{13}\\)C" nil "<sup>13</sup>C" "13C" "¹³C" "¹³O")
           ("COt" "CO\\(_{2}\\)" nil "CO<sub>2</sub>" "CO2" "CO₂" "CO₂")
           ("D" "\\Delta_{47}" t "&Delta;<sub>47</sub>" "Δ47" "Δ47" "Δ₄₇")
-          ("celsius" "\\(^{\\circ}\\)C" nil "&deg;C" "°C" "°C" "°C")
+          ("celsius" "\\(^{\\circ}\\)C" nil "&deg;C" "°C" "°C" "℃")
           ;; unit space, something like 15\us{}Ma
           ("us" "\\," nil "&nbsp;" " " " " " ")
           ("appr" "\\sim" t "&tilde;" "~" "~" "~")
@@ -684,18 +610,6 @@ possible.
           ("arcminute" "^{'}" t "&prime;" "'" "′" "′")
           ("arcsecond" "^{''}" t "&Prime;" "\"" "″" "″")
           ))
-#+END_SRC
-*** COMMENT org-latex-minted
-#+BEGIN_SRC emacs-lisp
-  (setq org-latex-minted-options '(
-                                   ("frame" "lines")
-                                   ("fontsize" "\\scriptsize")
-                                   ("xleftmargin" "\\parindent")
-                                   ("linenos" "")
-                                   ))
-  (setq org-latex-listings 'minted)
-  (add-to-list 'org-latex-minted-langs '(R "r"))
-  ;; (add-to-list 'org-latex-minted-langs '(ipython "python"))
 #+END_SRC
 *** latex class =ijkarticle=
 #+BEGIN_SRC emacs-lisp
@@ -710,41 +624,6 @@ possible.
                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-#+END_SRC
-*** COMMENT mathjax
-an attempt at getting siunitx and mhchem working in html
-#+BEGIN_SRC emacs-lisp
-  (setq org-html-mathjax-options
-        '((path "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
-          (scale "100")
-          (align "center")
-          (indent "2em")
-          (mathml t)))
-  (setq org-html-mathjax-template
-  "
-   <script type=\"text/x-mathjax-config\">
-      MathJax.Ajax.config.path[\"mhchem\"] =
-        \"https://cdnjs.cloudflare.com/ajax/libs/mathjax-mhchem/3.2.0\";
-      MathJax.Ajax.config.path[\"siunitx\"] =
-        \"https://cdn.rawgit.com/burnpanck/MathJax-siunitx/f0f03a29\";
-      MathJax.Hub.Config({
-        extensions: [\"[mhchem]/mhchem.js\", \"[siunitx]/siunitx.js\"],
-        jax: [\"input/TeX\", \"output/HTML-CSS\"],
-        TeX: {
-          extensions: [\"[mhchem]/mhchem.js\",\"[siunitx]/siunitx.js\"]
-        },
-        tex2jax: {
-          inlineMath: [ ['$','$'], [\"\\(\",\"\\)\"] ],
-          displayMath: [ ['$$','$$'], [\"\\[\",\"\\]\"] ],
-          processEscapes: true
-        },
-        \"HTML-CSS\": { availableFonts: [\"TeX\"] }
-      });
-    </script>
-    <script type=\"text/javascript\" async
-            src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML\">
-  </script>
-  ")
 #+END_SRC
 ** close use-package org
 #+BEGIN_SRC emacs-lisp
@@ -774,21 +653,9 @@ an attempt at getting siunitx and mhchem working in html
     (if (equal "emacs-popup" (frame-parameter nil 'name))
         (delete-frame)))
 #+END_SRC
-** org-bullets
-   prettify org mode
-#+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :ensure t
-    :after org
-    :hook
-    (org-mode . (lambda () (org-bullets-mode 1)))
-    :config
-    (setq org-bullets-bullet-list
-          '("◉" "●" "○" "♦" "◆" "►" "▸")))
-#+END_SRC
 ** COMMENT org-gcal
-   synchronize google calendar with org. Note that these settings are
-   overwritten by a private file that has my different calendars and IDs.
+synchronize google calendar with org. Note that these settings are
+overwritten by a private file that has my different calendars and IDs.
 #+BEGIN_SRC emacs-lisp
   (use-package org-gcal
     :after org
@@ -844,24 +711,6 @@ an attempt at getting siunitx and mhchem working in html
                  '("JIR" "Journal of Irreproducible Research" "J. Irrep. Res."))
     (require 'org-ref-scopus))
 #+END_SRC
-** COMMENT org-clock-query-out
-I keep forgetting to clock out, this should help me prevent that.
-#+BEGIN_SRC emacs-lisp
-  (defun org-clock-query-out ()
-    "Check if any clocks are running, jump to the clock and ask to clock it out"
-    (when (org-clocking-p)
-        (progn
-          (org-clock-jump-to-current-clock)
-          (if (yes-or-no-p "This clock is still running, want to clock out?")
-              (org-clock-out)
-            (if (yes-or-no-p "Would you like to edit the clock?")
-                nil
-              (progn (switch-to-prev-buffer) t))
-            t))
-      t))
-  ;; run this everytime I kill emacs
-  (add-hook 'kill-emacs-query-functions 'org-clock-query-out)
-#+END_SRC
 ** org-noter
 #+BEGIN_SRC emacs-lisp
   (use-package org-noter
@@ -869,7 +718,7 @@ I keep forgetting to clock out, this should help me prevent that.
 #+END_SRC
 * general packages and functions
 ** easy symbol insertion
-   By default C-x 8 o = ° and C-x 8 m = µ. So:
+By default C-x 8 o = ° and C-x 8 m = µ. So:
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x 8 a") (lambda () (interactive) (insert "α")))
   (global-set-key (kbd "C-x 8 b") (lambda () (interactive) (insert "β")))
@@ -880,7 +729,7 @@ I keep forgetting to clock out, this should help me prevent that.
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "<f5>") 'revert-buffer)
 #+END_SRC
-** eshell
+** COMMENT eshell
 *** open an eshell here
 #+BEGIN_SRC emacs-lisp
   (defun eshell-here ()
@@ -921,15 +770,7 @@ I keep forgetting to clock out, this should help me prevent that.
 	   '(lambda()
 	      (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
  #+END_SRC
-** COMMENT lispy
-file not found!
-https://github.com/abo-abo/lispy
-#+BEGIN_SRC emacs-lisp
-  (use-package lispy
-    ;; :hook (emacs-lisp-mode . (lispy-mode 1))
-    :ensure t)
-#+END_SRC
-** ranger
+** COMMENT ranger
 #+BEGIN_SRC emacs-lisp
   (use-package ranger
     :ensure t
@@ -943,7 +784,6 @@ https://github.com/abo-abo/lispy
     (ranger-override-dired-mode t))
 #+END_SRC
 ** pdf-tools
-install from AUR ~emacs-pdf-tools-git~
 #+BEGIN_SRC emacs-lisp
   (use-package pdf-tools
     :magic ("%PDF" . pdf-view-mode)
@@ -953,18 +793,6 @@ install from AUR ~emacs-pdf-tools-git~
     :bind
     ;; swiper doesn't play nice with pdf-tools, so I disable it.
     (:map pdf-view-mode-map ("C-s" . isearch-forward)))
-#+END_SRC
-** COMMENT edit with emacs (chromium)
-   Edit gmail messages and other input fields in chrome with emacs, markdown.
-#+BEGIN_SRC emacs-lisp
-  (use-package edit-server
-    :ensure t
-    :config
-    (edit-server-start))
-  (use-package ham-mode
-    :ensure t)
-  (use-package gmail-message-mode
-    :ensure t)
 #+END_SRC
 ** swiper
 very nice search replacement
@@ -1001,28 +829,8 @@ jump to next chararcter. Slightly redundant b/c of evil's =f= and =t=.
     ("M-x" . counsel-M-x)
     ("C-c s" . counsel-rg))
 #+END_SRC
-** COMMENT ace-window
-no longer needed with frames-only-mode! <3
-Move to other buffers
-https://github.com/abo-abo/ace-window
-#+BEGIN_SRC emacs-lisp
-  (use-package ace-window
-    :ensure t
-    :bind (([remap other-window] . ace-window)
-           ("M-o" . ace-window))
-    :init
-    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-    (setq aw-scope 'frame)   ; disable jumping between frames
-    (setq aw-background nil) ; disable graying out of frames
-    :custom-face
-    (aw-leading-char-face
-     ((t (:inherit ace-jump-face-foreground
-                   :height 2.0
-                   :foreground "deep sky blue"
-                   :weight bold)))))
-#+END_SRC
 ** magit
-   git management
+git management
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :ensure t
@@ -1039,28 +847,6 @@ https://github.com/abo-abo/ace-window
     (diff-hl-flydiff-mode +1)
     :hook (magit-post-refresh . diff-hl-magit-post-refresh))
 #+END_SRC
-** COMMENT git-gutter
-#+BEGIN_SRC emacs-lisp
-  (use-package git-gutter
-    :ensure t
-    :config
-    (global-git-gutter-mode +1))
-#+END_SRC
-** COMMENT projectile
-#+BEGIN_SRC emacs-lisp
-  (use-package projectile
-    :ensure t
-    :config
-    (projectile-mode))
-#+END_SRC
-*** COMMENT counsel-projectile
-#+BEGIN_SRC emacs-lisp
-  (use-package counsel-projectile
-    :ensure t
-    :config
-    (counsel-projectile-mode))
-#+END_SRC
-
 ** COMMENT hydra
 file bookmarks
 #+BEGIN_SRC emacs-lisp
@@ -1083,11 +869,12 @@ file bookmarks
        "projects"
        ("s" (counsel-find-file "~/SurfDrive/PhD/projects/standardstats") "standardstats"))))
 #+END_SRC
-** auto-complete
-   auto complete everything
+** COMMENT auto-complete
+auto complete everything
 #+BEGIN_SRC emacs-lisp
   (use-package auto-complete
     :ensure t
+    :after yasnippet
     :init
     (ac-config-default)
     (global-auto-complete-mode t)
@@ -1095,34 +882,21 @@ file bookmarks
     (setq auto-show-delay nil)
     (setq-default ac-sources (push 'ac-source-yasnippet ac-sources)))
 #+END_SRC
-** COMMENT golden-ratio
-#+BEGIN_SRC emacs-lisp
-  (use-package golden-ratio
-     :ensure t
-     :config
-     (golden-ratio-mode 1)
-     (setq golden-ratio-auto-scale t))
-#+END_SRC
-** COMMENT file extension modes
-#+BEGIN_SRC emacs-lisp
-  (use-package conf-mode
-    :mode ("i3config" "i3status" "swayconfig" ".*rc\\'" "\\.inp\\'"))
-#+END_SRC
-** flycheck
+** COMMENT flycheck
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :ensure t
     :init
     (global-flycheck-mode t))
 #+END_SRC
-** web dictionary
+** COMMENT web dictionary
 #+BEGIN_SRC emacs-lisp
   (use-package define-word
     :ensure t
     :bind ("C-c d" . define-word))
 #+END_SRC
 ** yasnippet
-   usefull snippets for me: org-mode (fig_, )
+usefull snippets for me: org-mode (fig_, )
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :ensure t
@@ -1130,12 +904,6 @@ file bookmarks
     (yas-global-mode 1)
     :config
     (setq yas-indent-line t))
-
-  ;; (use-package ivy-yasnippet
-    ;; :ensure t)
-  ;; no updates since 2015
-  ;; (use-package r-autoyas
-  ;;   :hook (ess-mode . r-autoyas-ess-activate))
 #+END_SRC
 ** firefox as default browser
 #+BEGIN_SRC emacs-lisp
@@ -1147,7 +915,6 @@ Install it with Pacman
 #+BEGIN_SRC bash :results none :exports code
 sudo pacman -S emacs-pkgbuild-mode
 #+END_SRC
-
 Then load it into emacs when opening a PKGBUILD file
 #+BEGIN_SRC emacs-lisp
   (use-package pkgbuild-mode
@@ -1165,7 +932,7 @@ Then load it into emacs when opening a PKGBUILD file
     :ensure t)
 #+END_SRC
 ** erc
-   I use weechat on command line now
+I use weechat on command line now
 #+BEGIN_SRC emacs-lisp
   (use-package erc
     :config
@@ -1185,17 +952,6 @@ perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collec
     ("C-c o" . cfw:open-org-calendar))
 #+END_SRC
 * email
-** COMMENT notmuch email
-#+BEGIN_SRC emacs-lisp
-  (use-package notmuch
-    :ensure t
-    :config
-    (setq message-kill-buffer-on-exit t)
-    (setq notmuch-fcc-dirs '((".*gmail\.com.*" . "gmail/Sent +sent -inbox")
-			     (".*solismail\.uu\.nl.*" . "solismail/Sent +sent -inbox")))
-    :bind
-    ("C-c m" . notmuch))
-#+END_SRC
 ** smtp
 #+BEGIN_SRC emacs-lisp
 (use-package smtpmail
@@ -1215,7 +971,7 @@ perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collec
 	starttls-extra-args nil))
 #+END_SRC
 ** mu4e
-   install it with pacman ~mu~
+install it with pacman ~mu~
 #+BEGIN_SRC emacs-lisp
   (use-package mu4e
     :load-path "/usr/share/emacs/site-lisp/mu4e/"
@@ -1229,7 +985,6 @@ perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collec
     (setq mu4e-drafts-folder "/Drafts"
           mu4e-sent-folder "/Sent Items"
           mu4e-trash-folder "/Deleted Items")
-    ;;(setq mu4e-compose-format-flowed t)  ; plain-text nice to read on phone
     (setq mu4e-maildir-shortcuts
           '(("/inbox" . ?i)
             ("/NEXT" . ?n)
@@ -1248,11 +1003,11 @@ perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collec
             (:subject       .  nil)))
     (setq mu4e-get-mail-command "mbsync -a")
     (setq mu4e-headers-include-related t)
-    (setq mu4e-compose-format-flowed t)
+    (setq mu4e-compose-format-flowed t)  ; plain-text nice to read on phone
     (setq mu4e-confirm-quit nil)
     (setq mu4e-view-show-images t)
-    (add-to-list 'mu4e-view-actions
-                 '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+    ;; (add-to-list 'mu4e-view-actions
+                 ;; '("ViewInBrowser" . mu4e-action-view-in-browser) t)
     (require 'org-mu4e)
     (setq org-mu4e-link-query-in-headers-mode nil))
 #+END_SRC
@@ -1272,35 +1027,22 @@ perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collec
     (mu4e-alert-set-default-style 'libnotify)
     :hook (after-init . mu4e-alert-enable-notifications))
 #+END_SRC
-** COMMENT gnus
- #+BEGIN_SRC emacs-lisp
-   (setq gnus-select-method
-	 '(nnimap "gmail"
-		  (nnimap-address "imap.gmail.com")
-		  (nnimap-server-port "imaps")
-		  (nnimap-stream ssl)))
-
-   (setq smtpmail-smtp-server "smtp.gmail.com"
-	 smtpmail-smtp-service 587
-	 gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
- #+END_SRC
 * science packages
 ** ess
 emacs speaks statistics, work with R etc.
-installed from AUR ~emacs-ess~
 #+BEGIN_SRC emacs-lisp
-    (use-package ess
-      ;; :load-path "/usr/share/emacs/site-lisp/ess/"
-      :ensure t
-      :commands R
-      ;; :init (require 'ess-r-mode)
-      :config
-      (defun my-org-confirm-babel-evaluate (lang body)
-        (not (string= lang "R")))  ; don't ask for R
-      (setq ess-default-style 'RStudio)
-      (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
-      (setq inferior-R-args "--no-restore-history --no-save")
-      :bind (:map ess-mode-map (";" . ess-insert-assign)))
+  (use-package ess
+    ;; :load-path "/usr/share/emacs/site-lisp/ess/"
+    :ensure t
+    :commands R
+    ;; :init (require 'ess-r-mode)
+    :config
+    (defun my-org-confirm-babel-evaluate (lang body)
+      (not (string= lang "R")))  ; don't ask for R
+    (setq ess-default-style 'RStudio)
+    (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+    (setq inferior-R-args "--no-restore-history --no-save")
+    :bind (:map ess-mode-map (";" . ess-insert-assign)))
 #+END_SRC
 ** polymode
 for working with .Rmd files etc.
@@ -1336,10 +1078,8 @@ exporting markdown
     :ensure t
     :hook (markdown-mode . pandoc-mode))
 #+END_SRC
-
 ** LaTeX (AUCTeX, RefTeX)
 for working with \LaTeX
-installed with pacman ~auctex~
 #+BEGIN_SRC emacs-lisp
   ;(load "auctex.el" nil t t)
   ;(load "preview-latex.el" nil t t)
@@ -1372,8 +1112,8 @@ installed with pacman ~auctex~
     ((LaTeX-mode ess-mode) . hl-todo-mode))
 #+END_SRC
 ** bibtex/ivy-bibtex
-   reference manager I use it in conjunction with zotero, which generates the
-   .bib files, and org-ref, to insert citations in org files.
+reference manager I use it in conjunction with zotero, which generates the
+.bib files, and org-ref, to insert citations in org files.
 #+BEGIN_SRC emacs-lisp
   (use-package ivy-bibtex
     :ensure t
@@ -1391,10 +1131,19 @@ installed with pacman ~auctex~
     (setq org-ref-default-bibliography '("~/Documents/References/PhD.bib")))
 #+END_SRC
 * secret directories
-  These are all the settings that require secret directories, such as my org
-  agenda files and google calendar. They overwrite the settings with "<...>"
-  syntax above.
+These are all the settings that require secret directories, such as my org
+agenda files and google calendar. They overwrite the settings with "<...>"
+syntax above.
 #+BEGIN_SRC emacs-lisp
   ;; (use-package emacsdirs)
   (load "~/.emacs.d/secretdirs.el" t)
+#+END_SRC
+* reset gc-cons-threshold
+#+BEGIN_SRC emacs-lisp
+(run-with-idle-timer
+ 5 nil
+ (lambda ()
+   (setq gc-cons-threshold 1000000)
+   (message "gc-cons-threshold restored to %S"
+            gc-cons-threshold)))
 #+END_SRC
