@@ -1,12 +1,3 @@
-# moo!
-# fortune showerthoughts | cowthink
-
-# start sway if on tty1
-if [ "$(tty)" = "/dev/tty1" ]; then
-    sway
-    exit 0
-fi
-
 # start sway if on tty1
 if [ "$(tty)" = "/dev/tty1" ]; then
     sway
