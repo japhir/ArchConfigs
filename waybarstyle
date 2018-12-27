@@ -35,6 +35,10 @@ window#waybar {
     border-bottom: 3px solid white;
 }
 
+#window {
+    /* text-align: left; */
+}
+
 #clock, #battery, #cpu, #memory, #network, #pulseaudio, #custom-spotify, #custom-fuzzyclock, #tray, #mode {
     padding: 2px 15px;
     margin: 0px 0px;

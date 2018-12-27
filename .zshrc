@@ -78,11 +78,10 @@ export LANG=en_US.UTF-8
 if [[ -n $SSH_CONNECTION ]]; then
     export EDITOR='vim'
 else
-    export EDITOR="emacsclient -c -n -e '(switch-to-buffer nil)'"
+    export EDITOR="emacsclient -cn"
     export SUDO_EDITOR='vim'
-    export VISUAL="emacsclient -c -n -e '(switch-to-buffer nil)'"
+    export VISUAL="emacsclient -cn"
 fi
-
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
