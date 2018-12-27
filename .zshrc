@@ -1,3 +1,9 @@
+# start sway if on tty1
+if [ "$(tty)" = "/dev/tty1" ]; then
+    sway
+    exit 0
+fi
+
 # reload pywal colorscheme
 (cat /home/japhir/.cache/wal/sequences &)
 # Path to your oh-my-zsh installation.
