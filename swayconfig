@@ -134,28 +134,24 @@ set $ws8 "8:windows"
 set $ws9 "9:graphs"
 set $ws10 "10:spotify"
 
-# # workspace gaps
-# workspace $ws6 gaps inner 0
-# workspace $ws6 gaps outer 0
-# workspace $ws7 gaps inner 0
-# workspace $ws7 gaps outer 0
-# workspace $ws8 gaps inner 0
-# workspace $ws8 gaps outer 0
-# workspace $ws10 gaps inner 0
-# workspace $ws10 gaps outer 0
+# workspace gaps
+workspace $ws6 gaps inner 0
+workspace $ws6 gaps outer 0
+workspace $ws7 gaps inner 0
+workspace $ws7 gaps outer 0
+workspace $ws8 gaps inner 0
+workspace $ws8 gaps outer 0
+workspace $ws10 gaps inner 0
+workspace $ws10 gaps outer 0
 
-# # assign workspaces to screens
-# set $smallscreen eDP-1
-# set $bigscreen HDMI-A-2
-# # assign workspaces to screens
-
-# workspace $ws1 output $smallscreen
-# workspace $ws2 output $bigscreen
-# workspace $ws3 output $bigscreen
-# workspace $ws4 output $bigscreen
-# workspace $ws7 output $bigscreen
-# workspace $ws9 output $smallscreen
-# workspace $ws10 output $smallscreen
+# assign workspaces to screens
+workspace $ws1 output $smallscreen
+workspace $ws2 output $bigscreen
+workspace $ws3 output $bigscreen
+workspace $ws4 output $bigscreen
+workspace $ws7 output $bigscreen
+workspace $ws9 output $smallscreen
+workspace $ws10 output $smallscreen
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
@@ -310,7 +306,7 @@ exec --no-startup-id redshift -l 52.1:5.12 -m wayland -t 5500:2500
 
 # app launcher, launch w/ Control-space
 exec --no-startup-id albert
-exec --no-startup-id dropbox
+#exec --no-startup-id dropbox
 exec --no-startup-id owncloud
 
 # gaps
