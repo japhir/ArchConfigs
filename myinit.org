@@ -725,6 +725,13 @@ By default C-x 8 o = ° and C-x 8 m = µ. So:
   (global-set-key (kbd "C-x 8 d") (lambda () (interactive) (insert "δ")))
   (global-set-key (kbd "C-x 8 D") (lambda () (interactive) (insert "Δ")))
 #+END_SRC
+** all-the-icons
+https://github.com/domtronn/all-the-icons.el
+#+BEGIN_SRC emacs-lisp
+  (use-package all-the-icons
+    :ensure t)
+  (setq inhibit-compacting-font-caches t)
+#+END_SRC
 ** revert buffer
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "<f5>") 'revert-buffer)
