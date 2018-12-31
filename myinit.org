@@ -736,6 +736,20 @@ https://github.com/domtronn/all-the-icons.el
     :ensure t)
   (setq inhibit-compacting-font-caches t)
 #+END_SRC
+** all-the-icons-ivy
+#+BEGIN_SRC emacs-lisp
+(use-package all-the-icons-ivy
+  :ensure t
+  :config
+  (all-the-icons-ivy-setup))
+#+END_SRC
+** neotree
+#+BEGIN_SRC emacs-lisp
+  (use-package neotree
+    :ensure t
+    :config
+    (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))
+#+END_SRC
 ** revert buffer
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "<f5>") 'revert-buffer)
