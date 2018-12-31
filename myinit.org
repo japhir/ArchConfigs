@@ -1,15 +1,15 @@
 * use-package
 Use-package is an amazing resource to clean up my init file and have it play
 nice on both my desktop and laptop.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (eval-when-compile
     (require 'use-package))
   (require 'diminish)  ; to omit lines from the mode-line
   (require 'bind-key)  ; for easy keybindings
-#+END_SRC
+#+end_src
 * dirvar
 define dirvars 'org-in-file', 'org-gtd-file', etc.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defvar org-in-file "~/org/inbox.org"
     "GTD Inbox")
   (defvar org-gtd-file "~/org/todo.org"
@@ -28,10 +28,10 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
     "Lists of Movies etc.")
   (defvar org-cal-file "~/org/calendars/gcal.org"
     "Google Calendar")
-#+END_SRC
+#+end_src
 * interface and appearance
 ** turn off UI elements and small tweaks
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq inhibit-splash-screen t)
   (scroll-bar-mode -1)   ; turn off the scroll bar
   (tool-bar-mode -1)     ; turn off the tool bar
@@ -60,66 +60,66 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
   ;; always follow symlinks w/o asking
   (require 'vc-hooks)
   (setq vc-follow-symlinks t)
-#+END_SRC
+#+end_src
 ** don't make a mess of my folders
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq auto-save-default nil
         backup-inhibited t
         confirm-nonexistent-file-or-buffer nil
         create-lockfiles nil)
-#+END_SRC
+#+end_src
 ** frames-only-mode
 let my window manager handle screen creation
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package frames-only-mode
     :config (setq frames-only-mode t)
     :ensure t)
-#+END_SRC
+#+end_src
 ** play nice with parentheses
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (electric-pair-mode 1) ; auto-insert matching bracket
   (show-paren-mode 1)    ; turn on paren match highlighting
-#+END_SRC
+#+end_src
 ** rainbow-delimiters
 matching parenthesis are highlighted with rainbow colours.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package rainbow-delimiters
     :ensure t
     :config
     :hook ((prog-mode LaTeX-mode) . rainbow-delimiters-mode))
-#+END_SRC
+#+end_src
 ** set the theme
 *** clean up previous theme
 from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www.reddit.com/r/emacs/comments/4mzynd/what_emacs_theme_are_you_currently_using/d43c5cw][reddit]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defadvice load-theme (before clear-previous-themes activate)
     "Clear existing theme settings instead of layering them"
     (mapc #'disable-theme custom-enabled-themes))
-#+END_SRC
+#+end_src
 *** apropospriate
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package apropospriate-theme
     :ensure t
     :config (load-theme 'apropospriate-dark t))
-#+END_SRC
+#+end_src
 *** COMMENT fonts
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (set-face-attribute 'default nil :family "Fira Code" :height 130)
   (set-face-attribute 'fixed-pitch nil :family "Fira Code" :height 130)
   (set-face-attribute 'variable-pitch nil :family "ETBookOT" :height 150)
   (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
-#+END_SRC
+#+end_src
 *** COMMENT padding
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq line-spacing 0.1)
   (lambda () (progn
     (setq left-margin-width 2)
     (setq right-margin-width 2)
     (set-window-buffer nil (current-buffer))))
-#+END_SRC
+#+end_src
 ** beacon
 Highlight the current line when scrolling
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package beacon
     :ensure t
     :init (beacon-mode 1)
@@ -128,43 +128,43 @@ Highlight the current line when scrolling
     (setq beacon-size 80)
     (setq beacon-color "#ffcccc"))
   (global-hl-line-mode t)
-#+END_SRC
+#+end_src
 ** rainbow-mode
 Highlight hex colours!
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package rainbow-mode
     :hook ((html-mode r-mode) . rainbow-mode)
     :ensure t)
-#+END_SRC
+#+end_src
 ** relative number mode
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq display-line-numbers-type 'visual
         display-line-numbers-current-absolute t
         display-line-numbers-width 4
         display-line-numbers-widen nil)
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
-#+END_SRC
+#+end_src
 ** compilation window height
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq compilation-window-height 15)
-#+END_SRC
+#+end_src
 ** helpful
 https://github.com/Wilfred/helpful
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package helpful
     :ensure t)
-#+END_SRC
+#+end_src
 ** demos
 Insert demos after describe function https://github.com/xuchunyang/elisp-demos
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package elisp-demos
     :ensure t
     :config
     (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
-#+END_SRC
+#+end_src
 ** telephone-line
 very nice powerline-based status line
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package telephone-line
     :ensure t
     :after evil
@@ -183,11 +183,11 @@ very nice powerline-based status line
     :config
     (require 'telephone-line-config)
     (telephone-line-evil-config))
-#+END_SRC
+#+end_src
 * evil
 ** evil
 vim emulator
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil
     :ensure t
     :init
@@ -197,19 +197,19 @@ vim emulator
     ;; (setq evil-want-C-u-scroll t) ; C-u scrolls up half page
     :config
     (evil-mode 1))
-#+END_SRC
+#+end_src
 ** evil-collection
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-collection
     :after evil
     :ensure t
     :config
     (evil-collection-init))
-#+END_SRC
+#+end_src
 ** evil-org
 https://github.com/Somelauw/evil-org-mode
 evil keymap for org-mode
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-org
     :ensure t
     :after org
@@ -223,55 +223,55 @@ evil keymap for org-mode
     :config
     (require 'evil-org-agenda)
     (evil-org-agenda-set-keys))
-#+END_SRC
+#+end_src
 ** evil-escape
 https://github.com/syl20bnr/evil-escape
 escape from everything using =jk=
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-escape
     :ensure t
     :diminish evil-escape-mode
     :config
     (evil-escape-mode 1)
     (setq-default evil-escape-key-sequence "jk"))
-#+END_SRC
+#+end_src
 ** evil-easymotion
 https://github.com/PythonNut/evil-easymotion/
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-easymotion
     :ensure t
     :config
     (evilem-default-keybindings "SPC"))
-#+END_SRC
+#+end_src
 ** evil-snipe
 https://github.com/hlissner/evil-snipe
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-snipe
     :ensure t
     :config
     (evil-snipe-mode 1)
     (evil-snipe-override-mode 1))
-#+END_SRC
+#+end_src
 ** evil-commentary
 https://github.com/linktohack/evil-commentary
 comment/uncomment with gc
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-commentary
     :ensure t
     :config
     (evil-commentary-mode))
-#+END_SRC
+#+end_src
 ** evil-indent-plus
 https://github.com/TheBB/evil-indent-plus
 operate on indentation regions, mainly with ~ii~
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-indent-plus
     :ensure t
     :config
     (evil-indent-plus-default-bindings))
-#+END_SRC
+#+end_src
 ** COMMENT evil-leader
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-leader  ; default is \
     :ensure t
     :config
@@ -285,10 +285,10 @@ operate on indentation regions, mainly with ~ii~
       "r" 'comment-or-uncomment-region
       "v" 'evilnc-toggle-invert-comment-line-by-line
       "."  'evilnc-copy-and-comment-operator))
-#+END_SRC
+#+end_src
 ** evil-magit
 evil keybindings for magit
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package evil-magit
     :after magit
     :hook
@@ -296,11 +296,11 @@ evil keybindings for magit
     :ensure t
     :config
     (evil-set-initial-state 'magit-log-edit-mode 'insert))
-#+END_SRC
+#+end_src
 * org-mode
 ** my gtd and inbox files finding functions
 org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;; TODO: figure out how to do this in a less stupid way
   (defun open-gtd-file ()
     "Open the GTD file."
@@ -314,21 +314,21 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
      "Open the clumped file."
      (interactive)
      (find-file org-clumped-file))
-  #+END_SRC
+  #+end_src
 ** setup
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;; get latest org-mode from other repo than elpa
   (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
   (use-package org
     :pin org
     :ensure org-plus-contrib
-#+END_SRC
+#+end_src
 ** COMMENT hooks
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   :hook (org-mode . variable-pitch-mode)
-#+END_SRC
+#+end_src
 ** keybindings
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   :bind
   (("C-c l" . org-store-link)
    ("C-c a" . org-agenda)
@@ -337,24 +337,24 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
    ("C-c i" . open-inbox-file)
    ("C-c t" . open-clumped-file)
    ("C-c !" . org-time-stamp-inactive))
-#+END_SRC
+#+end_src
 ** basics
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   :config
   (setq org-return-follows-link t)
   (setf org-special-ctrl-a/e t)
   ;; folded drawers no longer ruin new entries
   (setq org-M-RET-may-split-line '((default . nil)))
   (setq org-startup-with-inline-images t)
-#+END_SRC
+#+end_src
 ** clocking
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-check-running-clock t
         org-log-note-clock-out t)
   (setq org-log-done 'time)
-#+END_SRC
+#+end_src
 ** theming
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setf org-tags-column -65)
   (setq org-startup-indented t
         org-agenda-block-separator ""
@@ -365,10 +365,10 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
         org-pretty-entities t
         org-ellipsis " ▼ " ;▼ … ◦
         org-hide-emphasis-markers t)
-#+END_SRC
+#+end_src
 *** org-bullets
 prettify org mode
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-bullets
     :ensure t
     :hook
@@ -377,9 +377,9 @@ prettify org mode
     (setq org-bullets-bullet-list
           '("◉" "●" "○" "♦" "◆" "►" "▸")))
           ;; '(" ")))
-#+END_SRC
+#+end_src
 ** file associations
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-file-apps
         '((auto-mode . emacs)
           ("\\.x?html?\\'" . "xdg-open %s")
@@ -389,10 +389,10 @@ prettify org mode
           ("\\.webm\\'" . "xdg-open %s")
           ("\\.mkv\\'" . "xdg-open %s")
           ("\\.pdf.xoj\\'" . "xournal %s")))
-#+END_SRC
+#+end_src
 ** GTD stuff
 *** org-agenda
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;; (setq org-agenda-files (list "<file1.org> etc."))
   (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
   (setq org-deadline-warning-days 14)
@@ -403,16 +403,16 @@ prettify org mode
   ;; (setq org-agenda-todo-ignore-with-date t)
   (setq org-agenda-prefix-format "  %-17:c%?-12t% s")
   (setq org-agenda-include-all-todo nil)
-#+END_SRC
+#+end_src
 *** agenda files
 all the org-files in my org-directory
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-directory "~/org/")
   (setq org-agenda-files (directory-files-recursively org-directory "\\.org$"))
-#+END_SRC
+#+end_src
 *** refile targets
 swyper makes refiling amazing!
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;; TODO: refile without the annoying ^ regex
   (setq org-refile-targets (quote ((nil :maxlevel . 9)  ;; current file
                                    (org-gtd-file :maxlevel . 3)
@@ -423,10 +423,10 @@ swyper makes refiling amazing!
                                    (org-clumped-file :maxlevel . 4))))
   (setq org-outline-path-complete-in-steps nil)   ;; Refile in a single go
   (setq org-refile-use-outline-path t)            ;; Show full paths for refiling
-#+END_SRC
+#+end_src
 *** agenda filters
 Filter tasks by context (sorted by todo state)
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-agenda-sorting-strategy
         '((agenda habit-down time-up priority-down todo-state-up category-keep)
           (todo todo-state-up priority-down category-keep)
@@ -470,10 +470,10 @@ Filter tasks by context (sorted by todo state)
           ("pM" "Martin" tags-todo "Martin")
           ("pA" "Anne" tags-todo "Anne")
           ("pI" "Inigo" tags-todo "Inigo")))
-#+END_SRC
+#+end_src
 *** capture templates
 customize capture templates
- #+BEGIN_SRC emacs-lisp
+ #+begin_src emacs-lisp
    (setq org-capture-templates
          '(("a" "Appointment" entry (file org-in-file)
             "* %?\n  %^T\n")
@@ -487,9 +487,9 @@ customize capture templates
             "* %?\nEntered on %U\n %i\n %a")
            ("j" "Journal" entry (file+olp+datetree org-journal-file)
             "* %?\nEntered on %U\n %i\n %a")))
- #+END_SRC
+ #+end_src
 *** TODO states
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
     (setq org-todo-keywords
           '((sequence "PROJ(p)" "NEXT(n)" "WAIT(w!/!)" "TICK(t)" "SOME(s!/!)" "|"
                       "DONE(d)" "CANC(c)")))
@@ -502,18 +502,18 @@ customize capture templates
             ("DONE" . (:foreground "green4"       :background "pale green"))
             ("CANC" . (:foreground "dim gray"     :background "gray"))
             ("PROJ" . (:foreground "navajo white" :background "saddle brown"))))
-#+END_SRC
+#+end_src
 *** effort estimates
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-to-list 'org-global-properties
                '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
-#+END_SRC
+#+end_src
 *** habits
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-to-list 'org-modules 'org-habit t)
-#+END_SRC
+#+end_src
 *** context tags
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-fast-tag-selection-single-key t)
   (setq org-tag-alist '((:startgroup . nil)
                         ("@home" . ?h)
@@ -545,19 +545,19 @@ customize capture templates
                         ("R" . ?R) ("python" . ?y) ("org" . ?O) ("Bayes" . ?B) ("emacs" . ?E) ("inkscape" . ?i)
                         ;; tags to accompany the @agenda context
                         ("Martin" . ?M) ("Inigo" . ?I) ("Anne" . ?A) ("Appy") ("FEST")))
-#+END_SRC
+#+end_src
 ** exporting
 *** source code block settings
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-src-fontify-natively t
         org-src-tab-acts-natively t)
   (add-to-list 'org-structure-template-alist
                '("se" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist
                '("sr" . "src R"))
-#+END_SRC
+#+end_src
 *** org-babel languages
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -567,37 +567,37 @@ customize capture templates
      (shell . t)
      (stan . t)
      (R . t)))
-#+END_SRC
+#+end_src
 *** org-export odt
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (require 'ob-org)
-#+END_SRC
+#+end_src
 *** ox-extra
 org-export ignore headlines with ~:ignore:~ tag
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (require 'ox-extra)
   (ox-extras-activate '(latex-header-blocks ignore-headlines))
-#+END_SRC
+#+end_src
 *** ox-latex
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (require 'ox-latex)
-#+END_SRC
+#+end_src
 *** org-latex export settings
 basic latex settings
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-highlight-latex-and-related '(latex script entities))
   (setq org-latex-create-formula-image-program 'dvipng)
   (setq org-latex-default-figure-position 'htbp)
   (setq org-latex-pdf-process
         (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
   (setq org-latex-prefer-user-labels t)
-#+END_SRC
+#+end_src
 *** org-entities-user
 These are nice shorthands for commands I use often. In org-source they look
 nice, and they export to both \LaTeX and htlm correctly. Note that
 unfortunately, special entity names cannot contain numerics, so \\d18O is not
 possible.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq org-entities-user
         '(("dO" "\\(\\delta^{18}\\)O" nil "&delta;<sup>18</sup>O" "δ18O" "δ18O" "δ¹⁸O")
           ("eO" "\\({}^{18}\\)O" nil "<sup>18</sup>O" "18O" "18O" "¹⁸O")
@@ -614,9 +614,9 @@ possible.
           ("arcminute" "^{'}" t "&prime;" "'" "′" "′")
           ("arcsecond" "^{''}" t "&Prime;" "\"" "″" "″")
           ))
-#+END_SRC
+#+end_src
 *** latex class =ijkarticle=
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-to-list 'org-latex-classes
          '("ijkarticle"
            "\\documentclass{article}
@@ -628,20 +628,20 @@ possible.
                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-#+END_SRC
+#+end_src
 ** close use-package org
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   )
-#+END_SRC
+#+end_src
 ** org-pomodoro
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-pomodoro
     :after org
     :bind ("M-p" . org-pomodoro)
     :ensure t)
-#+END_SRC
+#+end_src
 ** COMMENT org-fancy-capture attempt
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;;;; Thank you random guy from StackOverflow
   ;;;; http://stackoverflow.com/questions/23517372/hook-or-advice-when-aborting-org-capture-before-template-selection
   (require 'org-capture)
@@ -656,11 +656,11 @@ possible.
     "Advise capture-finalize to close the frame"
     (if (equal "emacs-popup" (frame-parameter nil 'name))
         (delete-frame)))
-#+END_SRC
+#+end_src
 ** COMMENT org-gcal
 synchronize google calendar with org. Note that these settings are
 overwritten by a private file that has my different calendars and IDs.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-gcal
     :after org
     :ensure t
@@ -670,15 +670,15 @@ overwritten by a private file that has my different calendars and IDs.
     (setq org-gcal-client-id "<your-client-id>"
           org-gcal-client-secret "<your-client-secret>"
           org-gcal-file-alist '(("<link>@group.calendar.google.com>" . "<link-to-org-file>"))))
-#+END_SRC
+#+end_src
 ** org-pdfview
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-pdfview
     :after org
     :ensure t)
-#+END_SRC
+#+end_src
 ** org-beamer
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ox-latex
     :after org
     :config
@@ -688,9 +688,9 @@ overwritten by a private file that has my different calendars and IDs.
                    ("\\section\{%s\}" . "\\section*\{%s\}")
                    ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
                    ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))))
-#+END_SRC
+#+end_src
 ** org-ref
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-ref
     :ensure t
     :bind ("C-c j" . org-ref-bibtex-hydra/body)
@@ -714,49 +714,49 @@ overwritten by a private file that has my different calendars and IDs.
     (add-to-list 'org-ref-bibtex-journal-abbreviations
                  '("JIR" "Journal of Irreproducible Research" "J. Irrep. Res."))
     (require 'org-ref-scopus))
-#+END_SRC
+#+end_src
 ** org-noter
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-noter
     :ensure t)
-#+END_SRC
+#+end_src
 * general packages and functions
 ** easy symbol insertion
 By default C-x 8 o = ° and C-x 8 m = µ. So:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (global-set-key (kbd "C-x 8 a") (lambda () (interactive) (insert "α")))
   (global-set-key (kbd "C-x 8 b") (lambda () (interactive) (insert "β")))
   (global-set-key (kbd "C-x 8 d") (lambda () (interactive) (insert "δ")))
   (global-set-key (kbd "C-x 8 D") (lambda () (interactive) (insert "Δ")))
-#+END_SRC
+#+end_src
 ** all-the-icons
 https://github.com/domtronn/all-the-icons.el
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package all-the-icons
     :ensure t)
   (setq inhibit-compacting-font-caches t)
-#+END_SRC
+#+end_src
 ** all-the-icons-ivy
-#+BEGIN_SRC emacs-lisp
-(use-package all-the-icons-ivy
-  :ensure t
-  :config
-  (all-the-icons-ivy-setup))
-#+END_SRC
+#+begin_src emacs-lisp
+  (use-package all-the-icons-ivy
+    :ensure t
+    :config
+    (all-the-icons-ivy-setup))
+#+end_src
 ** neotree
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package neotree
     :ensure t
     :config
     (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))
-#+END_SRC
+#+end_src
 ** revert buffer
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (global-set-key (kbd "<f5>") 'revert-buffer)
-#+END_SRC
+#+end_src
 ** COMMENT eshell
 *** open an eshell here
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun eshell-here ()
     "Opens up a new shell in the directory associated with the
   current buffer's file. The eshell is renamed to match that
@@ -775,16 +775,16 @@ https://github.com/domtronn/all-the-icons.el
       (insert (concat "ls"))
       (eshell-send-input)))
   (global-set-key (kbd "C-!") 'eshell-here)
-#+END_SRC
+#+end_src
 *** close current eshell
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun eshell/x ()
     (insert "exit")
     (eshell-send-input)
     (delete-window))
-#+END_SRC
+#+end_src
 *** C-l clears the eshell buffer
- #+BEGIN_SRC emacs-lisp
+ #+begin_src emacs-lisp
  (defun eshell-clear-buffer ()
    "Clear terminal"
    (interactive)
@@ -794,9 +794,9 @@ https://github.com/domtronn/all-the-icons.el
  (add-hook 'eshell-mode-hook
 	   '(lambda()
 	      (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
- #+END_SRC
+ #+end_src
 ** COMMENT ranger
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ranger
     :ensure t
     :bind
@@ -807,9 +807,9 @@ https://github.com/domtronn/all-the-icons.el
     (setq ranger-show-preview t)
     (setq ranger-width-preview 0.55)
     (ranger-override-dired-mode t))
-#+END_SRC
+#+end_src
 ** pdf-tools
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package pdf-tools
     :magic ("%PDF" . pdf-view-mode)
     :config
@@ -818,10 +818,10 @@ https://github.com/domtronn/all-the-icons.el
     :bind
     ;; swiper doesn't play nice with pdf-tools, so I disable it.
     (:map pdf-view-mode-map ("C-s" . isearch-forward)))
-#+END_SRC
+#+end_src
 ** swiper
 very nice search replacement
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package swiper
     :init (ivy-mode 1)
     :ensure t
@@ -834,36 +834,36 @@ very nice search replacement
     ("C-c C-r" . ivy-resume)
     ("C-c v" . ivy-push-view)
     ("C-c V" . ivy-pop-view))
-#+END_SRC
+#+end_src
 ** COMMENT avy
 jump to next chararcter. Slightly redundant b/c of evil's =f= and =t=.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package avy
     :ensure t
     :bind
     ("C-:" . avy-goto-char)
     ("C-'" . avy-goto-char-2)
     ("M-w" . avy-goto-word-1))
-#+END_SRC
+#+end_src
 ** counsel
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package counsel
     :init (counsel-mode 1)
     :ensure t
     :bind
     ("M-x" . counsel-M-x)
     ("C-c s" . counsel-rg))
-#+END_SRC
+#+end_src
 ** magit
 git management
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package magit
     :ensure t
     :bind
     ("M-g" . magit-status))
-#+END_SRC
+#+end_src
 ** diff-hl
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package diff-hl
     :ensure t
     :init
@@ -871,10 +871,10 @@ git management
     (setq diff-hl-gutter-mode t)
     (diff-hl-flydiff-mode +1)
     :hook (magit-post-refresh . diff-hl-magit-post-refresh))
-#+END_SRC
+#+end_src
 ** COMMENT hydra
 file bookmarks
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package hydra
     :config
     (global-set-key
@@ -893,10 +893,10 @@ file bookmarks
      (defhydra hydra-projects (:color blue)
        "projects"
        ("s" (counsel-find-file "~/SurfDrive/PhD/projects/standardstats") "standardstats"))))
-#+END_SRC
+#+end_src
 ** COMMENT auto-complete
 auto complete everything
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package auto-complete
     :ensure t
     :after yasnippet
@@ -906,68 +906,68 @@ auto complete everything
     :config
     (setq auto-show-delay nil)
     (setq-default ac-sources (push 'ac-source-yasnippet ac-sources)))
-#+END_SRC
+#+end_src
 ** COMMENT flycheck
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package flycheck
     :ensure t
     :init
     (global-flycheck-mode t))
-#+END_SRC
+#+end_src
 ** COMMENT web dictionary
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package define-word
     :ensure t
     :bind ("C-c d" . define-word))
-#+END_SRC
+#+end_src
 ** yasnippet
 usefull snippets for me: org-mode (fig_, )
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package yasnippet
     :ensure t
     :init
     (yas-global-mode 1)
     :config
     (setq yas-indent-line t))
-#+END_SRC
+#+end_src
 ** firefox as default browser
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq browse-url-browser-function 'browse-url-generic
 	browse-url-generic-program "firefox")
-#+END_SRC
+#+end_src
 ** emacs-pkgbuild-mode
 Install it with Pacman
-#+BEGIN_SRC bash :results none :exports code
+#+begin_src bash :results none :exports code
 sudo pacman -S emacs-pkgbuild-mode
-#+END_SRC
+#+end_src
 Then load it into emacs when opening a PKGBUILD file
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package pkgbuild-mode
      :load-path "/usr/share/emacs/site-lisp/"
      :mode "/PKGBUILD$")
-#+END_SRC
+#+end_src
 ** systemd
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package systemd
     :ensure t)
-#+END_SRC
+#+end_src
 ** COMMENT writeroom-mode
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package writeroom-mode
     :ensure t)
-#+END_SRC
+#+end_src
 ** erc
 I use weechat on command line now
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package erc
     :config
     (setq erc-hide-list '("JOIN" "PART" "QUIT"))
     (setq erc-track-exclude-types '("JOIN" "MODE"
       "NICK" "PART" "QUIT" "305" "306" "324" "329" "332" "333" "353" "477")))
-#+END_SRC
+#+end_src
 ** calendar
 perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collection/issues/211][evil-collection issue]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package calfw
     :ensure t
     :config)
@@ -975,10 +975,10 @@ perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collec
     :ensure t
     :bind
     ("C-c o" . cfw:open-org-calendar))
-#+END_SRC
+#+end_src
 * email
 ** smtp
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package smtpmail
   :config
   (setq message-send-mail-function 'smtpmail-send-it
@@ -994,10 +994,10 @@ perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collec
 	starttls-use-gnutls t
 	starttls-gnutls-program "gnutls-cli"
 	starttls-extra-args nil))
-#+END_SRC
+#+end_src
 ** mu4e
 install it with pacman ~mu~
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package mu4e
     :load-path "/usr/share/emacs/site-lisp/mu4e/"
     :commands mu4e
@@ -1035,27 +1035,27 @@ install it with pacman ~mu~
                  ;; '("ViewInBrowser" . mu4e-action-view-in-browser) t)
     (require 'org-mu4e)
     (setq org-mu4e-link-query-in-headers-mode nil))
-#+END_SRC
+#+end_src
 ** COMMENT mu4e-conversation
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package mu4e-conversation
     :ensure t
     :config
     (global-mu4e-conversation-mode))
-#+END_SRC
+#+end_src
 ** mu4e notifications
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package mu4e-alert
     :ensure t
     :after mu4e
     :config
     (mu4e-alert-set-default-style 'libnotify)
     :hook (after-init . mu4e-alert-enable-notifications))
-#+END_SRC
+#+end_src
 * science packages
 ** ess
 emacs speaks statistics, work with R etc.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ess
     ;; :load-path "/usr/share/emacs/site-lisp/ess/"
     :ensure t
@@ -1068,20 +1068,20 @@ emacs speaks statistics, work with R etc.
     (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
     (setq inferior-R-args "--no-restore-history --no-save")
     :bind (:map ess-mode-map (";" . ess-insert-assign)))
-#+END_SRC
+#+end_src
 ** polymode
 for working with .Rmd files etc.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package polymode
     :ensure t)
   (use-package poly-markdown
     :ensure t)
   (use-package poly-R
     :ensure t)
-#+END_SRC
+#+end_src
 ** matlab
 if I'm ever required to work in non-open-source
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package matlab
     :init (autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
     :mode ("\\.m\\'" . matlab-mode)
@@ -1089,23 +1089,23 @@ if I'm ever required to work in non-open-source
     :config
     (setq matlab-indent-function t)
     (setq matlab-indent-function "matlab"))
-#+END_SRC
+#+end_src
 ** markdown-mode
 markdown mode for writing
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package markdown-mode
     :ensure t)
-#+END_SRC
+#+end_src
 ** pandoc-mode
 exporting markdown
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package pandoc-mode
     :ensure t
     :hook (markdown-mode . pandoc-mode))
-#+END_SRC
+#+end_src
 ** LaTeX (AUCTeX, RefTeX)
 for working with \LaTeX
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;(load "auctex.el" nil t t)
   ;(load "preview-latex.el" nil t t)
   (use-package tex
@@ -1119,15 +1119,15 @@ for working with \LaTeX
     (setq TeX-parse-self t)
     (setq-default TeX-master nil)
     (setq reftex-plug-into-AUCTeX t))
-#+END_SRC
+#+end_src
 ** ispell: spell-checking
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ispell
     :config
     (setq ispell-dictionary "british-ize-w_accents"))
-#+END_SRC
+#+end_src
 ** hl-todo
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package hl-todo
     :ensure t
     :bind (:map hl-todo-mode-map
@@ -1135,40 +1135,40 @@ for working with \LaTeX
                 ("C-c j" . hl-todo-next))
     :hook
     ((LaTeX-mode ess-mode) . hl-todo-mode))
-#+END_SRC
+#+end_src
 ** bibtex/ivy-bibtex
 reference manager I use it in conjunction with zotero, which generates the
 .bib files, and org-ref, to insert citations in org files.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ivy-bibtex
     :ensure t
     :config
     (autoload 'ivy-bibtex "ivy-bibtex" "" t)
     (setq bibtex-completion-pdf-field "file"))
-#+END_SRC
+#+end_src
 ** org-ref
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org-ref
     :config
     (setq bibtex-completion-bibliography '("~/Documents/References/PhD.bib")
           bibtex-completion-pdf-field "file"
           bibtex-completion-notes-path "~/org/referencenotes.org")
     (setq org-ref-default-bibliography '("~/Documents/References/PhD.bib")))
-#+END_SRC
+#+end_src
 * secret directories
 These are all the settings that require secret directories, such as my org
 agenda files and google calendar. They overwrite the settings with "<...>"
 syntax above.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;; (use-package emacsdirs)
   (load "~/.emacs.d/secretdirs.el" t)
-#+END_SRC
+#+end_src
 * reset gc-cons-threshold
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (run-with-idle-timer
  5 nil
  (lambda ()
    (setq gc-cons-threshold 1000000)
    (message "gc-cons-threshold restored to %S"
             gc-cons-threshold)))
-#+END_SRC
+#+end_src
