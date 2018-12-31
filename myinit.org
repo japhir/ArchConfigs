@@ -551,6 +551,10 @@ customize capture templates
 #+BEGIN_SRC emacs-lisp
   (setq org-src-fontify-natively t
         org-src-tab-acts-natively t)
+  (add-to-list 'org-structure-template-alist
+               '("se" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist
+               '("sr" . "src R"))
 #+END_SRC
 *** org-babel languages
 #+BEGIN_SRC emacs-lisp
