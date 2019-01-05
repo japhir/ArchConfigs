@@ -4,8 +4,9 @@ nice on both my desktop and laptop.
 #+begin_src emacs-lisp
   (eval-when-compile
     (require 'use-package))
-  (require 'diminish)  ; to omit lines from the mode-line
-  (require 'bind-key)  ; for easy keybindings
+  (setq use-package-always-ensure t)
+  (use-package diminish)  ; to omit lines from the mode-line
+  (use-package bind-key)  ; for easy keybindings
 #+end_src
 * dirvar
 define dirvars 'org-in-file', 'org-gtd-file', etc.
@@ -72,8 +73,7 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
 let my window manager handle screen creation
 #+begin_src emacs-lisp
   (use-package frames-only-mode
-    :config (setq frames-only-mode t)
-    :ensure t)
+    :config (setq frames-only-mode t))
 #+end_src
 ** play nice with parentheses
 #+begin_src emacs-lisp
@@ -84,7 +84,6 @@ let my window manager handle screen creation
 matching parenthesis are highlighted with rainbow colours.
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
-    :ensure t
     :config
     :hook ((prog-mode LaTeX-mode) . rainbow-delimiters-mode))
 #+end_src
@@ -99,7 +98,6 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
 *** apropospriate
 #+begin_src emacs-lisp
   (use-package apropospriate-theme
-    :ensure t
     :config (load-theme 'apropospriate-dark t))
 #+end_src
 *** COMMENT fonts
@@ -121,7 +119,6 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
 Highlight the current line when scrolling
 #+begin_src emacs-lisp
   (use-package beacon
-    :ensure t
     :init (beacon-mode 1)
     :diminish beacon-mode
     :config
@@ -133,8 +130,7 @@ Highlight the current line when scrolling
 Highlight hex colours!
 #+begin_src emacs-lisp
   (use-package rainbow-mode
-    :hook ((html-mode r-mode) . rainbow-mode)
-    :ensure t)
+    :hook ((html-mode r-mode) . rainbow-mode))
 #+end_src
 ** relative number mode
 #+begin_src emacs-lisp
@@ -151,14 +147,12 @@ Highlight hex colours!
 ** helpful
 https://github.com/Wilfred/helpful
 #+begin_src emacs-lisp
-  (use-package helpful
-    :ensure t)
+  (use-package helpful)
 #+end_src
 ** demos
 Insert demos after describe function https://github.com/xuchunyang/elisp-demos
 #+begin_src emacs-lisp
   (use-package elisp-demos
-    :ensure t
     :config
     (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
 #+end_src
@@ -166,7 +160,6 @@ Insert demos after describe function https://github.com/xuchunyang/elisp-demos
 very nice powerline-based status line
 #+begin_src emacs-lisp
   (use-package telephone-line
-    :ensure t
     :after evil
     :init
     (setq telephone-line-lhs
@@ -189,7 +182,6 @@ very nice powerline-based status line
 vim emulator
 #+begin_src emacs-lisp
   (use-package evil
-    :ensure t
     :init
     (setq evil-want-integration t)
     (setq evil-want-keybinding nil)
@@ -202,7 +194,6 @@ vim emulator
 #+begin_src emacs-lisp
   (use-package evil-collection
     :after evil
-    :ensure t
     :config
     (evil-collection-init))
 #+end_src
@@ -211,7 +202,6 @@ https://github.com/Somelauw/evil-org-mode
 evil keymap for org-mode
 #+begin_src emacs-lisp
   (use-package evil-org
-    :ensure t
     :after org
     :hook ((org-mode . evil-org-mode)
            (evil-org-mode . (lambda ()
@@ -229,7 +219,6 @@ https://github.com/syl20bnr/evil-escape
 escape from everything using =jk=
 #+begin_src emacs-lisp
   (use-package evil-escape
-    :ensure t
     :diminish evil-escape-mode
     :config
     (evil-escape-mode 1)
@@ -239,7 +228,6 @@ escape from everything using =jk=
 https://github.com/PythonNut/evil-easymotion/
 #+begin_src emacs-lisp
   (use-package evil-easymotion
-    :ensure t
     :config
     (evilem-default-keybindings "SPC"))
 #+end_src
@@ -247,7 +235,6 @@ https://github.com/PythonNut/evil-easymotion/
 https://github.com/hlissner/evil-snipe
 #+begin_src emacs-lisp
   (use-package evil-snipe
-    :ensure t
     :config
     (evil-snipe-mode 1)
     (evil-snipe-override-mode 1))
@@ -257,7 +244,6 @@ https://github.com/linktohack/evil-commentary
 comment/uncomment with gc
 #+begin_src emacs-lisp
   (use-package evil-commentary
-    :ensure t
     :config
     (evil-commentary-mode))
 #+end_src
@@ -266,14 +252,12 @@ https://github.com/TheBB/evil-indent-plus
 operate on indentation regions, mainly with ~ii~
 #+begin_src emacs-lisp
   (use-package evil-indent-plus
-    :ensure t
     :config
     (evil-indent-plus-default-bindings))
 #+end_src
 ** COMMENT evil-leader
 #+begin_src emacs-lisp
   (use-package evil-leader  ; default is \
-    :ensure t
     :config
     (evil-leader/set-leader "SPC>")
     (global-evil-leader-mode)
@@ -293,7 +277,6 @@ evil keybindings for magit
     :after magit
     :hook
     (git-commit-mode . evil-insert-state)
-    :ensure t
     :config
     (evil-set-initial-state 'magit-log-edit-mode 'insert))
 #+end_src
@@ -370,7 +353,6 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 prettify org mode
 #+begin_src emacs-lisp
   (use-package org-bullets
-    :ensure t
     :hook
     (org-mode . (lambda () (org-bullets-mode 1)))
     :config
@@ -637,8 +619,7 @@ possible.
 #+begin_src emacs-lisp
   (use-package org-pomodoro
     :after org
-    :bind ("M-p" . org-pomodoro)
-    :ensure t)
+    :bind ("M-p" . org-pomodoro))
 #+end_src
 ** COMMENT org-fancy-capture attempt
 #+begin_src emacs-lisp
@@ -663,7 +644,6 @@ overwritten by a private file that has my different calendars and IDs.
 #+begin_src emacs-lisp
   (use-package org-gcal
     :after org
-    :ensure t
     :bind (:map org-agenda-mode-map
                 ("C-S-u" . org-gcal-fetch))  ;; same key as mu4e!
     :config
@@ -674,13 +654,13 @@ overwritten by a private file that has my different calendars and IDs.
 ** org-pdfview
 #+begin_src emacs-lisp
   (use-package org-pdfview
-    :after org
-    :ensure t)
+    :after org)
 #+end_src
 ** org-beamer
 #+begin_src emacs-lisp
   (use-package ox-latex
     :after org
+    :ensure nil
     :config
     (add-to-list 'org-latex-classes
                  '("beamer"
@@ -692,7 +672,6 @@ overwritten by a private file that has my different calendars and IDs.
 ** org-ref
 #+begin_src emacs-lisp
   (use-package org-ref
-    :ensure t
     :bind ("C-c j" . org-ref-bibtex-hydra/body)
     :after org
     :init
@@ -717,8 +696,7 @@ overwritten by a private file that has my different calendars and IDs.
 #+end_src
 ** org-noter
 #+begin_src emacs-lisp
-  (use-package org-noter
-    :ensure t)
+  (use-package org-noter)
 #+end_src
 * general packages and functions
 ** easy symbol insertion
@@ -732,21 +710,18 @@ By default C-x 8 o = ° and C-x 8 m = µ. So:
 ** all-the-icons
 https://github.com/domtronn/all-the-icons.el
 #+begin_src emacs-lisp
-  (use-package all-the-icons
-    :ensure t)
+  (use-package all-the-icons)
   (setq inhibit-compacting-font-caches t)
 #+end_src
 ** all-the-icons-ivy
 #+begin_src emacs-lisp
   (use-package all-the-icons-ivy
-    :ensure t
     :config
     (all-the-icons-ivy-setup))
 #+end_src
 ** neotree
 #+begin_src emacs-lisp
   (use-package neotree
-    :ensure t
     :config
     (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))
 #+end_src
@@ -798,7 +773,6 @@ https://github.com/domtronn/all-the-icons.el
 ** COMMENT ranger
 #+begin_src emacs-lisp
   (use-package ranger
-    :ensure t
     :bind
     ("C-c r" . ranger)
     :config
@@ -824,7 +798,6 @@ very nice search replacement
 #+begin_src emacs-lisp
   (use-package swiper
     :init (ivy-mode 1)
-    :ensure t
     :config
     (setq ivy-use-virtual-buffers t)
     (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
@@ -839,7 +812,6 @@ very nice search replacement
 jump to next chararcter. Slightly redundant b/c of evil's =f= and =t=.
 #+begin_src emacs-lisp
   (use-package avy
-    :ensure t
     :bind
     ("C-:" . avy-goto-char)
     ("C-'" . avy-goto-char-2)
@@ -849,7 +821,6 @@ jump to next chararcter. Slightly redundant b/c of evil's =f= and =t=.
 #+begin_src emacs-lisp
   (use-package counsel
     :init (counsel-mode 1)
-    :ensure t
     :bind
     ("M-x" . counsel-M-x)
     ("C-c s" . counsel-rg))
@@ -858,14 +829,12 @@ jump to next chararcter. Slightly redundant b/c of evil's =f= and =t=.
 git management
 #+begin_src emacs-lisp
   (use-package magit
-    :ensure t
     :bind
     ("M-g" . magit-status))
 #+end_src
 ** diff-hl
 #+begin_src emacs-lisp
   (use-package diff-hl
-    :ensure t
     :init
     (global-diff-hl-mode)
     (setq diff-hl-gutter-mode t)
@@ -898,7 +867,6 @@ file bookmarks
 auto complete everything
 #+begin_src emacs-lisp
   (use-package auto-complete
-    :ensure t
     :after yasnippet
     :init
     (ac-config-default)
@@ -910,21 +878,18 @@ auto complete everything
 ** COMMENT flycheck
 #+begin_src emacs-lisp
   (use-package flycheck
-    :ensure t
     :init
     (global-flycheck-mode t))
 #+end_src
 ** COMMENT web dictionary
 #+begin_src emacs-lisp
   (use-package define-word
-    :ensure t
     :bind ("C-c d" . define-word))
 #+end_src
 ** yasnippet
 usefull snippets for me: org-mode (fig_, )
 #+begin_src emacs-lisp
   (use-package yasnippet
-    :ensure t
     :init
     (yas-global-mode 1)
     :config
@@ -943,23 +908,23 @@ sudo pacman -S emacs-pkgbuild-mode
 Then load it into emacs when opening a PKGBUILD file
 #+begin_src emacs-lisp
   (use-package pkgbuild-mode
+     :ensure nil
      :load-path "/usr/share/emacs/site-lisp/"
      :mode "/PKGBUILD$")
 #+end_src
 ** systemd
 #+begin_src emacs-lisp
-  (use-package systemd
-    :ensure t)
+  (use-package systemd)
 #+end_src
 ** COMMENT writeroom-mode
 #+begin_src emacs-lisp
-  (use-package writeroom-mode
-    :ensure t)
+  (use-package writeroom-mode)
 #+end_src
 ** erc
 I use weechat on command line now
 #+begin_src emacs-lisp
   (use-package erc
+    :ensure nil
     :config
     (setq erc-hide-list '("JOIN" "PART" "QUIT"))
     (setq erc-track-exclude-types '("JOIN" "MODE"
@@ -968,37 +933,36 @@ I use weechat on command line now
 ** calendar
 perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collection/issues/211][evil-collection issue]]
 #+begin_src emacs-lisp
-  (use-package calfw
-    :ensure t
-    :config)
+  (use-package calfw)
   (use-package calfw-org
-    :ensure t
     :bind
     ("C-c o" . cfw:open-org-calendar))
 #+end_src
 * email
 ** smtp
 #+begin_src emacs-lisp
-(use-package smtpmail
-  :config
-  (setq message-send-mail-function 'smtpmail-send-it
-	send-mail-function 'smtpmail-send-it
-	user-mail-address "<your-email-address>"
-	smtpmail-default-smtp-server "<your-smtp-server>"
-	smtpmail-smtp-server "<your-smtp-server>"
-	smtpmail-smtp-service 587
-	smtp-stream-type 'starttls
-	smtpmail-smtp-user "<your-user-id>"
-	smtpmail-starttls-credentials
-	'(("<your-smtp-server>" 587 "<possiblly-domain>/<your-user-id>" nil))
-	starttls-use-gnutls t
-	starttls-gnutls-program "gnutls-cli"
-	starttls-extra-args nil))
+  (use-package smtpmail
+    :ensure nil
+    :config
+    (setq message-send-mail-function 'smtpmail-send-it
+          send-mail-function 'smtpmail-send-it
+          user-mail-address "<your-email-address>"
+          smtpmail-default-smtp-server "<your-smtp-server>"
+          smtpmail-smtp-server "<your-smtp-server>"
+          smtpmail-smtp-service 587
+          smtp-stream-type 'starttls
+          smtpmail-smtp-user "<your-user-id>"
+          smtpmail-starttls-credentials
+          '(("<your-smtp-server>" 587 "<possiblly-domain>/<your-user-id>" nil))
+          starttls-use-gnutls t
+          starttls-gnutls-program "gnutls-cli"
+          starttls-extra-args nil))
 #+end_src
 ** mu4e
 install it with pacman ~mu~
 #+begin_src emacs-lisp
   (use-package mu4e
+    :ensure nil
     :load-path "/usr/share/emacs/site-lisp/mu4e/"
     :commands mu4e
     :bind (("C-c m" . mu4e)
@@ -1039,14 +1003,12 @@ install it with pacman ~mu~
 ** COMMENT mu4e-conversation
 #+begin_src emacs-lisp
   (use-package mu4e-conversation
-    :ensure t
     :config
     (global-mu4e-conversation-mode))
 #+end_src
 ** mu4e notifications
 #+begin_src emacs-lisp
   (use-package mu4e-alert
-    :ensure t
     :after mu4e
     :config
     (mu4e-alert-set-default-style 'libnotify)
@@ -1058,7 +1020,6 @@ emacs speaks statistics, work with R etc.
 #+begin_src emacs-lisp
   (use-package ess
     ;; :load-path "/usr/share/emacs/site-lisp/ess/"
-    :ensure t
     :commands R
     ;; :init (require 'ess-r-mode)
     :config
@@ -1069,32 +1030,29 @@ emacs speaks statistics, work with R etc.
     (setq inferior-R-args "--no-restore-history --no-save")
     :bind (:map ess-mode-map (";" . ess-insert-assign)))
 #+end_src
+** markdown-mode
+markdown mode for writing
+#+begin_src emacs-lisp
+  (use-package markdown-mode)
+#+end_src
 ** polymode
 for working with .Rmd files etc.
 #+begin_src emacs-lisp
-  (use-package polymode
-    :ensure t)
-  (use-package poly-markdown
-    :ensure t)
-  (use-package poly-R
-    :ensure t)
+  (use-package polymode)
+  (use-package poly-markdown)
+  ;; (use-package poly-R)
 #+end_src
 ** matlab
 if I'm ever required to work in non-open-source
 #+begin_src emacs-lisp
   (use-package matlab
+    :ensure nil
     :init (autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
     :mode ("\\.m\\'" . matlab-mode)
     :interpreter "matlab"
     :config
     (setq matlab-indent-function t)
     (setq matlab-indent-function "matlab"))
-#+end_src
-** markdown-mode
-markdown mode for writing
-#+begin_src emacs-lisp
-  (use-package markdown-mode
-    :ensure t)
 #+end_src
 ** pandoc-mode
 exporting markdown
@@ -1129,7 +1087,6 @@ for working with \LaTeX
 ** hl-todo
 #+begin_src emacs-lisp
   (use-package hl-todo
-    :ensure t
     :bind (:map hl-todo-mode-map
                 ("C-c k" . hl-todo-previous)
                 ("C-c j" . hl-todo-next))
@@ -1141,7 +1098,6 @@ reference manager I use it in conjunction with zotero, which generates the
 .bib files, and org-ref, to insert citations in org files.
 #+begin_src emacs-lisp
   (use-package ivy-bibtex
-    :ensure t
     :config
     (autoload 'ivy-bibtex "ivy-bibtex" "" t)
     (setq bibtex-completion-pdf-field "file"))
@@ -1165,10 +1121,10 @@ syntax above.
 #+end_src
 * reset gc-cons-threshold
 #+begin_src emacs-lisp
-(run-with-idle-timer
- 5 nil
- (lambda ()
-   (setq gc-cons-threshold 1000000)
-   (message "gc-cons-threshold restored to %S"
-            gc-cons-threshold)))
+  (run-with-idle-timer
+   5 nil
+   (lambda ()
+     (setq gc-cons-threshold 1000000)
+     (message "gc-cons-threshold restored to %S"
+              gc-cons-threshold)))
 #+end_src
