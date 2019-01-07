@@ -28,8 +28,8 @@ client.focused_inactive $color0 $background $foreground $color7 $color7
 # Default wallpaper (more resolutions are available in __DATADIR__/backgrounds/sway/)
 output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 # set names for desktop screens
-set $smallscreen HDMI-A-2
-set $bigscreen eDP-1
+set $smallscreen eDP-1
+set $bigscreen HDMI-A-2
 # main laptop screen
 output $smallscreen {
        background $wallpaper fill

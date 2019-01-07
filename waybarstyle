@@ -3,7 +3,7 @@
     border: none;
     border-radius: 0;
     /* FontAwesome5Free, FontAwesome5Brands; */
-    font-family: Source Code Pro, Helvetica, Arial, sans-serif;
+    font-family: Source Code Pro, Helvetica, Arial, fileicon, material, sans-serif;
     font-size: 12px;
     min-height: 0;
 }
