@@ -100,8 +100,32 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
 #+begin_src emacs-lisp
   (use-package apropospriate-theme
     :ensure t
-    :config (load-theme 'apropospriate-dark t))
+    :config (load-theme 'apropospriate-light t))
 #+end_src
+*** COMMENT poet
+**** use-package
+#+begin_src emacs-lisp :tangle no
+  (use-package poet-theme
+    :ensure t
+    :hook (text-mode . (lambda() (variable-pitch-mode 1)))
+    :init
+    (set-face-attribute 'default nil :family "Iosevka" :height 130)
+    (set-face-attribute 'fixed-pitch nil :family "Iosevka" :height 125)
+    (set-face-attribute 'variable-pitch nil :family "ETBookOT")
+    :config
+    (load-theme 'poet-dark))
+#+end_src
+**** COMMENT no use-package
+#+begin_src emacs-lisp
+  (set-face-attribute 'default nil :family "Iosevka" :height 120)
+  (set-face-attribute 'fixed-pitch nil :family "Iosevka")
+  (set-face-attribute 'variable-pitch nil :family "Baskerville")
+  (load-theme 'poet)
+  (add-hook 'text-mode-hook
+            (lambda ()
+              (variable-pitch-mode 1)))
+#+end_src
+
 *** COMMENT fonts
 #+begin_src emacs-lisp
   (set-face-attribute 'default nil :family "Fira Code" :height 130)
@@ -347,11 +371,12 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
   (setq org-M-RET-may-split-line '((default . nil)))
   (setq org-startup-with-inline-images t)
 #+end_src
-** clocking
+** clocking/logging
 #+begin_src emacs-lisp
   (setq org-check-running-clock t
         org-log-note-clock-out t)
   (setq org-log-done 'time)
+  (setq org-log-into-drawer t)
 #+end_src
 ** theming
 #+begin_src emacs-lisp
@@ -490,18 +515,18 @@ customize capture templates
  #+end_src
 *** TODO states
 #+begin_src emacs-lisp
-    (setq org-todo-keywords
-          '((sequence "PROJ(p)" "NEXT(n)" "WAIT(w!/!)" "TICK(t)" "SOME(s!/!)" "|"
-                      "DONE(d)" "CANC(c)")))
-    ;; prettify the todo keywords
-    (setq org-todo-keyword-faces
-          '(("NEXT" . (:foreground "light goldenrod yellow" :background "red" :weight bold))
-            ("WAIT" . (:foreground "dim gray" :background "yellow"))
-            ("TICK" . (:background "light slate blue"))
-            ("SOME" . (:foreground "ghost white"  :background "deep sky blue"))
-            ("DONE" . (:foreground "green4"       :background "pale green"))
-            ("CANC" . (:foreground "dim gray"     :background "gray"))
-            ("PROJ" . (:foreground "navajo white" :background "saddle brown"))))
+  (setq org-todo-keywords
+        '((sequence "NEXT(n)" "WAIT(w!/!)" "TICK(t)" "PROJ(p)" "SOME(s!/!)" "|"
+                    "DONE(d)" "CANC(c)")))
+  ;; prettify the todo keywords
+  (setq org-todo-keyword-faces
+        '(("NEXT" . (:foreground "light goldenrod yellow" :background "red" :weight bold))
+          ("WAIT" . (:foreground "dim gray" :background "yellow"))
+          ("TICK" . (:background "light slate blue"))
+          ("SOME" . (:foreground "ghost white"  :background "deep sky blue"))
+          ("DONE" . (:foreground "green4"       :background "pale green"))
+          ("CANC" . (:foreground "dim gray"     :background "gray"))
+          ("PROJ" . (:foreground "navajo white" :background "saddle brown"))))
 #+end_src
 *** effort estimates
 #+begin_src emacs-lisp
@@ -522,7 +547,6 @@ customize capture templates
                         ("@lab" . ?l)
                         ("@travel" . ?t)
                         (:endgroup . nil)
-                        (:startgroup . nil)
                         ("@computer" . ?c)  ;; general in case I can't decide
                         ("@phone" . ?B)     ;; b for Dutch "bellen"
                         ("@email" . ?m)
@@ -534,7 +558,6 @@ customize capture templates
                         ("@research" . ?g)
                         ("@schedule" . ?s)
                         ("@agenda" . ?a)    ;; things to discuss
-                        (:endgroup . nil)
                         (:startgroup . nil)
                         ("morning" . ?1) ("afternoon" .?2) ("evening" .?3)
                         (:endgroup . nil)
@@ -594,26 +617,19 @@ basic latex settings
 #+end_src
 *** org-entities-user
 These are nice shorthands for commands I use often. In org-source they look
-nice, and they export to both \LaTeX and htlm correctly. Note that
-unfortunately, special entity names cannot contain numerics, so \\d18O is not
+nice, and they export to both \LaTeX and =html= correctly. Note that
+unfortunately, special entity names cannot contain numerics, so =\d18O= is not
 possible.
 #+begin_src emacs-lisp
   (setq org-entities-user
-        '(("dO" "\\(\\delta^{18}\\)O" nil "&delta;<sup>18</sup>O" "δ18O" "δ18O" "δ¹⁸O")
-          ("eO" "\\({}^{18}\\)O" nil "<sup>18</sup>O" "18O" "18O" "¹⁸O")
-          ("dC" "\\(\\delta^{13}\\)C" nil "&delta;<sup>13</sup>O" "δ13C" "δ¹³C" "δ¹³C")
-          ("tC" "\\({}^{13}\\)C" nil "<sup>13</sup>C" "13C" "¹³C" "¹³O")
-          ("COt" "CO\\(_{2}\\)" nil "CO<sub>2</sub>" "CO2" "CO₂" "CO₂")
-          ("D" "\\Delta_{47}" t "&Delta;<sub>47</sub>" "Δ47" "Δ47" "Δ₄₇")
-          ("celsius" "\\(^{\\circ}\\)C" nil "&deg;C" "°C" "°C" "℃")
-          ;; unit space, something like 15\us{}Ma
-          ("us" "\\," nil "&nbsp;" " " " " " ")
-          ("appr" "\\sim" t "&tilde;" "~" "~" "~")
-          ;; for gps-coordinates
-          ("degree" "^{\\circ}" t "&deg;" "°" "°" "°")
-          ("arcminute" "^{'}" t "&prime;" "'" "′" "′")
-          ("arcsecond" "^{''}" t "&Prime;" "\"" "″" "″")
-          ))
+	'(("celsius" "\\(^{\\circ}\\)C" nil "&deg;C" "°C" "°C" "℃")
+	  ;; unit space, something like 15\us{}Ma
+	  ("us" "\\," nil "&nbsp;" " " " " " ")
+	  ("appr" "\\sim" t "&tilde;" "~" "~" "~")
+	  ;; for gps-coordinates
+	  ("degree" "^{\\circ}" t "&deg;" "°" "°" "°")
+	  ("arcminute" "^{'}" t "&prime;" "'" "′" "′")
+	  ("arcsecond" "^{''}" t "&Prime;" "\"" "″" "″")))
 #+end_src
 *** latex class =ijkarticle=
 #+begin_src emacs-lisp
@@ -674,7 +690,7 @@ overwritten by a private file that has my different calendars and IDs.
 ** org-pdfview
 #+begin_src emacs-lisp
   (use-package org-pdfview
-    :after org
+    :after org pdf-tools
     :ensure t)
 #+end_src
 ** org-beamer
@@ -718,6 +734,7 @@ overwritten by a private file that has my different calendars and IDs.
 ** org-noter
 #+begin_src emacs-lisp
   (use-package org-noter
+    :after pdf-tools org
     :ensure t)
 #+end_src
 * general packages and functions
@@ -743,12 +760,32 @@ https://github.com/domtronn/all-the-icons.el
     :config
     (all-the-icons-ivy-setup))
 #+end_src
-** neotree
+** COMMENT neotree
 #+begin_src emacs-lisp
   (use-package neotree
     :ensure t
+    :bind ("<f8>" . neotree-toggle)
     :config
     (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))
+#+end_src
+** treemacs
+#+begin_src emacs-lisp
+  (use-package treemacs
+    :ensure t
+    :defer t
+    :bind ("<f8>" . treemacs))
+#+end_src
+** treemacs-evil
+#+begin_src emacs-lisp
+  (use-package treemacs-evil
+      :ensure t
+      :after treemacs evil)
+#+end_src
+** COMMENT treemacs-magit
+#+begin_src emacs-lisp
+  (use-package treemacs-magit
+    :ensure t
+    :after treemacs magit)
 #+end_src
 ** revert buffer
 #+begin_src emacs-lisp
@@ -1055,6 +1092,7 @@ install it with pacman ~mu~
 * science packages
 ** ess
 emacs speaks statistics, work with R etc.
+*** use-package
 #+begin_src emacs-lisp
   (use-package ess
     ;; :load-path "/usr/share/emacs/site-lisp/ess/"
@@ -1066,8 +1104,19 @@ emacs speaks statistics, work with R etc.
       (not (string= lang "R")))  ; don't ask for R
     (setq ess-default-style 'RStudio)
     (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
-    (setq inferior-R-args "--no-restore-history --no-save")
-    :bind (:map ess-mode-map (";" . ess-insert-assign)))
+    (setq inferior-R-args "--no-restore-history --no-save"))
+    ;; :bind (:map ess-mode-map (";" . ess-insert-assign)))
+#+end_src
+*** COMMENT non-use-package
+#+begin_src emacs-lisp
+  (setq load-path (cons "/usr/share/emacs/site-lisp/ess" load-path))
+  ;;(require 'ess-site)
+  (load "ess-autoloads")
+  (defun my-org-confirm-babel-evaluate (lang body)
+    (not (string= lang "R")))  ; don't ask for R
+  (setq ess-default-style 'RStudio)
+  (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+  (setq inferior-R-args "--no-restore-history --no-save")
 #+end_src
 ** polymode
 for working with .Rmd files etc.
@@ -1076,8 +1125,8 @@ for working with .Rmd files etc.
     :ensure t)
   (use-package poly-markdown
     :ensure t)
-  (use-package poly-R
-    :ensure t)
+  ;; (use-package poly-R
+    ;; :ensure t)
 #+end_src
 ** matlab
 if I'm ever required to work in non-open-source
