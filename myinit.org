@@ -635,7 +635,7 @@ possible.
 #+begin_src emacs-lisp
   (use-package org-pomodoro
     :after org
-    :bind ("M-p" . org-pomodoro))
+    :bind ("C-c p" . org-pomodoro))
 #+end_src
 ** COMMENT org-fancy-capture attempt
 #+begin_src emacs-lisp
