@@ -6,5 +6,4 @@
   (package-initialize)
   (setq custom-file "~/.emacs.d/emacs-custom.el")
   (load custom-file)
-  (org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org"))
-)
+  (org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org")))

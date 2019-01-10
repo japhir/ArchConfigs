@@ -32,6 +32,8 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
 #+end_src
 * interface and appearance
 ** turn off UI elements and small tweaks
+The gc-cons-threshold is set to a superlarge number for faster startup time. It
+is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
 #+begin_src emacs-lisp
   (setq inhibit-splash-screen t)
   (scroll-bar-mode -1)   ; turn off the scroll bar
@@ -53,7 +55,6 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
 
   (setq mouse-wheel-progressive-speed nil)
 
-   ;; 20MB of memory before calling garbage collection
   (setq gc-cons-threshold 100000000)
 
   (defalias 'yes-or-no-p 'y-or-n-p)
@@ -226,7 +227,7 @@ https://github.com/Somelauw/evil-org-mode
 evil keymap for org-mode
 #+begin_src emacs-lisp
   (use-package evil-org
-    :after org
+    :after org evil
     :hook ((org-mode . evil-org-mode)
            (evil-org-mode . (lambda ()
                               (evil-org-set-key-theme
@@ -604,23 +605,23 @@ unfortunately, special entity names cannot contain numerics, so =\d18O= is not
 possible.
 #+begin_src emacs-lisp
   (setq org-entities-user
-	'(("celsius" "\\(^{\\circ}\\)C" nil "&deg;C" "°C" "°C" "℃")
-	  ;; unit space, something like 15\us{}Ma
-	  ("us" "\\," nil "&nbsp;" " " " " " ")
-	  ("appr" "\\sim" t "&tilde;" "~" "~" "~")
-	  ;; for gps-coordinates
-	  ("degree" "^{\\circ}" t "&deg;" "°" "°" "°")
-	  ("arcminute" "^{'}" t "&prime;" "'" "′" "′")
-	  ("arcsecond" "^{''}" t "&Prime;" "\"" "″" "″")))
+        '(("celsius" "\\(^{\\circ}\\)C" nil "&deg;C" "°C" "°C" "℃")
+          ("minus" "-" t "&minus;" "-" "-" "−")  ;; defaults to =\\minus= in LaTeX, which doesn't work.
+          ;; unit space, something like 15\us{}Ma
+          ("permil" "\\textperthousand{}" nil "&permil;" "per thousand" "per thousand" "‰")  ;; exactly the same as in org-entities
+          ("us" "\\," nil "&nbsp;" " " " " " ")
+          ("appr" "\\sim" t "&tilde;" "~" "~" "~")
+          ;; for gps-coordinates
+          ("degree" "^{\\circ}" t "&deg;" "°" "°" "°")
+          ("arcminute" "^{'}" t "&prime;" "'" "′" "′")
+          ("arcsecond" "^{''}" t "&Prime;" "\"" "″" "″")))
 #+end_src
-*** latex class =ijkarticle=
+*** latejx class =ijkarticle=
 #+begin_src emacs-lisp
   (add-to-list 'org-latex-classes
          '("ijkarticle"
-           "\\documentclass{article}
-  \\usepackage[citestyle=authoryear,bibstyle=authoryear,hyperref=true,maxcitenames=3,url=true,backend=biber,natbib=true]{biblatex}
-  %% aliases for clearer document
-  "
+  "\\documentclass{article}
+  \\usepackage[citestyle=authoryear,bibstyle=authoryear,hyperref=true,maxcitenames=3,url=true,backend=biber,natbib=true]{biblatex}"
                    ("\\section{%s}" . "\\section*{%s}")
                    ("\\subsection{%s}" . "\\subsection*{%s}")
                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -687,28 +688,32 @@ overwritten by a private file that has my different calendars and IDs.
 #+end_src
 ** org-ref
 #+begin_src emacs-lisp
-  (use-package org-ref
-    :bind ("C-c j" . org-ref-bibtex-hydra/body)
-    :after org
-    :init
-    (setq org-ref-completion-library 'org-ref-ivy-cite)
-    (setq reftex-default-bibliography '("~/SurfDrive/bibliography/references.bib"))
-    (setq org-ref-bibliography-notes "~/SurfDrive/bibliography/notes.org"
-          org-ref-default-bibliography '("~/SurfDrive/bibliography/references.bib")
-          org-ref-pdf-directory "~/SurfDrive/bibliography/bibtex-pdfs/")
-    (setq bibtex-completion-pdf-open-function 'org-open-file)
-    :config
-    (require 'doi-utils)
-    (setq bibtex-autokey-year-length 4
-          bibtex-autokey-name-year-separator ""
-          bibtex-autokey-year-title-separator "-"
-          bibtex-autokey-titleword-separator "-"
-          bibtex-autokey-titlewords 0
-          bibtex-autokey-titlewords-stretch 1
-          bibtex-autokey-titleword-length 5)
-    (add-to-list 'org-ref-bibtex-journal-abbreviations
-                 '("JIR" "Journal of Irreproducible Research" "J. Irrep. Res."))
-    (require 'org-ref-scopus))
+    (use-package org-ref
+      :bind ("C-c j" . org-ref-bibtex-hydra/body)
+      :after org
+      :init
+      (setq org-ref-completion-library 'org-ref-ivy-cite)
+      (setq reftex-default-bibliography '("~/SurfDrive/bibliography/references.bib"))
+      (setq org-ref-bibliography-notes "~/SurfDrive/bibliography/notes.org"
+            org-ref-default-bibliography '("~/SurfDrive/bibliography/references.bib")
+            org-ref-pdf-directory "~/SurfDrive/bibliography/bibtex-pdfs/")
+      (setq bibtex-completion-pdf-open-function 'org-open-file)
+      :config
+      (require 'doi-utils)
+  (require 'org-id)
+  (require 'org-ref-wos)
+  (require 'org-ref-scopus)
+  (require 'org-ref-pubmed)
+      (setq bibtex-autokey-year-length 4
+            bibtex-autokey-name-year-separator ""
+            bibtex-autokey-year-title-separator "-"
+            bibtex-autokey-titleword-separator "-"
+            bibtex-autokey-titlewords 0
+            bibtex-autokey-titlewords-stretch 1
+            bibtex-autokey-titleword-length 5)
+      (add-to-list 'org-ref-bibtex-journal-abbreviations
+                   '("JIR" "Journal of Irreproducible Research" "J. Irrep. Res."))
+      (require 'org-ref-scopus))
 #+end_src
 ** org-noter
 #+begin_src emacs-lisp
