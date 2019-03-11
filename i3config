@@ -1,0 +1,329 @@
+# -*- mode: conf -*-
+#=======================================================================
+#                           i3 config file
+#=======================================================================
+
+# put it in ~/.config/i3/ or ~/.i3/config
+
+#=======================================================================
+#                                Basics
+#=======================================================================
+
+# I use the superkey, you can also use Alt
+set $mod Mod4
+
+# mouse modifier
+floating_modifier $mod
+
+# start a terminal
+bindsym $mod+Return exec i3-sensible-terminal
+
+# smart dmenu
+bindsym $mod+d exec /usr/bin/dmenu_run -b "$fg" -nf "$bg" -sb "$bg" -sf "$fg"
+#| rofi -dmenu
+#=======================================================================
+#                          Window management
+#=======================================================================
+
+# vim keybindings
+set $left  h
+set $down  j
+set $up    k
+set $right l
+
+# kill focused window
+bindsym $mod+Shift+q kill
+
+# change focus
+bindsym $mod+$left  focus left
+bindsym $mod+$down  focus down
+bindsym $mod+$up    focus up
+bindsym $mod+$right focus right
+
+# move focused window
+bindsym $mod+Shift+$left  move left 30
+bindsym $mod+Shift+$down  move down 30
+bindsym $mod+Shift+$up    move up 30
+bindsym $mod+Shift+$right move right 30
+
+# enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen toggle
+
+# change container layout (stacked, tabbed, toggle split)
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+
+# toggle tiling / floating
+bindsym $mod+Shift+space floating toggle
+
+# change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
+
+# focus the parent container
+bindsym $mod+a focus parent
+
+# focus the child container
+#bindsym $mod+d focus child
+
+# toggle vertical / horizontal split
+bindsym $mod+t split toggle
+
+# move the currently focused window to the scratchpad
+bindsym $mod+Shift+minus move scratchpad
+
+# show next scratchpad window or hide focused scratchpad window
+# cycle if there are multiple
+bindsym $mod+minus scratchpad show
+
+# make the currently focused window sticky
+bindsym $mod+Shift+s sticky toggle
+
+# resize window (you can also use the mouse on a border)
+bindsym $mod+Shift+y resize shrink width  10 px or 10 ppt
+bindsym $mod+Shift+u resize grow   height 10 px or 10 ppt
+bindsym $mod+Shift+i resize shrink height 10 px or 10 ppt
+bindsym $mod+Shift+o resize grow   width  10 px or 10 ppt
+
+# gaps
+# smart_gaps on
+hide_edge_borders both
+gaps inner 15
+gaps outer 15
+for_window [class="^.*"] border pixel 0
+
+bindsym $mod+Shift+t gaps inner current set 15; gaps outer current set 15
+bindsym $mod+s       gaps inner current plus 5
+# bindsym $mod+Shift+s gaps inner current minus 5
+bindsym $mod+Shift+d gaps inner current set 0; gaps outer current set 0
+bindsym $mod+z       gaps outer current plus 5
+bindsym $mod+Shift+z gaps outer current minus 5
+
+
+# media keys
+# Increase volume
+bindsym XF86AudioRaiseVolume  exec --no-startup-id "amixer set Master 5%+ && volnoti-show $(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)"
+# Decrease volume
+bindsym XF86AudioLowerVolume  exec --no-startup-id "amixer set Master 5%- && volnoti-show $(amixer get Master | grep -Po '[0-9]+(?=%)' | tail -1)"
+# Toggle mute
+bindsym XF86AudioMute         exec --no-startup-id "amixer set Master toggle; if amixer get Master | grep -Fq '[off]'; then volnoti-show -m; else volnoti-show $(amixer get Master | grep -pO '[0-9]+(?=%)' | tail -1); fi"
+# Suspend also locks
+bindsym XF86Sleep             exec --no-startup-id "systemctl suspend & sh $HOME/ArchConfigs/launchi3lock.sh"
+bindsym XF86AudioPlay         exec --no-startup-id playerctl play-pause
+#bindsym XF86AudioPause        exec playerctl pause
+bindsym XF86AudioNext         exec --no-startup-id playerctl next
+bindsym XF86AudioPrev         exec --no-startup-id playerctl previous
+bindsym XF86AudioMicMute      exec --no-startup-id amixer set Capture toggle
+bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 10 -steps 5
+bindsym XF86MonBrightnessUp   exec --no-startup-id xbacklight -inc 10 -steps 5
+bindsym XF86Display           exec --no-startup-id arandr
+bindsym XF86WLAN              exec --no-startup-id sudo systemctl restart NetworkManager
+bindsym XF86Tools             exec --no-startup-id lxappearance
+# bindsym XF86Bluetooth
+
+#=======================================================================
+#                              Workspaces
+#=======================================================================
+
+# workspace names
+set $ws1 "1:"
+set $ws2 "2:"
+set $ws3 "3:"
+set $ws4 "4:"
+set $ws5 "5:"
+set $ws6 "6:"
+set $ws7 "7:"
+set $ws8 "8:"
+set $ws9 "9:"
+set $ws10 "10:"
+
+# workspace gaps
+workspace $ws6 gaps inner 0
+workspace $ws6 gaps outer 0
+workspace $ws7 gaps inner 0
+workspace $ws7 gaps outer 0
+workspace $ws8 gaps inner 0
+workspace $ws8 gaps outer 0
+workspace $ws10 gaps inner 0
+workspace $ws10 gaps outer 0
+
+# assign workspaces to screens
+set $smallscreen DVI-I-1-1
+set $bigscreen DVI-I-2
+
+workspace $ws1 output $smallscreen
+workspace $ws2 output $bigscreen
+workspace $ws3 output $bigscreen
+workspace $ws4 output $bigscreen
+workspace $ws7 output $bigscreen
+workspace $ws9 output $smallscreen
+workspace $ws10 output $smallscreen
+
+# switch to workspace
+bindsym $mod+1 workspace $ws1
+bindsym $mod+2 workspace $ws2
+bindsym $mod+3 workspace $ws3
+bindsym $mod+4 workspace $ws4
+bindsym $mod+5 workspace $ws5
+bindsym $mod+6 workspace $ws6
+bindsym $mod+7 workspace $ws7
+bindsym $mod+8 workspace $ws8
+bindsym $mod+9 workspace $ws9
+bindsym $mod+0 workspace $ws10
+
+# move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace $ws1
+bindsym $mod+Shift+2 move container to workspace $ws2
+bindsym $mod+Shift+3 move container to workspace $ws3
+bindsym $mod+Shift+4 move container to workspace $ws4
+bindsym $mod+Shift+5 move container to workspace $ws5
+bindsym $mod+Shift+6 move container to workspace $ws6
+bindsym $mod+Shift+7 move container to workspace $ws7
+bindsym $mod+Shift+8 move container to workspace $ws8
+bindsym $mod+Shift+9 move container to workspace $ws9
+bindsym $mod+Shift+0 move container to workspace $ws10
+
+# switch to previous workspace by repeatedly tapping
+workspace_auto_back_and_forth yes
+
+#=======================================================================
+#                       Reload/Exit/Lock
+#=======================================================================
+
+# reload the configuration file
+#bindsym $mod+Shift+c reload
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+# exit i3 (logs you out of your X session)
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+# Lock the desktop
+bindsym $mod+Delete exec ~/ArchConfigs/launchi3lock.sh #&& sudo sh -c "echo mem > /sys/power/state
+
+#=======================================================================
+#                                 i3bar
+#=======================================================================
+
+# Set the font
+font pango: Roboto Bold, FontAwesome 10
+
+# Colors
+# first the main theme colors and the accent color are defined to reuse
+# get colours/bg from pywal
+set_from_resource $fg i3wm.color7 #f0f0f0
+set_from_resource $bg i3wm.color2 #f0f0f0
+
+# set $light #424242
+# set $mid #303030
+# set $dark #212121
+
+# set $acc #F44336
+# set $wht #FFFFFF
+# set $blk #000000
+
+# # class                  border  backgr. text    indicator
+# client.focused           $light  $light  $wht
+# client.focused_inactive  $mid    $mid    #c4c4c4
+# client.unfocused         $blk    $dark   #5e5e5e
+# client.urgent            $acc    $acc    $wht
+# client.placeholder       $blk    $mid    $wht
+
+# class                 border  backgr. text indicator child_border
+client.focused          $bg     $bg     $fg  $bg       $bg
+client.focused_inactive $bg     $bg     $fg  $bg       $bg
+client.unfocused        $bg     $bg     $fg  $bg       $bg
+client.urgent           $bg     $bg     $fg  $bg       $bg
+client.placeholder      $bg     $bg     $fg  $bg       $bg
+
+# launch polybar
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+
+#=======================================================================
+#                      Specific program settings
+#=======================================================================
+
+### move programs to specific workspaces ###
+
+assign [class="^Mendeley Desktop$"] → $ws4
+assign [class="^Zotero$"] → $ws4
+assign [class="^Slack$"] → $ws5
+assign [class="^Trello$"] → $ws5
+assign [class="^Inkscape$"] → $ws6
+assign [class="^VirtualBox$" title="^Win10"] $ws8
+assign [class="R_x11"] $ws9
+# assign [class="^Spotify$"] $ws10
+for_window [class="^Spotify$"] move to workspace $ws10
+
+### make programs floating ###
+
+# pop-up windows are always floating
+#for_window [window_role="pop-up"] floating enable
+# Bubble windows (chrome notifications) are always floating
+for_window [window_role="bubble"] floating enable
+for_window [window_role="task_dialog"] floating enable
+for_window [window_role="dialog"] floating enable
+for_window [window_role="menu"] floating enable
+for_window [window_role="Preferences"] floating enable
+for_window [class="^Gnome-calculator"] floating enable sticky enable
+for_window [class="Lxappearance"] floating enable sticky enable border normal
+for_window [class="Arandr"] floating enable
+for_window [class="albert"] move position center
+for_window [instance="emacs-popup"] floating enable
+
+### Specific software launching keybindings ###
+bindsym $mod+b exec firefox
+bindsym $mod+x exec nautilus
+bindsym $mod+m exec emacsclient -c
+bindsym $mod+r exec i3-sensible-terminal -e ranger
+#bindsym $mod+shift+w exec emacs-popup --eval '(org-capture nil "w")'
+#bindsym $mod+Shift+c exec emacs-popup --eval '(org-capture nil "t")'
+
+# Take a screenshot with scrot
+bindsym Print exec "scrot -b /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T.png"
+bindsym --release Shift+Print exec "scrot -s /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T-region.png"
+
+
+#=======================================================================
+#                            Startup software
+#=======================================================================
+
+# screenlayout created w/ arandr
+exec_always --no-startup-id ~/.screenlayout/desktop2screens.sh
+
+# backgrounds for two monitors
+exec_always --no-startup-id nitrogen --restore
+exec --no-startup-id xedgewarp -b        # let mouse shift between screens
+exec --no-startup-id pulseaudio --start  # audio
+exec_always --no-startup-id xbindkeys    # alternative keyboard layout
+exec --no-startup-id volnoti             # volume change notification
+exec --no-startup-id cbatticon           # battery indicator
+exec --no-startup-id compton -b          # composite manager
+exec --no-startup-id nm-applet           # NetworkManager applet
+exec --no-startup-id caffeine            # don't sleep when playing youtube
+# app launcher, launch w/ Control-space
+exec --no-startup-id albert
+
+# f.lux or redshift reduces eye strain at night
+#exec --no-startup-id xflux -l 52.1 -g 5.12
+# default is 3000-4000 during night, 5500-6500 during the day.
+# Netherlands
+exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2500
+
+# file syncs
+# exec --no-startup-id ~/ArchConfigs/multidropbox.sh
+#exec --no-startup-id dropbox
+exec --no-startup-id owncloud           # more uni file sync
+
+#=======================================================================
+#                             Mouse integration
+#=======================================================================
+
+# Hide the mouse when it's not moving
+exec --no-startup-id unclutter
+
+# Mod + rmb over titlebar toggles floating mode
+bindsym $mod+button3 floating toggle
+
+# The middle button over a titlebar kills the window
+bindsym --release button2 kill
+
+# Mouse hovering shouldn't dictate mouse focus
+focus_follows_mouse no
