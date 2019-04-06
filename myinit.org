@@ -99,7 +99,18 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
     "Clear existing theme settings instead of layering them"
     (mapc #'disable-theme custom-enabled-themes))
 #+end_src
-*** apropospriate
+*** doom
+#+begin_src emacs-lisp
+  (use-package doom-themes
+    :ensure t
+    :config
+    (load-theme 'doom-one t)
+    (doom-themes-visual-bell-config)
+    (doom-themes-neotree-config)
+    (doom-themes-treemacs-config)
+    (doom-themes-org-config))
+#+end_src
+*** COMMENT apropospriate
 #+begin_src emacs-lisp
   (use-package apropospriate-theme
     :config (load-theme 'apropospriate-light t))
