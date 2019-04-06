@@ -4,6 +4,6 @@
   (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
   (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/") t)
   (package-initialize)
+  (org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org"))
   (setq custom-file "~/.emacs.d/emacs-custom.el")
-  (load custom-file)
-  (org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org")))
+  (load custom-file))
