@@ -105,3 +105,5 @@ alias pb='curl -F c=@- https://ptpb.pw\?u\=1' # neat pastebin
 alias yt="youtube-dl --add-metadata -ic" # Download video link
 alias yta="youtube-dl --add-metadata -xic" # Download only audio
 alias dis_screen="swaymsg output HDMI-A-2 disable"
+alias ena_screen="swaymsg output HDMI-A-2 enable"
+alias pg="cd ~/SurfDrive/PhD/programming"
