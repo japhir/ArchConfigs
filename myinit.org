@@ -1,3 +1,8 @@
+* set gc-cons threshold low
+#+begin_src emacs-lisp
+(setq gc-cons-threshold 402653184
+      gc-cons-percentage 0.6)
+#+end_src
 * use-package
 Use-package is an amazing resource to clean up my init file and have it play
 nice on both my desktop and laptop.
@@ -54,8 +59,6 @@ is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
   (prefer-coding-system 'utf-8-unix)
 
   (setq mouse-wheel-progressive-speed nil)
-
-  (setq gc-cons-threshold 100000000)
 
   (defalias 'yes-or-no-p 'y-or-n-p)
 
@@ -157,7 +160,7 @@ Highlight hex colours!
   (use-package rainbow-mode
     :hook ((html-mode r-mode) . rainbow-mode))
 #+end_src
-** relative number mode
+** COMMENT relative number mode
 #+begin_src emacs-lisp
   (setq display-line-numbers-type 'visual
         display-line-numbers-current-absolute t
@@ -272,7 +275,7 @@ comment/uncomment with gc
     :config
     (evil-commentary-mode))
 #+end_src
-** evil-indent-plus
+** COMMENT evil-indent-plus
 https://github.com/TheBB/evil-indent-plus
 operate on indentation regions, mainly with ~ii~
 #+begin_src emacs-lisp
@@ -864,6 +867,8 @@ jump to next chararcter. Slightly redundant b/c of evil's =f= and =t=.
   (use-package counsel
     :init (counsel-mode 1)
     :bind
+    ("C-x l" . counsel-locate)
+    ("C-c g" . counsel-git)
     ("M-x" . counsel-M-x)
     ("C-c s" . counsel-rg))
 #+end_src
@@ -1175,10 +1180,6 @@ syntax above.
 #+end_src
 * reset gc-cons-threshold
 #+begin_src emacs-lisp
-  (run-with-idle-timer
-   5 nil
-   (lambda ()
-     (setq gc-cons-threshold 1000000)
-     (message "gc-cons-threshold restored to %S"
-              gc-cons-threshold)))
+  (setq gc-cons-threshold 16777216
+        gc-cons-percentage 0.1)
 #+end_src
