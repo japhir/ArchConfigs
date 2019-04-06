@@ -14,8 +14,8 @@
         "format-icons": {
 	    "1:term": "",
 	    "2:web": "",
-	    "3:emacs": "",
-	    "4:refs": "",
+	    "3:emacs": "",
+	    "4:refs": "",
 	    "5:slack": "",
 	    "6:inkscape": "",
 	    "7:vid": "",
@@ -29,6 +29,9 @@
     },
     "sway/mode": {
         "format": "{}"
+    },
+    "sway/window": {
+	"format": "{}"
     },
     "tray": {
         "icon-size": 21,

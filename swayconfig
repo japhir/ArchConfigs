@@ -198,18 +198,21 @@ assign [class="^Trello$"] $ws5
 assign [class="^Inkscape$"] $ws6
 assign [class="^VirtualBox$" title="^Win10"] $ws8
 assign [class="R_x11"] $ws9
-assign [class="^Spotify$"] $ws10
+# doesn't work somehow?
+#assign [class="Spotify"] $ws10
+#for_window [app_id="spotify"] move --no-auto-back-and-forth container to workspace $ws10
+
 #
 # Layout stuff:
 #
     # You can "split" the current object of your focus with
     # $mod+b or $mod+v, for horizontal and vertical splits
     # respectively.
-    bindsym $mod+b splith
+    # bindsym $mod+b splith
     bindsym $mod+v splitv
 
     # Switch the current container between different layout styles
-    # bindsym $mod+s layout stacking
+    # bindsym $mod+s layout stacking  # I never use stacking
     bindsym $mod+w layout tabbed
     bindsym $mod+e layout toggle split
 
@@ -268,13 +271,13 @@ bindsym XF86WLAN              exec --no-startup-id sudo systemctl restart Networ
 # bindsym XF86Bluetooth
 
 # lock screen
-bindsym $mod+Delete exec ~/ArchConfigs/launchswaylock.sh
+bindsym $mod+Delete exec swaylock -c 000000
+# ~/ArchConfigs/launchswaylock.sh
 
 # Status Bar:
 #
 # Read `man 5 sway-bar` for more information about this section.
 
-exec --no-startup-id waybar
 # bar {
 #    swaybar_command waybar
 #    mode hide
@@ -298,10 +301,14 @@ exec --no-startup-id waybar
 # }
 # include /etc/sway/config.d/*
 
-# launch software keybindings
-bindsym $mod+c exec firefox
-bindsym $mod+x exec nautilus
-bindsym $mod+m exec emacsclient -c -n -e '(switch-to-buffer nil)'
+# launch
+# keybinding        software                                        mnemonic(ish?)
+bindsym $mod+b exec firefox                                       # firefox browser
+bindsym $mod+x exec nautilus                                      # xxx file manager
+bindsym $mod+m exec emacsclient -c -n -e '(switch-to-buffer nil)' # eMacs
+bindsym $mod+i exec inkscape
+bindsym $mod+s exec slack                                         # slack messages
+bindsym $mod+o exec libreoffice                                   # office
 
 bindsym Print exec grim ~/Pictures/Screenshots/$(date +'%F-%T.png')
 bindsym --release Shift+Print exec slurp | grim -g - -c ~/Pictures/Screenshots/$(date +'%F-%T_region.png')
@@ -309,15 +316,12 @@ bindsym --release Shift+Print exec slurp | grim -g - -c ~/Pictures/Screenshots/$
 # startup software for the tray doesn't work now!
 # exec --no-startup-id cbatticon           # battery indicator
 # exec --no-startup-id nm-applet           # NetworkManager applet
-# so I use nmtui from terminal for now
+# so I use nmtui from terminal for now for new wifi networks
 
 exec --no-startup-id volnoti               # volume change notification
 exec --no-startup-id redshift -l 52.1:5.12 -m wayland -t 5500:2500
-
-# app launcher, launch w/ Control-space
-exec --no-startup-id albert
-#exec --no-startup-id dropbox
 exec --no-startup-id owncloud
+exec --no-startup-id waybar
 
 # gaps
 default_border pixel 1
@@ -337,3 +341,6 @@ bindsym $mod+Shift+z gaps outer current minus 5
 # for_window [class="^Emacs$"] opacity 0.95
 
 include /etc/sway/config.d/*
+
+# add X or wayland session to title
+for_window [shell=".*"] title_format "%title :: %shell"
