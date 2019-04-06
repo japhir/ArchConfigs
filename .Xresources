@@ -39,7 +39,7 @@ URxvt*scrollBar:        false
 URxvt*depth:            32
 URxvt*background: 	rgba:0000/0000/0200/c800
 
-URxvt*font:             xft:Source Code Pro:hinting=True:antialias=True:pixelsize=16,pango:Font Awesome 5 Free,pango:Font Awesome 5 Brands
+URxvt*font:             xft:Droid Sans Mono:hinting=True:antialias=True:pixelsize=16,pango:Font Awesome 5 Free,pango:Font Awesome 5 Brands
 URxvt.allow_bold:       true
 URxvt.letterSpace: 0
 
