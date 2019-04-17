@@ -45,6 +45,7 @@ is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
   (tool-bar-mode -1)     ; turn off the tool bar
   (menu-bar-mode -1)     ; turn off the menu
   (setq visible-bell 1)  ; turn off beeps, make them flash!
+  (global-hl-line-mode t)
   ;; typing
   (setq-default fill-column 79)
   (setq sentence-end-double-space nil)
@@ -52,7 +53,6 @@ is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
   (delete-selection-mode 1)
   ;; backspace deletes one character instead of one column
   (global-set-key (kbd "DEL") 'backward-delete-char)
-
   ;; remove trailing whitespace before save
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
   ;; prefer utf-8
@@ -110,6 +110,12 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
     (doom-themes-treemacs-config)
     (doom-themes-org-config))
 #+end_src
+*** doom modeline
+#+begin_src emacs-lisp
+(use-package doom-modeline
+      :ensure t
+      :hook (after-init . doom-modeline-mode))
+#+end_src
 *** COMMENT apropospriate
 #+begin_src emacs-lisp
   (use-package apropospriate-theme
@@ -154,7 +160,7 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
     (setq right-margin-width 2)
     (set-window-buffer nil (current-buffer))))
 #+end_src
-** beacon
+** COMMENT beacon
 Highlight the current line when scrolling
 #+begin_src emacs-lisp
   (use-package beacon
@@ -163,7 +169,6 @@ Highlight the current line when scrolling
     :config
     (setq beacon-size 80)
     (setq beacon-color "#ffcccc"))
-  (global-hl-line-mode t)
 #+end_src
 ** rainbow-mode
 Highlight hex colours!
@@ -195,7 +200,7 @@ Insert demos after describe function https://github.com/xuchunyang/elisp-demos
     :config
     (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
 #+end_src
-** telephone-line
+** COMMENT telephone-line
 very nice powerline-based status line
 #+begin_src emacs-lisp
   (use-package telephone-line
@@ -253,7 +258,7 @@ evil keymap for org-mode
     (require 'evil-org-agenda)
     (evil-org-agenda-set-keys))
 #+end_src
-** evil-escape
+** COMMENT evil-escape
 https://github.com/syl20bnr/evil-escape
 escape from everything using =jk=
 #+begin_src emacs-lisp
@@ -264,7 +269,8 @@ escape from everything using =jk=
     (setq-default evil-escape-key-sequence "jk"))
 #+end_src
 ** evil-easymotion
-https://github.com/PythonNut/evil-easymotion/
+Link evil forward commands etc. to avy jump previews so you can jump down 10
+lines if you forgot to press 10j. https://github.com/PythonNut/evil-easymotion/
 #+begin_src emacs-lisp
   (use-package evil-easymotion
     :config
@@ -364,7 +370,7 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 #+begin_src emacs-lisp
   :config
   (setq org-return-follows-link t)
-  (setf org-special-ctrl-a/e t)
+  ;; (setf org-special-ctrl-a/e t) ; I use evil's 0 and $ anyway
   ;; folded drawers no longer ruin new entries
   (setq org-M-RET-may-split-line '((default . nil)))
   (setq org-startup-with-inline-images t)
@@ -372,9 +378,9 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 ** clocking/logging
 #+begin_src emacs-lisp
   (setq org-check-running-clock t
-        org-log-note-clock-out t)
-  (setq org-log-done 'time)
-  (setq org-log-into-drawer t)
+        org-log-note-clock-out t
+        org-log-done 'time
+        org-log-into-drawer t)
 #+end_src
 ** theming
 #+begin_src emacs-lisp
@@ -419,11 +425,11 @@ prettify org mode
   (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
   (setq org-deadline-warning-days 14)
   ;; exclude scheduled items from all todo's in list
-  ;; (setq org-agenda-todo-ignore-scheduled t)
+  (setq org-agenda-todo-ignore-scheduled t)
   ;; (setq org-agenda-todo-ignore-deadlines t)
   ;; (setq org-agenda-todo-ignore-timestamp t)
   ;; (setq org-agenda-todo-ignore-with-date t)
-  (setq org-agenda-prefix-format "  %-17:c%?-12t% s")
+  ;;(setq org-agenda-prefix-format "  %-17:c%?-12t% s") ; TODO: see if I like the default
   (setq org-agenda-include-all-todo nil)
 #+end_src
 *** agenda files
@@ -435,7 +441,6 @@ all the org-files in my org-directory
 *** refile targets
 swyper makes refiling amazing!
 #+begin_src emacs-lisp
-  ;; TODO: refile without the annoying ^ regex
   (setq org-refile-targets (quote ((nil :maxlevel . 9)  ;; current file
                                    (org-gtd-file :maxlevel . 3)
                                    (org-tickler-file :maxlevel . 2)
@@ -497,8 +502,8 @@ Filter tasks by context (sorted by todo state)
 customize capture templates
  #+begin_src emacs-lisp
    (setq org-capture-templates
-         '(("a" "Appointment" entry (file org-in-file)
-            "* %?\n  %^T\n")
+         '(;("a" "Appointment" entry (file org-in-file)
+           ; "* %?\n  %^T\n")
            ("t" "Todo" entry (file org-in-file)
             "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
            ("T" "Todo-nolink-tag" entry (file org-in-file)
@@ -551,6 +556,7 @@ customize capture templates
                         ("@bank" . ?b)      ;; I need my little reader thingie
                         ("@write" . ?w)
                         ("@program" . ?p)
+                        ("@createplot" . ?C)
                         ("@read" . ?r)
                         ("@research" . ?g)
                         ("@schedule" . ?s)
@@ -567,15 +573,6 @@ customize capture templates
                         ("Martin" . ?M) ("Inigo" . ?I) ("Anne" . ?A) ("Appy") ("FEST")))
 #+end_src
 ** exporting
-*** source code block settings
-#+begin_src emacs-lisp
-  (setq org-src-fontify-natively t
-        org-src-tab-acts-natively t)
-  (add-to-list 'org-structure-template-alist
-               '("se" . "src emacs-lisp"))
-  (add-to-list 'org-structure-template-alist
-               '("sr" . "src R"))
-#+end_src
 *** org-babel languages
 #+begin_src emacs-lisp
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
@@ -641,6 +638,17 @@ possible.
                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+end_src
+*** org source code block settings
+#+begin_src emacs-lisp
+  (setq org-src-fontify-natively t
+        org-src-tab-acts-natively t
+        org-src-window-setup 'current-window)
+  (add-to-list 'org-structure-template-alist
+               '("se" . "src emacs-lisp"))
+  ;; TODO figure out how to add multiple items to the list
+  (add-to-list 'org-structure-template-alist
+               '("sr" . "src R"))
 #+end_src
 ** close use-package org
 #+begin_src emacs-lisp
@@ -743,6 +751,8 @@ By default C-x 8 o = ° and C-x 8 m = µ. So:
   (global-set-key (kbd "C-x 8 d") (lambda () (interactive) (insert "δ")))
   (global-set-key (kbd "C-x 8 D") (lambda () (interactive) (insert "Δ")))
 #+end_src
+I also use compose-key, mapped to right alt with some custom settings for
+<ralt> g d, resulting in δ, for example.
 ** all-the-icons
 https://github.com/domtronn/all-the-icons.el
 #+begin_src emacs-lisp
@@ -762,14 +772,14 @@ https://github.com/domtronn/all-the-icons.el
     :config
     (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))
 #+end_src
-** treemacs
+** COMMENT treemacs
 #+begin_src emacs-lisp
-  (use-package treemacs
-    :ensure t
-    :defer t
-    :bind ("<f8>" . treemacs))
+    (use-package treemacs
+      :ensure t
+      :defer t
+      :bind ("<f8>" . treemacs))
 #+end_src
-** treemacs-evil
+** COMMENT treemacs-evil
 #+begin_src emacs-lisp
   (use-package treemacs-evil
       :ensure t
@@ -807,14 +817,14 @@ https://github.com/domtronn/all-the-icons.el
       (eshell-send-input)))
   (global-set-key (kbd "C-!") 'eshell-here)
 #+end_src
-*** close current eshell
+*** COMMENT close current eshell
 #+begin_src emacs-lisp
   (defun eshell/x ()
     (insert "exit")
     (eshell-send-input)
     (delete-window))
 #+end_src
-*** C-l clears the eshell buffer
+*** COMMENT C-l clears the eshell buffer
  #+begin_src emacs-lisp
  (defun eshell-clear-buffer ()
    "Clear terminal"
@@ -883,14 +893,25 @@ jump to next chararcter. Slightly redundant b/c of evil's =f= and =t=.
     ("M-x" . counsel-M-x)
     ("C-c s" . counsel-rg))
 #+end_src
+** COMMENT ace-link
+#+begin_src emacs-lisp
+  (use-package ace-link
+    :init (ace-link-setup-default))
+    ;; :bind
+    ;; (:map org-mode-map
+          ;; ("M-o" . ace-link-org)))
+    ;; (:map helpful-mode-map
+          ;; ("o" . ace-link-help)))
+#+end_src
 ** magit
-git management
+git management, essential!
 #+begin_src emacs-lisp
   (use-package magit
     :bind
     ("M-g" . magit-status))
 #+end_src
 ** diff-hl
+Highlight diffs of current version-controlled buffer in the margin. Quite cool!
 #+begin_src emacs-lisp
   (use-package diff-hl
     :init
@@ -978,7 +999,7 @@ Then load it into emacs when opening a PKGBUILD file
 #+begin_src emacs-lisp
   (use-package writeroom-mode)
 #+end_src
-** erc
+** COMMENT erc
 I use weechat on command line now
 #+begin_src emacs-lisp
   (use-package erc
@@ -1064,7 +1085,7 @@ install it with pacman ~mu~
     :config
     (global-mu4e-conversation-mode))
 #+end_src
-** mu4e notifications
+** COMMENT mu4e notifications
 #+begin_src emacs-lisp
   (use-package mu4e-alert
     :after mu4e
@@ -1075,17 +1096,23 @@ install it with pacman ~mu~
 * science packages
 ** ess
 emacs speaks statistics, work with R etc.
+*** electric-spacing
+Put spaces around operators such as +, -, etc.
+#+begin_src emacs-lisp
+  (use-package electric-spacing)
+#+end_src
 *** use-package
 #+begin_src emacs-lisp
   (use-package ess
     ;; :load-path "/usr/share/emacs/site-lisp/ess/"
     :commands R
     ;; :init (require 'ess-r-mode)
+    :hook (ess-r-mode . electric-spacing-mode)
     :config
     (defun my-org-confirm-babel-evaluate (lang body)
       (not (string= lang "R")))  ; don't ask for R
-    (setq ess-default-style 'RStudio)
     (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+    (ess-set-style 'RStudio)
     (setq inferior-R-args "--no-restore-history --no-save"))
     ;; :bind (:map ess-mode-map (";" . ess-insert-assign)))
 #+end_src
@@ -1131,6 +1158,16 @@ exporting markdown
     :ensure t
     :hook (markdown-mode . pandoc-mode))
 #+end_src
+** org-pandoc
+https://github.com/kawabata/ox-pandoc
+#+begin_src emacs-lisp
+  (use-package ox-pandoc
+    :config
+    (setq org-pandoc-options '((bibliography
+          . "/home/japhir/Documents/References/PhD.bib"))
+          org-pandoc-options-for-docx '((reference-docx
+          . "/home/japhir/SurfDrive/PhD/chapters/wordtemplate.docx"))))
+#+end_src
 ** LaTeX (AUCTeX, RefTeX)
 for working with \LaTeX
 #+begin_src emacs-lisp
@@ -1161,7 +1198,7 @@ for working with \LaTeX
                 ("C-c k" . hl-todo-previous)
                 ("C-c j" . hl-todo-next))
     :hook
-    ((LaTeX-mode ess-mode) . hl-todo-mode))
+    ((LaTeX-mode ess-mode ess-r-mode org-mode) . hl-todo-mode))
 #+end_src
 ** bibtex/ivy-bibtex
 reference manager I use it in conjunction with zotero, which generates the
