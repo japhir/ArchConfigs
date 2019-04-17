@@ -116,73 +116,11 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
       :ensure t
       :hook (after-init . doom-modeline-mode))
 #+end_src
-*** COMMENT apropospriate
-#+begin_src emacs-lisp
-  (use-package apropospriate-theme
-    :config (load-theme 'apropospriate-light t))
-#+end_src
-*** COMMENT poet
-**** use-package
-#+begin_src emacs-lisp :tangle no
-  (use-package poet-theme
-    :ensure t
-    :hook (text-mode . (lambda() (variable-pitch-mode 1)))
-    :init
-    (set-face-attribute 'default nil :family "Iosevka" :height 130)
-    (set-face-attribute 'fixed-pitch nil :family "Iosevka" :height 125)
-    (set-face-attribute 'variable-pitch nil :family "ETBookOT")
-    :config
-    (load-theme 'poet-dark))
-#+end_src
-**** COMMENT no use-package
-#+begin_src emacs-lisp
-  (set-face-attribute 'default nil :family "Iosevka" :height 120)
-  (set-face-attribute 'fixed-pitch nil :family "Iosevka")
-  (set-face-attribute 'variable-pitch nil :family "Baskerville")
-  (load-theme 'poet)
-  (add-hook 'text-mode-hook
-            (lambda ()
-              (variable-pitch-mode 1)))
-#+end_src
-
-*** COMMENT fonts
-#+begin_src emacs-lisp
-  (set-face-attribute 'default nil :family "Fira Code" :height 130)
-  (set-face-attribute 'fixed-pitch nil :family "Fira Code" :height 130)
-  (set-face-attribute 'variable-pitch nil :family "ETBookOT" :height 150)
-  (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
-#+end_src
-*** COMMENT padding
-#+begin_src emacs-lisp
-  (setq line-spacing 0.1)
-  (lambda () (progn
-    (setq left-margin-width 2)
-    (setq right-margin-width 2)
-    (set-window-buffer nil (current-buffer))))
-#+end_src
-** COMMENT beacon
-Highlight the current line when scrolling
-#+begin_src emacs-lisp
-  (use-package beacon
-    :init (beacon-mode 1)
-    :diminish beacon-mode
-    :config
-    (setq beacon-size 80)
-    (setq beacon-color "#ffcccc"))
-#+end_src
 ** rainbow-mode
 Highlight hex colours!
 #+begin_src emacs-lisp
   (use-package rainbow-mode
     :hook ((html-mode r-mode) . rainbow-mode))
-#+end_src
-** COMMENT relative number mode
-#+begin_src emacs-lisp
-  (setq display-line-numbers-type 'visual
-        display-line-numbers-current-absolute t
-        display-line-numbers-width 4
-        display-line-numbers-widen nil)
-  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+end_src
 ** compilation window height
 #+begin_src emacs-lisp
@@ -199,27 +137,6 @@ Insert demos after describe function https://github.com/xuchunyang/elisp-demos
   (use-package elisp-demos
     :config
     (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
-#+end_src
-** COMMENT telephone-line
-very nice powerline-based status line
-#+begin_src emacs-lisp
-  (use-package telephone-line
-    :after evil
-    :init
-    (setq telephone-line-lhs
-          '((evil   . (telephone-line-evil-tag-segment))
-            (accent . (telephone-line-vc-segment
-                       telephone-line-erc-modified-channels-segment
-                       telephone-line-process-segment))
-            (nil    . (;telephone-line-minor-mode-segment
-                       telephone-line-buffer-segment))))
-    (setq telephone-line-rhs
-          '((nil    . (telephone-line-misc-info-segment))
-            (accent . (telephone-line-major-mode-segment))
-          (evil   . (telephone-line-airline-position-segment))))
-    :config
-    (require 'telephone-line-config)
-    (telephone-line-evil-config))
 #+end_src
 * evil
 ** evil
@@ -258,16 +175,6 @@ evil keymap for org-mode
     (require 'evil-org-agenda)
     (evil-org-agenda-set-keys))
 #+end_src
-** COMMENT evil-escape
-https://github.com/syl20bnr/evil-escape
-escape from everything using =jk=
-#+begin_src emacs-lisp
-  (use-package evil-escape
-    :diminish evil-escape-mode
-    :config
-    (evil-escape-mode 1)
-    (setq-default evil-escape-key-sequence "jk"))
-#+end_src
 ** evil-easymotion
 Link evil forward commands etc. to avy jump previews so you can jump down 10
 lines if you forgot to press 10j. https://github.com/PythonNut/evil-easymotion/
@@ -292,29 +199,6 @@ comment/uncomment with gc
     :config
     (evil-commentary-mode))
 #+end_src
-** COMMENT evil-indent-plus
-https://github.com/TheBB/evil-indent-plus
-operate on indentation regions, mainly with ~ii~
-#+begin_src emacs-lisp
-  (use-package evil-indent-plus
-    :config
-    (evil-indent-plus-default-bindings))
-#+end_src
-** COMMENT evil-leader
-#+begin_src emacs-lisp
-  (use-package evil-leader  ; default is \
-    :config
-    (evil-leader/set-leader "SPC>")
-    (global-evil-leader-mode)
-    (evil-leader/set-key
-      "i" 'evilnc-comment-or-uncomment-lines
-      "l" 'evilnc-quick-comment-or-uncomment-to-the-line
-      "c" 'evilnc-copy-and-comment-lines
-      "p" 'evilnc-comment-or-uncomment-paragraphs
-      "r" 'comment-or-uncomment-region
-      "v" 'evilnc-toggle-invert-comment-line-by-line
-      "."  'evilnc-copy-and-comment-operator))
-#+end_src
 ** evil-magit
 evil keybindings for magit
 #+begin_src emacs-lisp
@@ -322,6 +206,7 @@ evil keybindings for magit
     :after magit
     :hook
     (git-commit-mode . evil-insert-state)
+    (magit-mode . turn-off-evil-snipe-override-mode)
     :config
     (evil-set-initial-state 'magit-log-edit-mode 'insert))
 #+end_src
@@ -350,10 +235,6 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
   (use-package org
     :pin org
     :ensure org-plus-contrib
-#+end_src
-** COMMENT hooks
-#+begin_src emacs-lisp
-  :hook (org-mode . variable-pitch-mode)
 #+end_src
 ** keybindings
 #+begin_src emacs-lisp
@@ -660,36 +541,6 @@ possible.
     :after org
     :bind ("C-c p" . org-pomodoro))
 #+end_src
-** COMMENT org-fancy-capture attempt
-#+begin_src emacs-lisp
-  ;;;; Thank you random guy from StackOverflow
-  ;;;; http://stackoverflow.com/questions/23517372/hook-or-advice-when-aborting-org-capture-before-template-selection
-  (require 'org-capture)
-  (require 'org-protocol)
-  (defadvice org-capture
-      (after make-full-window-frame activate)
-    "Advise capture to be the only window when used as a popup"
-    (if (equal "emacs-popup" (frame-parameter nil 'name))
-        (delete-other-windows)))
-  (defadvice org-capture-finalize
-      (after delete-capture-frame activate)
-    "Advise capture-finalize to close the frame"
-    (if (equal "emacs-popup" (frame-parameter nil 'name))
-        (delete-frame)))
-#+end_src
-** COMMENT org-gcal
-synchronize google calendar with org. Note that these settings are
-overwritten by a private file that has my different calendars and IDs.
-#+begin_src emacs-lisp
-  (use-package org-gcal
-    :after org
-    :bind (:map org-agenda-mode-map
-                ("C-S-u" . org-gcal-fetch))  ;; same key as mu4e!
-    :config
-    (setq org-gcal-client-id "<your-client-id>"
-          org-gcal-client-secret "<your-client-secret>"
-          org-gcal-file-alist '(("<link>@group.calendar.google.com>" . "<link-to-org-file>"))))
-#+end_src
 ** org-pdfview
 #+begin_src emacs-lisp
   (use-package org-pdfview
@@ -765,88 +616,9 @@ https://github.com/domtronn/all-the-icons.el
     :config
     (all-the-icons-ivy-setup))
 #+end_src
-** COMMENT neotree
-#+begin_src emacs-lisp
-  (use-package neotree
-    :bind ("<f8>" . neotree-toggle)
-    :config
-    (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))
-#+end_src
-** COMMENT treemacs
-#+begin_src emacs-lisp
-    (use-package treemacs
-      :ensure t
-      :defer t
-      :bind ("<f8>" . treemacs))
-#+end_src
-** COMMENT treemacs-evil
-#+begin_src emacs-lisp
-  (use-package treemacs-evil
-      :ensure t
-      :after treemacs evil)
-#+end_src
-** COMMENT treemacs-magit
-#+begin_src emacs-lisp
-  (use-package treemacs-magit
-    :ensure t
-    :after treemacs magit)
-#+end_src
 ** revert buffer
 #+begin_src emacs-lisp
   (global-set-key (kbd "<f5>") 'revert-buffer)
-#+end_src
-** COMMENT eshell
-*** open an eshell here
-#+begin_src emacs-lisp
-  (defun eshell-here ()
-    "Opens up a new shell in the directory associated with the
-  current buffer's file. The eshell is renamed to match that
-  directory to make multiple eshell windows easier."
-    (interactive)
-    (let* ((parent (if (buffer-file-name)
-                       (file-name-directory (buffer-file-name))
-                     default-directory))
-           (height (/ (window-total-height) 3))
-           (name   (car (last (split-string parent "/" t)))))
-      (split-window-vertically (- height))
-      (other-window 1)
-      (eshell "new")
-      (rename-buffer (concat "*eshell: " name "*"))
-
-      (insert (concat "ls"))
-      (eshell-send-input)))
-  (global-set-key (kbd "C-!") 'eshell-here)
-#+end_src
-*** COMMENT close current eshell
-#+begin_src emacs-lisp
-  (defun eshell/x ()
-    (insert "exit")
-    (eshell-send-input)
-    (delete-window))
-#+end_src
-*** COMMENT C-l clears the eshell buffer
- #+begin_src emacs-lisp
- (defun eshell-clear-buffer ()
-   "Clear terminal"
-   (interactive)
-   (let ((inhibit-read-only t))
-     (erase-buffer)
-     (eshell-send-input)))
- (add-hook 'eshell-mode-hook
-	   '(lambda()
-	      (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
- #+end_src
-** COMMENT ranger
-#+begin_src emacs-lisp
-  (use-package ranger
-    :bind
-    ("C-c r" . ranger)
-    :config
-    (setq ranger-show-hidden nil)
-    (setq ranger-show-literal nil)
-    (setq ranger-show-preview t)
-    (setq ranger-width-preview 0.55)
-    (ranger-override-dired-mode t))
 #+end_src
 ** pdf-tools
 #+begin_src emacs-lisp
@@ -874,15 +646,6 @@ very nice search replacement
     ("C-c v" . ivy-push-view)
     ("C-c V" . ivy-pop-view))
 #+end_src
-** COMMENT avy
-jump to next chararcter. Slightly redundant b/c of evil's =f= and =t=.
-#+begin_src emacs-lisp
-  (use-package avy
-    :bind
-    ("C-:" . avy-goto-char)
-    ("C-'" . avy-goto-char-2)
-    ("M-w" . avy-goto-word-1))
-#+end_src
 ** counsel
 #+begin_src emacs-lisp
   (use-package counsel
@@ -892,16 +655,6 @@ jump to next chararcter. Slightly redundant b/c of evil's =f= and =t=.
     ("C-c g" . counsel-git)
     ("M-x" . counsel-M-x)
     ("C-c s" . counsel-rg))
-#+end_src
-** COMMENT ace-link
-#+begin_src emacs-lisp
-  (use-package ace-link
-    :init (ace-link-setup-default))
-    ;; :bind
-    ;; (:map org-mode-map
-          ;; ("M-o" . ace-link-org)))
-    ;; (:map helpful-mode-map
-          ;; ("o" . ace-link-help)))
 #+end_src
 ** magit
 git management, essential!
@@ -919,51 +672,6 @@ Highlight diffs of current version-controlled buffer in the margin. Quite cool!
     (setq diff-hl-gutter-mode t)
     (diff-hl-flydiff-mode +1)
     :hook (magit-post-refresh . diff-hl-magit-post-refresh))
-#+end_src
-** COMMENT hydra
-file bookmarks
-#+begin_src emacs-lisp
-  (use-package hydra
-    :config
-    (global-set-key
-     (kbd "C-c j")
-     (defhydra hydra-jump (:color blue)
-       "jump"
-       ("d" (counsel-find-file "~/Documents") "Documents")
-       ("D" (counsel-find-file "~/Downloads") "Downloads")
-       ("p" (counsel-find-file "~/SurfDrive/PhD/projects") "projects")
-       ;; this doesn't work
-       ;("pt" (counsel-find-file "~/SurfDrive/PhD/presentations") "presentations")
-       ))
-       ;; what could be a good way to do this?
-    (global-set-key
-     (kbd "C-c p")
-     (defhydra hydra-projects (:color blue)
-       "projects"
-       ("s" (counsel-find-file "~/SurfDrive/PhD/projects/standardstats") "standardstats"))))
-#+end_src
-** COMMENT auto-complete
-auto complete everything
-#+begin_src emacs-lisp
-  (use-package auto-complete
-    :after yasnippet
-    :init
-    (ac-config-default)
-    (global-auto-complete-mode t)
-    :config
-    (setq auto-show-delay nil)
-    (setq-default ac-sources (push 'ac-source-yasnippet ac-sources)))
-#+end_src
-** COMMENT flycheck
-#+begin_src emacs-lisp
-  (use-package flycheck
-    :init
-    (global-flycheck-mode t))
-#+end_src
-** COMMENT web dictionary
-#+begin_src emacs-lisp
-  (use-package define-word
-    :bind ("C-c d" . define-word))
 #+end_src
 ** yasnippet
 usefull snippets for me: org-mode (fig_, )
@@ -994,20 +702,6 @@ Then load it into emacs when opening a PKGBUILD file
 ** systemd
 #+begin_src emacs-lisp
   (use-package systemd)
-#+end_src
-** COMMENT writeroom-mode
-#+begin_src emacs-lisp
-  (use-package writeroom-mode)
-#+end_src
-** COMMENT erc
-I use weechat on command line now
-#+begin_src emacs-lisp
-  (use-package erc
-    :ensure nil
-    :config
-    (setq erc-hide-list '("JOIN" "PART" "QUIT"))
-    (setq erc-track-exclude-types '("JOIN" "MODE"
-      "NICK" "PART" "QUIT" "305" "306" "324" "329" "332" "333" "353" "477")))
 #+end_src
 ** calendar
 perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collection/issues/211][evil-collection issue]]
@@ -1079,20 +773,6 @@ install it with pacman ~mu~
     (require 'org-mu4e)
     (setq org-mu4e-link-query-in-headers-mode nil))
 #+end_src
-** COMMENT mu4e-conversation
-#+begin_src emacs-lisp
-  (use-package mu4e-conversation
-    :config
-    (global-mu4e-conversation-mode))
-#+end_src
-** COMMENT mu4e notifications
-#+begin_src emacs-lisp
-  (use-package mu4e-alert
-    :after mu4e
-    :config
-    (mu4e-alert-set-default-style 'libnotify)
-    :hook (after-init . mu4e-alert-enable-notifications))
-#+end_src
 * science packages
 ** ess
 emacs speaks statistics, work with R etc.
@@ -1115,17 +795,6 @@ Put spaces around operators such as +, -, etc.
     (ess-set-style 'RStudio)
     (setq inferior-R-args "--no-restore-history --no-save"))
     ;; :bind (:map ess-mode-map (";" . ess-insert-assign)))
-#+end_src
-*** COMMENT non-use-package
-#+begin_src emacs-lisp
-  (setq load-path (cons "/usr/share/emacs/site-lisp/ess" load-path))
-  ;;(require 'ess-site)
-  (load "ess-autoloads")
-  (defun my-org-confirm-babel-evaluate (lang body)
-    (not (string= lang "R")))  ; don't ask for R
-  (setq ess-default-style 'RStudio)
-  (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
-  (setq inferior-R-args "--no-restore-history --no-save")
 #+end_src
 ** markdown-mode
 markdown mode for writing
