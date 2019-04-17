@@ -1,0 +1,10 @@
+include "%L"
+
+<Multi_key> <g> <a> : "α"
+<Multi_key> <g> <b> : "β"
+<Multi_key> <g> <y> : "ɣ"
+<Multi_key> <g> <d> : "δ"
+<Multi_key> <g> <D> : "Δ"
+<Multi_key> <g> <m> : "µ"
+<Multi_key> <g> <u> : "µ"
+<Multi_key> <g> <p> : "π"

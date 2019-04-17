@@ -47,11 +47,11 @@ output $bigscreen {
 ### Idle configuration
 #
 # Example configuration:
- exec swayidle \
-     timeout 300 'swaylock -c 000000' \
-     timeout 600 'swaymsg "output * dpms off"' \
-        resume 'swaymsg "output * dpms on"' \
-     before-sleep 'swaylock -c 000000'
+exec swayidle \
+    timeout 300 'swaylock -c 000000' \
+    timeout 600 'swaymsg "output * dpms off"' \
+       resume 'swaymsg "output * dpms on"' \
+    before-sleep 'swaylock -c 000000'
 #
 # This will lock your screen after 300 seconds of inactivity, then turn off
 # your displays after another 600 seconds, and turn your screens back on when
@@ -253,21 +253,21 @@ bindsym $mod+Shift+o resize grow   width  20 px or 20 ppt
 
 # media keys
 # Increase volume
-bindsym XF86AudioRaiseVolume exec --no-startup-id "amixer set Master 2%+ && volnoti-show $(amixer get Master | grep -Po '[0-9]+(?=%)' | head -1)"
-bindsym XF86AudioLowerVolume exec --no-startup-id "amixer set Master 2%- && volnoti-show $(amixer get Master | grep -Po '[0-9]+(?=%)' | head -1)"
-bindsym --locked XF86AudioMute exec --no-startup-id "amixer set Master toggle && if amixer get Master | grep -Fq '[off]'; then volnoti-show -m; else volnoti-show $(amixer get Master | grep -Po '[0-9]+(?=%)' | head -1); fi"
+bindsym XF86AudioRaiseVolume exec "amixer set Master 2%+ && volnoti-show $(amixer get Master | grep -Po '[0-9]+(?=%)' | head -1)"
+bindsym XF86AudioLowerVolume exec "amixer set Master 2%- && volnoti-show $(amixer get Master | grep -Po '[0-9]+(?=%)' | head -1)"
+bindsym --locked XF86AudioMute exec "amixer set Master toggle && if amixer get Master | grep -Fq '[off]'; then volnoti-show -m; else volnoti-show $(amixer get Master | grep -Po '[0-9]+(?=%)' | head -1); fi"
 # Suspend also locks
-bindsym XF86Sleep             exec --no-startup-id "systemctl suspend"
-bindsym --locked XF86AudioPlay         exec --no-startup-id playerctl play-pause
+bindsym XF86Sleep             exec "systemctl suspend"
+bindsym --locked XF86AudioPlay         exec playerctl play-pause
 #bindsym XF86AudioPause        exec playerctl pause
-bindsym XF86AudioNext         exec --no-startup-id playerctl next
-bindsym XF86AudioPrev         exec --no-startup-id playerctl previous
-bindsym XF86AudioMicMute      exec --no-startup-id amixer set Capture toggle
-bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 10%-
-bindsym XF86MonBrightnessUp   exec --no-startup-id brightnessctl set +10%
-# bindsym XF86Display           exec --no-startup-id arandr
-bindsym XF86WLAN              exec --no-startup-id sudo systemctl restart NetworkManager
-# bindsym XF86Tools             exec --no-startup-id lxappearance
+bindsym XF86AudioNext         exec playerctl next
+bindsym XF86AudioPrev         exec playerctl previous
+bindsym XF86AudioMicMute      exec amixer set Capture toggle
+# bindsym XF86MonBrightnessDown exec brightnessctl set 10%-
+# bindsym XF86MonBrightnessUp   exec brightnessctl set +10%
+# bindsym XF86Display           exec arandr
+bindsym XF86WLAN              exec sudo systemctl restart NetworkManager
+# bindsym XF86Tools             exec lxappearance
 # bindsym XF86Bluetooth
 
 # lock screen
@@ -318,10 +318,10 @@ bindsym --release Shift+Print exec slurp | grim -g - -c ~/Pictures/Screenshots/$
 # exec --no-startup-id nm-applet           # NetworkManager applet
 # so I use nmtui from terminal for now for new wifi networks
 
-exec --no-startup-id volnoti               # volume change notification
-exec --no-startup-id redshift -l 52.1:5.12 -m wayland -t 5500:2500
-exec --no-startup-id owncloud
-exec --no-startup-id waybar
+exec volnoti               # volume change notification
+exec redshift -l 52.1:5.12 -m wayland -t 5500:2500
+exec owncloud
+exec waybar
 
 # gaps
 default_border pixel 1
