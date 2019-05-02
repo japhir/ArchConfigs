@@ -79,6 +79,21 @@ let my window manager handle screen creation
   (use-package frames-only-mode
     :config (setq frames-only-mode t))
 #+end_src
+** clone-indirect-buffer-other-frame
+#+begin_src emacs-lisp
+  (defun clone-indirect-buffer-other-frame (newname display-flag &optional norecord)
+    "Like `clone-indirect-buffer' but display in another frame."
+    (interactive
+     (progn
+       (if (get major-mode 'no-clone-indirect)
+           (error "Cannot indirectly clone a buffer in %s mode" mode-name))
+       (list (if current-prefix-arg
+                 (read-buffer "Name of indirect buffer: " (current-buffer)))
+             t)))
+    (let ((pop-up-frames t))
+      (clone-indirect-buffer newname display-flag norecord)))
+  (global-set-key (kbd "C-x 5 c") 'clone-indirect-buffer-other-frame)
+#+end_src
 ** play nice with parentheses
 #+begin_src emacs-lisp
   (electric-pair-mode 1) ; auto-insert matching bracket
