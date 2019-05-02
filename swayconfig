@@ -16,7 +16,7 @@ exec xrdb ~/.Xresources			# load urxvt customisations
 set $term urxvt
 # Your preferred application launcher
 # Note: it's recommended that you pass the final command to sway
-set $menu dmenu_path | rofi -dmenu | xargs swaymsg exec
+set $menu dmenu_path | rofi -dmenu | xargs swaymsg exec --
 
 ### Output configuration
 
@@ -47,18 +47,18 @@ output $bigscreen {
 ### Idle configuration
 #
 # Example configuration:
-exec swayidle \
-    timeout 300 'swaylock -c 000000' \
-    timeout 600 'swaymsg "output * dpms off"' \
-       resume 'swaymsg "output * dpms on"' \
-    before-sleep 'swaylock -c 000000'
 #
+exec swayidle -w \
+         timeout 300 'swaylock -f -c 000000' \
+         timeout 600 'swaymsg "output * dpms off"' \
+              resume 'swaymsg "output * dpms on"' \
+         before-sleep 'swaylock -f -c 000000'
 # This will lock your screen after 300 seconds of inactivity, then turn off
-# your displays after another 600 seconds, and turn your screens back on when
+# your displays after another 300 seconds, and turn your screens back on when
 # resumed. It will also lock your screen before your computer goes to sleep.
 
 ### Input configuration
-#
+# laptop touchpad
 input "2:7:SynPS/2_Synaptics_TouchPad" {
        dwt enabled
        tap enabled
@@ -66,15 +66,16 @@ input "2:7:SynPS/2_Synaptics_TouchPad" {
        middle_emulation enabled
        pointer_accel 0.5
 }
-input "1:1:AT_Translated_Set_2_keyboard" {
-    xkb_layout us
-    xkb_options ctrl:nocaps,compose:ralt
-}
-# work external keyboard
-input "9456:320:Metadot_-_Das_Keyboard_Das_Keyboard" {
+# default keyboard
+input "*" {
       xkb_layout us
       xkb_options ctrl:nocaps,compose:ralt
       xkb_numlock enabled
+}
+# integrated laptop keyboard
+input "1:1:AT_Translated_Set_2_keyboard" {
+    xkb_layout us
+    xkb_options ctrl:nocaps,compose:ralt
 }
 #
 # You can get the names of your inputs by running: swaymsg -t get_inputs
@@ -200,7 +201,7 @@ assign [class="^VirtualBox$" title="^Win10"] $ws8
 assign [class="R_x11"] $ws9
 # doesn't work somehow?
 #assign [class="Spotify"] $ws10
-#for_window [app_id="spotify"] move --no-auto-back-and-forth container to workspace $ws10
+for_window [class="Spotify"] move container to workspace $ws10
 
 #
 # Layout stuff:
@@ -263,8 +264,8 @@ bindsym --locked XF86AudioPlay         exec playerctl play-pause
 bindsym XF86AudioNext         exec playerctl next
 bindsym XF86AudioPrev         exec playerctl previous
 bindsym XF86AudioMicMute      exec amixer set Capture toggle
-# bindsym XF86MonBrightnessDown exec brightnessctl set 10%-
-# bindsym XF86MonBrightnessUp   exec brightnessctl set +10%
+bindsym XF86MonBrightnessDown exec brightnessctl set 10%-
+bindsym XF86MonBrightnessUp   exec brightnessctl set +10%
 # bindsym XF86Display           exec arandr
 bindsym XF86WLAN              exec sudo systemctl restart NetworkManager
 # bindsym XF86Tools             exec lxappearance
@@ -278,10 +279,11 @@ bindsym $mod+Delete exec swaylock -c 000000
 #
 # Read `man 5 sway-bar` for more information about this section.
 
-# bar {
-#    swaybar_command waybar
-#    mode hide
-#    position top
+# exec waybar
+bar {
+   swaybar_command waybar
+   # mode hide
+   position top
 #     # TODO: battery icon, processor/memory overview
 #     # WAITING: tray icons
 #     # mode hide
@@ -298,14 +300,14 @@ bindsym $mod+Delete exec swaylock -c 000000
 # 	inactive_workspace $color0 $background $foreground
 # 	urgent_workspace $color0 $color13 $color0
  #    }
-# }
+}
 # include /etc/sway/config.d/*
 
 # launch
 # keybinding        software                                        mnemonic(ish?)
 bindsym $mod+b exec firefox                                       # firefox browser
 bindsym $mod+x exec nautilus                                      # xxx file manager
-bindsym $mod+m exec emacsclient -c -n -e '(switch-to-buffer nil)' # eMacs
+bindsym $mod+m exec emacsclient -c -n -e '(switch-to-buffer nil)' # emacs
 bindsym $mod+i exec inkscape
 bindsym $mod+s exec slack                                         # slack messages
 bindsym $mod+o exec libreoffice                                   # office
@@ -321,7 +323,7 @@ bindsym --release Shift+Print exec slurp | grim -g - -c ~/Pictures/Screenshots/$
 exec volnoti               # volume change notification
 exec redshift -l 52.1:5.12 -m wayland -t 5500:2500
 exec owncloud
-exec waybar
+# exec nextcloud
 
 # gaps
 default_border pixel 1
@@ -337,10 +339,11 @@ bindsym $mod+Shift+d gaps inner current set 0; gaps outer current set 0
 bindsym $mod+z       gaps outer current plus 5
 bindsym $mod+Shift+z gaps outer current minus 5
 
-# for_window [class="^URxvt"] opacity 0.9  # see if .Xresources settings work
+for_window [class="^URxvt"] opacity 0.7
 # for_window [class="^Emacs$"] opacity 0.95
-
-include /etc/sway/config.d/*
+seat seat0 hide_cursor 1500
 
 # add X or wayland session to title
 for_window [shell=".*"] title_format "%title :: %shell"
+
+include /etc/sway/config.d/*
