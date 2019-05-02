@@ -791,25 +791,43 @@ install it with pacman ~mu~
 * science packages
 ** ess
 emacs speaks statistics, work with R etc.
-*** electric-spacing
-Put spaces around operators such as +, -, etc.
+*** insert pipe %>% function
 #+begin_src emacs-lisp
-  (use-package electric-spacing)
+  (defun then_R_operator ()
+    "R - %>% operator or 'then' pipe operator"
+    (interactive)
+    (just-one-space 1)
+    (insert "%>%")
+    (reindent-then-newline-and-indent))
 #+end_src
 *** use-package
 #+begin_src emacs-lisp
   (use-package ess
     ;; :load-path "/usr/share/emacs/site-lisp/ess/"
+    :init (require 'ess-site)  ;; seems like this is needed to load the minor modes as well (keybindings don't work without it
+    :hook ((ess-r-mode inferior-ess-r-mode) . electric-layout-mode)
     :commands R
-    ;; :init (require 'ess-r-mode)
-    :hook (ess-r-mode . electric-spacing-mode)
+    :bind (:map ess-r-mode-map
+           (";" . ess-insert-assign)
+           ;; RStudio equivalents
+           ("M--" . ess-insert-assign)
+           ("C-S-m" . then_R_operator)
+           :map inferior-ess-r-mode-map
+           (";" . ess-insert-assign)
+           ("M--" . ess-insert-assign)
+           ("C-S-m" . then_R_operator))
     :config
     (defun my-org-confirm-babel-evaluate (lang body)
       (not (string= lang "R")))  ; don't ask for R
     (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
-    (ess-set-style 'RStudio)
+    (setq ess-style 'RStudio)
     (setq inferior-R-args "--no-restore-history --no-save"))
-    ;; :bind (:map ess-mode-map (";" . ess-insert-assign)))
+#+end_src
+*** electric-spacing
+Put spaces around operators such as +, -, etc.
+#+begin_src emacs-lisp
+  (use-package electric-operator
+    :hook ((R-mode ess-r-mode inferior-ess-r-mode). electric-operator-mode))
 #+end_src
 ** markdown-mode
 markdown mode for writing
