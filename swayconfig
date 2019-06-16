@@ -12,32 +12,32 @@ set $up k
 set $right l
 
 exec xrdb ~/.Xresources			# load urxvt customisations
+exec sh ~/.profile                      # load environment variables
+
 # Your preferred terminal emulator
 set $term urxvt
+## get colours/bg from pywal
+include "$HOME/.cache/wal/colors-sway"
+client.focused $color0 $color9 $foreground $color7 $color7
+client.focused_inactive $color0 $background $foreground $color7 $color7
+
 # Your preferred application launcher
 # Note: it's recommended that you pass the final command to sway
 set $menu dmenu_path | rofi -dmenu | xargs swaymsg exec --
 
 ### Output configuration
 
-## get colours/bg from pywal
-include "$HOME/.cache/wal/colors-sway"
-client.focused $color0 $color9 $foreground $color7 $color7
-client.focused_inactive $color0 $background $foreground $color7 $color7
-
 # Default wallpaper (more resolutions are available in __DATADIR__/backgrounds/sway/)
 output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
-# set names for desktop screens
-set $smallscreen eDP-1
-set $bigscreen HDMI-A-2
+
 # main laptop screen
-output $smallscreen {
+output eDP-1 {
        background $wallpaper fill
        resolution 1920x1080
        position 0 1080
 }
 # HDMI screen at office above laptop
-output $bigscreen {
+output HDMI-A-2 {
        background $wallpaper fill
        resolution 1920x1080
        position 0 0
@@ -45,9 +45,6 @@ output $bigscreen {
 # You can get the names of your outputs by running: swaymsg -t get_outputs
 
 ### Idle configuration
-#
-# Example configuration:
-#
 exec swayidle -w \
          timeout 300 'swaylock -f -c 000000' \
          timeout 600 'swaymsg "output * dpms off"' \
@@ -58,26 +55,35 @@ exec swayidle -w \
 # resumed. It will also lock your screen before your computer goes to sleep.
 
 ### Input configuration
-# laptop touchpad
-input "2:7:SynPS/2_Synaptics_TouchPad" {
-       dwt enabled
-       tap enabled
-       natural_scroll enabled
-       middle_emulation enabled
-       pointer_accel 0.5
-}
-# default keyboard
+# default keyboard settings
 input "*" {
       xkb_layout us
       xkb_options ctrl:nocaps,compose:ralt
       xkb_numlock enabled
 }
-# integrated laptop keyboard
-input "1:1:AT_Translated_Set_2_keyboard" {
-    xkb_layout us
-    xkb_options ctrl:nocaps,compose:ralt
+# laptop touchpad
+input "2:7:SynPS/2_Synaptics_TouchPad" {
+      # touchpad settings
+      dwt enabled
+      tap enabled
+      natural_scroll enabled
+      middle_emulation enabled
+      pointer_accel 0.5
 }
+# tablet should have some slower accelleration because it's bigger
+input "1386:209:Wacom_Bamboo_2FG_4x5_Pad" {
+      pointer_accel 0.9
+      tap enabled
+      natural_scroll enabled
+}
+# input "1386:209:Wacom_Bamboo_2FG_4x5_Pen" {
+#     # attempts at getting the buttons to remap to MMB and RMB
+#     #scroll_button 331
+#     #middle_emulation enabled
+# }
 #
+# hide the cursor after a while
+seat seat0 hide_cursor 1500
 # You can get the names of your inputs by running: swaymsg -t get_inputs
 # Read `man 5 sway-input` for more information about this section.
 
@@ -93,13 +99,6 @@ input "1:1:AT_Translated_Set_2_keyboard" {
 
     # start your launcher
     bindsym $mod+d exec $menu
-
-    # Drag floating windows by holding down $mod and left mouse button.
-    # Resize them with right mouse button + $mod.
-    # Despite the name, also works for non-floating windows.
-    # Change normal to inverse to use left mouse button for resizing and right
-    # mouse button for dragging.
-    floating_modifier $mod normal
 
     # reload the configuration file
     bindsym $mod+Shift+c reload
@@ -145,16 +144,6 @@ set $ws8 "8:windows"
 set $ws9 "9:graphs"
 set $ws10 "10:spotify"
 
-# workspace gaps
-workspace $ws6 gaps inner 0
-workspace $ws6 gaps outer 0
-workspace $ws7 gaps inner 0
-workspace $ws7 gaps outer 0
-workspace $ws8 gaps inner 0
-workspace $ws8 gaps outer 0
-workspace $ws10 gaps inner 0
-workspace $ws10 gaps outer 0
-
 # assign workspaces to screens
 workspace $ws1 output $smallscreen
 workspace $ws2 output $bigscreen
@@ -176,6 +165,9 @@ bindsym $mod+8 workspace $ws8
 bindsym $mod+9 workspace $ws9
 bindsym $mod+0 workspace $ws10
 
+# switch to previous workspace by repeatedly tapping
+workspace_auto_back_and_forth yes
+
 # move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace $ws1
 bindsym $mod+Shift+2 move container to workspace $ws2
@@ -188,18 +180,16 @@ bindsym $mod+Shift+8 move container to workspace $ws8
 bindsym $mod+Shift+9 move container to workspace $ws9
 bindsym $mod+Shift+0 move container to workspace $ws10
 
-# switch to previous workspace by repeatedly tapping
-workspace_auto_back_and_forth yes
-
 ### move programs to specific workspaces ###
 assign [class="^Mendeley Desktop$"] $ws4
 assign [class="^Zotero$"] $ws4
 assign [class="^Slack$"] $ws5
+assign [class="^Riot$"] $ws5
 assign [class="^Trello$"] $ws5
 assign [class="^Inkscape$"] $ws6
 assign [class="^VirtualBox$" title="^Win10"] $ws8
 assign [class="R_x11"] $ws9
-# doesn't work somehow?
+# doesn't work because of long-standing spotify bug
 #assign [class="Spotify"] $ws10
 for_window [class="Spotify"] move container to workspace $ws10
 
@@ -246,11 +236,18 @@ for_window [class="Spotify"] move container to workspace $ws10
 #
 # Resizing containers:
 #
-## resize window (you can also use the mouse on a border)
+## resize window (you can also use the mouse on a border or $mod + RMB)
 bindsym $mod+Shift+y resize shrink width  20 px or 20 ppt
 bindsym $mod+Shift+u resize grow   height 20 px or 20 ppt
 bindsym $mod+Shift+i resize shrink height 20 px or 20 ppt
 bindsym $mod+Shift+o resize grow   width  20 px or 20 ppt
+
+# Drag floating windows by holding down $mod and left mouse button.
+# Resize them with right mouse button + $mod.
+# Despite the name, also works for non-floating windows.
+# Change normal to inverse to use left mouse button for resizing and right
+# mouse button for dragging.
+floating_modifier $mod normal
 
 # media keys
 # Increase volume
@@ -273,24 +270,23 @@ bindsym XF86WLAN              exec sudo systemctl restart NetworkManager
 
 # lock screen
 bindsym $mod+Delete exec swaylock -c 000000
-# ~/ArchConfigs/launchswaylock.sh
 
 # Status Bar:
 #
 # Read `man 5 sway-bar` for more information about this section.
 
-# exec waybar
-bar {
-   swaybar_command waybar
+# see below for exec waybar
+# bar {
+   # swaybar_command waybar
    # mode hide
-   position top
+   # position top
 #     # TODO: battery icon, processor/memory overview
 #     # WAITING: tray icons
 #     # mode hide
 #     # When the status_command prints a new line to stdout, swaybar updates.
    # status_command SCRIPT_DIR=~/.config/i3blocks i3blocks
    # font pango:Source Code Pro, Font Awesome 5 Free, Font Awesome 5 Brands 10
-   # colors {
+#    colors {
 # 	background $background
 # 	statusline $foreground
 # 	# focused_background $color1
@@ -299,9 +295,8 @@ bar {
 # 	active_workspace $color0 $color3 $foreground
 # 	inactive_workspace $color0 $background $foreground
 # 	urgent_workspace $color0 $color13 $color0
- #    }
-}
-# include /etc/sway/config.d/*
+#     }
+# }
 
 # launch
 # keybinding        software                                        mnemonic(ish?)
@@ -323,9 +318,11 @@ bindsym --release Shift+Print exec slurp | grim -g - -c ~/Pictures/Screenshots/$
 exec volnoti               # volume change notification
 exec redshift -l 52.1:5.12 -m wayland -t 5500:2500
 exec owncloud
+exec mako  # notification daemon
 # exec nextcloud
 
 # gaps
+smart_gaps on
 default_border pixel 1
 hide_edge_borders both
 gaps inner 15
@@ -339,11 +336,19 @@ bindsym $mod+Shift+d gaps inner current set 0; gaps outer current set 0
 bindsym $mod+z       gaps outer current plus 5
 bindsym $mod+Shift+z gaps outer current minus 5
 
+# inhibit swayidle in fullscreen ff
+# xwayland version
+for_window [class="Firefox"] inhibit_idle fullscreen
+# wayland vesion
+for_window [app_id="firefox"] inhibit_idle fullscreen
+
 for_window [class="^URxvt"] opacity 0.7
+
 # for_window [class="^Emacs$"] opacity 0.95
-seat seat0 hide_cursor 1500
 
 # add X or wayland session to title
 for_window [shell=".*"] title_format "%title :: %shell"
+
+exec waybar  # moved to end so the rest of the stuff can launch first
 
 include /etc/sway/config.d/*

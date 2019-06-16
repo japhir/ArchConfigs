@@ -125,11 +125,12 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
     (doom-themes-treemacs-config)
     (doom-themes-org-config))
 #+end_src
-*** doom modeline
+*** COMMENT doom modeline
 #+begin_src emacs-lisp
-(use-package doom-modeline
-      :ensure t
-      :hook (after-init . doom-modeline-mode))
+  (setq inhibit-compacting-font-caches t)
+  (use-package doom-modeline
+    :ensure t
+    :hook (after-init . doom-modeline-mode))
 #+end_src
 ** rainbow-mode
 Highlight hex colours!
@@ -477,8 +478,10 @@ customize capture templates
    '((emacs-lisp . t)
      (dot . t)
      (python . t)
+     (latex . t)
      (shell . t)
      (stan . t)
+     (latex . t)
      (R . t)))
 #+end_src
 *** org-export odt
@@ -513,8 +516,7 @@ possible.
 #+begin_src emacs-lisp
   (setq org-entities-user
         '(("celsius" "\\(^{\\circ}\\)C" nil "&deg;C" "°C" "°C" "℃")
-          ("minus" "-" t "&minus;" "-" "-" "−")  ;; defaults to =\\minus= in LaTeX, which doesn't work.
-          ;; unit space, something like 15\us{}Ma
+          ("minus" "\\-" t "&minus;" "-" "-" "−")  ;; defaults to =\\minus= in LaTeX, which doesn't work.
           ("permil" "\\textperthousand{}" nil "&permil;" "per thousand" "per thousand" "‰")  ;; exactly the same as in org-entities
           ("us" "\\," nil "&nbsp;" " " " " " ")
           ("appr" "\\sim" t "&tilde;" "~" "~" "~")
@@ -536,15 +538,18 @@ possible.
                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 #+end_src
 *** org source code block settings
+[[https://emacs.stackexchange.com/a/47370/9748][Nice answer on how to have point on a blank line in code block]]
 #+begin_src emacs-lisp
   (setq org-src-fontify-natively t
         org-src-tab-acts-natively t
         org-src-window-setup 'current-window)
   (add-to-list 'org-structure-template-alist
-               '("se" . "src emacs-lisp"))
+               '("se" . "src emacs-lisp
+  "))
   ;; TODO figure out how to add multiple items to the list
   (add-to-list 'org-structure-template-alist
-               '("sr" . "src R"))
+               '("sr" . "src R
+  "))
 #+end_src
 ** close use-package org
 #+begin_src emacs-lisp
@@ -576,38 +581,46 @@ possible.
 #+end_src
 ** org-ref
 #+begin_src emacs-lisp
-    (use-package org-ref
-      :bind ("C-c j" . org-ref-bibtex-hydra/body)
-      :after org
-      :init
-      (setq org-ref-completion-library 'org-ref-ivy-cite)
-      (setq reftex-default-bibliography '("~/SurfDrive/bibliography/references.bib"))
-      (setq org-ref-bibliography-notes "~/SurfDrive/bibliography/notes.org"
-            org-ref-default-bibliography '("~/SurfDrive/bibliography/references.bib")
-            org-ref-pdf-directory "~/SurfDrive/bibliography/bibtex-pdfs/")
-      (setq bibtex-completion-pdf-open-function 'org-open-file)
-      :config
-      (require 'doi-utils)
-  (require 'org-id)
-  (require 'org-ref-wos)
-  (require 'org-ref-scopus)
-  (require 'org-ref-pubmed)
-      (setq bibtex-autokey-year-length 4
-            bibtex-autokey-name-year-separator ""
-            bibtex-autokey-year-title-separator "-"
-            bibtex-autokey-titleword-separator "-"
-            bibtex-autokey-titlewords 0
-            bibtex-autokey-titlewords-stretch 1
-            bibtex-autokey-titleword-length 5)
-      (add-to-list 'org-ref-bibtex-journal-abbreviations
+  (use-package org-ref
+    :bind ("C-c j" . org-ref-bibtex-hydra/body)
+    :after org
+    :init
+    (setq org-ref-completion-library 'org-ref-ivy-cite)
+    (setq reftex-default-bibliography '("~/SurfDrive/bibliography/references.bib"))
+    (setq org-ref-bibliography-notes "~/SurfDrive/bibliography/notes.org"
+          org-ref-default-bibliography '("~/SurfDrive/bibliography/references.bib")
+          org-ref-pdf-directory "~/SurfDrive/bibliography/bibtex-pdfs/")
+    (setq bibtex-completion-pdf-open-function 'org-open-file)
+    :config
+    (require 'doi-utils)
+    (require 'org-id)
+    (require 'org-ref-wos)
+    (require 'org-ref-scopus)
+    (require 'org-ref-pubmed)
+    (setq bibtex-autokey-year-length 4
+          bibtex-autokey-name-year-separator ""
+          bibtex-autokey-year-title-separator "-"
+          bibtex-autokey-titleword-separator "-"
+          bibtex-autokey-titlewords 0
+          bibtex-autokey-titlewords-stretch 1
+          bibtex-autokey-titleword-length 5)
+    (add-to-list 'org-ref-bibtex-journal-abbreviations
                    '("JIR" "Journal of Irreproducible Research" "J. Irrep. Res."))
-      (require 'org-ref-scopus))
+    (require 'org-ref-scopus))
 #+end_src
 ** org-noter
 #+begin_src emacs-lisp
   (use-package org-noter
     :after pdf-tools org)
 #+end_src
+** pdf preview in org
+#+begin_src emacs-lisp
+  (add-to-list 'image-type-file-name-regexps '("\\.pdf\\'" . imagemagick))
+  (add-to-list 'image-file-name-extensions "pdf")
+  (setq imagemagick-types-inhibit (remove 'PDF imagemagick-types-inhibit))
+  (setq org-image-actual-width t)
+#+end_src
+
 * general packages and functions
 ** easy symbol insertion
 By default C-x 8 o = ° and C-x 8 m = µ. So:
@@ -793,8 +806,8 @@ install it with pacman ~mu~
 emacs speaks statistics, work with R etc.
 *** insert pipe %>% function
 #+begin_src emacs-lisp
-  (defun then_R_operator ()
-    "R - %>% operator or 'then' pipe operator"
+  (defun japhir/insert-r-pipe ()
+    "Insert the pipe operator in R, %>%"
     (interactive)
     (just-one-space 1)
     (insert "%>%")
@@ -804,24 +817,33 @@ emacs speaks statistics, work with R etc.
 #+begin_src emacs-lisp
   (use-package ess
     ;; :load-path "/usr/share/emacs/site-lisp/ess/"
-    :init (require 'ess-site)  ;; seems like this is needed to load the minor modes as well (keybindings don't work without it
+    :init (require 'ess-site)  ;; seems like this is needed to load the minor modes as well keybindings don't work without it
     :hook ((ess-r-mode inferior-ess-r-mode) . electric-layout-mode)
     :commands R
     :bind (:map ess-r-mode-map
            (";" . ess-insert-assign)
            ;; RStudio equivalents
            ("M--" . ess-insert-assign)
-           ("C-S-m" . then_R_operator)
+           ("C-S-m" . japhir/insert-r-pipe)
            :map inferior-ess-r-mode-map
            (";" . ess-insert-assign)
            ("M--" . ess-insert-assign)
-           ("C-S-m" . then_R_operator))
+           ("C-S-m" . japhir/insert-r-pipe))
     :config
     (defun my-org-confirm-babel-evaluate (lang body)
-      (not (string= lang "R")))  ; don't ask for R
+      (not (or (string= lang "R")
+               (string= lang "elisp")
+               (string= lang "emacs-lisp")
+               (string= lang "latex"))))
+    (setq display-buffer-alist
+          '(("*R"
+             (display-buffer-reuse-window display-buffer-pop-up-frame)
+             (reusable-frames . 0))))
     (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
     (setq ess-style 'RStudio)
-    (setq inferior-R-args "--no-restore-history --no-save"))
+    (setq ess-pdf-viewer-pref 'emacsclient)
+    (setq inferior-R-args "--no-restore-history --no-save")
+    )
 #+end_src
 *** electric-spacing
 Put spaces around operators such as +, -, etc.
@@ -863,12 +885,13 @@ exporting markdown
 ** org-pandoc
 https://github.com/kawabata/ox-pandoc
 #+begin_src emacs-lisp
-  (use-package ox-pandoc
-    :config
-    (setq org-pandoc-options '((bibliography
-          . "/home/japhir/Documents/References/PhD.bib"))
-          org-pandoc-options-for-docx '((reference-docx
-          . "/home/japhir/SurfDrive/PhD/chapters/wordtemplate.docx"))))
+    (use-package ox-pandoc
+      :config
+      (setq org-pandoc-options '((bibliography
+            . "/home/japhir/Documents/References/PhD.bib"))
+            ;; org-pandoc-options-for-docx '((reference-docx
+            ;; . "/home/japhir/SurfDrive/PhD/chapters/wordtemplate.docx"))
+            ))
 #+end_src
 ** LaTeX (AUCTeX, RefTeX)
 for working with \LaTeX
@@ -910,15 +933,6 @@ reference manager I use it in conjunction with zotero, which generates the
     :config
     (autoload 'ivy-bibtex "ivy-bibtex" "" t)
     (setq bibtex-completion-pdf-field "file"))
-#+end_src
-** org-ref
-#+begin_src emacs-lisp
-  (use-package org-ref
-    :config
-    (setq bibtex-completion-bibliography '("~/Documents/References/PhD.bib")
-          bibtex-completion-pdf-field "file"
-          bibtex-completion-notes-path "~/org/referencenotes.org")
-    (setq org-ref-default-bibliography '("~/Documents/References/PhD.bib")))
 #+end_src
 * secret directories
 These are all the settings that require secret directories, such as my org

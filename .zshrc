@@ -70,7 +70,6 @@ plugins=(vi-mode)
 # User configuration
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/home/japhir/.cabal/bin:/home/japhir/bin"
 # export MANPATH="/usr/local/man:$MANPATH"
-export BROWSER=firefox-beta
 
 source $ZSH/oh-my-zsh.sh
 
