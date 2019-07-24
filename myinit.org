@@ -102,6 +102,18 @@ let my window manager handle screen creation
   (electric-pair-mode 1) ; auto-insert matching bracket
   (show-paren-mode 1)    ; turn on paren match highlighting
 #+end_src
+** smartparens
+#+begin_src emacs-lisp
+  (use-package smartparens-config
+    ;; :hook ((prog-mode markdown-mode org-mode) . turn-on-smartparens-strict-mode)
+    :ensure smartparens
+    :config (progn (show-smartparens-global-mode t)))
+#+end_src
+** evil-smartparens
+#+begin_src emacs-lisp
+  (use-package evil-smartparens
+    :hook ((prog-mode org-mode) . evil-smartparens-mode))
+#+end_src
 ** rainbow-delimiters
 matching parenthesis are highlighted with rainbow colours.
 #+begin_src emacs-lisp
