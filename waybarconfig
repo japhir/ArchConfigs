@@ -7,7 +7,7 @@
     // Choose the order of the modules
     "modules-left": ["sway/workspaces", "sway/mode", "sway/window"], // , "custom/spotify", "sway/window",
     "modules-center": ["custom/fuzzyclock"],
-    "modules-right": ["network", "cpu", "memory", "battery", "clock", "tray"], // "pulseaudio",
+    "modules-right": ["cpu", "memory", "battery", "clock", "tray"], // "pulseaudio", // "network",
     // Modules configuration
     "sway/workspaces": {
         "format": "{index} {icon}",

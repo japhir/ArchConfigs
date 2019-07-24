@@ -319,6 +319,7 @@ exec volnoti               # volume change notification
 exec redshift -l 52.1:5.12 -m wayland -t 5500:2500
 exec owncloud
 exec mako  # notification daemon
+exec nm-applet --indicator # network-manager-applet-indicator from AUR
 # exec nextcloud
 
 # gaps
