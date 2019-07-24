@@ -83,7 +83,7 @@ input "1386:209:Wacom_Bamboo_2FG_4x5_Pad" {
 # }
 #
 # hide the cursor after a while
-seat seat0 hide_cursor 1500
+# seat seat0 hide_cursor 1500
 # You can get the names of your inputs by running: swaymsg -t get_inputs
 # Read `man 5 sway-input` for more information about this section.
 
