@@ -833,7 +833,7 @@ emacs speaks statistics, work with R etc.
   (use-package ess
     ;; :load-path "/usr/share/emacs/site-lisp/ess/"
     :init (require 'ess-site)  ;; seems like this is needed to load the minor modes as well keybindings don't work without it
-    :hook ((ess-r-mode inferior-ess-r-mode) . electric-layout-mode)
+    ;; :hook ((ess-r-mode inferior-ess-r-mode) . electric-layout-mode)  ;; commented out since new curly-curly operator for rlang
     :commands R
     :bind (:map ess-r-mode-map
            (";" . ess-insert-assign)
