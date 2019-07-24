@@ -60,6 +60,9 @@ is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
 
   (setq mouse-wheel-progressive-speed nil)
 
+  ;; automatically re-open files that have been changed on disk
+  (global-auto-revert-mode 1)
+
   (defalias 'yes-or-no-p 'y-or-n-p)
 
   ;; always follow symlinks w/o asking
