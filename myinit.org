@@ -105,14 +105,14 @@ let my window manager handle screen creation
 ** smartparens
 #+begin_src emacs-lisp
   (use-package smartparens-config
-    ;; :hook ((prog-mode markdown-mode org-mode) . turn-on-smartparens-strict-mode)
+    :hook ((prog-mode markdown-mode org-mode) . turn-on-smartparens-strict-mode)
     :ensure smartparens
     :config (progn (show-smartparens-global-mode t)))
 #+end_src
 ** evil-smartparens
 #+begin_src emacs-lisp
   (use-package evil-smartparens
-    :hook ((prog-mode org-mode) . evil-smartparens-mode))
+    :hook ((prog-mode markdown-mode org-mode) . evil-smartparens-mode))
 #+end_src
 ** rainbow-delimiters
 matching parenthesis are highlighted with rainbow colours.
@@ -316,7 +316,6 @@ prettify org mode
     :config
     (setq org-bullets-bullet-list
           '("◉" "●" "○" "♦" "◆" "►" "▸")))
-          ;; '(" ")))
 #+end_src
 ** file associations
 #+begin_src emacs-lisp
