@@ -82,6 +82,11 @@ let my window manager handle screen creation
   (use-package frames-only-mode
     :config (setq frames-only-mode t))
 #+end_src
+** default-text-scale
+#+begin_src emacs-lisp
+  (use-package default-text-scale
+    :config (setq default-text-scale-mode t))
+#+end_src
 ** clone-indirect-buffer-other-frame
 #+begin_src emacs-lisp
   (defun clone-indirect-buffer-other-frame (newname display-flag &optional norecord)
@@ -362,6 +367,48 @@ swyper makes refiling amazing!
   (setq org-outline-path-complete-in-steps nil)   ;; Refile in a single go
   (setq org-refile-use-outline-path t)            ;; Show full paths for refiling
 #+end_src
+*** load org-secretary
+#+begin_src emacs-lisp
+  (require 'org-secretary)
+  (setq org-sec-me "Ilja")
+  (global-set-key "\C-ch" 'org-sec-tag-entry)
+#+end_src
+**** overwrite some functions that have TASK hardcoded to WAIT
+source code available on [[https://github.com/emacsmirror/org/blob/master/contrib/lisp/org-secretary.el][GitHub]]
+#+begin_src emacs-lisp
+  (defun org-sec-assigned-with-view (par &optional who)
+    "Select tasks assigned to who, by default org-sec-with."
+    (org-tags-view '(4)
+                   (concat (join (split-string (if who
+                                                   who
+                                                 (org-sec-get-with)))
+                                 "|")
+                           "/WAIT")))
+#+end_src
+
+#+begin_src emacs-lisp
+  (defun org-sec-stuck-with-view (par &optional who)
+    "Select stuck projects assigned to who, by default
+     org-sec-with."
+    (let ((org-stuck-projects
+           `(,(concat "+prj+"
+                      (join (split-string (if who
+                                              who
+                                            (org-sec-get-with))) "|")
+                      "/-SOME-DONE-CANC")
+             ("NEXT" "WAIT") ())))
+      (org-agenda-list-stuck-projects)))
+#+end_src
+
+#+begin_src emacs-lisp
+  (defun org-sec-who-view (par)
+    "Builds agenda for a given user.  Queried. "
+    (let ((who (read-string "Build todo for user/tag: "
+                            "" "" "")))
+      (org-sec-with-view "NEXT dowith" who)
+      (org-sec-assigned-with-view "WAIT with" who)
+      (org-sec-stuck-with-view "STUCK with" who)))
+#+end_src
 *** agenda filters
 Filter tasks by context (sorted by todo state)
 #+begin_src emacs-lisp
@@ -379,12 +426,25 @@ Filter tasks by context (sorted by todo state)
                   ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
                    (org-agenda-overriding-header "High-priority unfinished tasks:")))))
           ("A" agenda*)
-          ("W" "Work" tags-todo "Work")
-          ("P" "Personal" tags-todo "Personal")
+          ;; ("W" "Work" tags-todo "Work")
+          ("W" "Work" tags-todo
+           "-Personal-doat={.+}-dowith={.+}/!-WAIT"
+           ((org-agenda-todo-ignore-scheduled t)))
+          ("P" "Personal" tags-todo
+           "-Work-doat={.+}-dowith={.+}/!-WAIT"
+           ((org-agenda-todo-ignore-scheduled t)))
+          ("j" "NEXT dowith and WAIT with"
+           ((org-sec-with-view "NEXT dowith")
+            (org-sec-where-view "NEXT doat")
+            (org-sec-assigned-with-view "WAIT with")
+            (org-sec-stuck-with-view "STUCK with")))
+          ("J" "Interactive NEXT dowith and WAIT with"
+           ((org-sec-who-view "NEXT dowith")))
           ("R" "R" tags-todo "R")
           ("O" "org" tags-todo "org")
           ("B" "Bayes" tags-todo "bayes")
           ("g" . "GTD contexts")
+          ("gj" "Projects" tags "prj/-SOME-DONE-CANC")
           ("gh" "Home" tags-todo "@home")
           ("go" "Office" tags-todo "@office")
           ("ge" "Errands" tags-todo "@errands")
@@ -409,6 +469,17 @@ Filter tasks by context (sorted by todo state)
           ("pA" "Anne" tags-todo "Anne")
           ("pI" "Inigo" tags-todo "Inigo")))
 #+end_src
+**** SOME add extra org-secretary filters
+:LOGBOOK:
+- State "SOME"       from              [2019-08-08 Thu 22:38]
+:END:
+http://juanreyero.com/article/emacs/org-teams.html
+*** stuck projects
+#+begin_src emacs-lisp
+  (setq org-tags-exclude-from-inheritance '("prj")
+        org-stuck-projects '("+prj/-CANC-DONE"
+                             ("NEXT" "WAIT" "TICK") ()))  ;;  "SOME"
+#+end_src
 *** capture templates
 customize capture templates
  #+begin_src emacs-lisp
@@ -429,7 +500,7 @@ customize capture templates
 *** TODO states
 #+begin_src emacs-lisp
   (setq org-todo-keywords
-        '((sequence "NEXT(n)" "WAIT(w!/!)" "TICK(t)" "PROJ(p)" "SOME(s!/!)" "|"
+        '((sequence "NEXT(n)" "WAIT(w!/!)" "TICK(t)" "SOME(s!/!)" "|"
                     "DONE(d)" "CANC(c)")))
   ;; prettify the todo keywords
   (setq org-todo-keyword-faces
@@ -438,8 +509,7 @@ customize capture templates
           ("TICK" . (:background "light slate blue"))
           ("SOME" . (:foreground "ghost white"  :background "deep sky blue"))
           ("DONE" . (:foreground "green4"       :background "pale green"))
-          ("CANC" . (:foreground "dim gray"     :background "gray"))
-          ("PROJ" . (:foreground "navajo white" :background "saddle brown"))))
+          ("CANC" . (:foreground "dim gray"     :background "gray"))))
 #+end_src
 *** effort estimates
 #+begin_src emacs-lisp
@@ -453,7 +523,8 @@ customize capture templates
 *** context tags
 #+begin_src emacs-lisp
   (setq org-fast-tag-selection-single-key t)
-  (setq org-tag-alist '((:startgroup . nil)
+  (setq org-tag-alist '(("prj" . ?j)
+                        (:startgroup . nil)
                         ("@home" . ?h)
                         ("@office" . ?o)
                         ("@errands" . ?e)
@@ -768,7 +839,7 @@ perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collec
           smtp-stream-type 'starttls
           smtpmail-smtp-user "<your-user-id>"
           smtpmail-starttls-credentials
-          '(("<your-smtp-server>" 587 "<possiblly-domain>/<your-user-id>" nil))
+          '(("<your-smtp-server>" 587 "<possibly-domain>/<your-user-id>" nil))
           starttls-use-gnutls t
           starttls-gnutls-program "gnutls-cli"
           starttls-extra-args nil))
@@ -786,6 +857,8 @@ install it with pacman ~mu~
            :map mu4e-view-mode-map
            ("C-c c" . org-mu4e-store-and-capture))
     :init
+    (require 'mu4e)  ;; somehow this is needed, because otherwise calling org-store-link doesn't work
+    (require 'org-mu4e)
     (setq mu4e-drafts-folder "/Drafts"
           mu4e-sent-folder "/Sent Items"
           mu4e-trash-folder "/Deleted Items")
@@ -811,8 +884,7 @@ install it with pacman ~mu~
     (setq mu4e-confirm-quit nil)
     (setq mu4e-view-show-images t)
     ;; (add-to-list 'mu4e-view-actions
-                 ;; '("ViewInBrowser" . mu4e-action-view-in-browser) t)
-    (require 'org-mu4e)
+    ;; '("ViewInBrowser" . mu4e-action-view-in-browser) t)
     (setq org-mu4e-link-query-in-headers-mode nil))
 #+end_src
 * science packages
@@ -858,7 +930,7 @@ emacs speaks statistics, work with R etc.
           org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
           ess-style 'RStudio
           ess-pdf-viewer-pref 'emacsclient
-          ;; inferior-R-args "--no-restore-history --no-save"
+          inferior-R-args "--no-restore-history --no-save"
           ess-ask-for-ess-directory nil))
 #+end_src
 *** electric-spacing operator
@@ -939,7 +1011,8 @@ for working with \LaTeX
     :config
     (setq ispell-dictionary "british-ize-w_accents"))
 #+end_src
-** hl-todo
+** COMMENT hl-todo
+hmm it does overwrite my nice highlighting of NEXT
 #+begin_src emacs-lisp
   (use-package hl-todo
     :bind (:map hl-todo-mode-map
@@ -954,7 +1027,8 @@ reference manager I use it in conjunction with zotero, which generates the
 #+begin_src emacs-lisp
   (use-package ivy-bibtex
     :config
-    (autoload 'ivy-bibtex "ivy-bibtex" "" t)
+    ;; (autoload 'ivy-bibtex "ivy-bibtex" "" t)
+    (require 'ivy-bibtex)
     (setq bibtex-completion-pdf-field "file"))
 #+end_src
 * secret directories
