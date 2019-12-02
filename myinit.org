@@ -684,6 +684,12 @@ https://github.com/domtronn/all-the-icons.el
     :config
     (all-the-icons-ivy-setup))
 #+end_src
+** emojify-mode
+#+begin_src emacs-lisp
+  (use-package emojify
+    :config (setq emojify-emoji-styles 'unicode)
+    :hook ((mu4e-mode mu4e-view-mode mu4e-compse-mode org-mode) . emojify-mode))
+#+end_src
 ** revert buffer
 #+begin_src emacs-lisp
   (global-set-key (kbd "<f5>") 'revert-buffer)
