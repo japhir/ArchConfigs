@@ -367,48 +367,6 @@ swyper makes refiling amazing!
   (setq org-outline-path-complete-in-steps nil)   ;; Refile in a single go
   (setq org-refile-use-outline-path t)            ;; Show full paths for refiling
 #+end_src
-*** load org-secretary
-#+begin_src emacs-lisp
-  (require 'org-secretary)
-  (setq org-sec-me "Ilja")
-  (global-set-key "\C-ch" 'org-sec-tag-entry)
-#+end_src
-**** overwrite some functions that have TASK hardcoded to WAIT
-source code available on [[https://github.com/emacsmirror/org/blob/master/contrib/lisp/org-secretary.el][GitHub]]
-#+begin_src emacs-lisp
-  (defun org-sec-assigned-with-view (par &optional who)
-    "Select tasks assigned to who, by default org-sec-with."
-    (org-tags-view '(4)
-                   (concat (join (split-string (if who
-                                                   who
-                                                 (org-sec-get-with)))
-                                 "|")
-                           "/WAIT")))
-#+end_src
-
-#+begin_src emacs-lisp
-  (defun org-sec-stuck-with-view (par &optional who)
-    "Select stuck projects assigned to who, by default
-     org-sec-with."
-    (let ((org-stuck-projects
-           `(,(concat "+prj+"
-                      (join (split-string (if who
-                                              who
-                                            (org-sec-get-with))) "|")
-                      "/-SOME-DONE-CANC")
-             ("NEXT" "WAIT") ())))
-      (org-agenda-list-stuck-projects)))
-#+end_src
-
-#+begin_src emacs-lisp
-  (defun org-sec-who-view (par)
-    "Builds agenda for a given user.  Queried. "
-    (let ((who (read-string "Build todo for user/tag: "
-                            "" "" "")))
-      (org-sec-with-view "NEXT dowith" who)
-      (org-sec-assigned-with-view "WAIT with" who)
-      (org-sec-stuck-with-view "STUCK with" who)))
-#+end_src
 *** agenda filters
 Filter tasks by context (sorted by todo state)
 #+begin_src emacs-lisp
@@ -426,29 +384,20 @@ Filter tasks by context (sorted by todo state)
                   ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
                    (org-agenda-overriding-header "High-priority unfinished tasks:")))))
           ("A" agenda*)
-          ;; ("W" "Work" tags-todo "Work")
-          ("W" "Work" tags-todo
-           "-Personal-doat={.+}-dowith={.+}/!-WAIT"
+          ("n" "Next Actions" todo "NEXT")
+          ("w" "Waiting" todo "WAIT")
+          ;; ("s" "Someday/Maybe" todo "SOME")
+          ("j" "Projects" tags "prj/-SOME-DONE-CANC")
+          ("W" "Work" tags-todo "-Personal/!-WAIT"
            ((org-agenda-todo-ignore-scheduled t)))
-          ("P" "Personal" tags-todo
-           "-Work-doat={.+}-dowith={.+}/!-WAIT"
+          ("P" "Personal" tags-todo "-Work/!-WAIT"
            ((org-agenda-todo-ignore-scheduled t)))
-          ("j" "NEXT dowith and WAIT with"
-           ((org-sec-with-view "NEXT dowith")
-            (org-sec-where-view "NEXT doat")
-            (org-sec-assigned-with-view "WAIT with")
-            (org-sec-stuck-with-view "STUCK with")))
-          ("J" "Interactive NEXT dowith and WAIT with"
-           ((org-sec-who-view "NEXT dowith")))
-          ("R" "R" tags-todo "R")
-          ("O" "org" tags-todo "org")
-          ("B" "Bayes" tags-todo "bayes")
           ("g" . "GTD contexts")
-          ("gj" "Projects" tags "prj/-SOME-DONE-CANC")
           ("gh" "Home" tags-todo "@home")
           ("go" "Office" tags-todo "@office")
           ("ge" "Errands" tags-todo "@errands")
           ("gl" "Laboratory" tags-todo "@lab")
+          ("gt" "Travel" tags-todo "@travel")
           ("gc" "Computer" tags-todo "@computer")
           ("gB" "Phone" tags-todo "@phone")
           ("gm" "e-mail" tags-todo "@email")
@@ -456,6 +405,7 @@ Filter tasks by context (sorted by todo state)
           ("gb" "Bank" tags-todo "@bank")
           ("gw" "Write" tags-todo "@write")
           ("gp" "Program" tags-todo "@program")
+          ("gc" "Create/Plot" tags-todo "@createplot")
           ("gr" "Read" tags-todo "@read")
           ("gg" "Research" tags-todo "@research")
           ("gs" "Schedule" tags-todo "@schedule")
@@ -465,19 +415,16 @@ Filter tasks by context (sorted by todo state)
           ("E2" "Afternoon" tags-todo "afternoon")
           ("E3" "Evening" tags-todo "evening")
           ("p" . "People")
-          ("pM" "Martin" tags-todo "Martin")
-          ("pA" "Anne" tags-todo "Anne")
-          ("pI" "Inigo" tags-todo "Inigo")))
+          ("pm" "Martin" tags-todo "Martin")
+          ("pl" "Luc" tags-todo "Luc")
+          ("pa" "Anne" tags-todo "Anne")
+          ("pf" "FEST" tags-todo "FEST")
+          ("pi" "Inigo" tags-todo "Inigo")))
 #+end_src
-**** SOME add extra org-secretary filters
-:LOGBOOK:
-- State "SOME"       from              [2019-08-08 Thu 22:38]
-:END:
-http://juanreyero.com/article/emacs/org-teams.html
 *** stuck projects
 #+begin_src emacs-lisp
   (setq org-tags-exclude-from-inheritance '("prj")
-        org-stuck-projects '("+prj/-CANC-DONE"
+        org-stuck-projects '("+prj/-CANC-SOME-DONE"
                              ("NEXT" "WAIT" "TICK") ()))  ;;  "SOME"
 #+end_src
 *** capture templates
@@ -552,7 +499,7 @@ customize capture templates
                         ;; programming/software stuff
                         ("R" . ?R) ("python" . ?y) ("org" . ?O) ("Bayes" . ?B) ("emacs" . ?E) ("inkscape" . ?i)
                         ;; tags to accompany the @agenda context
-                        ("Martin" . ?M) ("Inigo" . ?I) ("Anne" . ?A) ("Appy") ("FEST")))
+                        ("Martin" . ?M) ("Luc" . ?L) ("Inigo" . ?I) ("Anne" . ?A) ("Appy") ("FEST")))
 #+end_src
 ** exporting
 *** org-babel languages
