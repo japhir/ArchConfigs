@@ -334,6 +334,10 @@ prettify org mode
           ("\\.mkv\\'" . "xdg-open %s")
           ("\\.pdf.xoj\\'" . "xournal %s")))
 #+end_src
+** org-protocol
+#+begin_src emacs-lisp
+  (require 'org-protocol)
+#+end_src
 ** GTD stuff
 *** org-agenda
 #+begin_src emacs-lisp
@@ -441,6 +445,10 @@ customize capture templates
             "* %? :@email:\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
            ("w" "Website" entry (file org-in-file)
             "* %?\nEntered on %U\n %i\n %a")
+           ("p" "Protocol" entry (file org-in-file)
+            "* %:description%? :@web:\n:PROPERTIES:\n:CREATED: %U\n:END:\n[[%:link][%:description]]\n#+BEGIN_QUOTE\n%:initial\n#+END_QUOTE\n")
+           ("L" "Protocol Link" entry (file org-in-file)
+            "* %:description%? :@web:\n:PROPERTIES:\n:CREATED: %U\n:END:\n[[%:link][%:description]]")
            ("j" "Journal" entry (file+olp+datetree org-journal-file)
             "* %?\nEntered on %U\n %i\n %a")))
  #+end_src
