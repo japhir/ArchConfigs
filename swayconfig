@@ -313,7 +313,7 @@ bindsym Print exec grim ~/Pictures/Screenshots/$(date +'%F-%T.png')
 bindsym --release Shift+Print exec slurp | grim -g - -c ~/Pictures/Screenshots/$(date +'%F-%T_region.png')
 
 exec redshift -l 52.1:5.12 -m wayland -t 5500:2500
-exec flashfoucus           # highlight focused screen
+exec flashfocus           # highlight focused screen
 exec mako                  # notification daemon
 exec volnoti               # volume change notification
 exec pactl                 # pulseaudio volume control, manage with pamixer
