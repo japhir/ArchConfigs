@@ -82,6 +82,11 @@ let my window manager handle screen creation
   (use-package frames-only-mode
     :config (setq frames-only-mode t))
 #+end_src
+** default-text-scale
+#+begin_src emacs-lisp
+  (use-package default-text-scale
+    :config (setq default-text-scale-mode t))
+#+end_src
 ** clone-indirect-buffer-other-frame
 #+begin_src emacs-lisp
   (defun clone-indirect-buffer-other-frame (newname display-flag &optional norecord)
@@ -105,7 +110,7 @@ let my window manager handle screen creation
 ** smartparens
 #+begin_src emacs-lisp
   (use-package smartparens-config
-    ;; :hook ((prog-mode markdown-mode org-mode) . turn-on-smartparens-strict-mode)
+    :hook ((prog-mode markdown-mode org-mode) . turn-on-smartparens-strict-mode)
     :ensure smartparens
     :config (progn (show-smartparens-global-mode t)))
 #+end_src
@@ -113,7 +118,7 @@ let my window manager handle screen creation
 #+begin_src emacs-lisp
   (use-package evil-smartparens
     :after evil
-    :hook ((prog-mode org-mode) . evil-smartparens-mode))
+    :hook ((prog-mode markdown-mode org-mode) . evil-smartparens-mode))
 #+end_src
 ** rainbow-delimiters
 matching parenthesis are highlighted with rainbow colours.
@@ -317,7 +322,6 @@ prettify org mode
     :config
     (setq org-bullets-bullet-list
           '("◉" "●" "○" "♦" "◆" "►" "▸")))
-          ;; '(" ")))
 #+end_src
 ** file associations
 #+begin_src emacs-lisp
@@ -330,6 +334,10 @@ prettify org mode
           ("\\.webm\\'" . "xdg-open %s")
           ("\\.mkv\\'" . "xdg-open %s")
           ("\\.pdf.xoj\\'" . "xournal %s")))
+#+end_src
+** org-protocol
+#+begin_src emacs-lisp
+  (require 'org-protocol)
 #+end_src
 ** GTD stuff
 *** org-agenda
@@ -344,10 +352,6 @@ prettify org mode
   ;; (setq org-agenda-todo-ignore-with-date t)
   ;;(setq org-agenda-prefix-format "  %-17:c%?-12t% s") ; TODO: see if I like the default
   (setq org-agenda-include-all-todo nil)
-#+end_src
-*** org-super-agenda
-#+begin_src emacs-lisp
-  (use-package org-super-agenda)
 #+end_src
 *** agenda files
 all the org-files in my org-directory
@@ -385,16 +389,20 @@ Filter tasks by context (sorted by todo state)
                   ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
                    (org-agenda-overriding-header "High-priority unfinished tasks:")))))
           ("A" agenda*)
-          ("W" "Work" tags-todo "Work")
-          ("P" "Personal" tags-todo "Personal")
-          ("R" "R" tags-todo "R")
-          ("O" "org" tags-todo "org")
-          ("B" "Bayes" tags-todo "bayes")
+          ("n" "Next Actions" todo "NEXT")
+          ("w" "Waiting" todo "WAIT")
+          ;; ("s" "Someday/Maybe" todo "SOME")
+          ("j" "Projects" tags "prj/-SOME-DONE-CANC")
+          ("W" "Work" tags-todo "-Personal/!-WAIT"
+           ((org-agenda-todo-ignore-scheduled t)))
+          ("P" "Personal" tags-todo "-Work/!-WAIT"
+           ((org-agenda-todo-ignore-scheduled t)))
           ("g" . "GTD contexts")
           ("gh" "Home" tags-todo "@home")
           ("go" "Office" tags-todo "@office")
           ("ge" "Errands" tags-todo "@errands")
           ("gl" "Laboratory" tags-todo "@lab")
+          ("gt" "Travel" tags-todo "@travel")
           ("gc" "Computer" tags-todo "@computer")
           ("gB" "Phone" tags-todo "@phone")
           ("gm" "e-mail" tags-todo "@email")
@@ -402,6 +410,7 @@ Filter tasks by context (sorted by todo state)
           ("gb" "Bank" tags-todo "@bank")
           ("gw" "Write" tags-todo "@write")
           ("gp" "Program" tags-todo "@program")
+          ("gc" "Create/Plot" tags-todo "@createplot")
           ("gr" "Read" tags-todo "@read")
           ("gg" "Research" tags-todo "@research")
           ("gs" "Schedule" tags-todo "@schedule")
@@ -411,9 +420,17 @@ Filter tasks by context (sorted by todo state)
           ("E2" "Afternoon" tags-todo "afternoon")
           ("E3" "Evening" tags-todo "evening")
           ("p" . "People")
-          ("pM" "Martin" tags-todo "Martin")
-          ("pA" "Anne" tags-todo "Anne")
-          ("pI" "Inigo" tags-todo "Inigo")))
+          ("pm" "Martin" tags-todo "Martin")
+          ("pl" "Luc" tags-todo "Luc")
+          ("pa" "Anne" tags-todo "Anne")
+          ("pf" "FEST" tags-todo "FEST")
+          ("pi" "Inigo" tags-todo "Inigo")))
+#+end_src
+*** stuck projects
+#+begin_src emacs-lisp
+  (setq org-tags-exclude-from-inheritance '("prj")
+        org-stuck-projects '("+prj/-CANC-SOME-DONE"
+                             ("NEXT" "WAIT" "TICK") ()))  ;;  "SOME"
 #+end_src
 *** capture templates
 customize capture templates
@@ -429,36 +446,17 @@ customize capture templates
             "* %? :@email:\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
            ("w" "Website" entry (file org-in-file)
             "* %?\nEntered on %U\n %i\n %a")
+           ("p" "Protocol" entry (file org-in-file)
+            "* %:description%? :@web:\n:PROPERTIES:\n:CREATED: %U\n:END:\n[[%:link][%:description]]\n#+BEGIN_QUOTE\n%:initial\n#+END_QUOTE\n")
+           ("L" "Protocol Link" entry (file org-in-file)
+            "* %:description%? :@web:\n:PROPERTIES:\n:CREATED: %U\n:END:\n[[%:link][%:description]]")
            ("j" "Journal" entry (file+olp+datetree org-journal-file)
             "* %?\nEntered on %U\n %i\n %a")))
  #+end_src
-*** capture frame
-If we call make-capture-frame from anywhere, it creates a new frame named
-capture which I can decorate using my window manager, and which disappears
-after the capturing is complete.
-see: [[https://lists.gnu.org/archive/html/emacs-orgmode/2013-10/msg00150.html][an old mailing list answer]]
-this blog: https://www.diegoberrocal.com/blog/2015/08/19/org-protocol/
-this more recent blog: https://fuco1.github.io/2017-09-02-Maximize-the-org-capture-buffer.html
-#+begin_src emacs-lisp
-  (defun make-capture-frame ()
-    "Create a new frame and org-capture."
-    (interactive)
-    (make-frame '((name . "capture")))
-    (select-frame-by-name "capture")
-    (delete-other-windows)
-    (flet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
-      (org-capture)))
-
-  (defadvice org-capture-finalize
-      (after delete-capture-frame activate)
-    "Advice capture-finalize to close the frame"
-    (if (equal "capture" (frame-parameter nil 'name))
-        (delete-frame)))
-#+end_src
 *** TODO states
 #+begin_src emacs-lisp
   (setq org-todo-keywords
-        '((sequence "NEXT(n)" "WAIT(w!/!)" "TICK(t)" "PROJ(p)" "SOME(s!/!)" "|"
+        '((sequence "NEXT(n)" "WAIT(w!/!)" "TICK(t)" "SOME(s!/!)" "|"
                     "DONE(d)" "CANC(c)")))
   ;; prettify the todo keywords
   (setq org-todo-keyword-faces
@@ -467,8 +465,7 @@ this more recent blog: https://fuco1.github.io/2017-09-02-Maximize-the-org-captu
           ("TICK" . (:background "light slate blue"))
           ("SOME" . (:foreground "ghost white"  :background "deep sky blue"))
           ("DONE" . (:foreground "green4"       :background "pale green"))
-          ("CANC" . (:foreground "dim gray"     :background "gray"))
-          ("PROJ" . (:foreground "navajo white" :background "saddle brown"))))
+          ("CANC" . (:foreground "dim gray"     :background "gray"))))
 #+end_src
 *** effort estimates
 #+begin_src emacs-lisp
@@ -482,7 +479,8 @@ this more recent blog: https://fuco1.github.io/2017-09-02-Maximize-the-org-captu
 *** context tags
 #+begin_src emacs-lisp
   (setq org-fast-tag-selection-single-key t)
-  (setq org-tag-alist '((:startgroup . nil)
+  (setq org-tag-alist '(("prj" . ?j)
+                        (:startgroup . nil)
                         ("@home" . ?h)
                         ("@office" . ?o)
                         ("@errands" . ?e)
@@ -510,7 +508,7 @@ this more recent blog: https://fuco1.github.io/2017-09-02-Maximize-the-org-captu
                         ;; programming/software stuff
                         ("R" . ?R) ("python" . ?y) ("org" . ?O) ("Bayes" . ?B) ("emacs" . ?E) ("inkscape" . ?i)
                         ;; tags to accompany the @agenda context
-                        ("Martin" . ?M) ("Inigo" . ?I) ("Anne" . ?A) ("Appy") ("FEST")))
+                        ("Martin" . ?M) ("Luc" . ?L) ("Inigo" . ?I) ("Anne" . ?A) ("Appy") ("FEST")))
 #+end_src
 ** exporting
 *** org-babel languages
@@ -656,10 +654,6 @@ possible.
   (use-package org-noter
     :after pdf-tools org)
 #+end_src
-** org-ql
-#+begin_src emacs-lisp
-  (use-package org-ql)
-#+end_src
 ** pdf preview in org
 #+begin_src emacs-lisp
   (add-to-list 'image-type-file-name-regexps '("\\.pdf\\'" . imagemagick))
@@ -690,6 +684,12 @@ https://github.com/domtronn/all-the-icons.el
   (use-package all-the-icons-ivy
     :config
     (all-the-icons-ivy-setup))
+#+end_src
+** emojify-mode
+#+begin_src emacs-lisp
+  (use-package emojify
+    :config (setq emojify-emoji-styles 'unicode)
+    :hook ((mu4e-mode mu4e-view-mode mu4e-compse-mode org-mode) . emojify-mode))
 #+end_src
 ** revert buffer
 #+begin_src emacs-lisp
@@ -801,7 +801,7 @@ perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collec
           smtp-stream-type 'starttls
           smtpmail-smtp-user "<your-user-id>"
           smtpmail-starttls-credentials
-          '(("<your-smtp-server>" 587 "<possiblly-domain>/<your-user-id>" nil))
+          '(("<your-smtp-server>" 587 "<possibly-domain>/<your-user-id>" nil))
           starttls-use-gnutls t
           starttls-gnutls-program "gnutls-cli"
           starttls-extra-args nil))
@@ -819,6 +819,8 @@ install it with pacman ~mu~
            :map mu4e-view-mode-map
            ("C-c c" . org-mu4e-store-and-capture))
     :init
+    (require 'mu4e)  ;; somehow this is needed, because otherwise calling org-store-link doesn't work
+    (require 'org-mu4e)
     (setq mu4e-drafts-folder "/Drafts"
           mu4e-sent-folder "/Sent Items"
           mu4e-trash-folder "/Deleted Items")
@@ -844,8 +846,7 @@ install it with pacman ~mu~
     (setq mu4e-confirm-quit nil)
     (setq mu4e-view-show-images t)
     ;; (add-to-list 'mu4e-view-actions
-                 ;; '("ViewInBrowser" . mu4e-action-view-in-browser) t)
-    (require 'org-mu4e)
+    ;; '("ViewInBrowser" . mu4e-action-view-in-browser) t)
     (setq org-mu4e-link-query-in-headers-mode nil))
 #+end_src
 * science packages
@@ -891,7 +892,7 @@ emacs speaks statistics, work with R etc.
           org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
           ess-style 'RStudio
           ess-pdf-viewer-pref 'emacsclient
-          ;; inferior-R-args "--no-restore-history --no-save"
+          inferior-R-args "--no-restore-history --no-save"
           ess-ask-for-ess-directory nil))
 #+end_src
 *** electric-spacing operator
@@ -972,7 +973,8 @@ for working with \LaTeX
     :config
     (setq ispell-dictionary "british-ize-w_accents"))
 #+end_src
-** hl-todo
+** COMMENT hl-todo
+hmm it does overwrite my nice highlighting of NEXT
 #+begin_src emacs-lisp
   (use-package hl-todo
     :bind (:map hl-todo-mode-map
@@ -987,7 +989,8 @@ reference manager I use it in conjunction with zotero, which generates the
 #+begin_src emacs-lisp
   (use-package ivy-bibtex
     :config
-    (autoload 'ivy-bibtex "ivy-bibtex" "" t)
+    ;; (autoload 'ivy-bibtex "ivy-bibtex" "" t)
+    (require 'ivy-bibtex)
     (setq bibtex-completion-pdf-field "file"))
 #+end_src
 * secret directories

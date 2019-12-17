@@ -23,7 +23,8 @@ client.focused_inactive $color0 $background $foreground $color7 $color7
 
 # Your preferred application launcher
 # Note: it's recommended that you pass the final command to sway
-set $menu dmenu_path | rofi -dmenu | xargs swaymsg exec --
+# set $menu dmenu_path | rofi -dmenu | xargs swaymsg exec --
+set $menu rofi -show drun -show-icons swaymsg exec --
 
 ### Output configuration
 
@@ -266,7 +267,7 @@ bindsym XF86MonBrightnessUp   exec brightnessctl set +10%
 # bindsym XF86Display           exec arandr
 bindsym XF86WLAN              exec sudo systemctl restart NetworkManager
 # bindsym XF86Tools             exec lxappearance
-# bindsym XF86Bluetooth
+bindsym XF86Bluetooth         exec bluetooth toggle
 
 # lock screen
 bindsym $mod+Delete exec swaylock -c 000000
@@ -306,21 +307,20 @@ bindsym $mod+m exec emacsclient -c -n -e '(switch-to-buffer nil)' # emacs
 bindsym $mod+i exec inkscape
 bindsym $mod+s exec slack                                         # slack messages
 bindsym $mod+o exec libreoffice                                   # office
+bindsym $mod+p exec spotify                                       # music
 
 bindsym Print exec grim ~/Pictures/Screenshots/$(date +'%F-%T.png')
 bindsym --release Shift+Print exec slurp | grim -g - -c ~/Pictures/Screenshots/$(date +'%F-%T_region.png')
 
-# startup software for the tray doesn't work now!
-# exec --no-startup-id cbatticon           # battery indicator
-# exec --no-startup-id nm-applet           # NetworkManager applet
-# so I use nmtui from terminal for now for new wifi networks
-
-exec volnoti               # volume change notification
 exec redshift -l 52.1:5.12 -m wayland -t 5500:2500
-exec owncloud
-exec mako  # notification daemon
-exec nm-applet --indicator # network-manager-applet-indicator from AUR
+exec flashfocus           # highlight focused screen
+exec mako                  # notification daemon
+exec volnoti               # volume change notification
+exec pactl                 # pulseaudio volume control, manage with pamixer
+exec blueman-applet        # bluetooth status applet
 # exec nextcloud
+exec owncloud
+exec nm-applet --indicator # network-manager-applet-indicator from AUR
 
 # gaps
 smart_gaps on
@@ -340,6 +340,7 @@ bindsym $mod+Shift+z gaps outer current minus 5
 # inhibit swayidle in fullscreen ff
 # xwayland version
 for_window [class="Firefox"] inhibit_idle fullscreen
+for_window [class="popcorntime"] inhibit_idle fullscreen
 # wayland vesion
 for_window [app_id="firefox"] inhibit_idle fullscreen
 
