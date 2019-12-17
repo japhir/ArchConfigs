@@ -112,6 +112,7 @@ let my window manager handle screen creation
 ** evil-smartparens
 #+begin_src emacs-lisp
   (use-package evil-smartparens
+    :after evil
     :hook ((prog-mode org-mode) . evil-smartparens-mode))
 #+end_src
 ** rainbow-delimiters
@@ -344,6 +345,10 @@ prettify org mode
   ;;(setq org-agenda-prefix-format "  %-17:c%?-12t% s") ; TODO: see if I like the default
   (setq org-agenda-include-all-todo nil)
 #+end_src
+*** org-super-agenda
+#+begin_src emacs-lisp
+  (use-package org-super-agenda)
+#+end_src
 *** agenda files
 all the org-files in my org-directory
 #+begin_src emacs-lisp
@@ -427,6 +432,29 @@ customize capture templates
            ("j" "Journal" entry (file+olp+datetree org-journal-file)
             "* %?\nEntered on %U\n %i\n %a")))
  #+end_src
+*** capture frame
+If we call make-capture-frame from anywhere, it creates a new frame named
+capture which I can decorate using my window manager, and which disappears
+after the capturing is complete.
+see: [[https://lists.gnu.org/archive/html/emacs-orgmode/2013-10/msg00150.html][an old mailing list answer]]
+this blog: https://www.diegoberrocal.com/blog/2015/08/19/org-protocol/
+this more recent blog: https://fuco1.github.io/2017-09-02-Maximize-the-org-capture-buffer.html
+#+begin_src emacs-lisp
+  (defun make-capture-frame ()
+    "Create a new frame and org-capture."
+    (interactive)
+    (make-frame '((name . "capture")))
+    (select-frame-by-name "capture")
+    (delete-other-windows)
+    (flet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
+      (org-capture)))
+
+  (defadvice org-capture-finalize
+      (after delete-capture-frame activate)
+    "Advice capture-finalize to close the frame"
+    (if (equal "capture" (frame-parameter nil 'name))
+        (delete-frame)))
+#+end_src
 *** TODO states
 #+begin_src emacs-lisp
   (setq org-todo-keywords
@@ -627,6 +655,10 @@ possible.
 #+begin_src emacs-lisp
   (use-package org-noter
     :after pdf-tools org)
+#+end_src
+** org-ql
+#+begin_src emacs-lisp
+  (use-package org-ql)
 #+end_src
 ** pdf preview in org
 #+begin_src emacs-lisp

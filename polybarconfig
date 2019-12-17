@@ -9,7 +9,7 @@
 
 ;; bars
 [bar/bigscreen]
-monitor = DVI-I-2
+monitor = VGA1
 dock = false
 ; bottom = true
 width = 100%
@@ -43,7 +43,7 @@ tray-position = right
 
 
 [bar/smallscreen]
-monitor = DVI-I-1
+monitor = LVDS1
 dock = false
 ; bottom = true
 width = 100%

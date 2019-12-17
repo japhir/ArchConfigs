@@ -73,6 +73,10 @@ export PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/u
 
 source $ZSH/oh-my-zsh.sh
 
+# fzf
+source /usr/share/fzf/key-bindings.zsh
+source /usr/share/fzf/completion.zsh
+
 # You may need to manually set your language environment
 export LANG=en_US.UTF-8
 
