@@ -619,6 +619,13 @@ this more recent blog: https://fuco1.github.io/2017-09-02-Maximize-the-org-captu
     "Advice capture-finalize to close the frame"
     (if (equal "capture" (frame-parameter nil 'name))
         (delete-frame)))
+
+
+  (defadvice org-capture-destroy
+      (after delete-capture-frame activate)
+    "Advise capture-destroy to close the frame"
+    (if (equal "capture" (frame-parameter nil 'name))
+        (delete-frame)))
 #+end_src
 ** org-pomodoro
 #+begin_src emacs-lisp
