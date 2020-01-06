@@ -1041,6 +1041,18 @@ for working with \LaTeX
     :config
     (setq ispell-dictionary "british-ize-w_accents"))
 #+end_src
+** flyspell
+#+begin_src emacs-lisp
+  (use-package flyspell
+    :hook ((text-mode-hook . flyspell-mode)
+           (prog-mode-hook . flyspell-prog-mode))
+    :config
+    (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
+    (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC" . "#\\+END_SRC"))
+    (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
+    (add-to-list 'ispell-skip-region-alist '("^#\\+begin_example " . "#\\+end_example$"))
+    (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE " . "#\\+END_EXAMPLE$")))
+#+end_src
 ** COMMENT hl-todo
 hmm it does overwrite my nice highlighting of NEXT
 #+begin_src emacs-lisp
