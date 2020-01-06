@@ -943,9 +943,25 @@ emacs speaks statistics, work with R etc.
           ess-auto-width 'frame
           org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
           ess-style 'RStudio
+          ess-use-auto-complete nil
+          ess-use-company t
+          ess-indent-with-fancy-comments nil
           ess-pdf-viewer-pref 'emacsclient
           inferior-R-args "--no-restore-history --no-save"
-          ess-ask-for-ess-directory nil))
+          ess-ask-for-ess-directory nil
+          ess-R-font-lock-keywords
+          (quote
+           ((ess-R-fl-keyword:modifiers)
+            (ess-R-fl-keyword:fun-defs . t)
+            (ess-R-fl-keyword:keywords . t)
+            (ess-R-fl-keyword:assign-ops . t)
+            (ess-R-fl-keyword:constants . t)
+            (ess-R-fl-keyword:fun-cals . t)
+            (ess-R-fl-keyword:numbers)
+            (ess-R-fl-keyword:operators . t)
+            (ess-R-fl-keyword:delimiters)
+            (ess-R-fl-keyword:=)
+            (ess-R-fl-keyword:F&T)))))
 #+end_src
 *** electric-spacing operator
 Put spaces around operators such as +, -, etc.
