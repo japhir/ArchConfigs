@@ -52,6 +52,7 @@ window#waybar {
 
 #battery {
     /* background-color: #ffffff; */
+    background: rgba(43, 48, 59, 0.5);
 }
 
 #battery.charging {
