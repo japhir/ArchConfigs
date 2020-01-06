@@ -889,6 +889,19 @@ install it with pacman ~mu~
     (setq org-mu4e-link-query-in-headers-mode nil))
 #+end_src
 * science packages
+** eval-in-repl
+from: https://iqss.github.io/IQSS.emacs/init.html#general_repl_(comint)_config
+use other programming languages in interactive environment, similar to how ESS does it
+#+begin_src R
+  (use-package eval-in-repl
+    :hook (comint-mode . (lambda() (setq truncate - lines 1)))
+    :config
+    (setq comint-process-echoes t
+      eir-repl-placement 'below)
+    (setq comint-scroll-to-bottom-on-input t)
+    (setq comint-scroll-to-bottom-on-output t)
+    (setq comint-move-point-for-output t))
+#+end_src
 ** ess
 emacs speaks statistics, work with R etc.
 *** insert pipe %>% function
