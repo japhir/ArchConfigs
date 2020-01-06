@@ -103,7 +103,7 @@ fi
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-alias R='R --quiet'
+alias R='R --quiet --no-save --no-restore'
 alias o='xdg-open'
 alias e="emacsclient -c -n"
 alias en="emacsclient -nw"
