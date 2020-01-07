@@ -224,7 +224,8 @@ bindsym XF86Tools             exec lxappearance
 # bindsym XF86Bluetooth
 
 # Lock the desktop
-bindsym $mod+Delete exec ~/ArchConfigs/launchi3lock.sh #&& sudo sh -c "echo mem > /sys/power/state
+bindsym $mod+Delete exec i3lock -c 000000
+#~/ArchConfigs/launchi3lock.sh #&& sudo sh -c "echo mem > /sys/power/state
 
 # launch
 # keybinding        software                                        mnemonic(ish?)
@@ -237,8 +238,8 @@ bindsym $mod+i exec inkscape
 bindsym $mod+o exec libreoffice                                   # office
 
 # Take a screenshot with scrot
-bindsym Print exec "scrot -b /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T.png"
-bindsym --release Shift+Print exec "scrot -s /mnt/HDD/Pictures/Screenshots/%Y-%m-%d-%T-region.png"
+bindsym --release Print exec "scrot -b ~/Pictures/Screenshots/%Y-%m-%d-%T.png"
+bindsym --release Shift+Print exec "scrot -s ~/Pictures/Screenshots/%Y-%m-%d-%T-region.png"
 
 exec --no-startup-id nm-applet           # NetworkManager applet
 exec volnoti               # volume change notification
