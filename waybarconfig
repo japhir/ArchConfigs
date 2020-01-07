@@ -64,8 +64,8 @@
 	"bat": "BAT1",
 	//"on-click": "notify-senacpi",
 	"format": "bat: {capacity}% {icon}",
-        // "format-good": "", // An empty format will hide the module
-        //"format-full": "",
+        "format-good": "", // An empty format will hide the module
+        "format-full": "",
         "format-icons": ["", "", "", "", ""]
     },
     "network": {

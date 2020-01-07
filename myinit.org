@@ -769,6 +769,46 @@ git management, essential!
     :bind
     ("M-g" . magit-status))
 #+end_src
+** company
+See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for where I got it from.
+*** COMMENT capf
+#+begin_src emacs-lisp
+  (use-package company-capf)
+#+end_src
+*** COMMENT files
+  #+begin_src emacs-lisp
+  (use-package company-files)
+  #+end_src
+*** math
+  #+begin_src emacs-lisp
+  (use-package company-math)
+  #+end_src
+
+*** company itself
+#+begin_src emacs-lisp
+  (use-package company
+    :hook (after-init . global-company-mode)
+    :config
+    (setq company-require-match nil
+          ;; company-async-timeout 6
+          ;; company-idle-delay 5
+          company-minimum-prefix-length 1
+          company-global-modes '(not term-mode))
+    (setq company-backends '(company-files company-math-symbols-unicode company-capf))
+    (setq-default company-backends '(company-files company-math-symbols-unicode company-capf))
+    (setq tab-always-indent 'complete)
+
+    :bind
+    (:map company-active-map
+          ("C-n" . company-select-next)
+          ("C-p" . company-select-previous)
+          ("<tab>" . company-complete-common)
+          ("<backtab>" . company-select-previous))
+    (:map company-mode-map
+          ([remap indent-for-tab-command] . company-indent-or-complete-common)
+          ("C-M-i" . company-complete)
+          ("C-M-S-i" . counsel-company)))
+#+end_src
 ** diff-hl
 Highlight diffs of current version-controlled buffer in the margin. Quite cool!
 #+begin_src emacs-lisp
@@ -881,6 +921,19 @@ install it with pacman ~mu~
     (setq org-mu4e-link-query-in-headers-mode nil))
 #+end_src
 * science packages
+** eval-in-repl
+from: https://iqss.github.io/IQSS.emacs/init.html#general_repl_(comint)_config
+use other programming languages in interactive environment, similar to how ESS does it
+#+begin_src R
+  (use-package eval-in-repl
+    :hook (comint-mode . (lambda() (setq truncate - lines 1)))
+    :config
+    (setq comint-process-echoes t
+      eir-repl-placement 'below)
+    (setq comint-scroll-to-bottom-on-input t)
+    (setq comint-scroll-to-bottom-on-output t)
+    (setq comint-move-point-for-output t))
+#+end_src
 ** ess
 emacs speaks statistics, work with R etc.
 *** insert pipe %>% function
@@ -922,9 +975,25 @@ emacs speaks statistics, work with R etc.
           ess-auto-width 'frame
           org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
           ess-style 'RStudio
+          ess-use-auto-complete nil
+          ess-use-company t
+          ess-indent-with-fancy-comments nil
           ess-pdf-viewer-pref 'emacsclient
           inferior-R-args "--no-restore-history --no-save"
-          ess-ask-for-ess-directory nil))
+          ess-ask-for-ess-directory nil
+          ess-R-font-lock-keywords
+          (quote
+           ((ess-R-fl-keyword:modifiers)
+            (ess-R-fl-keyword:fun-defs . t)
+            (ess-R-fl-keyword:keywords . t)
+            (ess-R-fl-keyword:assign-ops . t)
+            (ess-R-fl-keyword:constants . t)
+            (ess-R-fl-keyword:fun-cals . t)
+            (ess-R-fl-keyword:numbers)
+            (ess-R-fl-keyword:operators . t)
+            (ess-R-fl-keyword:delimiters)
+            (ess-R-fl-keyword:=)
+            (ess-R-fl-keyword:F&T)))))
 #+end_src
 *** electric-spacing operator
 Put spaces around operators such as +, -, etc.
@@ -1003,6 +1072,18 @@ for working with \LaTeX
   (use-package ispell
     :config
     (setq ispell-dictionary "british-ize-w_accents"))
+#+end_src
+** flyspell
+#+begin_src emacs-lisp
+  (use-package flyspell
+    :hook ((text-mode-hook . flyspell-mode)
+           (prog-mode-hook . flyspell-prog-mode))
+    :config
+    (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
+    (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC" . "#\\+END_SRC"))
+    (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
+    (add-to-list 'ispell-skip-region-alist '("^#\\+begin_example " . "#\\+end_example$"))
+    (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE " . "#\\+END_EXAMPLE$")))
 #+end_src
 ** COMMENT hl-todo
 hmm it does overwrite my nice highlighting of NEXT
