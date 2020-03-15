@@ -113,3 +113,5 @@ alias yta="youtube-dl --add-metadata -xic" # Download only audio
 alias dis_screen="swaymsg output HDMI-A-2 disable"
 alias ena_screen="swaymsg output HDMI-A-2 enable"
 alias pg="cd ~/SurfDrive/PhD/programming"
+
+source /home/japhir/.config/broot/launcher/bash/br
