@@ -245,6 +245,7 @@ exec --no-startup-id nm-applet           # NetworkManager applet
 exec volnoti               # volume change notification
 exec --no-startup-id redshift-gtk -l 52.1:5.12 -m randr -t 5500:2500
 exec owncloud
+#exec spotify
 exec dunst  # notification daemon
 exec --no-startup-id flashfocus
 # screenlayout created w/ arandr
@@ -324,6 +325,3 @@ bindsym $mod+button3 floating toggle
 
 # The middle button over a titlebar kills the window
 bindsym --release button2 kill
-
-# Mouse hovering shouldn't dictate mouse focus
-focus_follows_mouse no
