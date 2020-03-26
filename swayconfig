@@ -189,6 +189,7 @@ assign [class="^Zotero$"] $ws4
 assign [class="^Slack$"] $ws5
 assign [class="^Riot$"] $ws5
 assign [class="^Trello$"] $ws5
+assign [class="^Microsoft Teams"] $ws5
 assign [class="^Inkscape$"] $ws6
 assign [class="^VirtualBox$" title="^Win10"] $ws8
 assign [class="R_x11"] $ws9
@@ -301,9 +302,10 @@ bindsym $mod+Delete exec swaylock -c 000000
 #     }
 # }
 
-# launch
+# launch software with key binding
 # keybinding        software                                        mnemonic(ish?)
 bindsym $mod+b exec firefox                                       # firefox browser
+bindsym $mod+c exec emacsclient -e '(make-capture-frame)'
 bindsym $mod+x exec nautilus                                      # xxx file manager
 bindsym $mod+m exec emacsclient -c -n -e '(switch-to-buffer nil)' # emacs
 bindsym $mod+i exec inkscape
@@ -314,7 +316,8 @@ bindsym $mod+p exec spotify                                       # music
 bindsym Print exec grim ~/Pictures/Screenshots/$(date +'%F-%T.png')
 bindsym --release Shift+Print exec slurp | grim -g - -c ~/Pictures/Screenshots/$(date +'%F-%T_region.png')
 
-exec redshift -l 52.1:5.12 -m wayland -t 5500:2500
+# startup software
+exec redshift -l 52.1:5.12 -m wayland -t 5500:2500 # make screen display orange less blue at night
 exec flashfocus           # highlight focused screen
 exec mako                  # notification daemon
 exec volnoti               # volume change notification
@@ -323,6 +326,7 @@ exec blueman-applet        # bluetooth status applet
 # exec nextcloud
 exec owncloud
 exec nm-applet --indicator # network-manager-applet-indicator from AUR
+exec teams                 # microsoft teams
 
 # gaps
 smart_gaps on
@@ -347,6 +351,7 @@ for_window [class="popcorntime"] inhibit_idle fullscreen
 for_window [app_id="firefox"] inhibit_idle fullscreen
 
 for_window [class="^URxvt"] opacity 0.7
+for_window [instance="capture"] floating enable
 
 # for_window [class="^Emacs$"] opacity 0.95
 
