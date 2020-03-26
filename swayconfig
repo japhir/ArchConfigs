@@ -63,7 +63,7 @@ input "*" {
       xkb_numlock enabled
 }
 # laptop touchpad
-input "2:7:SynPS/2_Synaptics_TouchPad" {
+input "1739:0:Synaptics_TM3145-007" {
       # touchpad settings
       dwt enabled
       tap enabled
@@ -77,11 +77,13 @@ input "1386:209:Wacom_Bamboo_2FG_4x5_Pad" {
       tap enabled
       natural_scroll enabled
 }
-# input "1386:209:Wacom_Bamboo_2FG_4x5_Pen" {
-#     # attempts at getting the buttons to remap to MMB and RMB
-#     #scroll_button 331
-#     #middle_emulation enabled
-# }
+input "1386:209:Wacom_Bamboo_2FG_4x5_Pen" {
+      #  map tablet to secondary screen if present
+      map_to_output HDMI-A-2
+      # attempts at getting the buttons to remap to MMB and RMB
+      #scroll_button 331
+      #middle_emulation enabled
+}
 #
 # hide the cursor after a while
 # seat seat0 hide_cursor 1500
