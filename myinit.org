@@ -313,15 +313,23 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
         org-ellipsis " ▼ " ;▼ … ◦
         org-hide-emphasis-markers t)
 #+end_src
-*** org-bullets
-prettify org mode
+*** org-superstar-mode
+https://github.com/integral-dw/org-superstar-mode
 #+begin_src emacs-lisp
-  (use-package org-bullets
+  (setq inhibit-compacting-font-caches t)  ;; supposedly takes care of it hanging because of font stuff
+  (use-package org-superstar
     :hook
-    (org-mode . (lambda () (org-bullets-mode 1)))
+    (org-mode . (lambda () (org-superstar-mode 1)))
     :config
-    (setq org-bullets-bullet-list
-          '("◉" "●" "○" "♦" "◆" "►" "▸")))
+    (setq org-superstar-headline-bullet-list
+          '("◉" "●" "○" "♦" "◆" "►" "▸")
+          ;; org-superstar-special-todo-items t)
+    ;; (setq org-superstar-todo-bullet-alist '(("NEXT" . ?☐)
+    ;;                                         ("WAIT" . ?⌛)
+    ;;                                         ("SOME" . ?☁)
+    ;;                                         ("DONE" . ?☑)
+          ;;                                         ("CANC" . ?☒))
+          ))
 #+end_src
 ** file associations
 #+begin_src emacs-lisp
@@ -508,7 +516,7 @@ customize capture templates
                         ;; programming/software stuff
                         ("R" . ?R) ("python" . ?y) ("org" . ?O) ("Bayes" . ?B) ("emacs" . ?E) ("inkscape" . ?i)
                         ;; tags to accompany the @agenda context
-                        ("Martin" . ?M) ("Luc" . ?L) ("Inigo" . ?I) ("Anne" . ?A) ("Appy") ("FEST")))
+                        ("Family" . ?F) ("Martin" . ?M) ("Luc" . ?L) ("Inigo" . ?I) ("Anne" . ?A) ("Niels" . ?N) ("Appy") ("FEST")))
 #+end_src
 ** exporting
 *** org-babel languages
@@ -771,33 +779,21 @@ git management, essential!
 #+end_src
 ** company
 See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for where I got it from.
-*** COMMENT capf
-#+begin_src emacs-lisp
-  (use-package company-capf)
-#+end_src
-*** COMMENT files
-  #+begin_src emacs-lisp
-  (use-package company-files)
-  #+end_src
-*** math
-  #+begin_src emacs-lisp
-  (use-package company-math)
-  #+end_src
-
-*** company itself
 #+begin_src emacs-lisp
   (use-package company
     :hook (after-init . global-company-mode)
     :config
-    (setq company-require-match nil
+    (setq ;; company-require-match nil
           ;; company-async-timeout 6
-          ;; company-idle-delay 5
-          company-minimum-prefix-length 1
+          ;; company-idle-delay 5 ;; default 0.5,
+          ;; company-minimum-prefix-length 1 ;; default 3
           company-global-modes '(not term-mode))
+    (require 'company-capf)
+    (require 'company-files)
+    (require 'company-math)
     (setq company-backends '(company-files company-math-symbols-unicode company-capf))
     (setq-default company-backends '(company-files company-math-symbols-unicode company-capf))
     (setq tab-always-indent 'complete)
-
     :bind
     (:map company-active-map
           ("C-n" . company-select-next)
@@ -809,6 +805,7 @@ See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for 
           ("C-M-i" . company-complete)
           ("C-M-S-i" . counsel-company)))
 #+end_src
+
 ** diff-hl
 Highlight diffs of current version-controlled buffer in the margin. Quite cool!
 #+begin_src emacs-lisp
@@ -854,6 +851,9 @@ perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collec
 #+begin_src emacs-lisp
   (use-package calfw)
   (use-package calfw-org
+    :config
+    (setq cfw:display-calendar-holidays nil
+          calendar-week-start 1)
     :bind
     ("C-c o" . cfw:open-org-calendar))
 #+end_src
@@ -948,7 +948,7 @@ emacs speaks statistics, work with R etc.
 *** use-package
 #+begin_src emacs-lisp
   (use-package ess
-    ;; :load-path "/usr/share/emacs/site-lisp/ess/"
+    :load-path "/usr/share/emacs/site-lisp/ess"
     :init (require 'ess-site)  ;; seems like this is needed to load the minor modes as well keybindings don't work without it
     ;; :hook ((ess-r-mode inferior-ess-r-mode) . electric-layout-mode)  ;; commented out since new curly-curly operator for rlang
     :commands R
