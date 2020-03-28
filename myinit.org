@@ -608,32 +608,48 @@ possible.
 If we call make-capture-frame from anywhere, it creates a new frame named
 capture which I can decorate using my window manager, and which disappears
 after the capturing is complete.
-see: [[https://lists.gnu.org/archive/html/emacs-orgmode/2013-10/msg00150.html][an old mailing list answer]]
-this blog: https://www.diegoberrocal.com/blog/2015/08/19/org-protocol/
-this more recent blog: https://fuco1.github.io/2017-09-02-Maximize-the-org-capture-buffer.html
+
+Sources:
+- [[https://lists.gnu.org/archive/html/emacs-orgmode/2013-10/msg00150.html][an old mailing list answer]]
+- this blog: https://www.diegoberrocal.com/blog/2015/08/19/org-protocol/
+- this more recent blog: https://fuco1.github.io/2017-09-02-Maximize-the-org-capture-buffer.html
+- this very nice implementation: [[https://gist.github.com/progfolio/af627354f87542879de3ddc30a31adc1][Emacs as an Org capture server]]
 
 #+begin_src emacs-lisp
   (defun make-capture-frame ()
     "Create a new frame and org-capture."
     (interactive)
+    (require 'cl-lib)
     (make-frame '((name . "capture")))
     (select-frame-by-name "capture")
     (delete-other-windows)
-    (flet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
-      (org-capture)))
+    (cl-letf (((symbol-function 'switch-to-buffer-other-window) #'switch-to-buffer))
+              (condition-case err
+                  (org-capture)
+                (user-error (when (string= (cadr err) "Abort")
+                              (delete-frame))))))
 
   (defadvice org-capture-finalize
       (after delete-capture-frame activate)
     "Advice capture-finalize to close the frame"
     (if (equal "capture" (frame-parameter nil 'name))
         (delete-frame)))
+#+end_src
+** org-roam
+[[https://org-roam.readthedocs.io/en/latest/installation/][docs here]]
 
-
-  (defadvice org-capture-destroy
-      (after delete-capture-frame activate)
-    "Advise capture-destroy to close the frame"
-    (if (equal "capture" (frame-parameter nil 'name))
-        (delete-frame)))
+#+begin_src emacs-lisp
+(use-package org-roam
+      :hook (after-init . org-roam-mode)
+      :custom
+      (org-roam-directory "/home/japhir/org/")
+      :bind (:map org-roam-mode-map
+              (("C-c n l" . org-roam)
+               ("C-c n f" . org-roam-find-file)
+               ("C-c n b" . org-roam-switch-to-buffer)
+               ("C-c n g" . org-roam-show-graph))
+              :map org-mode-map
+              (("C-c n i" . org-roam-insert))))
 #+end_src
 ** org-pomodoro
 #+begin_src emacs-lisp
