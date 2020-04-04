@@ -186,6 +186,7 @@ bindsym $mod+Shift+0 move container to workspace $ws10
 ### move programs to specific workspaces ###
 assign [class="^Mendeley Desktop$"] $ws4
 assign [class="^Zotero$"] $ws4
+assign [title="^GanttProject"] $ws4
 assign [class="^Slack$"] $ws5
 assign [class="^Riot$"] $ws5
 assign [class="^Trello$"] $ws5
@@ -327,6 +328,7 @@ exec blueman-applet        # bluetooth status applet
 exec owncloud
 exec nm-applet --indicator # network-manager-applet-indicator from AUR
 exec teams                 # microsoft teams
+exec ganttproject ~/SurfDrive/PhD/application/DrIljaKocken.gan  # my long-term planning
 
 # gaps
 smart_gaps on
