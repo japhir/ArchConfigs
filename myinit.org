@@ -316,20 +316,12 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 *** org-superstar-mode
 https://github.com/integral-dw/org-superstar-mode
 #+begin_src emacs-lisp
-  (setq inhibit-compacting-font-caches t)  ;; supposedly takes care of it hanging because of font stuff
   (use-package org-superstar
     :hook
     (org-mode . (lambda () (org-superstar-mode 1)))
     :config
-    (setq org-superstar-headline-bullet-list
-          '("◉" "●" "○" "♦" "◆" "►" "▸")
-          ;; org-superstar-special-todo-items t)
-    ;; (setq org-superstar-todo-bullet-alist '(("NEXT" . ?☐)
-    ;;                                         ("WAIT" . ?⌛)
-    ;;                                         ("SOME" . ?☁)
-    ;;                                         ("DONE" . ?☑)
-          ;;                                         ("CANC" . ?☒))
-          ))
+    (setq org-superstar-headline-bullets-list
+          '("◉" "●" "○" "♦" "◆" "►" "▸")))
 #+end_src
 ** file associations
 #+begin_src emacs-lisp
