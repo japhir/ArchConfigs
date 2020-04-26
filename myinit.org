@@ -35,7 +35,7 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
   (defvar org-cal-file "~/org/calendars/gcal.org"
     "Google Calendar")
 #+end_src
-* interface and appearance
+* interface
 ** turn off UI elements and small tweaks
 The gc-cons-threshold is set to a superlarge number for faster startup time. It
 is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
@@ -87,27 +87,26 @@ let my window manager handle screen creation
   (use-package default-text-scale
     :config (setq default-text-scale-mode t))
 #+end_src
-** clone-indirect-buffer-other-frame
-#+begin_src emacs-lisp
-  (defun clone-indirect-buffer-other-frame (newname display-flag &optional norecord)
-    "Like `clone-indirect-buffer' but display in another frame."
-    (interactive
-     (progn
-       (if (get major-mode 'no-clone-indirect)
-           (error "Cannot indirectly clone a buffer in %s mode" mode-name))
-       (list (if current-prefix-arg
-                 (read-buffer "Name of indirect buffer: " (current-buffer)))
-             t)))
-    (let ((pop-up-frames t))
-      (clone-indirect-buffer newname display-flag norecord)))
-  (global-set-key (kbd "C-x 5 c") 'clone-indirect-buffer-other-frame)
-#+end_src
 ** play nice with parentheses
 #+begin_src emacs-lisp
   (electric-pair-mode 1) ; auto-insert matching bracket
   (show-paren-mode 1)    ; turn on paren match highlighting
 #+end_src
+** helpful
+https://github.com/Wilfred/helpful
+#+begin_src emacs-lisp
+  (use-package helpful)
+#+end_src
+** demos
+Insert demos after describe function https://github.com/xuchunyang/elisp-demos
+#+begin_src emacs-lisp
+  (use-package elisp-demos
+    :config
+    (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
+#+end_src
+* change appearance
 ** smartparens
+insert matching parentheses and jump across them
 #+begin_src emacs-lisp
   (use-package smartparens-config
     :hook ((prog-mode markdown-mode org-mode) . turn-on-smartparens-strict-mode)
@@ -163,17 +162,48 @@ Highlight hex colours!
 #+begin_src emacs-lisp
   (setq compilation-window-height 15)
 #+end_src
-** helpful
-https://github.com/Wilfred/helpful
+* version control
+** diff-hl
+Highlight diffs of current version-controlled buffer in the margin. Quite cool!
 #+begin_src emacs-lisp
-  (use-package helpful)
+  (use-package diff-hl
+    :init
+    (global-diff-hl-mode)
+    (setq diff-hl-gutter-mode t)
+    (diff-hl-flydiff-mode +1)
+    :hook (magit-post-refresh . diff-hl-magit-post-refresh))
 #+end_src
-** demos
-Insert demos after describe function https://github.com/xuchunyang/elisp-demos
+** magit
+git management, essential!
 #+begin_src emacs-lisp
-  (use-package elisp-demos
-    :config
-    (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
+  (use-package magit
+    :bind
+    ("M-g" . magit-status))
+#+end_src
+* custom functions/keyboard shortcuts
+** clone-indirect-buffer-other-frame
+#+begin_src emacs-lisp
+  (defun clone-indirect-buffer-other-frame (newname display-flag &optional norecord)
+    "Like `clone-indirect-buffer' but display in another frame."
+    (interactive
+     (progn
+       (if (get major-mode 'no-clone-indirect)
+           (error "Cannot indirectly clone a buffer in %s mode" mode-name))
+       (list (if current-prefix-arg
+                 (read-buffer "Name of indirect buffer: " (current-buffer)))
+             t)))
+    (let ((pop-up-frames t))
+      (clone-indirect-buffer newname display-flag norecord)))
+  (global-set-key (kbd "C-x 5 c") 'clone-indirect-buffer-other-frame)
+#+end_src
+** revert buffer
+#+begin_src emacs-lisp
+  (global-set-key (kbd "<f5>") 'revert-buffer)
+#+end_src
+** firefox as default browser
+#+begin_src emacs-lisp
+  (setq browse-url-browser-function 'browse-url-generic
+	browse-url-generic-program "firefox")
 #+end_src
 * evil
 ** evil
@@ -321,7 +351,14 @@ https://github.com/integral-dw/org-superstar-mode
     (org-mode . (lambda () (org-superstar-mode 1)))
     :config
     (setq org-superstar-headline-bullets-list
-          '("◉" "●" "○" "♦" "◆" "►" "▸")))
+          '("◉" "●" "○" "♦" "◆" "►" "▸"))
+    (setq org-superstar-todo-bullet-alist '(("NEXT" " ☐" ?☐)
+                                            ("TICK" " →" ?*)
+                                            ("WAIT" " ☕" ?☕)
+                                            ("SOME" " ⋯" ?☼)
+                                            ("DONE" " ☑" ?☑)
+                                            ("CANC" " ❌" ?❌)))
+    (setq org-superstar-special-todo-items t))
 #+end_src
 ** file associations
 #+begin_src emacs-lisp
@@ -542,9 +579,9 @@ org-export ignore headlines with ~:ignore:~ tag
 *** org-latex export settings
 basic latex settings
 #+begin_src emacs-lisp
-  (setq org-highlight-latex-and-related '(latex script entities))
+  (setq org-highlight-latex-and-related '(native script entities))
   (setq org-latex-create-formula-image-program 'dvipng)
-  (setq org-latex-default-figure-position 'htbp)
+  ;; (setq org-latex-default-figure-position 'htbp)
   (setq org-latex-pdf-process
         (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
   (setq org-latex-prefer-user-labels t)
@@ -631,23 +668,31 @@ Sources:
 [[https://org-roam.readthedocs.io/en/latest/installation/][docs here]]
 
 #+begin_src emacs-lisp
-(use-package org-roam
-      :hook (after-init . org-roam-mode)
-      :custom
-      (org-roam-directory "/home/japhir/org/")
-      :bind (:map org-roam-mode-map
-              (("C-c n l" . org-roam)
-               ("C-c n f" . org-roam-find-file)
-               ("C-c n b" . org-roam-switch-to-buffer)
-               ("C-c n g" . org-roam-show-graph))
-              :map org-mode-map
-              (("C-c n i" . org-roam-insert))))
+  (use-package org-roam
+        :hook (after-init . org-roam-mode)
+        :custom
+        (org-roam-directory "/home/japhir/org/roam/")
+        :bind (:map org-roam-mode-map
+                (("C-c n l" . org-roam)
+                 ("C-c n f" . org-roam-find-file)
+                 ("C-c n b" . org-roam-switch-to-buffer)
+                 ("C-c n g" . org-roam-graph-show))
+                :map org-mode-map
+                (("C-c n i" . org-roam-insert)))
+        :config
+        (setq org-roam-completion-system 'ivy))
+#+end_src
+** ob-async
+allow asyncronous code block evaluation https://github.com/astahlman/ob-async
+#+begin_src emacs-lisp
+  (use-package ob-async)
 #+end_src
 ** org-pomodoro
 #+begin_src emacs-lisp
   (use-package org-pomodoro
     :after org
-    :bind ("C-c p" . org-pomodoro))
+    :bind ("C-c p" . org-pomodoro)
+    :config (setq org-pomodoro-manual-break t))
 #+end_src
 ** org-pdfview
 #+begin_src emacs-lisp
@@ -692,8 +737,8 @@ Sources:
           bibtex-autokey-titlewords 0
           bibtex-autokey-titlewords-stretch 1
           bibtex-autokey-titleword-length 5)
-    (add-to-list 'org-ref-bibtex-journal-abbreviations
-                   '("JIR" "Journal of Irreproducible Research" "J. Irrep. Res."))
+    ;; (add-to-list 'org-ref-bibtex-journal-abbreviations
+    ;;                '("JIR" "Journal of Irreproducible Research" "J. Irrep. Res."))
     (require 'org-ref-scopus))
 #+end_src
 ** org-noter
@@ -708,8 +753,15 @@ Sources:
   (setq imagemagick-types-inhibit (remove 'PDF imagemagick-types-inhibit)
         org-image-actual-width t)
 #+end_src
-
-* general packages and functions
+* writing
+** spell-fu
+#+begin_src emacs-lisp
+  (use-package spell-fu
+    :hook (org-mode . (lambda()
+                        (setq spell-fu-faces-exclude
+                              '(org-meta-line org-link org-code))
+                        (spell-fu-mode))))
+#+end_src
 ** easy symbol insertion
 By default C-x 8 o = ° and C-x 8 m = µ. So:
 #+begin_src emacs-lisp
@@ -738,10 +790,34 @@ https://github.com/domtronn/all-the-icons.el
     :config (setq emojify-emoji-styles 'unicode)
     :hook ((mu4e-mode mu4e-view-mode mu4e-compse-mode org-mode) . emojify-mode))
 #+end_src
-** revert buffer
+** yasnippet
+usefull snippets for me: org-mode (fig_, )
 #+begin_src emacs-lisp
-  (global-set-key (kbd "<f5>") 'revert-buffer)
+  (use-package yasnippet
+    :init
+    (yas-global-mode 1)
+    :config
+    (setq yas-indent-line t))
 #+end_src
+** ispell: spell-checking
+#+begin_src emacs-lisp
+  (use-package ispell
+    :config
+    (setq ispell-dictionary "british-ize-w_accents"))
+#+end_src
+** flyspell
+#+begin_src emacs-lisp
+  (use-package flyspell
+    :hook ((text-mode-hook . flyspell-mode)
+           (prog-mode-hook . flyspell-prog-mode))
+    :config
+    (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
+    (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC" . "#\\+END_SRC"))
+    (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
+    (add-to-list 'ispell-skip-region-alist '("^#\\+begin_example " . "#\\+end_example$"))
+    (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE " . "#\\+END_EXAMPLE$")))
+#+end_src
+* reading and annotating pdfs
 ** pdf-tools
 #+begin_src emacs-lisp
   (use-package pdf-tools
@@ -753,7 +829,7 @@ https://github.com/domtronn/all-the-icons.el
     ;; swiper doesn't play nice with pdf-tools, so I disable it.
     (:map pdf-view-mode-map ("C-s" . isearch-forward)))
 #+end_src
-** swiper
+* swiper
 very nice search replacement
 #+begin_src emacs-lisp
   (use-package swiper
@@ -777,13 +853,6 @@ very nice search replacement
     ("C-c g" . counsel-git)
     ("M-x" . counsel-M-x)
     ("C-c s" . counsel-rg))
-#+end_src
-** magit
-git management, essential!
-#+begin_src emacs-lisp
-  (use-package magit
-    :bind
-    ("M-g" . magit-status))
 #+end_src
 ** company
 See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for where I got it from.
@@ -814,35 +883,12 @@ See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for 
           ("C-M-S-i" . counsel-company)))
 #+end_src
 
-** diff-hl
-Highlight diffs of current version-controlled buffer in the margin. Quite cool!
-#+begin_src emacs-lisp
-  (use-package diff-hl
-    :init
-    (global-diff-hl-mode)
-    (setq diff-hl-gutter-mode t)
-    (diff-hl-flydiff-mode +1)
-    :hook (magit-post-refresh . diff-hl-magit-post-refresh))
-#+end_src
-** yasnippet
-usefull snippets for me: org-mode (fig_, )
-#+begin_src emacs-lisp
-  (use-package yasnippet
-    :init
-    (yas-global-mode 1)
-    :config
-    (setq yas-indent-line t))
-#+end_src
-** firefox as default browser
-#+begin_src emacs-lisp
-  (setq browse-url-browser-function 'browse-url-generic
-	browse-url-generic-program "firefox")
-#+end_src
 ** emacs-pkgbuild-mode
 Install it with Pacman
-#+begin_src bash :results none :exports code
+#+begin_src bash :results none :exports code :eval never
 sudo pacman -S emacs-pkgbuild-mode
 #+end_src
+
 Then load it into emacs when opening a PKGBUILD file
 #+begin_src emacs-lisp
   (use-package pkgbuild-mode
@@ -924,6 +970,9 @@ install it with pacman ~mu~
     (setq mu4e-compose-format-flowed t)  ; plain-text nice to read on phone
     (setq mu4e-confirm-quit nil)
     (setq mu4e-view-show-images t)
+    ;; use imagemagick, if available
+    (when (fboundp 'imagemagick-register-types)
+      (imagemagick-register-types))
     ;; (add-to-list 'mu4e-view-actions
     ;; '("ViewInBrowser" . mu4e-action-view-in-browser) t)
     (setq org-mu4e-link-query-in-headers-mode nil))
@@ -932,9 +981,9 @@ install it with pacman ~mu~
 ** eval-in-repl
 from: https://iqss.github.io/IQSS.emacs/init.html#general_repl_(comint)_config
 use other programming languages in interactive environment, similar to how ESS does it
-#+begin_src R
+#+begin_src emacs-lisp
   (use-package eval-in-repl
-    :hook (comint-mode . (lambda() (setq truncate - lines 1)))
+    :hook (comint-mode . (lambda() (setq truncate-lines 1)))
     :config
     (setq comint-process-echoes t
       eir-repl-placement 'below)
@@ -1074,24 +1123,6 @@ for working with \LaTeX
     (setq TeX-parse-self t)
     (setq-default TeX-master nil)
     (setq reftex-plug-into-AUCTeX t))
-#+end_src
-** ispell: spell-checking
-#+begin_src emacs-lisp
-  (use-package ispell
-    :config
-    (setq ispell-dictionary "british-ize-w_accents"))
-#+end_src
-** flyspell
-#+begin_src emacs-lisp
-  (use-package flyspell
-    :hook ((text-mode-hook . flyspell-mode)
-           (prog-mode-hook . flyspell-prog-mode))
-    :config
-    (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
-    (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC" . "#\\+END_SRC"))
-    (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
-    (add-to-list 'ispell-skip-region-alist '("^#\\+begin_example " . "#\\+end_example$"))
-    (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE " . "#\\+END_EXAMPLE$")))
 #+end_src
 ** COMMENT hl-todo
 hmm it does overwrite my nice highlighting of NEXT
