@@ -751,8 +751,9 @@ allow asyncronous code block evaluation https://github.com/astahlman/ob-async
           reftex-default-bibliography '("~/SurfDrive/bibliography/references.bib")
           org-ref-bibliography-notes '("~/SurfDrive/bibliography/notes.org")
           org-ref-default-bibliography '("~/SurfDrive/bibliography/references.bib")
-          org-ref-pdf-directory '("~/SurfDrive/bibliography/bibtex-pdfs/")
-          bibtex-completion-pdf-open-function 'org-open-file)
+          ;; org-ref-pdf-directory '("~/SurfDrive/bibliography/bibtex-pdfs/")
+          bibtex-completion-pdf-open-function 'org-open-file
+          )
     :config
     (require 'doi-utils)
     (require 'org-id)
@@ -770,13 +771,34 @@ allow asyncronous code block evaluation https://github.com/astahlman/ob-async
     ;;                '("JIR" "Journal of Irreproducible Research" "J. Irrep. Res."))
     (require 'org-ref-scopus))
 #+end_src
+*** open zotero pdf at point
+from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-mendeley-jabref-and-zotero-users][the manual]]
+#+begin_src emacs-lisp
+  (setq bibtex-completion-pdf-field "file")
+
+  (defun my/org-ref-open-pdf-at-point ()
+    "Open the pdf for bibtex key under point if it exists."
+    (interactive)
+    (let* ((results (org-ref-get-bibtex-key-and-file))
+      (key (car results))
+      (pdf-file (car (bibtex-completion-find-pdf-in-field key))))
+      (if (file-exists-p pdf-file)
+         (org-open-file pdf-file)
+        (message "No PDF found for %s" key))))
+
+  (setq org-ref-open-pdf-function 'my/org-ref-open-pdf-at-point)
+  ;; (setq org-ref-get-pdf-filename-function 'bibtex-completion-find-pdf-in-field)
+
+  ;; (global-set-key (kbd "<f8>") 'my/org-ref-open-pdf-at-point)
+#+end_src
+
 ** org-noter
 #+begin_src emacs-lisp
   (use-package org-noter
     :after pdf-tools org)
 #+end_src
-** pdf preview in org
-#+begin_src emacs-lisp
+** COMMENT pdf preview in org
+#+begin_src emacs-lisp :eval never :tangle no
   (add-to-list 'image-type-file-name-regexps '("\\.pdf\\'" . imagemagick))
   (add-to-list 'image-file-name-extensions "pdf")
   (setq imagemagick-types-inhibit (remove 'PDF imagemagick-types-inhibit)
@@ -851,8 +873,11 @@ usefull snippets for me: org-mode (fig_, )
 #+begin_src emacs-lisp
   (use-package pdf-tools
     :magic ("%PDF" . pdf-view-mode)
+    :load-path "/usr/share/emacs/site-lisp/pdf-tools"
+    :init
+    (pdf-tools-install)
     :config
-    ;; (pdf-tools-install)
+    ;(pdf-loader-install)
     (setq-default pdf-view-display-size 'fit-width)
     :bind
     ;; swiper doesn't play nice with pdf-tools, so I disable it.
@@ -1053,12 +1078,12 @@ emacs speaks statistics, work with R etc.
                (string= lang "elisp")
                (string= lang "emacs-lisp")
                (string= lang "latex"))))
-    (setq display-buffer-alist
-          '(("*R"
-             (display-buffer-reuse-window display-buffer-pop-up-frame)
-             (reusable-frames . 0)))
-          ess-help-own-frame 'one
-          ess-auto-width 'frame
+    (setq ;; display-buffer-alist
+          ;; '(("*R"
+          ;;    (display-buffer-reuse-window display-buffer-pop-up-frame)
+          ;;    (reusable-frames . 0)))
+          ;; ess-help-own-frame 'one
+          ;; ess-auto-width 'frame
           org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
           ess-style 'RStudio
           ess-use-auto-complete nil
@@ -1177,7 +1202,9 @@ reference manager I use it in conjunction with zotero, which generates the
     :config
     ;; (autoload 'ivy-bibtex "ivy-bibtex" "" t)
     (require 'ivy-bibtex)
-    (setq bibtex-completion-pdf-field "file"))
+    (setq bibtex-completion-bibliography
+          '("/home/japhir/SurfDrive/bibliography/references.bib"
+            "/home/japhir/Documents/References/PhD.bib")))
 #+end_src
 * secret directories
 These are all the settings that require secret directories, such as my org
