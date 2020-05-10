@@ -137,13 +137,24 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
 *** doom
 #+begin_src emacs-lisp
   (use-package doom-themes
-    :ensure t
     :config
     (load-theme 'doom-one t)
     (doom-themes-visual-bell-config)
     (doom-themes-neotree-config)
     (doom-themes-treemacs-config)
     (doom-themes-org-config))
+#+end_src
+*** COMMENT prot's modus operandi
+#+begin_src emacs-lisp :tangle no
+  (use-package modus-operandi-theme
+    :config
+    (load-theme 'modus-operandi))
+#+end_src
+*** COMMENT and vivendi themes
+#+begin_src emacs-lisp :tangle no
+  (use-package modus-vivendi-theme
+    :config
+    (load-theme 'modus-vivendi t))
 #+end_src
 *** COMMENT doom modeline
 #+begin_src emacs-lisp
@@ -387,6 +398,7 @@ https://github.com/integral-dw/org-superstar-mode
           ("\\.mkv\\'" . "xdg-open %s")
           ("\\.pdf.xoj\\'" . "xournal %s")))
 #+end_src
+
 ** org-protocol
 #+begin_src emacs-lisp
   (require 'org-protocol)
