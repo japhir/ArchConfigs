@@ -695,7 +695,7 @@ Sources:
 #+end_src
 ** org-roam
 [[https://org-roam.readthedocs.io/en/latest/installation/][docs here]]
-
+[[file:~/org/roam/20200427230825-how_to_take_smart_notes.org][How to Take Smart Notes]]
 #+begin_src emacs-lisp
   (use-package org-roam
         :hook (after-init . org-roam-mode)
