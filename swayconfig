@@ -16,28 +16,32 @@ exec sh ~/.profile                      # load environment variables
 
 # Your preferred terminal emulator
 set $term alacritty
-## get colours/bg from pywal
-include "$HOME/.cache/wal/colors-sway"
-client.focused $color0 $color9 $foreground $color7 $color7
-client.focused_inactive $color0 $background $foreground $color7 $color7
+## get colours/bg from pywal -> nope I now use ubuntu's new theme!
+# include "$HOME/.cache/wal/colors-sway"
+# client.focused $color0 $color9 $foreground $color7 $color7
+# client.focused_inactive $color0 $background $foreground $color7 $color7
 
 # Your preferred application launcher
 # Note: it's recommended that you pass the final command to sway
 # set $menu dmenu_path | rofi -dmenu | xargs swaymsg exec --
-set $menu wofi --show drun --allow-images --allow-markup --color=/home/japhir/.cache/wal/colors-rofi-dark.rasi swaymsg exec --
-
+set $menu wofi --show drun --allow-images --allow-markup swaymsg exec --
+# --color=/home/japhir/.cache/wal/colors-rofi-dark.rasi
 ### Output configuration
 
 # Default wallpaper (more resolutions are available in __DATADIR__/backgrounds/sway/)
 output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 
+set $wallpaper ~/Pictures/wallpapers/Landscapes/1454722946236.jpg
+
 # main laptop screen
+set $smallscreen eDP-1
 output eDP-1 {
        background $wallpaper fill
        resolution 1920x1080
        position 1920 10
 }
 # HDMI screen at office above laptop
+set $bigscreen HDMI-A-2
 output HDMI-A-2 {
        background $wallpaper fill
        resolution 1920x1080
@@ -47,8 +51,8 @@ output HDMI-A-2 {
 
 ### Idle configuration
 exec swayidle -w \
-         timeout 300 'swaylock -f -c 000000' \
-         timeout 600 'swaymsg "output * dpms off"' \
+         # timeout 300 'swaylock -f -c 000000' \
+         timeout 900 'swaymsg "output * dpms off"' \
               resume 'swaymsg "output * dpms on"' \
          before-sleep 'swaylock -f -c 000000'
 # This will lock your screen after 300 seconds of inactivity, then turn off
@@ -148,13 +152,14 @@ set $ws9 "9:graphs"
 set $ws10 "10:spotify"
 
 # assign workspaces to screens
-workspace $ws1 output $smallscreen
+workspace $ws1 output $bigscreen
 workspace $ws2 output $bigscreen
 workspace $ws3 output $bigscreen
 workspace $ws4 output $bigscreen
+workspace $ws5 output $smallscreen
 workspace $ws7 output $bigscreen
 workspace $ws9 output $smallscreen
-workspace $ws10 output $smallscreen
+workspace $ws10 output $bigscreen
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
@@ -327,7 +332,7 @@ exec blueman-applet        # bluetooth status applet
 # exec nextcloud
 exec owncloud
 exec nm-applet --indicator # network-manager-applet-indicator from AUR
-exec teams                 # microsoft teams
+# exec teams                 # microsoft teams
 exec ganttproject ~/SurfDrive/PhD/application/DrIljaKocken.gan  # my long-term planning
 
 # gaps
@@ -345,8 +350,7 @@ bindsym $mod+Shift+d gaps inner current set 0; gaps outer current set 0
 bindsym $mod+z       gaps outer current plus 5
 bindsym $mod+Shift+z gaps outer current minus 5
 
-# inhibit swayidle in fullscreen ff
-# xwayland version
+# inhibit swayidle in fullscreen ff xwayland version
 for_window [class="Firefox"] inhibit_idle fullscreen
 for_window [class="popcorntime"] inhibit_idle fullscreen
 # wayland vesion

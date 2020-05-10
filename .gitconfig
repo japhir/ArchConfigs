@@ -13,3 +13,5 @@
      	pushInsteadOf = "aur:"
 [status]
 	showUntrackedFiles = all
+[color]
+	ui = auto

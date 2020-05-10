@@ -5,9 +5,9 @@ if [ "$(tty)" = "/dev/tty1" ]; then
 fi
 
 # reload pywal colorscheme
-(cat /home/japhir/.cache/wal/sequences &)
+#(cat /home/japhir/.cache/wal/sequences &)
 # tty colours
-source ~/.cache/wal/colors-tty.sh
+#source ~/.cache/wal/colors-tty.sh
 
 # Path to your oh-my-zsh installation.
 export ZSH=/usr/share/oh-my-zsh
@@ -103,9 +103,10 @@ fi
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+alias yy="curl -s https://www.archlinux.org/ | xmllint --html --xpath '//div[@id=\"news\"]/div[1]' -  | pandoc -f html -t plain && yay"
 alias R='R --quiet --no-save --no-restore'
 alias o='xdg-open'
-alias e="emacsclient -c -n"
+alias e="emacsclient -t"
 alias en="emacsclient -nw"
 alias pb='curl -F c=@- https://ptpb.pw\?u\=1' # neat pastebin
 alias yt="youtube-dl --add-metadata -ic" # Download video link
@@ -113,5 +114,7 @@ alias yta="youtube-dl --add-metadata -xic" # Download only audio
 alias dis_screen="swaymsg output HDMI-A-2 disable"
 alias ena_screen="swaymsg output HDMI-A-2 enable"
 alias pg="cd ~/SurfDrive/PhD/programming"
+alias pacsize="expac -H M '%m\t%n' | sort -h"
+alias killorphans="sudo pacman -Rns $(pacman -Qtdq)"
 
-source /home/japhir/.config/broot/launcher/bash/br
+# source /home/japhir/.config/broot/launcher/bash/br
