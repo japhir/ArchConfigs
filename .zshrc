@@ -5,9 +5,9 @@ if [ "$(tty)" = "/dev/tty1" ]; then
 fi
 
 # reload pywal colorscheme
-#(cat /home/japhir/.cache/wal/sequences &)
+(cat /home/japhir/.cache/wal/sequences &)
 # tty colours
-#source ~/.cache/wal/colors-tty.sh
+source ~/.cache/wal/colors-tty.sh
 
 # Path to your oh-my-zsh installation.
 export ZSH=/usr/share/oh-my-zsh
