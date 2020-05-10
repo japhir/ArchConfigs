@@ -451,6 +451,7 @@ Filter tasks by context (sorted by todo state)
            ((org-agenda-todo-ignore-scheduled t)))
           ("g" . "GTD contexts")
           ("gh" "Home" tags-todo "@home")
+          ("gk" "Klusjes/Craft" tags-todo "@klusje")
           ("go" "Office" tags-todo "@office")
           ("ge" "Errands" tags-todo "@errands")
           ("gl" "Laboratory" tags-todo "@lab")
@@ -540,6 +541,7 @@ customize capture templates
                         ("@travel" . ?t)
                         (:endgroup . nil)
                         ("@computer" . ?c)  ;; general in case I can't decide
+                        ("@klusje" . ?k)    ;; crafts, things that require my toolbox
                         ("@phone" . ?B)     ;; b for Dutch "bellen"
                         ("@email" . ?m)
                         ;; ("@slack". ?s)
