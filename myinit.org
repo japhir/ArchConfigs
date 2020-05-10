@@ -205,6 +205,21 @@ git management, essential!
   (setq browse-url-browser-function 'browse-url-generic
 	browse-url-generic-program "firefox")
 #+end_src
+** get-labels in current buffer
+from [[https://kitchingroup.cheme.cmu.edu/blog/2014/03/08/Using-yasnippet-to-get-completion-in-ref-links/][JKitchin's blog]]
+#+begin_src emacs-lisp
+  (defun get-labels ()
+    (interactive)
+    (save-excursion
+      (goto-char (point-min))
+      (let ((matches '()))
+        (while (re-search-forward "label:\\([a-zA-z0-9:-]*\\)" (point-max) t)
+          (add-to-list 'matches (match-string-no-properties 1) t))
+        matches)))
+#+end_src
+
+this allows the yasnippet template to autocomplete ref: with all the labels in
+the buffer.
 * evil
 ** evil
 vim emulator
