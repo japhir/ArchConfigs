@@ -76,11 +76,11 @@ is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
         confirm-nonexistent-file-or-buffer nil
         create-lockfiles nil)
 #+end_src
-** frames-only-mode
+** COMMENT frames-only-mode
 let my window manager handle screen creation
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package frames-only-mode
-    :config (setq frames-only-mode t))
+    :config (setq frames-only-mode nil))
 #+end_src
 ** default-text-scale
 #+begin_src emacs-lisp
