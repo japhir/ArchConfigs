@@ -11,15 +11,24 @@ set $down j
 set $up k
 set $right l
 
-exec xrdb ~/.Xresources			# load urxvt customisations
+exec xrdb ~/.Xresources			# load urxvt customisations moved them over to ~/.Xdefaults, which should be loaded automatically
 exec sh ~/.profile                      # load environment variables
+seat seat0 xcursor_theme Yaru 24
 
 # Your preferred terminal emulator
 set $term alacritty
 ## get colours/bg from pywal -> nope I now use ubuntu's new theme!
 # include "$HOME/.cache/wal/colors-sway"
 # client.focused $color0 $color9 $foreground $color7 $color7
-# client.focused_inactive $color0 $background $foreground $color7 $color7
+# ubuntu orange with dark border and light text: border bg text
+client.focused #222222 #df4a16 #f7f7f7
+client.focused_inactive #222222 #515151 #f7f7f7
+client.unfocused #222222 #2c2c2c #848484
+
+exec_always import-gsettings \
+    gtk-theme:gtk-theme-name \
+    icon-theme:gtk-icon-theme-name \
+    cursor-theme:gtk-cursor-theme-name
 
 # Your preferred application launcher
 # Note: it's recommended that you pass the final command to sway
@@ -51,7 +60,7 @@ output HDMI-A-2 {
 
 ### Idle configuration
 exec swayidle -w \
-         # timeout 300 'swaylock -f -c 000000' \
+         timeout 300 'swaylock -f -c 000000' \
          timeout 900 'swaymsg "output * dpms off"' \
               resume 'swaymsg "output * dpms on"' \
          before-sleep 'swaylock -f -c 000000'
@@ -61,7 +70,7 @@ exec swayidle -w \
 
 ### Input configuration
 # default keyboard settings
-input "*" {
+input type:keyboard {
       xkb_layout us
       xkb_options ctrl:nocaps,compose:ralt
       xkb_numlock enabled
@@ -87,6 +96,12 @@ input "1386:209:Wacom_Bamboo_2FG_4x5_Pen" {
       # attempts at getting the buttons to remap to MMB and RMB
       #scroll_button 331
       #middle_emulation enabled
+}
+# mouse at work (scrolling isn't working correctly)
+input "1112:311:PixArt_USB_Optical_Mouse" {
+      natural_scroll disabled
+      pointer_accel 0.9
+      scroll_factor 1
 }
 #
 # hide the cursor after a while
@@ -271,14 +286,15 @@ bindsym --locked XF86AudioPlay         exec playerctl play-pause
 bindsym XF86AudioNext         exec playerctl next
 bindsym XF86AudioPrev         exec playerctl previous
 bindsym XF86AudioMicMute      exec amixer set Capture toggle
-bindsym XF86MonBrightnessDown exec brightnessctl set 10%-
-bindsym XF86MonBrightnessUp   exec brightnessctl set +10%
-# bindsym XF86Display           exec arandr
+bindsym XF86MonBrightnessDown exec "brightnessctl set 10%- && /home/japhir/bin/brightness-show"
+bindsym XF86MonBrightnessUp   exec "brightnessctl set +10% && /home/japhir/bin/brightness-show"
+bindsym XF86Display           exec "swaymsg 'output eDP-1 toggle'"
 bindsym XF86WLAN              exec sudo systemctl restart NetworkManager
-# bindsym XF86Tools             exec lxappearance
+# bindsym XF86Tools             exec "swaymsg 'output eDP-1 toggle'"
 bindsym XF86Bluetooth         exec bluetooth toggle
 
 # lock screen
+bindsym $mod+Shift+Delete exec systemctl suspend && swaylock -c 000000
 bindsym $mod+Delete exec swaylock -c 000000
 
 # Status Bar:
