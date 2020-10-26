@@ -46,8 +46,8 @@
     "clock": {
 	// I prefer it if this shows the date first
 	// format: weekday abbrev, YYYY-MM-DD
-        "format": "{:%a %F}",
-        "format-alt": "{:%T, wk %V}"
+        "format": "{:week %V, %a %F}",
+        "format-alt": "{:%T}"
     },
     "cpu": {
         "format": "cpu: {usage}% "
@@ -56,16 +56,18 @@
         "format": "mem: {}% "
     },
     "battery": {
+	"bat": "BAT1",
+	"interval": 60,
         "states": {
             "good": 95,
             "warning": 30,
             "critical": 15
         },
-	"bat": "BAT1",
 	//"on-click": "notify-senacpi",
 	"format": "bat: {capacity}% {icon}",
-        "format-good": "", // An empty format will hide the module
-        "format-full": "",
+	"format-charging": "{capacity}% ",
+        "format-good": "bat: {capacity}% {icon}", // An empty format will hide the module
+        "format-full": "bat: {capacity}% {icon}",
         "format-icons": ["", "", "", "", ""]
     },
     "network": {
