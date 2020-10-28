@@ -76,9 +76,18 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
   (require 'vc-hooks)
   (setq vc-follow-symlinks t)
 #+end_src
-** don't make a mess of my folders
+** auto-save: don't make a mess of my folders
+auto-save when I exit normal mode
+#+begin_src R
+  (defun my-save-if-bufferfilename ()
+    (if (buffer-file-name)
+        (progn (save-buffer))
+          (message "no file is associated to this buffer: do nothing")))
+  (add-hook 'evil-insert-state-exit-hook 'my-save-if-bufferfilename)
+#+end_src
+
 #+begin_src emacs-lisp
-  (setq auto-save-default nil
+  (setq auto-save-default t  ;; let's try autosave for a while
         backup-inhibited t
         confirm-nonexistent-file-or-buffer nil
         create-lockfiles nil)
