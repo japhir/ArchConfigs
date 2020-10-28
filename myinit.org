@@ -311,6 +311,36 @@ from [[https://kitchingroup.cheme.cmu.edu/blog/2014/03/08/Using-yasnippet-to-get
 
 this allows the yasnippet template to autocomplete ref: with all the labels in
 the buffer.
+** beginend
+#+begin_src emacs-lisp
+(use-package beginend
+  :init
+  (beginend-global-mode))
+#+end_src
+
+** internet up
+#+begin_src emacs-lisp
+(defun internet-up-p (&optional host)
+  (= 0 (call-process "ping" nil nil nil "-c" "1" "-W" "1"
+                     (if host host "www.google.com"))))
+#+end_src
+
+** fetch calendar
+#+begin_src emacs-lisp
+  (defun fetch-calendar ()
+    (when (internet-up-p) (org-gcal-fetch)))
+#+end_src
+
+** org-agenda recent open loops
+#+begin_src emacs-lisp
+(defun my-org-agenda-recent-open-loops ()
+  (interactive)
+  (let ((org-agenda-start-with-log-mode t)
+        (org-agenda-use-time-grid nil))
+    (fetch-calendar)
+    (org-agenda-list nil (org-read-date nil nil "-2d") 4)
+    (beginend-org-agenda-mode-goto-beginning)))
+#+end_src
 * evil
 ** evil
 vim emulator
