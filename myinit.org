@@ -35,10 +35,17 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
   (defvar org-cal-file "~/org/calendars/gcal.org"
     "Google Calendar")
 #+end_src
+* org-roam/notes/ref directories
+#+begin_src emacs-lisp
+  (setq
+   org_notes (concat (getenv "HOME") "/SurfDrive/bibliography/notes/")
+   zot_bib (concat (getenv "HOME") "/SurfDrive/bibliography/bibliography.bib")
+   org-directory org_notes
+   deft-directory org_notes
+   org-roam-directory org_notes)
+#+end_src
 * interface
 ** turn off UI elements and small tweaks
-The gc-cons-threshold is set to a superlarge number for faster startup time. It
-is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
 #+begin_src emacs-lisp
   (setq inhibit-splash-screen t)
   (scroll-bar-mode -1)   ; turn off the scroll bar
@@ -481,8 +488,8 @@ https://github.com/integral-dw/org-superstar-mode
 *** agenda files
 all the org-files in my org-directory
 #+begin_src emacs-lisp
-  (setq org-directory "~/org/")
-  (setq org-agenda-files (directory-files-recursively org-directory "\\.org$"))
+  ;(setq org-directory "~/org/") ;; changed for org-roam capture
+  (setq org-agenda-files (directory-files-recursively "~/org" "\\.org$"))
 #+end_src
 *** refile targets
 swyper makes refiling amazing!
@@ -756,22 +763,102 @@ Sources:
 #+end_src
 ** org-roam
 [[https://org-roam.readthedocs.io/en/latest/installation/][docs here]]
-[[file:~/org/roam/20200427230825-how_to_take_smart_notes.org][How to Take Smart Notes]]
+[[file:~/SurfDrive/bibliography/notes//20200427230825-how_to_take_smart_notes.org][How to Take Smart Notes]]
+
 #+begin_src emacs-lisp
   (use-package org-roam
-        :hook (after-init . org-roam-mode)
-        :custom
-        (org-roam-directory "/home/japhir/org/roam/")
-        :bind (:map org-roam-mode-map
+    :hook (org-mode . org-roam-mode)
+    :commands (org-roam-buffer-toggle-display
+               org-roam-find-file
+               org-roam-graph
+               org-roam-insert
+               org-roam-switch-to-buffer
+               org-roam-dailies-date
+               org-roam-dailies-today
+               org-roam-dailies-tomorrow
+               org-roam-dailies-yesterday)
+    :bind (:map org-roam-mode-map
+                (("C-c n l" . org-roam)
+                 ("C-c n f" . org-roam-find-file)
+                 ("C-c n b" . org-roam-switch-to-buffer)
+                 ("C-c n g" . org-roam-graph))
+                :map org-mode-map
+                (("C-c n i" . org-roam-insert)))
+    :config
+    (setq org-roam-verbose nil  ; https://youtu.be/fn4jIlFwuLU
+          org-roam-buffer-no-delete-other-windows t ; make org-roam buffer sticky
+          org-roam-completion-system 'default)
+
+    ;; Normally, the org-roam buffer doesn't open until you explicitly call
+    ;; `org-roam'. If `+org-roam-open-buffer-on-find-file' is non-nil, the
+    ;; org-roam buffer will be opened for you when you use `org-roam-find-file'
+    ;; (but not `find-file', to limit the scope of this behavior).
+    ;; (add-hook 'find-file-hook
+    ;;   (defun +org-roam-open-buffer-maybe-h ()
+    ;;     (and +org-roam-open-buffer-on-find-file
+    ;;          (memq 'org-roam-buffer--update-maybe post-command-hook)
+    ;;          (not (window-parameter nil 'window-side)) ; don't proc for popups
+    ;;          (not (eq 'visible (org-roam-buffer--visibility)))
+    ;;          (with-current-buffer (window-buffer)
+    ;;            (org-roam-buffer--get-create))))
+    ;; Hide the mode line in the org-roam buffer, since it serves no purpose. This
+    ;; makes it easier to distinguish among other org buffers.
+    ;; (add-hook 'org-roam-buffer-prepare-hook #'hide-mode-line-mode)
+    )
+
+
+  ;; Since the org module lazy loads org-protocol (waits until an org URL is
+  ;; detected), we can safely chain `org-roam-protocol' to it.
+  ;; (use-package org-roam-protocol
+  ;;   :after org-protocol)
+
+
+  ;; (use-package company-org-roam
+  ;;   :after org-roam
+  ;;   :config
+  ;;   (set-company-backend! 'org-mode '(company-org-roam company-yasnippet company-dabbrev)))
+#+end_src
+** COMMENT my own old org-roam config
+#+begin_src emacs-lisp :eval never :tangle no
+  (use-package org-roam
+    :diminish org-roam-mode
+    :hook (after-init . org-roam-mode)
+    :custom
+    ;; (org-roam-directory "/home/japhir/org/roam/")
+    :bind (:map org-roam-mode-map
                 (("C-c n l" . org-roam)
                  ("C-c n f" . org-roam-find-file)
                  ("C-c n b" . org-roam-switch-to-buffer)
                  ("C-c n g" . org-roam-graph-show))
                 :map org-mode-map
                 (("C-c n i" . org-roam-insert)))
-        :config
-        (setq org-roam-completion-system 'ivy))
+    :config
+    (setq org-roam-completion-system 'ivy))
 #+end_src
+** org-roam-bibtex
+#+begin_src emacs-lisp
+    (use-package org-roam-bibtex
+      :after (org-roam)
+      :hook (org-roam-mode . org-roam-bibtex-mode)
+      :bind (:map org-mode-map
+                  (("C-c n a" . orb-note-actions)))
+      :config
+      (setq org-roam-bibtex-preformat-keywords
+            '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
+      (setq orb-templates
+            '(("r" "ref" plain (function org-roam-capture--get-point)
+               ""
+               :file-name "${slug}"
+               :head "#+TITLE: ${=key=}: ${title}\n#+ROAM_KEY: ${ref}
+
+    - tags ::
+    - keywords :: ${keywords}
+
+    \n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n  :NOTER_PAGE: \n  :END:\n\n"
+
+               :unnarrowed t))))
+#+end_src
+
 ** ob-async
 allow asyncronous code block evaluation https://github.com/astahlman/ob-async
 #+begin_src emacs-lisp
@@ -809,18 +896,23 @@ allow asyncronous code block evaluation https://github.com/astahlman/ob-async
     :after org
     :init
     (setq org-ref-completion-library 'org-ref-ivy-cite
+          org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
           reftex-default-bibliography '("~/SurfDrive/bibliography/references.bib")
-          org-ref-bibliography-notes '("~/SurfDrive/bibliography/notes.org")
+          org-ref-bibliography-notes '("~/SurfDrive/bibliography/notes/notes.org")
           org-ref-default-bibliography '("~/SurfDrive/bibliography/references.bib")
+          org-ref-note-title-format "* TODO %y - %t\n :PROPERTIES:\n  :Custom_ID: %k\n  :NOTER_DOCUMENT: %F\n :ROAM_KEY: cite:%k\n  :AUTHOR: %9a\n  :JOURNAL: %j\n  :YEAR: %y\n  :VOLUME: %v\n  :PAGES: %p\n  :DOI: %D\n  :URL: %U\n :END:\n\n"
+          org-ref-notes-directory "~/SurfDrive/bibliography/notes/"
+          org-ref-notes-function 'orb-edit-notes
           ;; org-ref-pdf-directory '("~/SurfDrive/bibliography/bibtex-pdfs/")
-          bibtex-completion-pdf-open-function 'org-open-file
-          )
+          bibtex-completion-pdf-open-function 'org-open-file)
     :config
+    (require 'org-ref)
     (require 'doi-utils)
     (require 'org-id)
     (require 'org-ref-wos)
     (require 'org-ref-scopus)
     (require 'org-ref-pubmed)
+    (require 'org-ref-sci-id)
     (setq bibtex-autokey-year-length 4
           bibtex-autokey-name-year-separator ""
           bibtex-autokey-year-title-separator "-"
@@ -850,23 +942,82 @@ from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-me
   (setq org-ref-open-pdf-function 'my/org-ref-open-pdf-at-point)
   ;; (setq org-ref-get-pdf-filename-function 'bibtex-completion-find-pdf-in-field)
 
-  ;; (global-set-key (kbd "<f8>") 'my/org-ref-open-pdf-at-point)
+  (global-set-key (kbd "<f8>") 'my/org-ref-open-pdf-at-point)
+#+end_src
+** COMMENT deft
+:LOGBOOK:
+- Note taken on [2020-07-15 Wed 16:09] \\
+  added it based on [[file:~/SurfDrive/bibliography/notes//20200715160129-an_orgmode_note_workflow.org][An Orgmode Note Workflow]]
+:END:
+#+begin_src emacs-lisp :eval never :tangle no
+(use-package deft
+  :commands deft
+  :init
+  (setq deft-default-extension "org"
+        ;; de-couples filename and note title:
+        deft-use-filename-as-title nil
+        deft-use-filter-string-for-filename t
+        ;; disable auto-save
+        deft-auto-save-interval -1.0
+        ;; converts the filter string into a readable file-name using kebab-case:
+        deft-file-naming-rules
+        '((noslash . "-")
+          (nospace . "-")
+          (case-fn . downcase)))
+  :config
+  (add-to-list 'deft-extensions "tex"))
 #+end_src
 
 ** org-noter
 #+begin_src emacs-lisp
   (use-package org-noter
-    :after pdf-tools org)
+    :after (:any org pdf-view)
+    :config
+    (setq
+     ;; org-noter-notes-window-location 'horizontal-split
+     ;; Please stop opening frames
+     org-noter-always-create-frame nil
+     ;; I want to see the whole file
+     org-noter-hide-other nil
+     ;; Everything is relative to the main notes file
+     org-noter-notes-search-path (list org_notes)))
+#+end_src
+
+** mpv
+play videos from orgmode!
+#+begin_src emacs-lisp
+  (use-package mpv
+    :hook
+    (org-open-at-point-functions . mpv-seek-to-position-at-point)
+    :config
+    (org-add-link-type "mpv" #'mpv-play)
+    (defun org-mpv-complete-link (&optional arg)
+      (replace-regexp-in-string
+       "file:" "mpv:"
+       (org-file-complete-link arg)
+       t t)))
+#+end_src
+it's not working so far
+
+** play bell sound when task is marked as done
+from [[https://stackoverflow.com/questions/15345614/how-to-get-emacs-org-mode-to-play-sound-file-on-done-state][this stackoverflow post]]
+#+begin_src emacs-lisp
+  (add-hook 'org-after-todo-state-change-hook 'my-org-after-todo-state-change)
+  (defun my-org-after-todo-state-change ()
+    (when (or (string-equal org-state "DONE")
+              (string-equal org-state "CANC"))
+      (org-clock-out-if-current)
+      (play-sound-file "~/bell.au")))
 #+end_src
 ** COMMENT pdf preview in org
 #+begin_src emacs-lisp :eval never :tangle no
-  (add-to-list 'image-type-file-name-regexps '("\\.pdf\\'" . imagemagick))
-  (add-to-list 'image-file-name-extensions "pdf")
-  (setq imagemagick-types-inhibit (remove 'PDF imagemagick-types-inhibit)
-        org-image-actual-width t)
+  ; (add-to-list 'image-type-file-name-regexps '("\\.pdf\\'" . imagemagick))
+  ; (add-to-list 'image-file-name-extensions "pdf")
+  ; (setq imagemagick-types-inhibit (remove 'PDF imagemagick-types-inhibit)
+  ;       org-image-actual-width t)
 #+end_src
 * writing
-** spell-fu
+** COMMENT spell-fu
 #+begin_src emacs-lisp
   (use-package spell-fu
     :hook (org-mode . (lambda()
