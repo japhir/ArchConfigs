@@ -366,11 +366,13 @@ https://github.com/Somelauw/evil-org-mode
 evil keymap for org-mode
 #+begin_src emacs-lisp
   (use-package evil-org
-    :after org evil
-    :hook ((org-mode . evil-org-mode)
+    :after (:any org evil)
+    :diminish evil-org-mode
+    :hook (((org-mode org-agenda-mode). evil-org-mode)
            (evil-org-mode . (lambda ()
                               (evil-org-set-key-theme
                                '(navigation insert return textobjects additional shift todo heading calendar))))
+           ;; I want to immediately type when I capture or log
            (org-log-buffer-setup . evil-insert-state)
            (org-capture-mode . evil-insert-state)
            (yas-before-expand-snippet . evil-insert-state))
