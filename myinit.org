@@ -1080,6 +1080,15 @@ usefull snippets for me: org-mode (fig_, )
     (add-to-list 'ispell-skip-region-alist '("^#\\+begin_example " . "#\\+end_example$"))
     (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE " . "#\\+END_EXAMPLE$")))
 #+end_src
+** visual-fill-column-mode
+#+begin_src emacs-lisp
+  (use-package visual-fill-column
+    :hook (visual-line-mode . visual-fill-column-mode)
+    :config
+    (setq-default visual-fill-column-width 115
+                  split-window-preferred-function 'visual-fill-column-split-window-sensibly
+                  visual-fill-column-center-text t))
+#+end_src
 * reading and annotating pdfs
 ** pdf-tools
 #+begin_src emacs-lisp
