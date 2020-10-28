@@ -1,4 +1,6 @@
-* set gc-cons threshold low
+* set gc-cons threshold
+The gc-cons-threshold is set to a superlarge number for faster startup time. It
+is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
 #+begin_src emacs-lisp
 (setq gc-cons-threshold 402653184
       gc-cons-percentage 0.6)
@@ -133,6 +135,7 @@ insert matching parentheses and jump across them
 #+begin_src emacs-lisp
   (use-package evil-smartparens
     :after evil
+    :diminish evil-smartparens-mode
     :hook ((prog-mode markdown-mode org-mode) . evil-smartparens-mode))
 #+end_src
 ** rainbow-delimiters
@@ -150,7 +153,7 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
     "Clear existing theme settings instead of layering them"
     (mapc #'disable-theme custom-enabled-themes))
 #+end_src
-*** doom
+*** COMMENT doom
 #+begin_src emacs-lisp
   (use-package doom-themes
     :config
@@ -357,6 +360,7 @@ lines if you forgot to press 10j. https://github.com/PythonNut/evil-easymotion/
 https://github.com/hlissner/evil-snipe
 #+begin_src emacs-lisp
   (use-package evil-snipe
+    :diminish evil-snipe-mode
     :config
     (evil-snipe-mode 1)
     (evil-snipe-override-mode 1))
@@ -404,6 +408,7 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
   (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
   (use-package org
     :pin org
+    :diminish org-indent-mode
     :ensure org-plus-contrib
 #+end_src
 ** keybindings
@@ -484,6 +489,15 @@ selected instead of creating a new buffer."
 #+end_src
 *** org-superstar-mode
 https://github.com/integral-dw/org-superstar-mode
+
+Let's see how the symbols look in my regular font:
+NEXT: ☐
+TICK: →
+WAIT: ☕
+SOME: ⋯
+DONE: ☑
+CANC: ❌
+
 #+begin_src emacs-lisp
   (use-package org-superstar
     :hook
@@ -491,13 +505,13 @@ https://github.com/integral-dw/org-superstar-mode
     :config
     (setq org-superstar-headline-bullets-list
           '("◉" "●" "○" "♦" "◆" "►" "▸"))
-    (setq org-superstar-todo-bullet-alist '(("NEXT" " ☐" ?☐)
-                                            ("TICK" " →" ?*)
-                                            ("WAIT" " ☕" ?☕)
-                                            ("SOME" " ⋯" ?☼)
-                                            ("DONE" " ☑" ?☑)
-                                            ("CANC" " ❌" ?❌)))
-    (setq org-superstar-special-todo-items t))
+    ;; (setq org-superstar-todo-bullet-alist '(("NEXT" " ☐" ?☐)
+    ;;                                         ("TICK" " →" ?*)
+    ;;                                         ("WAIT" " ☕" ?☕)
+    ;;                                         ("SOME" " ⋯" ?☼)
+    ;;                                         ("DONE" " ☑" ?☑)
+    ;;                                         ("CANC" " ❌" ?❌)))
+    (setq org-superstar-special-todo-items nil))
 #+end_src
 ** file associations
 #+begin_src emacs-lisp
@@ -588,7 +602,7 @@ Filter tasks by context (sorted by todo state)
           ("gb" "Bank" tags-todo "@bank")
           ("gw" "Write" tags-todo "@write")
           ("gp" "Program" tags-todo "@program")
-          ("gc" "Create/Plot" tags-todo "@createplot")
+          ("gC" "Create/Plot" tags-todo "@createplot")
           ("gr" "Read" tags-todo "@read")
           ("gg" "Research" tags-todo "@research")
           ("gs" "Schedule" tags-todo "@schedule")
@@ -618,12 +632,16 @@ customize capture templates
            ; "* %?\n  %^T\n")
            ("t" "Todo" entry (file org-in-file)
             "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
+           ("x" "simple" entry (file org-in-file)
+            "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n")
            ("T" "Todo-nolink-tag" entry (file org-in-file)
             "* %? %^G\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n")
            ("m" "Email" entry (file org-in-file)
             "* %? :@email:\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
            ("w" "Website" entry (file org-in-file)
             "* %?\nEntered on %U\n %i\n %a")
+           ("r" "Daily Review" entry (file "~/org/log.org")
+            (file "~/org/daily_review.org") :clock-in t :clock-keep t)
            ("p" "Protocol" entry (file org-in-file)
             "* %:description%? :@web:\n:PROPERTIES:\n:CREATED: %U\n:END:\n[[%:link][%:description]]\n#+BEGIN_QUOTE\n%:initial\n#+END_QUOTE\n")
            ("L" "Protocol Link" entry (file org-in-file)
@@ -631,6 +649,11 @@ customize capture templates
            ("j" "Journal" entry (file+olp+datetree org-journal-file)
             "* %?\nEntered on %U\n %i\n %a")))
  #+end_src
+*** quick-capture
+#+begin_src emacs-lisp
+  (define-key global-map (kbd "C-c h")
+  (lambda () (interactive) (org-capture nil "x")))
+#+end_src
 *** TODO states
 #+begin_src emacs-lisp
   (setq org-todo-keywords
@@ -722,7 +745,7 @@ org-export ignore headlines with ~:ignore:~ tag
 basic latex settings
 #+begin_src emacs-lisp
   (setq org-highlight-latex-and-related '(native script entities))
-  (setq org-latex-create-formula-image-program 'dvipng)
+  (setq org-preview-latex-default-program 'imagemagick)
   ;; (setq org-latex-default-figure-position 'htbp)
   (setq org-latex-pdf-process
         (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
@@ -790,13 +813,13 @@ Sources:
   (defun make-capture-frame ()
     "Create a new frame and org-capture."
     (interactive)
-    (require 'cl-lib)
+    ;; (require 'cl-lib)
     (make-frame '((name . "capture")))
     (select-frame-by-name "capture")
     (delete-other-windows)
     (cl-letf (((symbol-function 'switch-to-buffer-other-window) #'switch-to-buffer))
               (condition-case err
-                  (org-capture)
+                  (org-capture nil "x")
                 (user-error (when (string= (cadr err) "Abort")
                               (delete-frame))))))
 
@@ -1104,7 +1127,10 @@ usefull snippets for me: org-mode (fig_, )
   (use-package yasnippet
     :init
     (yas-global-mode 1)
+    :diminish yas-mode
     :config
+    (require 'warnings)
+    (add-to-list 'warning-suppress-types '(yasnippet backquote-change))
     (setq yas-indent-line t))
 #+end_src
 ** ispell: spell-checking
@@ -1154,6 +1180,7 @@ very nice search replacement
 #+begin_src emacs-lisp
   (use-package swiper
     :init (ivy-mode 1)
+    :diminish ivy-mode
     :config
     (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
     (setq ivy-use-virtual-buffers t
@@ -1168,6 +1195,7 @@ very nice search replacement
 #+begin_src emacs-lisp
   (use-package counsel
     :init (counsel-mode 1)
+    :diminish counsel-mode
     :bind
     ("C-x l" . counsel-locate)
     ("C-c g" . counsel-git)
@@ -1179,6 +1207,7 @@ See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for 
 #+begin_src emacs-lisp
   (use-package company
     :hook (after-init . global-company-mode)
+    :diminish company-mode
     :config
     (setq ;; company-require-match nil
           ;; company-async-timeout 6
@@ -1258,11 +1287,7 @@ install it with pacman ~mu~
     :ensure nil
     :load-path "/usr/share/emacs/site-lisp/mu4e/"
     :commands mu4e
-    :bind (("C-c m" . mu4e)
-           :map mu4e-headers-mode-map
-           ("C-c c" . org-mu4e-store-and-capture)
-           :map mu4e-view-mode-map
-           ("C-c c" . org-mu4e-store-and-capture))
+    :bind (("C-c m" . mu4e))
     :init
     (require 'mu4e)  ;; somehow this is needed, because otherwise calling org-store-link doesn't work
     (require 'org-mu4e)
@@ -1271,28 +1296,30 @@ install it with pacman ~mu~
           mu4e-trash-folder "/Deleted Items")
     (setq mu4e-maildir-shortcuts
           '(("/inbox" . ?i)
-            ("/NEXT" . ?n)
+            ;;("/NEXT" . ?n)
             ("/Waiting" . ?w)
-            ("/Deferred" . ?d)
-            ("/news" . ?m)
+            ("/Deleted Items" . ?d)
+            ("/news" . ?n)
             ("/Important backlog" . ?l)
-            ("/Sent Items" . ?s)
+            ;("/Sent Items" . ?s)
+            ("/Junk Email" . ?s)
             ("/archive" . ?r)))
-    (setq mu4e-change-filenames-when-moving t) ; important for isync
-    (setq mu4e-headers-date-format "%Y-%m-%d %H:%M")
-    (setq mu4e-headers-fields
+    (setq mu4e-change-filenames-when-moving t ; important for isync
+          mu4e-headers-date-format "%Y-%m-%d %H:%M"
+          mu4e-headers-fields
           '((:date          .  17)
             (:flags         .   5)
             (:from          .  22)
-            (:subject       .  nil)))
-    (setq mu4e-get-mail-command "mbsync -a")
-    (setq mu4e-headers-include-related t)
-    (setq mu4e-compose-format-flowed t)  ; plain-text nice to read on phone
-    (setq mu4e-confirm-quit nil)
-    (setq mu4e-view-show-images t)
+            (:subject       .  nil))
+          mu4e-get-mail-command "mbsync -a"
+          mu4e-headers-include-related t
+          mu4e-compose-format-flowed nil  ; plain-text nice to read on phone
+          use-hard-newlines t             ; above doesn't work for Outlooks, so disabled for colleagues
+          mu4e-confirm-quit nil
+          mu4e-view-show-images t)
     ;; use imagemagick, if available
-    (when (fboundp 'imagemagick-register-types)
-      (imagemagick-register-types))
+    ;; (when (fboundp 'imagemagick-register-types)
+    ;;   (imagemagick-register-types))
     ;; (add-to-list 'mu4e-view-actions
     ;; '("ViewInBrowser" . mu4e-action-view-in-browser) t)
     (setq org-mu4e-link-query-in-headers-mode nil))
@@ -1327,7 +1354,7 @@ emacs speaks statistics, work with R etc.
   (use-package ess
     :load-path "/usr/share/emacs/site-lisp/ess"
     :init (require 'ess-site)  ;; seems like this is needed to load the minor modes as well keybindings don't work without it
-    ;; :hook ((ess-r-mode inferior-ess-r-mode) . electric-layout-mode)  ;; commented out since new curly-curly operator for rlang
+    :hook ((ess-r-mode inferior-ess-r-mode) . electric-layout-mode)  ;; commented out since new curly-curly operator for rlang
     :commands R
     :bind (:map ess-r-mode-map
            (";" . ess-insert-assign)
@@ -1344,12 +1371,23 @@ emacs speaks statistics, work with R etc.
                (string= lang "elisp")
                (string= lang "emacs-lisp")
                (string= lang "latex"))))
-    (setq ;; display-buffer-alist
-          ;; '(("*R"
-          ;;    (display-buffer-reuse-window display-buffer-pop-up-frame)
-          ;;    (reusable-frames . 0)))
+    (setq display-buffer-alist
+          '(("*R Dired"
+             (display-buffer-reuse-window display-buffer-in-side-window)
+             (side . right)
+             (slot . -1)
+             (window-width . 0.33))
+            ("*R"
+             (display-buffer-reuse-window display-buffer-in-side-window)
+             (slot . 2)
+             (window-width . 0.5))
+            ("*Help"
+             (display-buffer-reuse-window display-buffer-in-side-window)
+             (side . right)
+             (slot . 1)
+             (window-width . 0.33)))
           ;; ess-help-own-frame 'one
-          ;; ess-auto-width 'frame
+          ess-auto-width 'frame
           org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
           ess-style 'RStudio
           ess-use-auto-complete nil
@@ -1377,11 +1415,10 @@ Put spaces around operators such as +, -, etc.
 #+begin_src emacs-lisp
   (use-package electric-operator
     :hook ((R-mode ess-r-mode inferior-ess-r-mode). electric-operator-mode)
-    ;; attempts at getting curly-curly to instert {{ <cursor> }}, below inserts {{{ }}
     ;; :config
     ;; (electric-operator-add-rules-for-mode 'ess-r-mode
-                                          ;; (cons "{{" "{{ "))
-                                          ;; (cons "}" " }"))
+    ;;                                       (cons "{{" "{{ ")
+    ;;                                       (cons "}" " }"))
     :custom
     (electric-operator-R-named-argument-style 'spaced))
 #+end_src
@@ -1440,6 +1477,7 @@ for working with \LaTeX
   ;(load "preview-latex.el" nil t t)
   (use-package tex
     :load-path "/usr/share/emacs/site-lisp/auctex/"
+    ;; :diminish reftex-mode
     :hook
     (LaTeX-mode . turn-on-reftex)
     (LaTeX-mode . turn-on-auto-fill)
@@ -1471,6 +1509,28 @@ reference manager I use it in conjunction with zotero, which generates the
     (setq bibtex-completion-bibliography
           '("/home/japhir/SurfDrive/bibliography/references.bib"
             "/home/japhir/Documents/References/PhD.bib")))
+#+end_src
+** helm-bibtex
+#+begin_src emacs-lisp
+  (setq
+   bibtex-completion-notes-path "/home/japhir/SurfDrive/bibliography/notes/"
+   ;; bibtex-completion-bibliography "/home/japhir/SurfDrive/bibliography/references.bib" ; defined elsewhere
+   ;; bibtex-completion-pdf-field "file"
+   bibtex-completion-notes-template-multiple-files
+   (concat
+   "#+TITLE: ${title}\n"
+   "#+ROAM_KEY: cite:${=key=}\n"
+   "* TODO Notes\n"
+   ":PROPERTIES:\n"
+   ":Custom_ID: ${=key=}\n"
+   ":NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n"
+   ":AUTHOR: ${author-abbrev}\n"
+   ":JOURNAL: ${journaltitle}\n"
+   ":DATE: ${date}\n"
+   ":YEAR: ${year}\n"
+   ":DOI: ${doi}\n"
+   ":URL: ${url}\n"
+   ":END:\n\n"))
 #+end_src
 * secret directories
 These are all the settings that require secret directories, such as my org
