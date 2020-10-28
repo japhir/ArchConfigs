@@ -144,17 +144,70 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
     (doom-themes-treemacs-config)
     (doom-themes-org-config))
 #+end_src
-*** COMMENT prot's modus operandi
-#+begin_src emacs-lisp :tangle no
+*** prot's modus themes
+**** operandi (light theme)
+#+begin_src emacs-lisp
   (use-package modus-operandi-theme
-    :config
-    (load-theme 'modus-operandi))
+    :init
+    (setq modus-operandi-theme-bold-constructs t
+          modus-operandi-theme-slanted-constructs t
+          modus-operandi-theme-faint-syntax t
+          modus-operandi-theme-prompts 'subtle
+          modus-operandi-theme-mode-line nil
+          modus-operandi-theme-completions 'opinionated
+          modus-operandi-theme-fringes nil
+          modus-operandi-theme-intense-hl-line t
+          modus-operandi-theme-intense-paren-match t
+          modus-operandi-theme-diffs nil
+          modus-operandi-theme-org-blocks nil
+          modus-operandi-theme-org-blocks 'rainbow
+          modus-operandi-theme-headings nil
+          modus-operandi-theme-scale-headings t
+          modus-operandi-theme-variable-pitch-headings t))
 #+end_src
-*** COMMENT and vivendi themes
+**** vivendi (dark theme)
 #+begin_src emacs-lisp :tangle no
   (use-package modus-vivendi-theme
-    :config
-    (load-theme 'modus-vivendi t))
+    :init
+    (setq modus-vivendi-theme-bold-constructs t
+          modus-vivendi-theme-slanted-constructs t
+          modus-vivendi-theme-faint-syntax t
+          modus-vivendi-theme-prompts 'subtle
+          modus-vivendi-theme-mode-line nil
+          modus-vivendi-theme-completions 'opinionated
+          modus-vivendi-theme-fringes nil
+          modus-vivendi-theme-intense-hl-line t
+          modus-vivendi-theme-intense-paren-match t
+          modus-vivendi-theme-diffs nil
+          modus-vivendi-theme-org-blocks nil
+          modus-vivendi-theme-org-blocks 'rainbow
+          modus-vivendi-theme-headings nil
+          modus-vivendi-theme-scale-headings t
+          modus-vivendi-theme-variable-pitch-headings t))
+#+end_src
+**** auto-set theme by time of day
+#+begin_src emacs-lisp
+  ;; Light for the day
+  (load-theme 'modus-operandi t t)
+  (run-at-time "10:10" (* 60 60 24)
+               (lambda () (enable-theme 'modus-operandi)))
+
+  ;; Dark for the night
+  (load-theme 'modus-vivendi t t)
+  (run-at-time "20:00" (* 60 60 24)
+               (lambda () (enable-theme 'modus-vivendi)))
+#+end_src
+**** toggle theme
+#+begin_src emacs-lisp
+  (defun modus-themes-toggle ()
+    "Toggle between `modus-operandi' and `modus-vivendi' themes."
+    (interactive)
+    (if (eq (car custom-enabled-themes) 'modus-operandi)
+        (progn
+          (disable-theme 'modus-operandi)
+          (load-theme 'modus-vivendi t))
+      (disable-theme 'modus-vivendi)
+      (load-theme 'modus-operandi t)))
 #+end_src
 *** COMMENT doom modeline
 #+begin_src emacs-lisp
@@ -163,6 +216,14 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
     :ensure t
     :hook (after-init . doom-modeline-mode))
 #+end_src
+** set variable font
+#+begin_src emacs-lisp
+  (variable-pitch-mode 1)
+  (set-face-attribute 'variable-pitch nil :family "Tex Gyre Pagella" :height 120)
+  (set-face-attribute 'fixed-pitch nil :family "Iosevka" :height 120)
+  (set-face-attribute 'default nil :family "Iosevka" :height 120)
+#+end_src
+
 ** rainbow-mode
 Highlight hex colours!
 #+begin_src emacs-lisp
@@ -525,12 +586,12 @@ customize capture templates
                     "DONE(d)" "CANC(c)")))
   ;; prettify the todo keywords
   (setq org-todo-keyword-faces
-        '(("NEXT" . (:foreground "light goldenrod yellow" :background "red" :weight bold))
-          ("WAIT" . (:foreground "dim gray" :background "yellow"))
-          ("TICK" . (:background "light slate blue"))
-          ("SOME" . (:foreground "ghost white"  :background "deep sky blue"))
-          ("DONE" . (:foreground "green4"       :background "pale green"))
-          ("CANC" . (:foreground "dim gray"     :background "gray"))))
+        '(("NEXT" . (:family "Iosevka" :foreground "light goldenrod yellow" :background "red" :weight bold))
+          ("WAIT" . (:family "Iosevka" :foreground "dim gray" :background "yellow"))
+          ("TICK" . (:family "Iosevka" :background "light slate blue"))
+          ("SOME" . (:family "Iosevka" :foreground "ghost white"  :background "deep sky blue"))
+          ("DONE" . (:family "Iosevka" :foreground "green4"       :background "pale green"))
+          ("CANC" . (:family "Iosevka" :foreground "dim gray"     :background "gray"))))
 #+end_src
 *** effort estimates
 #+begin_src emacs-lisp
