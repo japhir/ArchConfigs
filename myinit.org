@@ -471,33 +471,33 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 ** edit heading in indirect buffer
 [[https://www.reddit.com/r/orgmode/comments/fuvdqv/org_notetaking_workflow_with_orgroam/fmhl3ml?utm_source=share&utm_medium=web2x][taken from this reddit thread by alphapapa]]
 #+begin_src emacs-lisp
-(defun ap/org-tree-to-indirect-buffer (&optional arg)
-  "Create indirect buffer and narrow it to current subtree.
-The buffer is named after the subtree heading, with the filename
-appended.  If a buffer by that name already exists, it is
-selected instead of creating a new buffer."
-  (interactive "P")
-  (let* ((new-buffer-p)
-         (pos (point))
-         (buffer-name (let* ((heading (org-get-heading t t))
-                             (level (org-outline-level))
-                             (face (intern (concat "outline-" (number-to-string level))))
-                             (heading-string (propertize (org-link-display-format heading)
-                                                         'face face)))
-                        (concat heading-string "::" (buffer-name))))
-         (new-buffer (or (get-buffer buffer-name)
-                         (prog1 (condition-case nil
-                                    (make-indirect-buffer (current-buffer) buffer-name 'clone)
-                                  (error (make-indirect-buffer (current-buffer) buffer-name)))
-                           (setq new-buffer-p t)))))
-    (switch-to-buffer new-buffer)
-    (when new-buffer-p
-      ;; I don't understand why setting the point again is necessary, but it is.
-      (goto-char pos)
-      (rename-buffer buffer-name)
-      (org-narrow-to-subtree))))
+  (defun ap/org-tree-to-indirect-buffer (&optional arg)
+    "Create indirect buffer and narrow it to current subtree.
+  The buffer is named after the subtree heading, with the filename
+  appended.  If a buffer by that name already exists, it is
+  selected instead of creating a new buffer."
+    (interactive "P")
+    (let* ((new-buffer-p)
+           (pos (point))
+           (buffer-name (let* ((heading (org-get-heading t t))
+                               (level (org-outline-level))
+                               (face (intern (concat "outline-" (number-to-string level))))
+                               (heading-string (propertize (org-link-display-format heading)
+                                                           'face face)))
+                          (concat heading-string "::" (buffer-name))))
+           (new-buffer (or (get-buffer buffer-name)
+                           (prog1 (condition-case nil
+                                      (make-indirect-buffer (current-buffer) buffer-name 'clone)
+                                    (error (make-indirect-buffer (current-buffer) buffer-name)))
+                             (setq new-buffer-p t)))))
+      (switch-to-buffer new-buffer)
+      (when new-buffer-p
+        ;; I don't understand why setting the point again is necessary, but it is.
+        (goto-char pos)
+        (rename-buffer buffer-name)
+        (org-narrow-to-subtree))))
 
-(advice-add 'org-tree-to-indirect-buffer :override 'ap/org-tree-to-indirect-buffer)
+  (advice-add 'org-tree-to-indirect-buffer :override 'ap/org-tree-to-indirect-buffer)
 #+end_src
 ** clocking/logging
 #+begin_src emacs-lisp
