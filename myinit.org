@@ -178,11 +178,15 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
           modus-operandi-theme-intense-hl-line t
           modus-operandi-theme-intense-paren-match t
           modus-operandi-theme-diffs nil
-          modus-operandi-theme-org-blocks nil
           modus-operandi-theme-org-blocks 'rainbow
           modus-operandi-theme-headings nil
           modus-operandi-theme-scale-headings t
-          modus-operandi-theme-variable-pitch-headings t))
+          modus-operandi-theme-variable-pitch-headings t)
+    :config
+    ;; Light for the day
+    (load-theme 'modus-operandi t t)
+    (run-at-time "10:10" (* 60 60 24)
+                 (lambda () (enable-theme 'modus-operandi))))
 #+end_src
 **** vivendi (dark theme)
 #+begin_src emacs-lisp :tangle no
@@ -198,23 +202,15 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
           modus-vivendi-theme-intense-hl-line t
           modus-vivendi-theme-intense-paren-match t
           modus-vivendi-theme-diffs nil
-          modus-vivendi-theme-org-blocks nil
           modus-vivendi-theme-org-blocks 'rainbow
           modus-vivendi-theme-headings nil
           modus-vivendi-theme-scale-headings t
-          modus-vivendi-theme-variable-pitch-headings t))
-#+end_src
-**** auto-set theme by time of day
-#+begin_src emacs-lisp
-  ;; Light for the day
-  (load-theme 'modus-operandi t t)
-  (run-at-time "10:10" (* 60 60 24)
-               (lambda () (enable-theme 'modus-operandi)))
-
-  ;; Dark for the night
-  (load-theme 'modus-vivendi t t)
-  (run-at-time "20:00" (* 60 60 24)
-               (lambda () (enable-theme 'modus-vivendi)))
+          modus-vivendi-theme-variable-pitch-headings t)
+    :config
+    ;; Dark for the night
+    (load-theme 'modus-vivendi t t)
+    (run-at-time "20:00" (* 60 60 24)
+                 (lambda () (enable-theme 'modus-vivendi))))
 #+end_src
 **** toggle theme
 #+begin_src emacs-lisp
