@@ -667,6 +667,13 @@ Filter tasks by context (sorted by todo state)
           ("pf" "FEST" tags-todo "FEST")
           ("pi" "Inigo" tags-todo "Inigo")))
 #+end_src
+*** display PROPERTIES in agenda
+#+begin_src emacs-lisp
+  (use-package org-agenda-property
+    :config
+    (setq org-agenda-property-list '("DELEGATED_TO"))
+    (setq org-agenda-property-position 'next-line))
+#+end_src
 *** stuck projects
 #+begin_src emacs-lisp
   (setq org-tags-exclude-from-inheritance '("prj")
