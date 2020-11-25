@@ -86,7 +86,12 @@ input "1739:0:Synaptics_TM3145-007" {
 }
 # tablet should have some slower accelleration because it's bigger
 input "1386:209:Wacom_Bamboo_2FG_4x5_Pad" {
-      pointer_accel 0.9
+      pointer_accel 0.6
+      tap enabled
+      natural_scroll enabled
+}
+input "1386:209:Wacom_Bamboo_2FG_4x5_Finger" {
+      pointer_accel 0.35
       tap enabled
       natural_scroll enabled
 }
