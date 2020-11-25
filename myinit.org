@@ -644,11 +644,11 @@ Filter tasks by context (sorted by todo state)
           ("go" "Office" tags-todo "@office")
           ("ge" "Errands" tags-todo "@errands")
           ("gl" "Laboratory" tags-todo "@lab")
-          ("gt" "Travel" tags-todo "@travel")
+          ;; ("gt" "Travel" tags-todo "@travel")
+          ("gt" "Teams" tags-todo "@teams")
           ("gc" "Computer" tags-todo "@computer")
           ("gB" "Phone" tags-todo "@phone")
           ("gm" "e-mail" tags-todo "@email")
-          ;; ("gs" "Slack" tags-todo "@slack")
           ("gb" "Bank" tags-todo "@bank")
           ("gw" "Write" tags-todo "@write")
           ("gp" "Program" tags-todo "@program")
@@ -658,9 +658,8 @@ Filter tasks by context (sorted by todo state)
           ("gs" "Schedule" tags-todo "@schedule")
           ("ga" "Agenda" tags-todo "@agenda")
           ("E" . "Energy")
-          ("E1" "Morning" tags-todo "morning")
-          ("E2" "Afternoon" tags-todo "afternoon")
-          ("E3" "Evening" tags-todo "evening")
+          ("Ef" "Focus" tags-todo "@focus")
+          ("Ed" "Braindead" tags-todo "@braindead")
           ("p" . "People")
           ("pm" "Martin" tags-todo "Martin")
           ("pl" "Luc" tags-todo "Luc")
@@ -736,13 +735,12 @@ customize capture templates
                         ("@office" . ?o)
                         ("@errands" . ?e)
                         ("@lab" . ?l)
-                        ("@travel" . ?t)
                         (:endgroup . nil)
                         ("@computer" . ?c)  ;; general in case I can't decide
                         ("@klusje" . ?k)    ;; crafts, things that require my toolbox
                         ("@phone" . ?B)     ;; b for Dutch "bellen"
                         ("@email" . ?m)
-                        ;; ("@slack". ?s)
+                        ("@teams" . ?t)
                         ("@bank" . ?b)      ;; I need my little reader thingie
                         ("@write" . ?w)
                         ("@program" . ?p)
@@ -751,16 +749,16 @@ customize capture templates
                         ("@research" . ?g)
                         ("@schedule" . ?s)
                         ("@agenda" . ?a)    ;; things to discuss
+                        ;; ("@admin" . ??) ;; do I want admin? which key should it use?
                         (:startgroup . nil)
-                        ("morning" . ?1) ("afternoon" .?2) ("evening" .?3)
+                        ("@focus" . ?f)
+                        ("@braindead" . ?d)
                         (:endgroup . nil)
                         (:startgroup . nil)
                         ("Work" . ?W) ("Personal" . ?P)
                         (:endgroup . nil)
-                        ;; programming/software stuff
-                        ("R" . ?R) ("python" . ?y) ("org" . ?O) ("Bayes" . ?B) ("emacs" . ?E) ("inkscape" . ?i)
                         ;; tags to accompany the @agenda context
-                        ("Family" . ?F) ("Martin" . ?M) ("Luc" . ?L) ("Inigo" . ?I) ("Anne" . ?A) ("Niels" . ?N) ("Appy") ("FEST")))
+                        ("Family" . ?F) ("Martin" . ?M) ("Luc" . ?L) ("Inigo" . ?I) ("Niels" . ?N)))
 #+end_src
 ** exporting
 *** org-babel languages
