@@ -306,28 +306,9 @@ bindsym $mod+Delete exec swaylock -c 000000
 #
 # Read `man 5 sway-bar` for more information about this section.
 
-# see below for exec waybar
-# bar {
-   # swaybar_command waybar
-   # mode hide
-   # position top
-#     # TODO: battery icon, processor/memory overview
-#     # WAITING: tray icons
-#     # mode hide
-#     # When the status_command prints a new line to stdout, swaybar updates.
-   # status_command SCRIPT_DIR=~/.config/i3blocks i3blocks
-   # font pango:Source Code Pro, Font Awesome 5 Free, Font Awesome 5 Brands 10
-#    colors {
-# 	background $background
-# 	statusline $foreground
-# 	# focused_background $color1
-# 	# focused_statusline $color14
-# 	focused_workspace $color0 $color2 $color15
-# 	active_workspace $color0 $color3 $foreground
-# 	inactive_workspace $color0 $background $foreground
-# 	urgent_workspace $color0 $color13 $color0
-#     }
-# }
+bar {
+   swaybar_command waybar
+}
 
 # launch software with key binding
 # keybinding        software                                        mnemonic(ish?)
@@ -388,6 +369,6 @@ for_window [title="capture"] floating enable
 # add X or wayland session to title
 for_window [shell=".*"] title_format "%title :: %shell"
 
-exec waybar  # moved to end so the rest of the stuff can launch first
+# exec waybar
 
 include /etc/sway/config.d/*
