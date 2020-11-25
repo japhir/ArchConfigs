@@ -452,7 +452,8 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
   ;; (setf org-special-ctrl-a/e t) ; I use evil's 0 and $ anyway
   ;; folded drawers no longer ruin new entries
   (setq org-M-RET-may-split-line '((default . nil)))
-  (setq org-startup-with-inline-images t)
+  (setq org-display-remote-inline-images 'cache
+        org-startup-with-inline-images t)
 #+end_src
 ** edit heading in indirect buffer
 [[https://www.reddit.com/r/orgmode/comments/fuvdqv/org_notetaking_workflow_with_orgroam/fmhl3ml?utm_source=share&utm_medium=web2x][taken from this reddit thread by alphapapa]]
@@ -490,19 +491,22 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
   (setq org-check-running-clock t
         org-log-note-clock-out t
         org-log-done 'time
-        org-log-into-drawer t)
+        org-log-into-drawer t
+        ;; org-clock-auto-clockout-timer (* 10 60)
+        )
 #+end_src
 ** theming
 #+begin_src emacs-lisp
   (setf org-tags-column -65)
   (setq org-startup-indented t
+        org-startup-folded 'content
         org-agenda-block-separator ""
         org-fontify-emphasized-text t
+        ;; org-fontify-todo-headline t ;; might be nice, but needs customisation of org-headline-todo face
         org-fontify-whole-heading-line t
-        org-fontify-done-headline t
         org-fontify-quote-and-verse-blocks t
         org-pretty-entities t
-        org-ellipsis " ▼ " ;▼ … ◦
+        org-ellipsis "…" ;▼ … ◦
         org-hide-emphasis-markers t)
 #+end_src
 *** org-superstar-mode
