@@ -266,21 +266,6 @@ git management, essential!
     ("M-g" . magit-status))
 #+end_src
 * custom functions/keyboard shortcuts
-** clone-indirect-buffer-other-frame
-#+begin_src emacs-lisp
-  (defun clone-indirect-buffer-other-frame (newname display-flag &optional norecord)
-    "Like `clone-indirect-buffer' but display in another frame."
-    (interactive
-     (progn
-       (if (get major-mode 'no-clone-indirect)
-           (error "Cannot indirectly clone a buffer in %s mode" mode-name))
-       (list (if current-prefix-arg
-                 (read-buffer "Name of indirect buffer: " (current-buffer)))
-             t)))
-    (let ((pop-up-frames t))
-      (clone-indirect-buffer newname display-flag norecord)))
-  (global-set-key (kbd "C-x 5 c") 'clone-indirect-buffer-other-frame)
-#+end_src
 ** revert buffer
 #+begin_src emacs-lisp
   (global-set-key (kbd "<f5>") 'revert-buffer)
