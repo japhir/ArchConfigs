@@ -1,0 +1,13 @@
+#!/usr/bin/bash
+alt=$(cat ~/org/inbox.org ~/org/mobin.org | grep "^*" | wc -l)
+# alt=140
+max=150 # at full font size, 150 items fit on the screen
+# echo "alt: $alt"
+percentage=$(printf %.2f%% "$((10**3 * 100 * $alt/$max))e-3")
+# echo "percentage: $percentage"
+for (( c=1; c<=$alt; c++ ))
+do
+    text="$text$(echo -n '█')"
+done
+# echo "text: $text"
+printf '{"text": "%s", "alt": "%s", "tooltip": "%s items in inboxes", "class": "inbox", "percentage": "%s" }' "$text" "$alt" "$alt" "$percentage"
