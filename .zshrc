@@ -68,7 +68,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 plugins=(vi-mode)
 
 # User configuration
-export PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/home/japhir/.cabal/bin:/home/japhir/bin"
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/home/japhir/.cabal/bin:/home/japhir/bin:/home/japhir/.local/bin"
 # export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
@@ -103,7 +103,7 @@ fi
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-alias yy="curl -s https://www.archlinux.org/ | xmllint --html --xpath '//div[@id=\"news\"]/div[1]' -  | pandoc -f html -t plain && yay"
+# alias yy="curl -s https://www.archlinux.org/ | xmllint --html --xpath '//div[@id=\"news\"]/div[1]' -  | pandoc -f html -t plain && yay"
 alias R='R --quiet --no-save --no-restore'
 alias o='xdg-open'
 alias e="emacsclient -t"
