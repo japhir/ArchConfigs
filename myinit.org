@@ -312,13 +312,13 @@ the buffer.
 
 ** org-agenda recent open loops
 #+begin_src emacs-lisp
-(defun my-org-agenda-recent-open-loops ()
-  (interactive)
-  (let ((org-agenda-start-with-log-mode t)
-        (org-agenda-use-time-grid nil))
-    (fetch-calendar)
-    (org-agenda-list nil (org-read-date nil nil "-2d") 4)
-    (beginend-org-agenda-mode-goto-beginning)))
+  (defun my-org-agenda-recent-open-loops ()
+    (interactive)
+    (let ((org-agenda-start-with-log-mode t)
+          (org-agenda-use-time-grid nil))
+      (fetch-calendar)
+      (org-agenda-list nil (org-read-date nil nil "-2d") 4)
+      (beginend-org-agenda-mode-goto-beginning)))
 #+end_src
 * evil
 ** evil
