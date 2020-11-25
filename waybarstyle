@@ -9,9 +9,10 @@
 }
 
 #custom-inbox {
-    color: #BF6F46;
+    color: #c99868; /* colour of papyrus for my paper stack */
     padding: 2px 2px;
     margin: 0px 0px;
+    min-width: 0;
 }
 
 window#waybar {
