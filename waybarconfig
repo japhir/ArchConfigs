@@ -1,9 +1,9 @@
 // -*- mode: json -*-
-{
+[{
     "layer": "top", // Waybar at top layer
     // "position": "bottom", // Waybar at the bottom of your screen
     "height": 24, // Waybar height
-    // "width": 1920, // Waybar width
+    "width": 1920, // Waybar width
     // Choose the order of the modules
     "modules-left": ["sway/workspaces", "sway/mode", "sway/window"], // , "custom/spotify", "sway/window",
     "modules-center": ["custom/fuzzyclock"],
@@ -75,4 +75,22 @@
         "format-ethernet": "{ifname}: {ipaddr}/{cidr} ",
         "format-disconnected": ""
     }
+}, {
+    "layer": "bottom",
+    "position": "left",
+    "width": 24,
+    "height": 1056, // 1080 - 24 of other bar
+    "output": "eDP-1",
+    "modules-center": ["custom/inbox"],
+
+    "custom/inbox": {
+	"format": "{}",
+	"return-type": "json",
+	"interval": 10,
+	"exec": "/home/japhir/bin/inboxsize",
+	"on-click": "emacsclient -c ~/org/inbox.org",
+	"rotate": 90,
+	// "format-icons": ["😁", "😊", "🙂", "😐", "😬", "😵", "😱"]
+    },
 }
+]

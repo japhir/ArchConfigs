@@ -8,6 +8,12 @@
     min-height: 0;
 }
 
+#custom-inbox {
+    color: #BF6F46;
+    padding: 2px 2px;
+    margin: 0px 0px;
+}
+
 window#waybar {
     /* background: rgba(43, 48, 59, 0.5); */
     /* background: transparent; */
@@ -15,6 +21,10 @@ window#waybar {
     /* border-bottom: 3px solid rgba(100, 114, 125, 0.5); */
     color: #e3e3e3;
 }
+
+/* window#waybar.hidded { */
+/*     opacity: 0.0; */
+/* } */
 
 #workspaces button {
     padding: 2px 10px;
@@ -25,7 +35,6 @@ window#waybar {
 }
 
 #workspaces button.focused {
-    /* background: #64727D; */
     background: transparent;
     border-bottom: 3px solid #BF6F46;
 }
