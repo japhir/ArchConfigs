@@ -527,13 +527,13 @@ CANC: ❌
     :config
     (setq org-superstar-headline-bullets-list
           '("◉" "●" "○" "♦" "◆" "►" "▸"))
-    ;; (setq org-superstar-todo-bullet-alist '(("NEXT" " ☐" ?☐)
-    ;;                                         ("TICK" " →" ?*)
-    ;;                                         ("WAIT" " ☕" ?☕)
-    ;;                                         ("SOME" " ⋯" ?☼)
-    ;;                                         ("DONE" " ☑" ?☑)
-    ;;                                         ("CANC" " ❌" ?❌)))
-    (setq org-superstar-special-todo-items nil))
+    (setq org-superstar-todo-bullet-alist '(("NEXT" " ☐" ?☐)
+                                            ("TICK" " →" ?*)
+                                            ("WAIT" " ☕" ?☕)
+                                            ("SOME" " ⋯" ?☼)
+                                            ("DONE" " ☑" ?☑)
+                                            ("CANC" " ❌" ?❌)))
+    (setq org-superstar-special-todo-items t))
 #+end_src
 ** file associations
 #+begin_src emacs-lisp
