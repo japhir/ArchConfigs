@@ -153,16 +153,6 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
     "Clear existing theme settings instead of layering them"
     (mapc #'disable-theme custom-enabled-themes))
 #+end_src
-*** COMMENT doom
-#+begin_src emacs-lisp
-  (use-package doom-themes
-    :config
-    (load-theme 'doom-one t)
-    (doom-themes-visual-bell-config)
-    (doom-themes-neotree-config)
-    (doom-themes-treemacs-config)
-    (doom-themes-org-config))
-#+end_src
 *** prot's modus themes
 **** operandi (light theme)
 #+begin_src emacs-lisp
@@ -182,15 +172,12 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
           modus-operandi-theme-headings nil
           modus-operandi-theme-scale-headings t
           modus-operandi-theme-variable-pitch-headings t)
-    :config
-    ;; Light for the day
-    (load-theme 'modus-operandi t t)
-    (run-at-time "10:10" (* 60 60 24)
-                 (lambda () (enable-theme 'modus-operandi))))
+    :defer)
 #+end_src
 **** vivendi (dark theme)
 #+begin_src emacs-lisp :tangle no
   (use-package modus-vivendi-theme
+    :after modus-themes
     :init
     (setq modus-vivendi-theme-bold-constructs t
           modus-vivendi-theme-slanted-constructs t
@@ -206,11 +193,18 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
           modus-vivendi-theme-headings nil
           modus-vivendi-theme-scale-headings t
           modus-vivendi-theme-variable-pitch-headings t)
+    :defer)
+#+end_src
+**** circadian: dark theme at night, light theme during the day
+#+begin_src emacs-lisp
+  (use-package circadian
+    :ensure t
     :config
-    ;; Dark for the night
-    (load-theme 'modus-vivendi t t)
-    (run-at-time "20:00" (* 60 60 24)
-                 (lambda () (enable-theme 'modus-vivendi))))
+    (setq calendar-latitude 52.08)
+    (setq calendar-longitude 5.11)
+    (setq circadian-themes '((:sunrise . modus-operandi)
+                             (:sunset  . modus-vivendi)))
+    (circadian-setup))
 #+end_src
 **** toggle theme
 #+begin_src emacs-lisp
@@ -223,13 +217,6 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
           (load-theme 'modus-vivendi t))
       (disable-theme 'modus-vivendi)
       (load-theme 'modus-operandi t)))
-#+end_src
-*** COMMENT doom modeline
-#+begin_src emacs-lisp
-  (setq inhibit-compacting-font-caches t)
-  (use-package doom-modeline
-    :ensure t
-    :hook (after-init . doom-modeline-mode))
 #+end_src
 ** set variable font
 #+begin_src emacs-lisp
