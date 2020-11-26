@@ -177,7 +177,6 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
 **** vivendi (dark theme)
 #+begin_src emacs-lisp :tangle no
   (use-package modus-vivendi-theme
-    :after modus-themes
     :init
     (setq modus-vivendi-theme-bold-constructs t
           modus-vivendi-theme-slanted-constructs t
