@@ -188,18 +188,6 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
                              (:sunset  . modus-vivendi)))
     (circadian-setup))
 #+end_src
-*** toggle theme
-#+begin_src emacs-lisp
-  (defun modus-themes-toggle ()
-    "Toggle between `modus-operandi' and `modus-vivendi' themes."
-    (interactive)
-    (if (eq (car custom-enabled-themes) 'modus-operandi)
-        (progn
-          (disable-theme 'modus-operandi)
-          (load-theme 'modus-vivendi t))
-      (disable-theme 'modus-vivendi)
-      (load-theme 'modus-operandi t)))
-#+end_src
 ** set variable font
 #+begin_src emacs-lisp
   (variable-pitch-mode 1)
