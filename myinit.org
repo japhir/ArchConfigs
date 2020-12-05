@@ -804,6 +804,9 @@ basic latex settings
   (setq org-latex-pdf-process
         (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
   (setq org-latex-prefer-user-labels t)
+  (customize-set-value 'org-latex-hyperref-template "
+  \\hypersetup{\n pdfauthor={%a},\n pdftitle={%t},\n pdfkeywords={%k},
+   pdfsubject={%d},\n pdfcreator={%c},\n pdflang={%L},\n colorlinks=true}\n")
 #+end_src
 *** org-entities-user
 These are nice shorthands for commands I use often. In org-source they look
