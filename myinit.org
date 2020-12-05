@@ -158,47 +158,26 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
     (mapc #'disable-theme custom-enabled-themes))
 #+end_src
 *** prot's modus themes
-**** operandi (light theme)
 #+begin_src emacs-lisp
-  (use-package modus-operandi-theme
+  (use-package modus-themes
     :init
-    (setq modus-operandi-theme-bold-constructs t
-          modus-operandi-theme-slanted-constructs t
-          modus-operandi-theme-faint-syntax t
-          modus-operandi-theme-prompts 'subtle
-          modus-operandi-theme-mode-line nil
-          modus-operandi-theme-completions 'opinionated
-          modus-operandi-theme-fringes nil
-          modus-operandi-theme-intense-hl-line t
-          modus-operandi-theme-intense-paren-match t
-          modus-operandi-theme-diffs nil
-          modus-operandi-theme-org-blocks 'rainbow
-          modus-operandi-theme-headings nil
-          modus-operandi-theme-scale-headings t
-          modus-operandi-theme-variable-pitch-headings t)
+    (setq modus-themes-bold-constructs t
+          modus-themes-slanted-constructs t
+          modus-themes-faint-syntax t
+          modus-themes-prompts 'subtle
+          modus-themes-mode-line nil
+          modus-themes-completions 'opinionated
+          modus-themes-fringes nil
+          modus-themes-intense-hl-line t
+          modus-themes-intense-paren-match t
+          modus-themes-diffs nil
+          modus-themes-org-blocks 'rainbow
+          modus-themes-headings nil
+          modus-themes-scale-headings t
+          modus-themes-variable-pitch-headings t)
     :defer)
 #+end_src
-**** vivendi (dark theme)
-#+begin_src emacs-lisp :tangle no
-  (use-package modus-vivendi-theme
-    :init
-    (setq modus-vivendi-theme-bold-constructs t
-          modus-vivendi-theme-slanted-constructs t
-          modus-vivendi-theme-faint-syntax t
-          modus-vivendi-theme-prompts 'subtle
-          modus-vivendi-theme-mode-line nil
-          modus-vivendi-theme-completions 'opinionated
-          modus-vivendi-theme-fringes nil
-          modus-vivendi-theme-intense-hl-line t
-          modus-vivendi-theme-intense-paren-match t
-          modus-vivendi-theme-diffs nil
-          modus-vivendi-theme-org-blocks 'rainbow
-          modus-vivendi-theme-headings nil
-          modus-vivendi-theme-scale-headings t
-          modus-vivendi-theme-variable-pitch-headings t)
-    :defer)
-#+end_src
-**** circadian: dark theme at night, light theme during the day
+*** circadian: dark theme at night, light theme during the day
 #+begin_src emacs-lisp
   (use-package circadian
     :ensure t
@@ -209,7 +188,7 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
                              (:sunset  . modus-vivendi)))
     (circadian-setup))
 #+end_src
-**** toggle theme
+*** toggle theme
 #+begin_src emacs-lisp
   (defun modus-themes-toggle ()
     "Toggle between `modus-operandi' and `modus-vivendi' themes."
