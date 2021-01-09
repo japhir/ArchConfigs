@@ -15,7 +15,7 @@ I use:
   - [mako](https://github.com/emersion/mako) for notifications
 - [alacritty](https://github.com/alacritty/alacritty) terminal emulator
  - [zsh](https://grml.org/zsh/) bash alternative
- - [fzf](https://github.com/junegunn/fzf) fuzzy file finder, this makes terminal's <kbd>ctrl</kbd>+<kbd>r</kdb> so nice!
+ - [fzf](https://github.com/junegunn/fzf) fuzzy file finder, this makes terminal's <kbd>ctrl</kbd>+<kbd>r</kbd> so nice!
 - [firefox](https://firefox.org/) browser
   - [vim-vixen](https://github.com/ueokande/vim-vixen/releases/tag/0.30) vim keybindings in firefox
   - [org-capture](https://github.com/sprig/org-capture-extension) capture websites into emacs org-mode
