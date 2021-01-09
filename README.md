@@ -1,7 +1,7 @@
 This is my config dot file repository.
 
 I use:
-- [arch linux](https://archlinux.org/) as my operating system
+- [arch linux](https://archlinux.org/) as operating system
 - [emacs](https://www.gnu.org/software/emacs/) for writing, email, agenda, note-taking, and text-editor
   - [evil](https://github.com/emacs-evil/evil) to use vim keys in emacs
   - [org-mode](https://orgmode.org/) mode that I use for GTD, writing, literate programming
@@ -9,18 +9,18 @@ I use:
   - [org-roam](https://www.orgroam.com/) connected note-taking following the zettelkasten method
   - [ess](https://ess.r-project.org/) data analysis in R
   - [modus-themes](https://gitlab.com/protesilaos/modus-themes/) beautiful light and dark theme
-- [sway](https://swaywm.org/) my window manager
-  - [waybar](https://github.com/Alexays/Waybar/) for my workspaces bar and other nice widgets
+- [sway](https://swaywm.org/) window manager
+  - [waybar](https://github.com/Alexays/Waybar/) for workspaces, bar, and other nice widgets
   - [wofi](https://hg.sr.ht/~scoopta/wofi) for launching programs that I don't have a keybinding for
   - [mako](https://github.com/emersion/mako) for notifications
-- [alacritty](https://github.com/alacritty/alacritty) my terminal emulator
- - [zsh](https://grml.org/zsh/) my bash alternative
+- [alacritty](https://github.com/alacritty/alacritty) terminal emulator
+ - [zsh](https://grml.org/zsh/) bash alternative
  - [fzf](https://github.com/junegunn/fzf) fuzzy file finder, this makes terminal's <kbd>ctrl</kbd>+<kbd>r</kdb> so nice!
-- [firefox](https://firefox.org/) my browser
+- [firefox](https://firefox.org/) browser
   - [vim-vixen](https://github.com/ueokande/vim-vixen/releases/tag/0.30) vim keybindings in firefox
   - [org-capture](https://github.com/sprig/org-capture-extension) capture websites into emacs org-mode
 
-My personal scripts are in /bin and user services in /services.
+Personal scripts are in /bin and user services in /services.
 
 If you want to use (some) of my configs, I recommend that you proceed with caution and use only the bits that you like!
 
