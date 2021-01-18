@@ -50,6 +50,7 @@ see [[*org-roam][org-roam]]
      deft-directory org_notes
      org-roam-directory org_notes
      org-roam-db-location (concat org_notes "org-roam.db"))
+   zot_bib (concat (getenv "HOME") "/SurfDrive/bibliography/bibliography.bib")
 #+end_src
 * interface
 ** turn off UI elements and small tweaks
@@ -143,6 +144,11 @@ Insert demos after describe function https://github.com/xuchunyang/elisp-demos
     (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
 #+end_src
 * change appearance
+** line spacing, underline
+#+begin_src emacs-lisp
+  (setq-default line-spacing 0)
+  (setq x-underline-at-descent-line t)
+#+end_src
 ** rainbow-delimiters
 matching parenthesis are highlighted with rainbow colours.
 #+begin_src emacs-lisp
@@ -191,12 +197,10 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
 #+end_src
 ** set variable font
 #+begin_src emacs-lisp
-  (variable-pitch-mode 1)
-  (set-face-attribute 'variable-pitch nil :family "Tex Gyre Pagella" :height 120)
-  (set-face-attribute 'fixed-pitch nil :family "Iosevka" :height 120)
   (set-face-attribute 'default nil :family "Iosevka" :height 120)
+  (set-face-attribute 'variable-pitch nil :family "Tex Gyre Pagella" :height 1.0)
+  (set-face-attribute 'fixed-pitch nil :family "Iosevka" :height 1.0)
 #+end_src
-
 ** rainbow-mode
 Highlight hex colours!
 #+begin_src emacs-lisp
@@ -869,16 +873,34 @@ allow asyncronous code block evaluation https://github.com/astahlman/ob-async
   (use-package ob-async)
 #+end_src
 ** org-pomodoro
+got the function from this [[https://github.com/marcinkoziej/org-pomodoro/issues/89#issuecomment-701025952][github issue]]
 #+begin_src emacs-lisp
   (use-package org-pomodoro
     :after org
     :bind ("C-c p" . org-pomodoro)
-    :config (setq org-pomodoro-manual-break t))
+    :hook (org-pomodoro-break-finished-hook . org-pomodoro-prompt)
+    :config
+    (setq org-pomodoro-manual-break t)
+    (defun org-pomodoro-prompt ()
+      (interactive)
+      (org-clock-goto)
+      (if (y-or-n-p "Start a new pomodoro?")
+          (progn
+            (org-pomodoro))))
+    )
 #+end_src
 ** org-pdfview
 #+begin_src emacs-lisp
   (use-package org-pdfview
     :after org pdf-tools)
+#+end_src
+** COMMENT view inline pdfs?
+doesn't work :(
+#+begin_src emacs-lisp
+  (add-to-list 'image-type-file-name-regexps '("\\.pdf\\'" . imagemagick))
+  (add-to-list 'image-file-name-extensions "pdf")
+  (setq imagemagick-types-inhibit (remove 'PDF imagemagick-types-inhibit))
+  (setq org-image-actual-width 600)
 #+end_src
 ** org-beamer
 #+begin_src emacs-lisp
@@ -1037,24 +1059,23 @@ usefull snippets for me: org-mode (fig_, )
           org-ref-notes-function 'orb-edit-notes
           ;; org-ref-pdf-directory '("~/SurfDrive/bibliography/bibtex-pdfs/")
           bibtex-completion-pdf-open-function 'org-open-file)
+    :bind
+    (:map org-mode-map ("C-c ]" . org-ref-ivy-insert-cite-link))
     :config
     (require 'org-ref)
-    (require 'doi-utils)
-    (require 'org-id)
-    (require 'org-ref-wos)
-    (require 'org-ref-scopus)
-    (require 'org-ref-pubmed)
-    (require 'org-ref-sci-id)
+    ;; (require 'doi-utils)
+    ;; (require 'org-id)
+    ;; (require 'org-ref-wos)
+    ;; (require 'org-ref-scopus)
+    ;; (require 'org-ref-pubmed)
+    ;; (require 'org-ref-sci-id)
     (setq bibtex-autokey-year-length 4
           bibtex-autokey-name-year-separator ""
           bibtex-autokey-year-title-separator "-"
           bibtex-autokey-titleword-separator "-"
           bibtex-autokey-titlewords 0
           bibtex-autokey-titlewords-stretch 1
-          bibtex-autokey-titleword-length 5)
-    ;; (add-to-list 'org-ref-bibtex-journal-abbreviations
-    ;;                '("JIR" "Journal of Irreproducible Research" "J. Irrep. Res."))
-    (require 'org-ref-scopus))
+          bibtex-autokey-titleword-length 5))
 #+end_src
 *** open zotero pdf at point
 from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-mendeley-jabref-and-zotero-users][the manual]]
@@ -1117,9 +1138,14 @@ https://github.com/hlissner/evil-snipe
     (:map pdf-view-mode-map ("C-s" . isearch-forward)))
 #+end_src
 ** org-noter
+https://github.com/weirdNox/org-noter
 #+begin_src emacs-lisp
   (use-package org-noter
     :after (:any org pdf-view)
+    :bind ((:map org-mode-map ("C-c o" . org-noter))
+           (:map org-noter-notes-mode-map
+                 ("C-c k" . org-noter-create-skeleton)
+                 ("C-c q" . org-noter-kill-session)))
     :config
     (setq
      ;; org-noter-notes-window-location 'horizontal-split
@@ -1421,6 +1447,18 @@ very nice search replacement
 #+begin_src emacs-lisp
   (use-package systemd)
 #+end_src
+** dired
+#+begin_src emacs-lisp
+  (use-package dired
+    :ensure nil
+    :config
+    (setq dired-listing-switches "-lh"))
+#+end_src
+** ranger
+#+begin_src emacs-lisp
+  (use-package ranger
+    :bind ("C-x d" . ranger))
+#+end_src
 ** emacs-pkgbuild-mode
 Install it with Pacman
 #+begin_src bash :results none :exports code :eval never
@@ -1452,16 +1490,18 @@ See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for 
     :hook (after-init . global-company-mode)
     :diminish company-mode
     :config
-    (setq ;; company-require-match nil
+    ;; (setq ;; company-require-match nil
           ;; company-async-timeout 6
-          ;; company-idle-delay 5 ;; default 0.5,
-          ;; company-minimum-prefix-length 1 ;; default 3
-          company-global-modes '(not term-mode))
+          ;; company-idle-delay 0.25 ;; default 0.5,
+          ;; company-minimum-prefix-length 2 ;; default 3
+          ;; completion-ignore-case t
+          ;; company-global-modes '(not term-mode))
     (require 'company-capf)
     (require 'company-files)
     (require 'company-math)
-    (setq company-backends '(company-files company-math-symbols-unicode company-capf))
-    (setq-default company-backends '(company-files company-math-symbols-unicode company-capf))
+    (delete-dups (push 'company-math-symbols-unicode company-backends))
+    (delete-dups (push 'company-capf company-backends))
+    (delete-dups (push 'company-files company-backends))
     (setq tab-always-indent 'complete)
     :bind
     (:map company-active-map
@@ -1600,7 +1640,7 @@ emacs speaks statistics, work with R etc.
 *** use-package
 #+begin_src emacs-lisp
   (use-package ess
-    :load-path "/usr/share/emacs/site-lisp/ess"
+    ;; :load-path "/usr/share/emacs/site-lisp/ess"
     :init (require 'ess-site)  ;; seems like this is needed to load the minor modes as well keybindings don't work without it
     :hook ((ess-r-mode inferior-ess-r-mode) . electric-layout-mode)  ;; commented out since new curly-curly operator for rlang
     :commands R
@@ -1674,6 +1714,11 @@ Put spaces around operators such as +, -, etc.
 #+begin_src emacs-lisp
   (setq compilation-window-height 15)
 #+end_src
+*** flycheck
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :init (global-flycheck-mode))
+#+end_src
 ** markdown-mode
 markdown mode for writing
 #+begin_src emacs-lisp
@@ -1709,7 +1754,7 @@ exporting markdown
 #+begin_src emacs-lisp
   (use-package ob-mermaid
     :config
-    (setq ob-mermaid-cli-path "~/node_modules/.bin/mmdc"))
+    (setq ob-mermaid-cli-path "/usr/bin/mmdc"))
 #+end_src
 ** org-pandoc
 https://github.com/kawabata/ox-pandoc
