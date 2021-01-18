@@ -81,7 +81,7 @@
     "width": 24,
     "height": 1056, // 1080 - 24 of other bar
     "output": "eDP-1",
-    "modules-center": ["custom/inbox"],
+    "modules-right": ["custom/inbox"],
 
     "custom/inbox": {
 	"format": "{}",

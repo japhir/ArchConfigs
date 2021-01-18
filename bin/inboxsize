@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 alt=$(cat ~/org/inbox.org ~/org/mobin.org | grep "^*" | wc -l)
-# alt=140
+# alt=2
 max=150 # at full font size, 150 items fit on the screen
 # echo "alt: $alt"
 percentage=$(printf %.2f%% "$((10**3 * 100 * $alt/$max))e-3")

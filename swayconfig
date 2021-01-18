@@ -41,6 +41,7 @@ set $menu wofi --show drun --allow-images --allow-markup swaymsg exec --
 output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 
 set $wallpaper ~/Pictures/wallpapers/Landscapes/1454722946236.jpg
+# set $wallpaper ~/SurfDrive/PhD/application/kocken_simplified_gantt_clean.svg
 
 # main laptop screen
 set $smallscreen eDP-1
@@ -212,9 +213,10 @@ bindsym $mod+Shift+0 move container to workspace $ws10
 assign [class="^Mendeley Desktop$"] $ws4
 assign [class="^Zotero$"] $ws4
 assign [title="^GanttProject"] $ws4
-assign [class="^Slack$"] $ws5
-assign [class="^Riot$"] $ws5
-assign [class="^Trello$"] $ws5
+# assign [class="^Slack$"] $ws5
+# assign [class="^Riot$"] $ws5
+# assign [class="^Trello$"] $ws5
+assign [class="^Discord"] $ws5
 assign [class="^Microsoft Teams"] $ws5
 assign [class="^Inkscape$"] $ws6
 assign [class="^VirtualBox$" title="^Win10"] $ws8
@@ -324,6 +326,7 @@ bindsym $mod+p exec spotify                                       # music
 # add the webcam screen for video recording
 bindsym $mod+Shift+w exec mpv --no-osc --demuxer-lavf-format=video4linux2 --demuxer-lavf-o-set=input_format=mjpeg av://v4l2:/dev/video0 || notify-send "failed to start webcam"
 for_window [title="^video0 - mpv$"] floating enable, sticky enable, resize set height 260 px, move absolute position 0 px 820 px, border none
+for_window [title="Firefox — Sharing Indicator$"] floating enable, resize set height 16 px, move absolute position 0 px 820 px, border none
 
 bindsym Print exec grim ~/Pictures/Screenshots/$(date +'%F-%T.png')
 bindsym --release Shift+Print exec slurp | grim -g - -c ~/Pictures/Screenshots/$(date +'%F-%T_region.png')
@@ -336,10 +339,10 @@ exec volnoti               # volume change notification
 exec pactl                 # pulseaudio volume control, manage with pamixer
 exec blueman-applet        # bluetooth status applet
 # exec nextcloud
-exec owncloud
+exec sleep 5 && owncloud
 exec nm-applet --indicator # network-manager-applet-indicator from AUR
 # exec teams                 # microsoft teams
-exec ganttproject ~/SurfDrive/PhD/application/DrIljaKocken.gan  # my long-term planning
+# exec ganttproject ~/SurfDrive/PhD/application/2020-09-16_DrIljaKocken.gan  # my long-term planning
 
 # gaps
 smart_gaps on
