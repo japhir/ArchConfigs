@@ -15,3 +15,5 @@
 	showUntrackedFiles = all
 [color]
 	ui = auto
+[credential]
+	helper = cache

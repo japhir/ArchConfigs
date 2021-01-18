@@ -116,6 +116,7 @@ alias ena_screen="swaymsg output HDMI-A-2 enable"
 alias pg="cd ~/SurfDrive/PhD/programming"
 alias pacsize="expac -H M '%m\t%n' | sort -h"
 alias killorphans="sudo pacman -Rns $(pacman -Qtdq)"
+alias sudo='sudo -v; sudo '
 
 # source /home/japhir/.config/broot/launcher/bash/br
 
