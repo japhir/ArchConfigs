@@ -469,7 +469,9 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 #+end_src
 ** hook
 #+begin_src emacs-lisp
-  :hook (org-mode . visual-line-mode)
+  :hook ((org-mode . visual-line-mode)
+         (before-save . zp/org-set-last-modified)
+         (org-capture-prepare-finalize . zp/org-capture-set-created-property))
 #+end_src
 ** basics
 #+begin_src emacs-lisp
@@ -597,7 +599,9 @@ https://emacs.stackexchange.com/questions/42281/org-mode-is-it-possible-to-displ
 all the org-files in my org-directory
 #+begin_src emacs-lisp
   ;(setq org-directory "~/org/") ;; changed for org-roam capture
-  (setq org-agenda-files (directory-files-recursively "~/org" "\\.org$"))
+  (setq org-agenda-files (append
+                          (directory-files-recursively "~/org" "\\.org$")
+                          (directory-files-recursively "~/SurfDrive/bibliography/notes/daily" "\\.org$")))
 #+end_src
 *** refile targets
 swyper makes refiling amazing!
@@ -686,24 +690,28 @@ customize capture templates
          '(;("a" "Appointment" entry (file org-in-file)
            ; "* %?\n  %^T\n")
            ("t" "Todo" entry (file org-in-file)
-            "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
+            "* %?\n%a" :add-created t)
            ("x" "simple" entry (file org-in-file)
-            "* %?\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n")
+            "* %?" :add-created t)
            ("T" "Todo-nolink-tag" entry (file org-in-file)
-            "* %? %^G\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n")
+            "* %? %^G\n" :add-created t)
            ("m" "Email" entry (file org-in-file)
-            "* %? :@email:\n:PROPERTIES:\n:CREATED: %u\n:END:\n %i\n %a\n")
+            "* %? :@email:\n %i\n %a\n" :add-created t)
            ("w" "Website" entry (file org-in-file)
             "* %?\nEntered on %U\n %i\n %a")
            ("r" "Weekly Review" entry (file "~/org/log.org")
             (file "~/org/weekly_review.org") :clock-in t :clock-keep t)
            ("p" "Protocol" entry (file org-in-file)
-            "* %:description%? :@web:\n:PROPERTIES:\n:CREATED: %U\n:END:\n[[%:link][%:description]]\n#+BEGIN_QUOTE\n%:initial\n#+END_QUOTE\n")
+            "* %:description%? :@web:\n[[%:link][%:description]]\n#+BEGIN_QUOTE\n%:initial\n#+END_QUOTE\n" :add-created t)
            ("L" "Protocol Link" entry (file org-in-file)
-            "* %:description%? :@web:\n:PROPERTIES:\n:CREATED: %U\n:END:\n[[%:link][%:description]]")
+            "* %:description%? :@web:\n[[%:link][%:description]]" :add-created t)
            ("j" "Journal" entry (file+olp+datetree org-journal-file)
             "* %?\nEntered on %U\n %i\n %a")))
  #+end_src
+
+ #+RESULTS:
+ | t | Todo | entry | (file org-in-file) | * %? |
+
 *** quick-capture
 #+begin_src emacs-lisp
   (define-key global-map (kbd "C-c h")
@@ -885,28 +893,29 @@ allow asyncronous code block evaluation https://github.com/astahlman/ob-async
                    ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
                    ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))))
 #+end_src
-** COMMENT deft
+** deft
 :LOGBOOK:
 - Note taken on [2020-07-15 Wed 16:09] \\
   added it based on [[file:~/SurfDrive/bibliography/notes//20200715160129-an_orgmode_note_workflow.org][An Orgmode Note Workflow]]
 :END:
 #+begin_src emacs-lisp :eval never :tangle no
-(use-package deft
-  :commands deft
-  :init
-  (setq deft-default-extension "org"
-        ;; de-couples filename and note title:
-        deft-use-filename-as-title nil
-        deft-use-filter-string-for-filename t
-        ;; disable auto-save
-        deft-auto-save-interval -1.0
-        ;; converts the filter string into a readable file-name using kebab-case:
-        deft-file-naming-rules
-        '((noslash . "-")
-          (nospace . "-")
-          (case-fn . downcase)))
-  :config
-  (add-to-list 'deft-extensions "tex"))
+  (use-package deft
+    :commands deft
+    :bind ("C-c d" . deft)
+    :init
+    (setq deft-default-extension "org"
+          ;; de-couples filename and note title:
+          deft-use-filename-as-title nil
+          deft-use-filter-string-for-filename t
+          ;; disable auto-save
+          deft-auto-save-interval -1.0
+          ;; converts the filter string into a readable file-name using kebab-case:
+          deft-file-naming-rules
+          '((noslash . "-")
+            (nospace . "-")
+            (case-fn . downcase)))
+    :config
+    (add-to-list 'deft-extensions "tex"))
 #+end_src
 
 ** COMMENT mpv
@@ -932,6 +941,14 @@ it's not working so far
   ; (setq imagemagick-types-inhibit (remove 'PDF imagemagick-types-inhibit)
   ;       org-image-actual-width t)
 #+end_src
+
+* presenting
+** org-tree-slide-mode
+#+begin_src emacs-lisp
+  (use-package org-tree-slide
+    :bind (:map org-mode-map ("<f9>" . org-tree-slide-mode)))
+#+end_src
+
 * writing
 ** COMMENT spell-fu
 #+begin_src emacs-lisp
@@ -951,17 +968,22 @@ By default C-x 8 o = ° and C-x 8 m = µ. So:
 #+end_src
 I also use compose-key, mapped to right alt with some custom settings for
 <ralt> g d, resulting in δ, for example.
-** COMMENT all-the-icons
+** all-the-icons
 https://github.com/domtronn/all-the-icons.el
 #+begin_src emacs-lisp
   (use-package all-the-icons)
   (setq inhibit-compacting-font-caches t)
 #+end_src
-** COMMENT all-the-icons-ivy
+*** all-the-icons-ivy
 #+begin_src emacs-lisp
   (use-package all-the-icons-ivy
     :config
     (all-the-icons-ivy-setup))
+#+end_src
+*** all-the-icons-dired
+#+begin_src emacs-lisp
+  (use-package all-the-icons-dired
+    :hook (dired-mode . all-the-icons-dired-mode))
 #+end_src
 ** COMMENT emojify-mode
 #+begin_src emacs-lisp
@@ -1108,6 +1130,22 @@ https://github.com/hlissner/evil-snipe
      ;; Everything is relative to the main notes file
      org-noter-notes-search-path (list org_notes)))
 #+end_src
+*** org-noter-insert-precice-note-dwim---stolen from zaeph
+https://github.com/zaeph/.emacs.d/blob/master/init.el#L4420
+#+begin_src emacs-lisp
+    (defun zp/org-noter-insert-precise-note-dwim (force-mouse)
+      "Insert note associated with a specific location.
+  If in nov-mode, use point rather than the mouse to target the
+  position."
+      (interactive "P")
+      (if (and (derived-mode-p 'nov-mode)
+               (not force-mouse))
+          (let ((pos (if (region-active-p)
+                         (min (region-beginning) (point))
+                       (point))))
+            (org-noter-insert-note pos))
+        (org-noter-insert-precise-note)))
+#+end_src
 
 ** org-roam
 [[https://org-roam.readthedocs.io/en/latest/installation/][docs here]]
@@ -1115,7 +1153,7 @@ https://github.com/hlissner/evil-snipe
 
 #+begin_src emacs-lisp
   (use-package org-roam
-    :hook (org-mode . org-roam-mode)
+    :hook (after-init-hook . org-roam-mode)
     :commands (org-roam-buffer-toggle-display
                org-roam-find-file
                org-roam-graph
@@ -1129,67 +1167,224 @@ https://github.com/hlissner/evil-snipe
                 (("C-c n l" . org-roam)
                  ("C-c n f" . org-roam-find-file)
                  ("C-c n b" . org-roam-switch-to-buffer)
-                 ("C-c n g" . org-roam-graph))
+                 ("C-c n d" . org-roam-dailies-capture-today)
+                 ("C-c n g" . org-roam-graph)
+                 :map evil-normal-state-map
+                 ("g[" . org-roam-dailies-find-previous-note)
+                 ("g]" . org-roam-dailies-find-next-note)
+                 ;; ("g." . org-roam-dailies-find-today) ;; these don't work
+                 ;; ("g/" . org-roam-dailies-find-today)
+                 )
                 :map org-mode-map
                 (("C-c n i" . org-roam-insert)))
     :config
+    (require 'org-roam-capture)
     (setq org-roam-verbose nil  ; https://youtu.be/fn4jIlFwuLU
           org-roam-buffer-no-delete-other-windows t ; make org-roam buffer sticky
-          org-roam-completion-system 'default)
-
-    ;; Normally, the org-roam buffer doesn't open until you explicitly call
-    ;; `org-roam'. If `+org-roam-open-buffer-on-find-file' is non-nil, the
-    ;; org-roam buffer will be opened for you when you use `org-roam-find-file'
-    ;; (but not `find-file', to limit the scope of this behavior).
-    ;; (add-hook 'find-file-hook
-    ;;   (defun +org-roam-open-buffer-maybe-h ()
-    ;;     (and +org-roam-open-buffer-on-find-file
-    ;;          (memq 'org-roam-buffer--update-maybe post-command-hook)
-    ;;          (not (window-parameter nil 'window-side)) ; don't proc for popups
-    ;;          (not (eq 'visible (org-roam-buffer--visibility)))
-    ;;          (with-current-buffer (window-buffer)
-    ;;            (org-roam-buffer--get-create))))
-    ;; Hide the mode line in the org-roam buffer, since it serves no purpose. This
-    ;; makes it easier to distinguish among other org buffers.
-    ;; (add-hook 'org-roam-buffer-prepare-hook #'hide-mode-line-mode)
-    )
-
-
-  ;; Since the org module lazy loads org-protocol (waits until an org URL is
-  ;; detected), we can safely chain `org-roam-protocol' to it.
-  ;; (use-package org-roam-protocol
-  ;;   :after org-protocol)
-
-
-  ;; (use-package company-org-roam
-  ;;   :after org-roam
-  ;;   :config
-  ;;   (set-company-backend! 'org-mode '(company-org-roam company-yasnippet company-dabbrev)))
+          org-roam-capture-templates '(("d" "default" plain #'org-roam-capture--get-point "%?"
+                                        :file-name "%<%Y%m%d%H%M%S>-${slug}"
+                                        :head "#+title: ${title}\n#+created: %U\n#+last_modified:\n#+roam_tags:\n\n"
+                                        :unnarrowed t))
+          org-roam-dailies-capture-templates
+          '(("d" "default" entry #'org-roam-capture--get-point
+             "* %?"
+             :add-created t
+             :file-name "daily/%<%Y-%m-%d>"
+             :head "#+title: %<%Y-%m-%d>\n#+created: %u\n#+last_modified: %U\n#+roam_tags: dailies\n\n"))))
 #+end_src
+** org-roam-create-note-from-headline
+https://org-roam.discourse.group/t/creating-an-org-roam-note-from-an-existing-headline/978
+#+begin_src emacs-lisp
+  (defun org-roam-create-note-from-headline ()
+    "Create an Org-roam note from the current headline and jump to it.
+
+  Normally, insert the headline’s title using the ’#title:’ file-level property
+  and delete the Org-mode headline. However, if the current headline has a
+  Org-mode properties drawer already, keep the headline and don’t insert
+  ‘#+title:'. Org-roam can extract the title from both kinds of notes, but using
+  ‘#+title:’ is a bit cleaner for a short note, which Org-roam encourages."
+    (interactive)
+    (let ((title (nth 4 (org-heading-components)))
+          (has-properties (org-get-property-block)))
+      (org-cut-subtree)
+      (org-roam-find-file title nil nil 'no-confirm)
+      (org-paste-subtree)
+      (unless has-properties
+        (kill-line)
+        (while (outline-next-heading)
+          (org-promote)))
+      (goto-char (point-min))
+      (when has-properties
+        (kill-line)
+        (kill-line))))
+#+end_src
+
+** zaeph's CREATED and LAST_MODIFIED properties
+https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
+#+begin_src emacs-lisp
+  (defvar zp/org-created-property-name "CREATED"
+      "The name of the org-mode property that stores the creation date of the entry")
+
+  ;; TODO: Find the source for this because I’ve improved something which
+  ;; already existed
+  (defun zp/org-set-created-property (&optional active name)
+    "Set a property on the entry giving the creation time.
+  By default the property is called CREATED. If given, the ‘NAME’
+  argument will be used instead. If the property already exists, it
+  will not be modified.
+  If the function sets CREATED, it returns its value."
+    (interactive)
+    (let* ((created (or name zp/org-created-property-name))
+           (fmt (if active "<%s>" "[%s]"))
+           (now (format fmt (format-time-string "%Y-%m-%d %a %H:%M"))))
+      (unless (org-entry-get (point) created nil)
+        (org-set-property created now)
+        now)))
+#+end_src
+
+*** set it after capture
+#+begin_src emacs-lisp
+  (defun zp/org-capture-set-created-property ()
+    "Conditionally set the CREATED property on captured trees."
+    (let ((add-created (plist-get org-capture-plist :add-created))
+          (type (plist-get org-capture-current-plist :type)))
+      (when (and (not org-note-abort)
+                 (eq type 'entry)
+                 add-created)
+        (unless (buffer-narrowed-p)
+          (error "Cannot add CREATED when buffer is not narrowed"))
+        (save-excursion
+          (goto-char (point-min))
+          (zp/org-set-created-property)))))
+#+end_src
+
+*** set time-file property
+#+begin_src emacs-lisp
+  (defun zp/org-set-time-file-property (property &optional anywhere pos)
+    "Set the time file PROPERTY in the preamble.
+  When ANYWHERE is non-nil, search beyond the preamble.
+  If the position of the file PROPERTY has already been computed,
+  it can be passed in POS."
+    (when-let ((pos (or pos
+                        (zp/org-find-time-file-property property))))
+      (save-excursion
+        (goto-char pos)
+        (if (looking-at-p " ")
+            (forward-char)
+          (insert " "))
+        (delete-region (point) (line-end-position))
+        (let* ((now (format-time-string "[%Y-%m-%d %a %H:%M]")))
+          (insert now)))))
+#+end_src
+
+*** org-find-time-file-property
+#+begin_src emacs-lisp
+  (defun zp/org-find-time-file-property (property &optional anywhere)
+    "Return the position of the time file PROPERTY if it exists.
+  When ANYWHERE is non-nil, search beyond the preamble."
+    (save-excursion
+      (goto-char (point-min))
+      (let ((first-heading
+             (save-excursion
+               (re-search-forward org-outline-regexp-bol nil t))))
+        (when (re-search-forward (format "^#\\+%s:" property)
+                                 (if anywhere nil first-heading)
+                                 t)
+          (point)))))
+#+end_src
+*** org-has-time-file-property-p
+#+begin_src emacs-lisp
+  (defun zp/org-has-time-file-property-p (property &optional anywhere)
+    "Return the position of time file PROPERTY if it is defined.
+  As a special case, return -1 if the time file PROPERTY exists but
+  is not defined."
+    (when-let ((pos (zp/org-find-time-file-property property anywhere)))
+      (save-excursion
+        (goto-char pos)
+        (if (and (looking-at-p " ")
+                 (progn (forward-char)
+                        (org-at-timestamp-p 'lax)))
+            pos
+          -1))))
+#+end_src
+
+*** set last modified
+#+begin_src emacs-lisp
+  (defun zp/org-set-last-modified ()
+    "Update the LAST_MODIFIED file property in the preamble."
+    (when (derived-mode-p 'org-mode)
+      (zp/org-set-time-file-property "LAST_MODIFIED")))
+#+end_src
+
 ** org-roam-bibtex
 #+begin_src emacs-lisp
-    (use-package org-roam-bibtex
-      :after (org-roam)
-      :hook (org-roam-mode . org-roam-bibtex-mode)
-      :bind (:map org-mode-map
-                  (("C-c n a" . orb-note-actions)))
-      :config
-      (setq org-roam-bibtex-preformat-keywords
-            '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
-      (setq orb-templates
-            '(("r" "ref" plain (function org-roam-capture--get-point)
-               ""
-               :file-name "${slug}"
-               :head "#+TITLE: ${=key=}: ${title}\n#+ROAM_KEY: ${ref}
+  (use-package org-roam-bibtex
+    :after (org-roam)
+    :hook (org-roam-mode . org-roam-bibtex-mode)
+    :bind (:map org-mode-map
+                (("C-c n a" . orb-note-actions)))
+    :config
+    (setq orb-preformat-keywords
+          '("citekey" "title" "url" "author-or-editor" "keywords" "file")
+          orb-process-file-field t
+          orb-file-field-extensions "pdf")
 
-    - tags ::
-    - keywords :: ${keywords}
+    (setq orb-templates
+          '(("r" "ref" plain (function org-roam-capture--get-point)
+             ""
+             :add-created t
+             :file-name "${citekey}"
+             :head "#+title: ${citekey}: ${title}\n#+roam_key: ${ref}\n#+created: %u\n#+last_modified: %U#+roam_tags: articles\n
 
-    \n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n  :NOTER_PAGE: \n  :END:\n\n"
+  - related ::
+  - keywords :: ${keywords}
 
-               :unnarrowed t))))
+  ,* ${title}
+  :PROPERTIES:
+  :Custom_ID: ${citekey}
+  :URL: ${url}
+  :AUTHOR: ${author-or-editor}
+  :NOTER_DOCUMENT: ${file}
+  :NOTER_PAGE:
+  :END:"))))
+#+end_src
+** company-org-roam
+for auto-completion
+#+begin_src emacs-lisp
+  (use-package company-org-roam
+    :ensure t
+    :config
+    (push 'company-org-roam company-backends))
 #+end_src
 
+** COMMENT org-roam-protocol
+this bit errors out if I use-package it.
+
+Since the org module lazy loads org-protocol (waits until an org URL is detected), we can safely chain `org-roam-protocol' to it.
+#+begin_src emacs-lisp
+  (require 'org-roam-protocol
+      :after org-protocol)
+#+end_src
+
+** org-roam-server
+https://github.com/org-roam/org-roam-server
+#+begin_src emacs-lisp
+   (use-package org-roam-server
+     :bind (:map org-roam-mode-map
+                 (("C-c n G" . org-roam-server-mode)))
+     :config
+     (setq org-roam-server-host "127.0.0.1"
+           org-roam-server-port 8080
+           org-roam-server-authenticate nil
+           org-roam-server-export-inline-images t
+           org-roam-server-serve-files nil
+           org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
+           org-roam-server-network-poll t
+           org-roam-server-network-arrows nil
+           org-roam-server-network-label-truncate t
+           org-roam-server-network-label-truncate-length 60
+           org-roam-server-network-label-wrap-length 20))
+#+end_src
 * swiper / ivy
 very nice search replacement
 #+begin_src emacs-lisp
@@ -1541,8 +1736,10 @@ reference manager I use it in conjunction with zotero, which generates the
    ;; bibtex-completion-pdf-field "file"
    bibtex-completion-notes-template-multiple-files
    (concat
-   "#+TITLE: ${title}\n"
-   "#+ROAM_KEY: cite:${=key=}\n"
+   "#+title: ${title}\n"
+   "#+created: %u\n"
+   "#+last_modified: %U\n"
+   "#+roam_key: cite:${=key=}\n\n\n"
    "* TODO Notes\n"
    ":PROPERTIES:\n"
    ":Custom_ID: ${=key=}\n"
