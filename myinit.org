@@ -43,19 +43,20 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
 * org-roam/notes/ref directories
 see [[*org-roam][org-roam]]
 #+begin_src emacs-lisp
-    (setq
-     org_notes (concat (getenv "HOME") "/SurfDrive/bibliography/notes/")
-     zot_bib (concat (getenv "HOME") "/SurfDrive/bibliography/bibliography.bib")
-     org-directory org_notes
-     deft-directory org_notes
-     org-roam-directory org_notes
-     org-roam-db-location (concat org_notes "org-roam.db"))
+  (setq
+   org_notes (concat (getenv "HOME") "/SurfDrive/bibliography/notes/")
    zot_bib (concat (getenv "HOME") "/SurfDrive/bibliography/bibliography.bib")
+   org-directory org_notes
+   org-roam-dailies-directory (concat org_notes "daily")
+   deft-directory org_notes
+   org-roam-directory org_notes
+   org-roam-db-location (concat org_notes "org-roam.db"))
 #+end_src
 * interface
 ** turn off UI elements and small tweaks
 #+begin_src emacs-lisp
   (setq inhibit-splash-screen t)
+  (setq initial-major-mode 'org-mode)
   (scroll-bar-mode -1)   ; turn off the scroll bar
   (tool-bar-mode -1)     ; turn off the tool bar
   (menu-bar-mode -1)     ; turn off the menu
@@ -107,6 +108,7 @@ let my window manager handle screen creation
     :config (setq frames-only-mode nil))
 #+end_src
 ** default-text-scale
+use C-M-= and C-M-- to increase/decrease font size globally.
 #+begin_src emacs-lisp
   (use-package default-text-scale
     :config (setq default-text-scale-mode t))
@@ -119,19 +121,19 @@ let my window manager handle screen creation
 *** smartparens
 insert matching parentheses and jump across them
 #+begin_src emacs-lisp
-  (use-package smartparens-config
+  (use-package smartparens
     :hook ((prog-mode markdown-mode org-mode) . turn-on-smartparens-strict-mode)
-    :ensure smartparens
-    :config (progn (show-smartparens-global-mode t)))
+    :config (show-smartparens-global-mode t))
 #+end_src
 *** evil-smartparens
 #+begin_src emacs-lisp
   (use-package evil-smartparens
     :after evil
-    :diminish evil-smartparens-mode
     :hook ((prog-mode markdown-mode org-mode) . evil-smartparens-mode))
 #+end_src
+* browsing the documentation
 ** helpful
+beautiful help functions
 https://github.com/Wilfred/helpful
 #+begin_src emacs-lisp
   (use-package helpful)
@@ -157,7 +159,7 @@ matching parenthesis are highlighted with rainbow colours.
     :hook ((prog-mode LaTeX-mode) . rainbow-delimiters-mode))
 #+end_src
 ** set the theme
-*** clean up previous theme
+*** COMMENT clean up previous theme
 from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www.reddit.com/r/emacs/comments/4mzynd/what_emacs_theme_are_you_currently_using/d43c5cw][reddit]]
 #+begin_src emacs-lisp
   (defadvice load-theme (before clear-previous-themes activate)
@@ -208,7 +210,7 @@ Highlight hex colours!
     :hook ((html-mode r-mode) . rainbow-mode))
 #+end_src
 ** pulse
-Highlight the current line when changing focus.
+Highlight the current line when changing focus. It's like beacon-mode but native!
 from https://karthinks.com/software/batteries-included-with-emacs/
 #+begin_src emacs-lisp
   (defun pulse-line (&rest _)
@@ -220,6 +222,7 @@ from https://karthinks.com/software/batteries-included-with-emacs/
     (advice-add command :after #'pulse-line))
 #+end_src
 ** visual-fill-column-mode
+This allows me to write nicely on a widescreen monitor in a single buffer.
 #+begin_src emacs-lisp
   (use-package visual-fill-column
     :hook (visual-line-mode . visual-fill-column-mode)
@@ -256,7 +259,6 @@ git porcelain, essential!
   (defun fetch-calendar ()
     (when (internet-up-p) (org-gcal-fetch)))
 #+end_src
-
 ** org-agenda recent open loops
 #+begin_src emacs-lisp
   (defun my-org-agenda-recent-open-loops ()
@@ -267,8 +269,9 @@ git porcelain, essential!
       (org-agenda-list nil (org-read-date nil nil "-2d") 4)
       (beginend-org-agenda-mode-goto-beginning)))
 #+end_src
-** edit heading in indirect buffer
+** COMMENT edit heading in indirect buffer
 [[https://www.reddit.com/r/orgmode/comments/fuvdqv/org_notetaking_workflow_with_orgroam/fmhl3ml?utm_source=share&utm_medium=web2x][taken from this reddit thread by alphapapa]]
+I haven't used this at all.
 #+begin_src emacs-lisp
   (defun ap/org-tree-to-indirect-buffer (&optional arg)
     "Create indirect buffer and narrow it to current subtree.
@@ -1044,9 +1047,9 @@ usefull snippets for me: org-mode (fig_, )
     (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE " . "#\\+END_EXAMPLE$")))
 #+end_src
 ** org-ref
+https://github.com/jkitchin/org-ref/blob/master/org-ref.org
 #+begin_src emacs-lisp
   (use-package org-ref
-    :bind ("C-c j" . org-ref-bibtex-hydra/body)
     :after org
     :init
     (setq org-ref-completion-library 'org-ref-ivy-cite
