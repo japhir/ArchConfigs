@@ -1,0 +1,9 @@
+#!/usr/bin/sh
+# breaktime
+bt=30
+echo "Are you sure? Giving you ${bt}s to contemplate…"
+sleep $(($bt-10))s && echo '…you can cancel anytime! Just press C-c!…'
+sleep 10s && echo '…ok, but please only for a short time!' 
+sudo sed -e 's/127.0.0.1/##127.0.0.1/' -i /etc/hosts && notify-send "unblocking distractions for 20 minutes"
+
+sleep 19m && notify-send 'almost back to work!' && sleep 1m && block_distractions &
