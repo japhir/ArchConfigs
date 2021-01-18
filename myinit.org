@@ -1494,6 +1494,29 @@ See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for 
           starttls-gnutls-program "gnutls-cli"
           starttls-extra-args nil))
 #+end_src
+** use oauth2ms
+https://github.com/harishkrupo/oauth2ms/blob/main/steps.org
+I have to use this repo to access my work's office365 account through XOAUTH2
+#+begin_src emacs-lisp
+  ;;; Call the oauth2ms program to fetch the authentication token
+   (defun fetch-access-token ()
+     (with-temp-buffer
+	(call-process "/home/japhir/bin/oauth2ms" nil t nil "--encode-xoauth2")
+	(buffer-string)))
+
+   ;;; Add new authentication method for xoauth2
+   (cl-defmethod smtpmail-try-auth-method
+     (process (_mech (eql xoauth2)) user password)
+     (let* ((access-token (fetch-access-token)))
+	(smtpmail-command-or-throw
+	 process
+	 (concat "AUTH XOAUTH2 " access-token)
+	 235)))
+
+   ;;; Register the method
+   (with-eval-after-load 'smtpmail
+     (add-to-list 'smtpmail-auth-supported 'xoauth2))
+#+end_src
 ** mu4e
 install it with pacman ~mu~
 #+begin_src emacs-lisp
@@ -1502,6 +1525,7 @@ install it with pacman ~mu~
     :load-path "/usr/share/emacs/site-lisp/mu4e/"
     :commands mu4e
     :bind (("C-c m" . mu4e))
+    :hook ((mu4e-view-mode mu4e-compose-mode). visual-fill-column-mode)
     :init
     (require 'mu4e)  ;; somehow this is needed, because otherwise calling org-store-link doesn't work
     (require 'org-mu4e)
@@ -1525,17 +1549,27 @@ install it with pacman ~mu~
             (:flags         .   5)
             (:from          .  22)
             (:subject       .  nil))
-          mu4e-get-mail-command "mbsync -a"
+          mu4e-get-mail-command "env PATH=/usr/bin:/home/japhir/bin: mbsync -a"
           mu4e-headers-include-related t
-          mu4e-compose-format-flowed nil  ; plain-text nice to read on phone
-          use-hard-newlines t             ; above doesn't work for Outlooks, so disabled for colleagues
+          mu4e-compose-format-flowed t  ; plain-text nice to read on phone
+          ;; use-hard-newlines t             ; above doesn't work for Outlooks, so disabled for colleagues
           mu4e-confirm-quit nil
           mu4e-view-show-images t)
+
+    ;; this makes the html preview of emails nicer. Got it from System Crafters Discord channel
+    ;; might be default in emacs 27!
+    ;; (setq mu4e-html2text-command 'mu4e-shr2text
+    ;;       shr-color-visible-luminance-min 60
+    ;;       shr-color-visible-distance-min 5
+    ;;       shr-use-colors nil)
+    ;; Prevent emails from setting background color
+    ;; (advice-add #'shr-colorize-region :around (defun shr-no-colourise-region (&rest ignore)))
+
+    ;; if you press a V on an email you open it in the browser
+    (add-to-list 'mu4e-view-actions '("View in browser" . mu4e-action-view-in-browser) t)
     ;; use imagemagick, if available
     ;; (when (fboundp 'imagemagick-register-types)
     ;;   (imagemagick-register-types))
-    ;; (add-to-list 'mu4e-view-actions
-    ;; '("ViewInBrowser" . mu4e-action-view-in-browser) t)
     (setq org-mu4e-link-query-in-headers-mode nil))
 #+end_src
 * science packages
