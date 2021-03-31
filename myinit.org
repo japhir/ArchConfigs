@@ -1252,20 +1252,16 @@ https://github.com/zaeph/.emacs.d/blob/master/init.el#L4420
                org-roam-dailies-today
                org-roam-dailies-tomorrow
                org-roam-dailies-yesterday)
-    :bind (:map org-roam-mode-map
+    :bind (:map org-mode-map
                 (("C-c n l" . org-roam)
                  ("C-c n f" . org-roam-find-file)
                  ("C-c n b" . org-roam-switch-to-buffer)
                  ("C-c n d" . org-roam-dailies-capture-today)
                  ("C-c n g" . org-roam-graph)
-                 :map evil-normal-state-map
+                 ("C-c n i" . org-roam-insert)
+                 :map evil-normal-state-map ;; is there an evil map within org-mode?
                  ("g[" . org-roam-dailies-find-previous-note)
-                 ("g]" . org-roam-dailies-find-next-note)
-                 ;; ("g." . org-roam-dailies-find-today) ;; these don't work
-                 ;; ("g/" . org-roam-dailies-find-today)
-                 )
-                :map org-mode-map
-                (("C-c n i" . org-roam-insert)))
+                 ("g]" . org-roam-dailies-find-next-note)))
     :config
     (require 'org-roam-capture)
     (setq org-roam-verbose nil  ; https://youtu.be/fn4jIlFwuLU
@@ -1423,7 +1419,7 @@ https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
              ""
              :add-created t
              :file-name "${citekey}"
-             :head "#+title: ${citekey}: ${title}\n#+roam_key: ${ref}\n#+created: %u\n#+last_modified: %U#+roam_tags: articles\n
+             :head "#+title: ${citekey}: ${title}\n#+roam_key: ${ref}\n#+created: %u\n#+last_modified: %U\n#+roam_tags: articles\n
 
   - related ::
   - keywords :: ${keywords}
@@ -1458,22 +1454,63 @@ Since the org module lazy loads org-protocol (waits until an org URL is detected
 ** org-roam-server
 https://github.com/org-roam/org-roam-server
 #+begin_src emacs-lisp
-   (use-package org-roam-server
-     :bind (:map org-roam-mode-map
-                 (("C-c n G" . org-roam-server-mode)))
-     :config
-     (setq org-roam-server-host "127.0.0.1"
-           org-roam-server-port 8080
-           org-roam-server-authenticate nil
-           org-roam-server-export-inline-images t
-           org-roam-server-serve-files nil
-           org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
-           org-roam-server-network-poll t
-           org-roam-server-network-arrows nil
-           org-roam-server-network-label-truncate t
-           org-roam-server-network-label-truncate-length 60
-           org-roam-server-network-label-wrap-length 20))
+  (use-package org-roam-server
+    :after org-roam
+    :bind (:map org-roam-mode-map
+                (("C-c n G" . org-roam-server-mode)))
+    :config
+    (setq org-roam-server-host "127.0.0.1"
+          org-roam-server-port 8080
+          org-roam-server-authenticate nil
+          org-roam-server-export-inline-images t
+          org-roam-server-serve-files nil
+          org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
+          org-roam-server-network-poll t
+          org-roam-server-network-arrows nil
+          org-roam-server-network-label-truncate t
+          org-roam-server-network-label-truncate-length 60
+          org-roam-server-network-label-wrap-length 20))
 #+end_src
+* playing videos
+** emms for playing youtube videos etc.
+#+begin_src emacs-lisp
+  (use-package emms
+    :defer t
+    :config
+    (require 'emms-setup)
+    (emms-all)
+    (emms-default-players))
+#+end_src
+** org-media-note
+#+begin_src emacs-lisp
+  (use-package quelpa-use-package)
+  (use-package pretty-hydra)
+  (use-package org-media-note
+    :quelpa (org-media-note :fetcher github :repo "yuchen-lea/org-media-note")
+    :ensure nil
+    :hook (org-mode .  org-media-note-mode)
+    :bind (("C-c v" . org-media-note-hydra/body))  ;; Main entrance
+    :config
+    ;; (require 'org-attach)
+    (setq org-media-note-screenshot-image-dir "~/SurfDrive/bibliography/notes/imgs/"))
+#+end_src
+
+** COMMENT mpv
+play videos from orgmode!
+#+begin_src emacs-lisp
+  (use-package mpv
+    :hook
+    (org-open-at-point-functions . mpv-seek-to-position-at-point)
+    :config
+    (org-add-link-type "mpv" #'mpv-play)
+    (defun org-mpv-complete-link (&optional arg)
+      (replace-regexp-in-string
+       "file:" "mpv:"
+       (org-file-complete-link arg)
+       t t)))
+#+end_src
+it's not working so far
+
 * swiper / ivy
 very nice search replacement
 #+begin_src emacs-lisp
@@ -1643,7 +1680,7 @@ install it with pacman ~mu~
     :hook ((mu4e-view-mode mu4e-compose-mode). visual-fill-column-mode)
     :init
     (require 'mu4e)  ;; somehow this is needed, because otherwise calling org-store-link doesn't work
-    (require 'org-mu4e)
+    (require 'mu4e-org)
     (setq mu4e-drafts-folder "/Drafts"
           mu4e-sent-folder "/Sent Items"
           mu4e-trash-folder "/Deleted Items")
