@@ -28,8 +28,24 @@ nice on both my desktop and laptop.
   (eval-when-compile
     (require 'use-package))
   (setq use-package-always-ensure t)
+  (setq use-package-verbose t)
   (use-package diminish)  ; to omit lines from the mode-line
   (use-package bind-key)  ; for easy keybindings
+#+end_src
+* COMMENT straight.el
+#+begin_src emacs-lisp
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
 #+end_src
 * dirvar
 define dirvars 'org-in-file', 'org-gtd-file', etc.
