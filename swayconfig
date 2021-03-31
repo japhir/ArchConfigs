@@ -327,6 +327,7 @@ bindsym $mod+p exec spotify                                       # music
 bindsym $mod+Shift+w exec mpv --no-osc --demuxer-lavf-format=video4linux2 --demuxer-lavf-o-set=input_format=mjpeg av://v4l2:/dev/video0 || notify-send "failed to start webcam"
 for_window [title="^video0 - mpv$"] floating enable, sticky enable, resize set height 260 px, move absolute position 0 px 820 px, border none
 for_window [title="Firefox — Sharing Indicator$"] floating enable, resize set height 16 px, move absolute position 0 px 820 px, border none
+for_window [title="Picture-in-Picture"] floating enable
 
 bindsym Print exec grim ~/Pictures/Screenshots/$(date +'%F-%T.png')
 bindsym --release Shift+Print exec slurp | grim -g - -c ~/Pictures/Screenshots/$(date +'%F-%T_region.png')
