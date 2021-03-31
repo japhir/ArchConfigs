@@ -4,11 +4,11 @@ This is my config file for [[emacs.org]]!
 * set gc-cons threshold
 The gc-cons-threshold is set to a superlarge number for faster startup time. It
 is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
+
 #+begin_src emacs-lisp
   (setq gc-cons-threshold 402653184
         gc-cons-percentage 0.6)
 #+end_src
-
 * log startup time
 stolen from [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org#startup-performance][David Wilson's config]]
 #+begin_src emacs-lisp
@@ -511,19 +511,19 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
          (before-save . zp/org-set-last-modified)
          (org-capture-prepare-finalize . zp/org-capture-set-created-property))
 #+end_src
-** start with custom!
+** start with custom
 #+begin_src emacs-lisp
   :custom
 #+end_src
 *** org-latex export settings
 basic latex settings
 #+begin_src emacs-lisp
-  (setq org-highlight-latex-and-related '(native script entities))
-  (setq org-preview-latex-default-program 'imagemagick)
+  (org-highlight-latex-and-related '(native script entities))
+  (org-preview-latex-default-program 'imagemagick)
   ;; (setq org-latex-default-figure-position 'htbp)
-  (setq org-latex-pdf-process
+  (org-latex-pdf-process
         (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
-  (setq org-latex-prefer-user-labels t)
+  (org-latex-prefer-user-labels t)
   (customize-set-value 'org-latex-hyperref-template "
   \\hypersetup{\n pdfauthor={%a},\n pdftitle={%t},\n pdfkeywords={%k},
    pdfsubject={%d},\n pdfcreator={%c},\n pdflang={%L},\n colorlinks=true}\n")
@@ -534,16 +534,16 @@ nice, and they export to both \LaTeX and =html= correctly. Note that
 unfortunately, special entity names cannot contain numerics, so =\d18O= is not
 possible.
 #+begin_src emacs-lisp
-  (setq org-entities-user
-        '(("celsius" "\\(^{\\circ}\\)C" nil "&deg;C" "°C" "°C" "℃")
-          ("minus" "\\-" t "&minus;" "-" "-" "−")  ;; defaults to =\\minus= in LaTeX, which doesn't work.
-          ("permil" "\\textperthousand{}" nil "&permil;" "per thousand" "per thousand" "‰")  ;; exactly the same as in org-entities
-          ("us" "\\," nil "&nbsp;" " " " " " ")
-          ("appr" "\\sim" t "&tilde;" "~" "~" "~")
-          ;; for gps-coordinates
-          ("degree" "^{\\circ}" t "&deg;" "°" "°" "°")
-          ("arcminute" "^{'}" t "&prime;" "'" "′" "′")
-          ("arcsecond" "^{''}" t "&Prime;" "\"" "″" "″")))
+  (org-entities-user
+   '(("celsius" "\\(^{\\circ}\\)C" nil "&deg;C" "°C" "°C" "℃")
+     ("minus" "\\-" t "&minus;" "-" "-" "−")  ;; defaults to =\\minus= in LaTeX, which doesn't work.
+     ("permil" "\\textperthousand{}" nil "&permil;" "per thousand" "per thousand" "‰")  ;; exactly the same as in org-entities
+     ("us" "\\," nil "&nbsp;" " " " " " ")
+     ("appr" "\\sim" t "&tilde;" "~" "~" "~")
+     ;; for gps-coordinates
+     ("degree" "^{\\circ}" t "&deg;" "°" "°" "°")
+     ("arcminute" "^{'}" t "&prime;" "'" "′" "′")
+     ("arcsecond" "^{''}" t "&Prime;" "\"" "″" "″")))
 #+end_src
 ** basics
 #+begin_src emacs-lisp
@@ -795,17 +795,17 @@ customize capture templates
 #+begin_src emacs-lisp
   :config
 #+end_src
-*** quick-capture
+**** quick-capture
 #+begin_src emacs-lisp
   (define-key global-map (kbd "C-c h")
   (lambda () (interactive) (org-capture nil "x")))
 #+end_src
-*** effort estimates
+**** effort estimates
 #+begin_src emacs-lisp
   (add-to-list 'org-global-properties
                '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
 #+end_src
-*** habits
+**** habits
 #+begin_src emacs-lisp
   (add-to-list 'org-modules 'org-habit t)
 #+end_src
@@ -853,7 +853,6 @@ org-export ignore headlines with ~:ignore:~ tag
 *** add emacs and R source blocks
 [[https://emacs.stackexchange.com/a/47370/9748][Nice answer on how to have point on a blank line in code block]]
 #+begin_src emacs-lisp
-
   (add-to-list 'org-structure-template-alist
                '("se" . "src emacs-lisp
   "))
