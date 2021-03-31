@@ -737,7 +737,7 @@ customize capture templates
            ("T" "Todo-nolink-tag" entry (file org-in-file)
             "* %? %^G\n" :add-created t)
            ("m" "Email" entry (file org-in-file)
-            "* %? :@email:\n %i\n %a\n" :add-created t)
+            "* %? from %:from on %:subject :@email:\n %i\n %a\n" :add-created t)
            ("w" "Website" entry (file org-in-file)
             "* %?\nEntered on %U\n %i\n %a")
            ("r" "Weekly Review" entry (file "~/org/log.org")
@@ -919,6 +919,7 @@ got the function from this [[https://github.com/marcinkoziej/org-pomodoro/issues
     :hook (org-pomodoro-break-finished-hook . org-pomodoro-prompt)
     :config
     (setq org-pomodoro-manual-break t)
+    (setq org-pomodoro-long-break-length 15)
     (defun org-pomodoro-prompt ()
       (interactive)
       (org-clock-goto)
