@@ -1708,21 +1708,22 @@ install it with pacman ~mu~
           mu4e-confirm-quit nil
           mu4e-view-show-images t)
 
-    ;; this makes the html preview of emails nicer. Got it from System Crafters Discord channel
-    ;; might be default in emacs 27!
-    ;; (setq mu4e-html2text-command 'mu4e-shr2text
-    ;;       shr-color-visible-luminance-min 60
-    ;;       shr-color-visible-distance-min 5
-    ;;       shr-use-colors nil)
-    ;; Prevent emails from setting background color
-    ;; (advice-add #'shr-colorize-region :around (defun shr-no-colourise-region (&rest ignore)))
-
-    ;; if you press a V on an email you open it in the browser
+     ;; if you press a V on an email you open it in the browser
     (add-to-list 'mu4e-view-actions '("View in browser" . mu4e-action-view-in-browser) t)
     ;; use imagemagick, if available
     ;; (when (fboundp 'imagemagick-register-types)
     ;;   (imagemagick-register-types))
-    (setq org-mu4e-link-query-in-headers-mode nil))
+    (setq mu4e-org-link-query-in-headers-mode nil))
+#+end_src
+** mu4e-alert
+#+begin_src emacs-lisp
+  (use-package mu4e-alert
+    :after mu4e
+    :config (mu4e-alert-set-default-style 'libnotify)
+    (setq mu4e-alert-interesting-mail-query
+          (concat "flag:unread"
+                  " AND NOT maildir:\"/news\""))
+    :hook (after-init . mu4e-alert-enable-notifications))
 #+end_src
 * science packages
 ** COMMENT eval-in-repl
