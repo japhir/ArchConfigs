@@ -1000,22 +1000,6 @@ https://github.com/awth13/org-appear
     (add-to-list 'deft-extensions "tex"))
 #+end_src
 
-** COMMENT mpv
-play videos from orgmode!
-#+begin_src emacs-lisp
-  (use-package mpv
-    :hook
-    (org-open-at-point-functions . mpv-seek-to-position-at-point)
-    :config
-    (org-add-link-type "mpv" #'mpv-play)
-    (defun org-mpv-complete-link (&optional arg)
-      (replace-regexp-in-string
-       "file:" "mpv:"
-       (org-file-complete-link arg)
-       t t)))
-#+end_src
-it's not working so far
-
 ** COMMENT pdf preview in org
 #+begin_src emacs-lisp :eval never :tangle no
   ; (add-to-list 'image-type-file-name-regexps '("\\.pdf\\'" . imagemagick))
@@ -1741,13 +1725,13 @@ use other programming languages in interactive environment, similar to how ESS d
 #+end_src
 ** ess
 emacs speaks statistics, work with R etc.
-*** insert pipe %>% function
+*** insert pipe ~%>%~ function
 #+begin_src emacs-lisp
   (defun japhir/insert-r-pipe ()
     "Insert the pipe operator in R, %>%"
     (interactive)
     (just-one-space 1)
-    (insert "%>%")
+    (insert "%>%") ;; when R 4.1 hits I can replace this with |>
     (reindent-then-newline-and-indent))
 #+end_src
 *** use-package
@@ -1772,23 +1756,23 @@ emacs speaks statistics, work with R etc.
                (string= lang "elisp")
                (string= lang "emacs-lisp")
                (string= lang "latex"))))
-    (setq display-buffer-alist
-          '(("*R Dired"
-             (display-buffer-reuse-window display-buffer-in-side-window)
-             (side . right)
-             (slot . -1)
-             (window-width . 0.33))
-            ("*R"
-             (display-buffer-reuse-window display-buffer-in-side-window)
-             (slot . 2)
-             (window-width . 0.5))
-            ("*Help"
-             (display-buffer-reuse-window display-buffer-in-side-window)
-             (side . right)
-             (slot . 1)
-             (window-width . 0.33)))
+    (setq ;; display-buffer-alist
+          ;; '(("*R Dired*"
+          ;;    (display-buffer-reuse-window display-buffer-in-side-window)
+          ;;    (side . right)
+          ;;    (slot . -1)
+          ;;    (window-width . 0.33))
+          ;;   ("*R:"
+          ;;    (display-buffer-reuse-window display-buffer-in-side-window)
+          ;;    (slot . 2)
+          ;;    (window-width . 0.5))
+          ;;   ("*Help*"
+          ;;    (display-buffer-reuse-window display-buffer-in-side-window)
+          ;;    (side . right)
+          ;;    (slot . 1)
+          ;;    (window-width . 0.33)))
           ;; ess-help-own-frame 'one
-          ess-auto-width 'frame
+          ;; ess-auto-width 'window
           org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
           ess-style 'RStudio
           ess-use-auto-complete nil
@@ -1872,13 +1856,14 @@ exporting markdown
 ** org-pandoc
 https://github.com/kawabata/ox-pandoc
 #+begin_src emacs-lisp
-    (use-package ox-pandoc
-      :config
-      (setq org-pandoc-options '((bibliography
-            . "/home/japhir/Documents/References/PhD.bib"))
-            ;; org-pandoc-options-for-docx '((reference-docx
-            ;; . "/home/japhir/SurfDrive/PhD/chapters/wordtemplate.docx"))
-            ))
+  (use-package ox-pandoc
+    :after org
+    :config
+    (setq org-pandoc-options '((bibliography
+          . "/home/japhir/Documents/References/PhD.bib"))
+          ;; org-pandoc-options-for-docx '((reference-docx
+          ;; . "/home/japhir/SurfDrive/PhD/chapters/wordtemplate.docx"))
+          ))
 #+end_src
 ** LaTeX (AUCTeX, RefTeX)
 for working with \LaTeX
