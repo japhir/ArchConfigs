@@ -165,12 +165,14 @@ insert matching parentheses and jump across them
 beautiful help functions
 https://github.com/Wilfred/helpful
 #+begin_src emacs-lisp
-  (use-package helpful)
+    (use-package helpful
+       :commands (helpful-callable helpful-function helpful-variable helpful-mode))
 #+end_src
 ** demos
 Insert demos after describe function https://github.com/xuchunyang/elisp-demos
 #+begin_src emacs-lisp
   (use-package elisp-demos
+    :after helpful
     :config
     (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
 #+end_src
@@ -236,6 +238,7 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
 Highlight hex colours!
 #+begin_src emacs-lisp
   (use-package rainbow-mode
+    :defer t
     :hook ((html-mode r-mode) . rainbow-mode))
 #+end_src
 ** pulse
@@ -275,6 +278,8 @@ Highlight diffs of current version-controlled buffer in the margin. Quite cool!
 git porcelain, essential!
 #+begin_src emacs-lisp
   (use-package magit
+    :commands magit-status
+    :after with-editor
     :bind
     ("M-g" . magit-status))
 #+end_src
@@ -458,7 +463,7 @@ comment/uncomment with gc
 evil keybindings for magit
 #+begin_src emacs-lisp
   (use-package evil-magit
-    :after magit
+    :after (magit evil)
     :hook
     (git-commit-mode . evil-insert-state)
     (magit-mode . turn-off-evil-snipe-override-mode)
@@ -902,7 +907,8 @@ possible.
 ** ob-async
 allow asyncronous code block evaluation https://github.com/astahlman/ob-async
 #+begin_src emacs-lisp
-  (use-package ob-async)
+  (use-package ob-async
+    :after org)
 #+end_src
 ** org-pomodoro
 got the function from this [[https://github.com/marcinkoziej/org-pomodoro/issues/89#issuecomment-701025952][github issue]]
@@ -924,7 +930,7 @@ got the function from this [[https://github.com/marcinkoziej/org-pomodoro/issues
 ** org-pdfview
 #+begin_src emacs-lisp
   (use-package org-pdfview
-    :after org pdf-tools)
+    :after (org pdf-tools))
 #+end_src
 ** COMMENT view inline pdfs?
 doesn't work :(
@@ -1000,6 +1006,7 @@ it's not working so far
 ** org-tree-slide-mode
 #+begin_src emacs-lisp
   (use-package org-tree-slide
+    :after org
     :bind (:map org-mode-map ("<f9>" . org-tree-slide-mode)))
 #+end_src
 
@@ -1031,12 +1038,14 @@ https://github.com/domtronn/all-the-icons.el
 *** all-the-icons-ivy
 #+begin_src emacs-lisp
   (use-package all-the-icons-ivy
+    :after (ivy all-the-icons)
     :config
     (all-the-icons-ivy-setup))
 #+end_src
 *** all-the-icons-dired
 #+begin_src emacs-lisp
   (use-package all-the-icons-dired
+    :after (dired all-the-icons)
     :hook (dired-mode . all-the-icons-dired-mode))
 #+end_src
 ** COMMENT emojify-mode
@@ -1079,7 +1088,6 @@ usefull snippets for me: org-mode (fig_, )
 https://github.com/jkitchin/org-ref/blob/master/org-ref.org
 #+begin_src emacs-lisp
   (use-package org-ref
-    :after org
     :init
     (setq org-ref-completion-library 'org-ref-ivy-cite
           org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
@@ -1470,18 +1478,29 @@ very nice search replacement
     ("M-x" . counsel-M-x)
     ("C-c s" . counsel-rg))
 #+end_src
+** link-hint
+#+begin_src emacs-lisp
+  (use-package link-hint
+    :ensure t
+    :defer t
+    :bind ((:map evil-normal-state-map ("SPC f" . link-hint-open-link))))
+;;(:map mu4e-view-mode-map ("f" . link-hint-open-link))
+#+end_src
 * system
 ** vterm
-#+begin_src R
-  (use-package vterm)
+#+begin_src emacs-lisp
+  (use-package vterm
+    :defer t)
 #+end_src
 ** systemd
 #+begin_src emacs-lisp
-  (use-package systemd)
+  (use-package systemd
+    :defer t)
 #+end_src
 ** dired
 #+begin_src emacs-lisp
   (use-package dired
+    :commands dired
     :ensure nil
     :config
     (setq dired-listing-switches "-lh"))
@@ -1489,7 +1508,7 @@ very nice search replacement
 ** ranger
 #+begin_src emacs-lisp
   (use-package ranger
-    :bind ("C-x d" . ranger))
+    :defer t)
 #+end_src
 ** emacs-pkgbuild-mode
 Install it with Pacman
@@ -1501,6 +1520,7 @@ Then load it into emacs when opening a PKGBUILD file
 #+begin_src emacs-lisp
   (use-package pkgbuild-mode
      :ensure nil
+     :defer t
      :load-path "/usr/share/emacs/site-lisp/"
      :mode "/PKGBUILD$")
 #+end_src
@@ -1754,13 +1774,13 @@ Put spaces around operators such as +, -, etc.
 ** markdown-mode
 markdown mode for writing
 #+begin_src emacs-lisp
-  (use-package markdown-mode)
+  (use-package markdown-mode :defer t)
 #+end_src
 ** polymode
 for working with .Rmd files etc.
 #+begin_src emacs-lisp
-  (use-package polymode)
-  (use-package poly-markdown)
+  (use-package polymode :defer t)
+  (use-package poly-markdown :defer t)
   ;; (use-package poly-R)
 #+end_src
 ** COMMENT matlab
@@ -1779,7 +1799,7 @@ if I'm ever required to work in non-open-source
 exporting markdown
 #+begin_src emacs-lisp
   (use-package pandoc-mode
-    :ensure t
+    :defer t
     :hook (markdown-mode . pandoc-mode))
 #+end_src
 ** mermaid
@@ -1832,6 +1852,7 @@ reference manager I use it in conjunction with zotero, which generates the
 .bib files, and org-ref, to insert citations in org files.
 #+begin_src emacs-lisp
   (use-package ivy-bibtex
+    :after ivy
     :config
     ;; (autoload 'ivy-bibtex "ivy-bibtex" "" t)
     (require 'ivy-bibtex)
