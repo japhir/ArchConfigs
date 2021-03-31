@@ -216,7 +216,7 @@ assign [title="^GanttProject"] $ws4
 # assign [class="^Slack$"] $ws5
 # assign [class="^Riot$"] $ws5
 # assign [class="^Trello$"] $ws5
-assign [class="^Discord"] $ws5
+assign [class="^discord"] $ws5
 assign [class="^Microsoft Teams"] $ws5
 assign [class="^Inkscape$"] $ws6
 assign [class="^VirtualBox$" title="^Win10"] $ws8
@@ -344,6 +344,13 @@ exec sleep 5 && owncloud
 exec nm-applet --indicator # network-manager-applet-indicator from AUR
 # exec teams                 # microsoft teams
 # exec ganttproject ~/SurfDrive/PhD/application/2020-09-16_DrIljaKocken.gan  # my long-term planning
+
+# open up emacs with the current paper and a todo scratchpad
+exec swaymsg "workspace $ws3" && sleep 12 && /home/japhir/bin/current_paper.sh
+exec sleep 12 && /home/japhir/bin/pad.sh
+for_window [title="TODO"] move to scratchpad; resize grow width 600 px or 600 pt
+
+exec zotero  # should move to ws4 automatically
 
 # gaps
 smart_gaps on
