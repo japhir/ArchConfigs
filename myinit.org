@@ -134,13 +134,13 @@ auto-save when I exit normal mode
 let my window manager handle screen creation
 #+begin_src emacs-lisp :tangle no
   (use-package frames-only-mode
-    :config (setq frames-only-mode nil))
+    :custom (frames-only-mode nil))
 #+end_src
 ** default-text-scale
 use C-M-= and C-M-- to increase/decrease font size globally.
 #+begin_src emacs-lisp
   (use-package default-text-scale
-    :config (setq default-text-scale-mode t))
+    :custom (default-text-scale-mode t))
 #+end_src
 ** play nice with parentheses
 #+begin_src emacs-lisp
@@ -158,7 +158,7 @@ insert matching parentheses and jump across them
 #+begin_src emacs-lisp
   (use-package evil-smartparens
     :after evil
-    :hook ((prog-mode markdown-mode org-mode) . evil-smartparens-mode))
+    :hook (prog markdown org))
 #+end_src
 * browsing the documentation
 ** helpful
@@ -186,8 +186,7 @@ Insert demos after describe function https://github.com/xuchunyang/elisp-demos
 matching parenthesis are highlighted with rainbow colours.
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
-    :config
-    :hook ((prog-mode LaTeX-mode) . rainbow-delimiters-mode))
+    :hook prog-mode LaTeX-mode)
 #+end_src
 ** set the theme
 *** COMMENT clean up previous theme
@@ -220,12 +219,12 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
 *** circadian: dark theme at night, light theme during the day
 #+begin_src emacs-lisp
   (use-package circadian
-    :ensure t
+    :custom
+    (calendar-latitude 52.08)
+    (calendar-longitude 5.11)
+    (circadian-themes '((:sunrise . modus-operandi)
+                        (:sunset  . modus-vivendi)))
     :config
-    (setq calendar-latitude 52.08)
-    (setq calendar-longitude 5.11)
-    (setq circadian-themes '((:sunrise . modus-operandi)
-                             (:sunset  . modus-vivendi)))
     (circadian-setup))
 #+end_src
 ** set variable font
@@ -257,11 +256,11 @@ from https://karthinks.com/software/batteries-included-with-emacs/
 This allows me to write nicely on a widescreen monitor in a single buffer.
 #+begin_src emacs-lisp
   (use-package visual-fill-column
-    :hook (visual-line-mode . visual-fill-column-mode)
-    :config
-    (setq-default visual-fill-column-width 115
-                  split-window-preferred-function 'visual-fill-column-split-window-sensibly
-                  visual-fill-column-center-text t))
+    :hook visual-line
+    :custom
+    (visual-fill-column-width 115)
+    (split-window-preferred-function 'visual-fill-column-split-window-sensibly)
+    (visual-fill-column-center-text t))
 #+end_src
 * version control
 ** diff-hl
@@ -279,9 +278,7 @@ git porcelain, essential!
 #+begin_src emacs-lisp
   (use-package magit
     :commands magit-status
-    :after with-editor
-    :bind
-    ("M-g" . magit-status))
+    :after with-editor)
 #+end_src
 * custom functions/keyboard shortcuts
 ** revert buffer
@@ -514,85 +511,83 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
          (before-save . zp/org-set-last-modified)
          (org-capture-prepare-finalize . zp/org-capture-set-created-property))
 #+end_src
+** start with custom!
+#+begin_src emacs-lisp
+  :custom
+#+end_src
+*** org-latex export settings
+basic latex settings
+#+begin_src emacs-lisp
+  (setq org-highlight-latex-and-related '(native script entities))
+  (setq org-preview-latex-default-program 'imagemagick)
+  ;; (setq org-latex-default-figure-position 'htbp)
+  (setq org-latex-pdf-process
+        (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
+  (setq org-latex-prefer-user-labels t)
+  (customize-set-value 'org-latex-hyperref-template "
+  \\hypersetup{\n pdfauthor={%a},\n pdftitle={%t},\n pdfkeywords={%k},
+   pdfsubject={%d},\n pdfcreator={%c},\n pdflang={%L},\n colorlinks=true}\n")
+#+end_src
+*** org-entities-user
+These are nice shorthands for commands I use often. In org-source they look
+nice, and they export to both \LaTeX and =html= correctly. Note that
+unfortunately, special entity names cannot contain numerics, so =\d18O= is not
+possible.
+#+begin_src emacs-lisp
+  (setq org-entities-user
+        '(("celsius" "\\(^{\\circ}\\)C" nil "&deg;C" "°C" "°C" "℃")
+          ("minus" "\\-" t "&minus;" "-" "-" "−")  ;; defaults to =\\minus= in LaTeX, which doesn't work.
+          ("permil" "\\textperthousand{}" nil "&permil;" "per thousand" "per thousand" "‰")  ;; exactly the same as in org-entities
+          ("us" "\\," nil "&nbsp;" " " " " " ")
+          ("appr" "\\sim" t "&tilde;" "~" "~" "~")
+          ;; for gps-coordinates
+          ("degree" "^{\\circ}" t "&deg;" "°" "°" "°")
+          ("arcminute" "^{'}" t "&prime;" "'" "′" "′")
+          ("arcsecond" "^{''}" t "&Prime;" "\"" "″" "″")))
+#+end_src
 ** basics
 #+begin_src emacs-lisp
-  :config
-  (setq org-ctrl-k-protect-subtree t)
-  (setq org-return-follows-link t)
+  (org-ctrl-k-protect-subtree t)
+  (org-return-follows-link t)
   ;; (setf org-special-ctrl-a/e t) ; I use evil's 0 and $ anyway
   ;; folded drawers no longer ruin new entries
-  (setq org-M-RET-may-split-line '((default . nil)))
-  (setq org-display-remote-inline-images 'cache
-        org-startup-with-inline-images t)
+  (org-M-RET-may-split-line '((default . nil)))
+  (org-display-remote-inline-images 'cache)
+  (org-startup-with-inline-images t)
 #+end_src
 ** clocking/logging
 #+begin_src emacs-lisp
-  (setq org-check-running-clock t
-        org-log-note-clock-out t
-        org-log-done 'time
-        org-log-into-drawer t
-        ;; org-clock-auto-clockout-timer (* 10 60)
-        )
+  (org-check-running-clock t)
+  (org-log-note-clock-out t)
+  (org-log-done 'time)
+  (org-log-into-drawer t)
+  ;; (org-clock-auto-clockout-timer (* 10 60))
 #+end_src
 ** theming
 #+begin_src emacs-lisp
-  (setf org-tags-column -65)
-  (setq org-startup-indented t
-        org-startup-folded 'content
-        org-agenda-block-separator ""
-        org-fontify-emphasized-text t
+  (org-tags-column -65)
+  (org-startup-indented t)
+  (org-startup-folded 'content)
+  (org-agenda-block-separator "")
+  (org-fontify-emphasized-text t)
         ;; org-fontify-todo-headline t ;; might be nice, but needs customisation of org-headline-todo face
-        org-fontify-whole-heading-line t
-        org-fontify-quote-and-verse-blocks t
-        org-pretty-entities nil
-        org-ellipsis "…" ;▼ … ◦
-        org-hide-emphasis-markers t)
+  (org-fontify-whole-heading-line t)
+  (org-fontify-quote-and-verse-blocks t)
+  (org-pretty-entities nil)
+  (org-ellipsis "…") ;▼ … ◦
+  (org-hide-emphasis-markers t)
 #+end_src
-*** org-superstar-mode
-https://github.com/integral-dw/org-superstar-mode
-
-Here are some symbol options for my various todo-states
-NEXT: ☐
-DONE: ☑🗹
-TICK: →🗓📅📆
-WAIT: ☕…
-SOME: ☁⛅⛈🌤🌧🌥🌪⛱☼
-CANC: ❌☒✗⮽🗳🗵🗷✘╳❌
-
-see e.g. https://emojipedia.org/calendar/ for emoji!
-
-#+begin_src emacs-lisp
-  (use-package org-superstar
-    :hook
-    (org-mode . (lambda () (org-superstar-mode 1)))
-    :config
-    (setq org-superstar-headline-bullets-list
-          '("◉" "●" "○" "♦" "◆" "►" "▸"))
-    (setq org-superstar-todo-bullet-alist '(("NEXT" " ☐" ?☐)
-                                            ("TICK" " 🗓" ?🗓)
-                                            ("WAIT" " …" ?…)
-                                            ("SOME" " ☼" ?☼)
-                                            ("DONE" " ☑" ?☑)
-                                            ("CANC" " ❌" ?❌)))
-    (setq org-superstar-special-todo-items t))
-#+end_src
-
 ** file associations
 #+begin_src emacs-lisp
-  (setq org-file-apps
-        '((auto-mode . emacs)
-          ("\\.x?html?\\'" . "xdg-open %s")
-          ("\\.pdf\\'" . (lambda (file link)
-                           (org-pdfview-open link)))
-          ("\\.mp4\\'" . "xdg-open %s")
-          ("\\.webm\\'" . "xdg-open %s")
-          ("\\.mkv\\'" . "xdg-open %s")
-          ("\\.pdf.xoj\\'" . "xournal %s")))
-#+end_src
-
-** org-protocol
-#+begin_src emacs-lisp
-  (require 'org-protocol)
+  (org-file-apps
+   '((auto-mode . emacs)
+     ("\\.x?html?\\'" . "xdg-open %s")
+     ("\\.pdf\\'" . (lambda (file link)
+                      (org-pdfview-open link)))
+     ("\\.mp4\\'" . "xdg-open %s")
+     ("\\.webm\\'" . "xdg-open %s")
+     ("\\.mkv\\'" . "xdg-open %s")
+     ("\\.pdf.xoj\\'" . "xournal %s")))
 #+end_src
 
 ** COMMENT org-yt
@@ -626,46 +621,46 @@ https://emacs.stackexchange.com/questions/42281/org-mode-is-it-possible-to-displ
 *** org-agenda
 #+begin_src emacs-lisp
   ;; (setq org-agenda-files (list "<file1.org> etc."))
-  (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
-  (setq org-deadline-warning-days 14)
+  (calendar-week-start-day 1) ; 0:Sunday, 1:Monday
+  (org-deadline-warning-days 14)
   ;; exclude scheduled items from all todo's in list
-  (setq org-agenda-todo-ignore-scheduled t)
+  (org-agenda-todo-ignore-scheduled t)
   ;; (setq org-agenda-todo-ignore-deadlines t)
   ;; (setq org-agenda-todo-ignore-timestamp t)
   ;; (setq org-agenda-todo-ignore-with-date t)
   ;;(setq org-agenda-prefix-format "  %-17:c%?-12t% s") ; TODO: see if I like the default
-  (setq org-agenda-include-all-todo nil)
+  (org-agenda-include-all-todo nil)
 #+end_src
 *** agenda files
 all the org-files in my org-directory
 #+begin_src emacs-lisp
   ;(setq org-directory "~/org/") ;; changed for org-roam capture
-  (setq org-agenda-files (append
-                          (directory-files-recursively "~/org" "\\.org$")
-                          (directory-files-recursively "~/SurfDrive/bibliography/notes/daily" "\\.org$")))
+  (org-agenda-files (append
+                     (directory-files-recursively "~/org" "\\.org$")
+                     (directory-files-recursively "~/SurfDrive/bibliography/notes/daily" "\\.org$")))
 #+end_src
 *** refile targets
 swyper makes refiling amazing!
 #+begin_src emacs-lisp
-  (setq org-refile-targets (quote ((nil :maxlevel . 9)  ;; current file
+  (org-refile-targets (quote ((nil :maxlevel . 9)  ;; current file
                                    (org-gtd-file :maxlevel . 3)
                                    (org-tickler-file :maxlevel . 2)
                                    (org-notes-file :maxlevel . 2)
                                    (org-lists-file :maxlevel . 2)
                                    (org-someday-file :maxlevel . 2)
                                    (org-clumped-file :maxlevel . 4))))
-  (setq org-outline-path-complete-in-steps nil)   ;; Refile in a single go
-  (setq org-refile-use-outline-path t)            ;; Show full paths for refiling
+  (org-outline-path-complete-in-steps nil)   ;; Refile in a single go
+  (org-refile-use-outline-path t)            ;; Show full paths for refiling
 #+end_src
 *** agenda filters
 Filter tasks by context (sorted by todo state)
 #+begin_src emacs-lisp
-  (setq org-agenda-sorting-strategy
+  (org-agenda-sorting-strategy
         '((agenda habit-down time-up priority-down todo-state-up category-keep)
           (todo todo-state-up priority-down category-keep)
           (tags priority-down todo-state-up category-keep)
           (search category-keep)))
-  (setq org-agenda-custom-commands
+  (org-agenda-custom-commands
         '(("i" "Inbox" tags "in")
           ("I" "Important"
            ((tags "PRIORITY=\"A\"/PROJ"
@@ -711,66 +706,99 @@ Filter tasks by context (sorted by todo state)
           ("pf" "FEST" tags-todo "FEST")
           ("pi" "Inigo" tags-todo "Inigo")))
 #+end_src
-*** display PROPERTIES in agenda
-#+begin_src emacs-lisp
-  (use-package org-agenda-property
-    :config
-    (setq org-agenda-property-list '("DELEGATED_TO"))
-    (setq org-agenda-property-position 'next-line))
-#+end_src
 *** stuck projects
 #+begin_src emacs-lisp
-  (setq org-tags-exclude-from-inheritance '("prj")
-        org-stuck-projects '("+prj/-CANC-SOME-DONE"
-                             ("NEXT" "WAIT" "TICK") ()))  ;;  "SOME"
+  (org-tags-exclude-from-inheritance '("prj")
+                                     org-stuck-projects '("+prj/-CANC-SOME-DONE"
+                                                          ("NEXT" "WAIT" "TICK") ()))  ;;  "SOME"
 #+end_src
 *** capture templates
 customize capture templates
  #+begin_src emacs-lisp
-   (setq org-capture-templates
-         '(;("a" "Appointment" entry (file org-in-file)
-           ; "* %?\n  %^T\n")
-           ("t" "Todo" entry (file org-in-file)
-            "* %?\n%a" :add-created t)
-           ("x" "simple" entry (file org-in-file)
-            "* %?" :add-created t)
-           ("T" "Todo-nolink-tag" entry (file org-in-file)
-            "* %? %^G\n" :add-created t)
-           ("m" "Email" entry (file org-in-file)
-            "* %? from %:from on %:subject :@email:\n %i\n %a\n" :add-created t)
-           ("w" "Website" entry (file org-in-file)
-            "* %?\nEntered on %U\n %i\n %a")
-           ("r" "Weekly Review" entry (file "~/org/log.org")
-            (file "~/org/weekly_review.org") :clock-in t :clock-keep t)
-           ("p" "Protocol" entry (file org-in-file)
-            "* %:description%? :@web:\n[[%:link][%:description]]\n#+BEGIN_QUOTE\n%:initial\n#+END_QUOTE\n" :add-created t)
-           ("L" "Protocol Link" entry (file org-in-file)
-            "* %:description%? :@web:\n[[%:link][%:description]]" :add-created t)
-           ("j" "Journal" entry (file+olp+datetree org-journal-file)
-            "* %?\nEntered on %U\n %i\n %a")))
+   (org-capture-templates
+    '(;("a" "Appointment" entry (file org-in-file)
+                                           ; "* %?\n  %^T\n")
+      ("t" "Todo" entry (file org-in-file)
+       "* %?\n%a" :add-created t)
+      ("x" "simple" entry (file org-in-file)
+       "* %?" :add-created t)
+      ("T" "Todo-nolink-tag" entry (file org-in-file)
+       "* %? %^G\n" :add-created t)
+      ("m" "Email" entry (file org-in-file)
+       "* %? from %:from on %:subject :@email:\n %i\n %a\n" :add-created t)
+      ("w" "Website" entry (file org-in-file)
+       "* %?\nEntered on %U\n %i\n %a")
+      ("r" "Weekly Review" entry (file "~/org/log.org")
+       (file "~/org/weekly_review.org") :clock-in t :clock-keep t)
+      ("p" "Protocol" entry (file org-in-file)
+       "* %:description%? :@web:\n[[%:link][%:description]]\n#+begin_quote\n%:initial\n#+end_quote\n" :add-created t)
+      ("L" "Protocol Link" entry (file org-in-file)
+       "* %:description%? :@web:\n[[%:link][%:description]]" :add-created t)
+      ("j" "Journal" entry (file+olp+datetree org-journal-file)
+       "* %?\nEntered on %U\n %i\n %a")))
  #+end_src
-
- #+RESULTS:
- | t | Todo | entry | (file org-in-file) | * %? |
-
+*** TODO states
+#+begin_src emacs-lisp
+  (org-todo-keywords
+   '((sequence "NEXT(n)" "WAIT(w!/!)" "TICK(t)" "SOME(s!/!)" "|"
+               "DONE(d)" "CANC(c)")))
+  ;; prettify the todo keywords
+  (org-todo-keyword-faces
+   '(("NEXT" . (:family "Iosevka" :foreground "light goldenrod yellow" :background "red" :weight bold))
+     ("WAIT" . (:family "Iosevka" :foreground "dim gray" :background "yellow"))
+     ("TICK" . (:family "Iosevka" :background "light slate blue"))
+     ("SOME" . (:family "Iosevka" :foreground "ghost white"  :background "deep sky blue"))
+     ("DONE" . (:family "Iosevka" :foreground "green4"       :background "pale green"))
+     ("CANC" . (:family "Iosevka" :foreground "dim gray"     :background "gray"))))
+#+end_src
+*** context tags
+#+begin_src emacs-lisp
+  (org-fast-tag-selection-single-key t)
+  (org-tag-alist '(("prj" . ?j)
+                   (:startgroup . nil)
+                   ("@home" . ?h)
+                   ("@office" . ?o)
+                   ("@errands" . ?e)
+                   ("@lab" . ?l)
+                   (:endgroup . nil)
+                   ("@computer" . ?c)  ;; general in case I can't decide
+                   ("@klusje" . ?k)    ;; crafts, things that require my toolbox
+                   ("@phone" . ?B)     ;; b for Dutch "bellen"
+                   ("@email" . ?m)
+                   ("@teams" . ?t)
+                   ("@bank" . ?b)      ;; I need my little reader thingie
+                   ("@write" . ?w)
+                   ("@program" . ?p)
+                   ("@createplot" . ?C)
+                   ("@read" . ?r)
+                   ("@research" . ?g)
+                   ("@schedule" . ?s)
+                   ("@agenda" . ?a)    ;; things to discuss
+                   ;; ("@admin" . ??) ;; do I want admin? which key should it use?
+                   (:startgroup . nil)
+                   ("@focus" . ?f)
+                   ("@braindead" . ?d)
+                   (:endgroup . nil)
+                   (:startgroup . nil)
+                   ("Work" . ?W) ("Personal" . ?P)
+                   (:endgroup . nil)
+                   ;; tags to accompany the @agenda context
+                   ("Family" . ?F) ("Martin" . ?M) ("Luc" . ?L) ("Inigo" . ?I) ("Niels" . ?N)))
+#+end_src
+*** org src blocks
+#+begin_src emacs-lisp
+  (org-src-fontify-natively t)
+  (org-src-tab-acts-natively t)
+  (org-src-window-setup 'current-window)
+#+end_src
+*** config start
+#+begin_src emacs-lisp
+  :config
+#+end_src
 *** quick-capture
 #+begin_src emacs-lisp
   (define-key global-map (kbd "C-c h")
   (lambda () (interactive) (org-capture nil "x")))
-#+end_src
-*** TODO states
-#+begin_src emacs-lisp
-  (setq org-todo-keywords
-        '((sequence "NEXT(n)" "WAIT(w!/!)" "TICK(t)" "SOME(s!/!)" "|"
-                    "DONE(d)" "CANC(c)")))
-  ;; prettify the todo keywords
-  (setq org-todo-keyword-faces
-        '(("NEXT" . (:family "Iosevka" :foreground "light goldenrod yellow" :background "red" :weight bold))
-          ("WAIT" . (:family "Iosevka" :foreground "dim gray" :background "yellow"))
-          ("TICK" . (:family "Iosevka" :background "light slate blue"))
-          ("SOME" . (:family "Iosevka" :foreground "ghost white"  :background "deep sky blue"))
-          ("DONE" . (:family "Iosevka" :foreground "green4"       :background "pale green"))
-          ("CANC" . (:family "Iosevka" :foreground "dim gray"     :background "gray"))))
 #+end_src
 *** effort estimates
 #+begin_src emacs-lisp
@@ -780,40 +808,6 @@ customize capture templates
 *** habits
 #+begin_src emacs-lisp
   (add-to-list 'org-modules 'org-habit t)
-#+end_src
-*** context tags
-#+begin_src emacs-lisp
-  (setq org-fast-tag-selection-single-key t)
-  (setq org-tag-alist '(("prj" . ?j)
-                        (:startgroup . nil)
-                        ("@home" . ?h)
-                        ("@office" . ?o)
-                        ("@errands" . ?e)
-                        ("@lab" . ?l)
-                        (:endgroup . nil)
-                        ("@computer" . ?c)  ;; general in case I can't decide
-                        ("@klusje" . ?k)    ;; crafts, things that require my toolbox
-                        ("@phone" . ?B)     ;; b for Dutch "bellen"
-                        ("@email" . ?m)
-                        ("@teams" . ?t)
-                        ("@bank" . ?b)      ;; I need my little reader thingie
-                        ("@write" . ?w)
-                        ("@program" . ?p)
-                        ("@createplot" . ?C)
-                        ("@read" . ?r)
-                        ("@research" . ?g)
-                        ("@schedule" . ?s)
-                        ("@agenda" . ?a)    ;; things to discuss
-                        ;; ("@admin" . ??) ;; do I want admin? which key should it use?
-                        (:startgroup . nil)
-                        ("@focus" . ?f)
-                        ("@braindead" . ?d)
-                        (:endgroup . nil)
-                        (:startgroup . nil)
-                        ("Work" . ?W) ("Personal" . ?P)
-                        (:endgroup . nil)
-                        ;; tags to accompany the @agenda context
-                        ("Family" . ?F) ("Martin" . ?M) ("Luc" . ?L) ("Inigo" . ?I) ("Niels" . ?N)))
 #+end_src
 ** exporting
 *** org-babel languages
@@ -844,36 +838,6 @@ org-export ignore headlines with ~:ignore:~ tag
 #+begin_src emacs-lisp
   (require 'ox-latex)
 #+end_src
-*** org-latex export settings
-basic latex settings
-#+begin_src emacs-lisp
-  (setq org-highlight-latex-and-related '(native script entities))
-  (setq org-preview-latex-default-program 'imagemagick)
-  ;; (setq org-latex-default-figure-position 'htbp)
-  (setq org-latex-pdf-process
-        (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
-  (setq org-latex-prefer-user-labels t)
-  (customize-set-value 'org-latex-hyperref-template "
-  \\hypersetup{\n pdfauthor={%a},\n pdftitle={%t},\n pdfkeywords={%k},
-   pdfsubject={%d},\n pdfcreator={%c},\n pdflang={%L},\n colorlinks=true}\n")
-#+end_src
-*** org-entities-user
-These are nice shorthands for commands I use often. In org-source they look
-nice, and they export to both \LaTeX and =html= correctly. Note that
-unfortunately, special entity names cannot contain numerics, so =\d18O= is not
-possible.
-#+begin_src emacs-lisp
-  (setq org-entities-user
-        '(("celsius" "\\(^{\\circ}\\)C" nil "&deg;C" "°C" "°C" "℃")
-          ("minus" "\\-" t "&minus;" "-" "-" "−")  ;; defaults to =\\minus= in LaTeX, which doesn't work.
-          ("permil" "\\textperthousand{}" nil "&permil;" "per thousand" "per thousand" "‰")  ;; exactly the same as in org-entities
-          ("us" "\\," nil "&nbsp;" " " " " " ")
-          ("appr" "\\sim" t "&tilde;" "~" "~" "~")
-          ;; for gps-coordinates
-          ("degree" "^{\\circ}" t "&deg;" "°" "°" "°")
-          ("arcminute" "^{'}" t "&prime;" "'" "′" "′")
-          ("arcsecond" "^{''}" t "&Prime;" "\"" "″" "″")))
-#+end_src
 *** latejx class =ijkarticle=
 #+begin_src emacs-lisp
   (add-to-list 'org-latex-classes
@@ -886,12 +850,10 @@ possible.
                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 #+end_src
-*** org source code block settings
+*** add emacs and R source blocks
 [[https://emacs.stackexchange.com/a/47370/9748][Nice answer on how to have point on a blank line in code block]]
 #+begin_src emacs-lisp
-  (setq org-src-fontify-natively t
-        org-src-tab-acts-natively t
-        org-src-window-setup 'current-window)
+
   (add-to-list 'org-structure-template-alist
                '("se" . "src emacs-lisp
   "))
@@ -900,10 +862,51 @@ possible.
                '("sr" . "src R
   "))
 #+end_src
+** org-protocol
+#+begin_src emacs-lisp
+  (require 'org-protocol)
+#+end_src
+
 ** close use-package org
 #+begin_src emacs-lisp
   )
 #+end_src
+** display PROPERTIES in agenda
+#+begin_src emacs-lisp
+  (use-package org-agenda-property
+    :custom
+    (org-agenda-property-list '("DELEGATED_TO"))
+    (org-agenda-property-position 'next-line))
+#+end_src
+** org-superstar-mode
+https://github.com/integral-dw/org-superstar-mode
+
+Here are some symbol options for my various todo-states
+NEXT: ☐
+DONE: ☑🗹
+TICK: →🗓📅📆
+WAIT: ☕…
+SOME: ☁⛅⛈🌤🌧🌥🌪⛱☼
+CANC: ❌☒✗⮽🗳🗵🗷✘╳❌
+
+see e.g. https://emojipedia.org/calendar/ for emoji!
+
+#+begin_src emacs-lisp
+  (use-package org-superstar
+    :hook
+    (org-mode . (lambda () (org-superstar-mode 1)))
+    :custom
+    (org-superstar-headline-bullets-list
+     '("◉" "●" "○" "♦" "◆" "►" "▸"))
+    (org-superstar-todo-bullet-alist '(("NEXT" " ☐" ?☐)
+                                       ("TICK" " 🗓" ?🗓)
+                                       ("WAIT" " …" ?…)
+                                       ("SOME" " ☼" ?☼)
+                                       ("DONE" " ☑" ?☑)
+                                       ("CANC" " ❌" ?❌)))
+    (org-superstar-special-todo-items t))
+#+end_src
+
 ** ob-async
 allow asyncronous code block evaluation https://github.com/astahlman/ob-async
 #+begin_src emacs-lisp
@@ -917,9 +920,10 @@ got the function from this [[https://github.com/marcinkoziej/org-pomodoro/issues
     :after org
     :bind ("C-c p" . org-pomodoro)
     :hook (org-pomodoro-break-finished-hook . org-pomodoro-prompt)
+    :custom
+    (org-pomodoro-manual-break t)
+    (org-pomodoro-long-break-length 15)
     :config
-    (setq org-pomodoro-manual-break t)
-    (setq org-pomodoro-long-break-length 15)
     (defun org-pomodoro-prompt ()
       (interactive)
       (org-clock-goto)
@@ -959,10 +963,10 @@ auto-toggle latex fragments
 #+begin_src emacs-lisp
   (use-package org-fragtog
     :after org
-    :hook (org-mode . org-fragtog-mode)
-    :config
-    (setq org-startup-with-latex-preview t)
-    (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5)))
+    :hook org
+    :custom
+    (org-startup-with-latex-preview t)
+    (org-format-latex-options (plist-put org-format-latex-options :scale 1.5)))
 #+end_src
 ** org-appear
 dive into links/formatted entries
@@ -970,10 +974,10 @@ https://github.com/awth13/org-appear
 #+begin_src emacs-lisp
   (use-package org-appear
     ;; :straight (org-appear :type git :host github :repo "awth13/org-appear")
-    :hook (org-mode . org-appear-mode)
-    :config
-    (setq org-appear-autolinks t
-          org-appear-autosubmarkers t))
+    :hook org
+    :custom
+    (org-appear-autolinks t)
+    (org-appear-autosubmarkers t))
 #+end_src
 ** deft
 :LOGBOOK:
@@ -1052,13 +1056,13 @@ https://github.com/domtronn/all-the-icons.el
 #+begin_src emacs-lisp
   (use-package all-the-icons-dired
     :after (dired all-the-icons)
-    :hook (dired-mode . all-the-icons-dired-mode))
+    :hook dired)
 #+end_src
 ** COMMENT emojify-mode
 #+begin_src emacs-lisp
   (use-package emojify
-    :config (setq emojify-emoji-styles 'unicode)
-    :hook ((mu4e-mode mu4e-view-mode mu4e-compse-mode org-mode) . emojify-mode))
+    :custom (emojify-emoji-styles 'unicode)
+    :hook (mu4e mu4e-view mu4e-compse org))
 #+end_src
 ** yasnippet
 usefull snippets for me: org-mode (fig_, )
@@ -1107,21 +1111,22 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
           bibtex-completion-pdf-open-function 'org-open-file)
     :bind
     (:map org-mode-map ("C-c ]" . org-ref-ivy-insert-cite-link))
+    :custom
+    (bibtex-autokey-year-length 4)
+    (bibtex-autokey-name-year-separator "")
+    (bibtex-autokey-year-title-separator "-")
+    (bibtex-autokey-titleword-separator "-")
+    (bibtex-autokey-titlewords 0)
+    (bibtex-autokey-titlewords-stretch 1)
+    (bibtex-autokey-titleword-length 5)
     :config
-    (require 'org-ref)
     ;; (require 'doi-utils)
     ;; (require 'org-id)
     ;; (require 'org-ref-wos)
     ;; (require 'org-ref-scopus)
     ;; (require 'org-ref-pubmed)
     ;; (require 'org-ref-sci-id)
-    (setq bibtex-autokey-year-length 4
-          bibtex-autokey-name-year-separator ""
-          bibtex-autokey-year-title-separator "-"
-          bibtex-autokey-titleword-separator "-"
-          bibtex-autokey-titlewords 0
-          bibtex-autokey-titlewords-stretch 1
-          bibtex-autokey-titleword-length 5))
+    (require 'org-ref))
 #+end_src
 *** open zotero pdf at point
 from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-mendeley-jabref-and-zotero-users][the manual]]
@@ -1176,9 +1181,9 @@ https://github.com/hlissner/evil-snipe
     :load-path "/usr/share/emacs/site-lisp/pdf-tools"
     :init
     (pdf-tools-install)
-    :config
+    :custom
     ;(pdf-loader-install)
-    (setq-default pdf-view-display-size 'fit-width)
+    (pdf-view-display-size 'fit-width)
     :bind
     ;; swiper doesn't play nice with pdf-tools, so I disable it.
     (:map pdf-view-mode-map ("C-s" . isearch-forward)))
@@ -1192,16 +1197,15 @@ https://github.com/weirdNox/org-noter
            (:map org-noter-notes-mode-map
                  ("C-c k" . org-noter-create-skeleton)
                  ("C-c q" . org-noter-kill-session)))
-    :config
-    (setq
-     ;; org-noter-notes-window-location 'horizontal-split
+    :custom
+    ;; org-noter-notes-window-location 'horizontal-split
      ;; Please stop opening frames
-     org-noter-always-create-frame nil
-     org-noter-kill-frame-at-session-end nil
+     (org-noter-always-create-frame nil)
+     (org-noter-kill-frame-at-session-end nil)
      ;; I want to see the whole file
-     org-noter-hide-other nil
+     (org-noter-hide-other nil)
      ;; Everything is relative to the main notes file
-     org-noter-notes-search-path (list org_notes)))
+     (org-noter-notes-search-path (list org_notes)))
 #+end_src
 *** org-noter-insert-precice-note-dwim---stolen from zaeph
 https://github.com/zaeph/.emacs.d/blob/master/init.el#L4420
@@ -1246,20 +1250,21 @@ https://github.com/zaeph/.emacs.d/blob/master/init.el#L4420
                  :map evil-normal-state-map ;; is there an evil map within org-mode?
                  ("g[" . org-roam-dailies-find-previous-note)
                  ("g]" . org-roam-dailies-find-next-note)))
+    :custom
+    (org-roam-verbose nil) ; https://youtu.be/fn4jIlFwuLU
+    (org-roam-buffer-no-delete-other-windows t) ; make org-roam buffer sticky
+    (org-roam-capture-templates '(("d" "default" plain #'org-roam-capture--get-point "%?"
+                                   :file-name "%<%Y%m%d%H%M%S>-${slug}"
+                                   :head "#+title: ${title}\n#+created: %U\n#+last_modified:\n#+roam_tags:\n\n"
+                                   :unnarrowed t)))
+    (org-roam-dailies-capture-templates
+     '(("d" "default" entry #'org-roam-capture--get-point
+        "* %?"
+        :add-created t
+        :file-name "daily/%<%Y-%m-%d>"
+        :head "#+title: %<%Y-%m-%d>\n#+created: %u\n#+last_modified: %U\n#+roam_tags: dailies\n\n")))
     :config
-    (require 'org-roam-capture)
-    (setq org-roam-verbose nil  ; https://youtu.be/fn4jIlFwuLU
-          org-roam-buffer-no-delete-other-windows t ; make org-roam buffer sticky
-          org-roam-capture-templates '(("d" "default" plain #'org-roam-capture--get-point "%?"
-                                        :file-name "%<%Y%m%d%H%M%S>-${slug}"
-                                        :head "#+title: ${title}\n#+created: %U\n#+last_modified:\n#+roam_tags:\n\n"
-                                        :unnarrowed t))
-          org-roam-dailies-capture-templates
-          '(("d" "default" entry #'org-roam-capture--get-point
-             "* %?"
-             :add-created t
-             :file-name "daily/%<%Y-%m-%d>"
-             :head "#+title: %<%Y-%m-%d>\n#+created: %u\n#+last_modified: %U\n#+roam_tags: dailies\n\n"))))
+    (require 'org-roam-capture))
 #+end_src
 ** org-roam-create-note-from-headline
 https://org-roam.discourse.group/t/creating-an-org-roam-note-from-an-existing-headline/978
@@ -1389,21 +1394,20 @@ https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
 #+begin_src emacs-lisp
   (use-package org-roam-bibtex
     :after (org-roam)
-    :hook (org-roam-mode . org-roam-bibtex-mode)
+    :hook org-roam
     :bind (:map org-mode-map
                 (("C-c n a" . orb-note-actions)))
-    :config
-    (setq orb-preformat-keywords
-          '("citekey" "title" "url" "author-or-editor" "keywords" "file")
-          orb-process-file-field t
-          orb-file-field-extensions "pdf")
-
-    (setq orb-templates
-          '(("r" "ref" plain (function org-roam-capture--get-point)
-             ""
-             :add-created t
-             :file-name "${citekey}"
-             :head "#+title: ${citekey}: ${title}\n#+roam_key: ${ref}\n#+created: %u\n#+last_modified: %U\n#+roam_tags: articles\n
+    :custom
+    (orb-preformat-keywords
+     '("citekey" "title" "url" "author-or-editor" "keywords" "file"))
+    (orb-process-file-field t)
+    (orb-file-field-extensions "pdf")
+    (orb-templates
+     '(("r" "ref" plain (function org-roam-capture--get-point)
+        ""
+        :add-created t
+        :file-name "${citekey}"
+        :head "#+title: ${citekey}: ${title}\n#+roam_key: ${ref}\n#+created: %u\n#+last_modified: %U\n#+roam_tags: articles\n
 
   - related ::
   - keywords :: ${keywords}
@@ -1442,18 +1446,18 @@ https://github.com/org-roam/org-roam-server
     :after org-roam
     :bind (:map org-roam-mode-map
                 (("C-c n G" . org-roam-server-mode)))
-    :config
-    (setq org-roam-server-host "127.0.0.1"
-          org-roam-server-port 8080
-          org-roam-server-authenticate nil
-          org-roam-server-export-inline-images t
-          org-roam-server-serve-files nil
-          org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
-          org-roam-server-network-poll t
-          org-roam-server-network-arrows nil
-          org-roam-server-network-label-truncate t
-          org-roam-server-network-label-truncate-length 60
-          org-roam-server-network-label-wrap-length 20))
+    :custom
+    (org-roam-server-host "127.0.0.1")
+    (org-roam-server-port 8080)
+    (org-roam-server-authenticate nil)
+    (org-roam-server-export-inline-images t)
+    (org-roam-server-serve-files nil)
+    (org-roam-server-served-file-extensions '("pdf" "mp4" "ogv"))
+    (org-roam-server-network-poll t)
+    (org-roam-server-network-arrows nil)
+    (org-roam-server-network-label-truncate t)
+    (org-roam-server-network-label-truncate-length 60)
+    (org-roam-server-network-label-wrap-length 20))
 #+end_src
 * playing videos
 ** emms for playing youtube videos etc.
@@ -1472,11 +1476,10 @@ https://github.com/org-roam/org-roam-server
   (use-package org-media-note
     :quelpa (org-media-note :fetcher github :repo "yuchen-lea/org-media-note")
     :ensure nil
-    :hook (org-mode .  org-media-note-mode)
+    :hook org
     :bind (("C-c v" . org-media-note-hydra/body))  ;; Main entrance
-    :config
-    ;; (require 'org-attach)
-    (setq org-media-note-screenshot-image-dir "~/SurfDrive/bibliography/notes/imgs/"))
+    :custom
+    (org-media-note-screenshot-image-dir "~/SurfDrive/bibliography/notes/imgs/"))
 #+end_src
 
 ** COMMENT mpv
@@ -1503,8 +1506,9 @@ very nice search replacement
     :diminish ivy-mode
     :config
     (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
-    (setq ivy-use-virtual-buffers t
-          ivy-count-format "(%d/%d) ")
+    :custom
+    (ivy-use-virtual-buffers t)
+    (ivy-count-format "(%d/%d) ")
     :bind
     ("\C-s" . swiper)
     ("C-c C-r" . ivy-resume)
@@ -1546,8 +1550,8 @@ very nice search replacement
   (use-package dired
     :commands dired
     :ensure nil
-    :config
-    (setq dired-listing-switches "-lh"))
+    :custom
+    (dired-listing-switches "-lh"))
 #+end_src
 ** ranger
 #+begin_src emacs-lisp
@@ -1573,9 +1577,9 @@ perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collec
 #+begin_src emacs-lisp
   (use-package calfw)
   (use-package calfw-org
-    :config
-    (setq cfw:display-calendar-holidays nil
-          calendar-week-start 1)
+    :custom
+    (cfw:display-calendar-holidays nil)
+    (calendar-week-start 1)
     :bind
     ("C-c o" . cfw:open-org-calendar))
 #+end_src
@@ -1615,20 +1619,20 @@ See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for 
 #+begin_src emacs-lisp
   (use-package smtpmail
     :ensure nil
-    :config
-    (setq message-send-mail-function 'smtpmail-send-it
-          send-mail-function 'smtpmail-send-it
-          user-mail-address "<your-email-address>"
-          smtpmail-default-smtp-server "<your-smtp-server>"
-          smtpmail-smtp-server "<your-smtp-server>"
-          smtpmail-smtp-service 587
-          smtp-stream-type 'starttls
-          smtpmail-smtp-user "<your-user-id>"
-          smtpmail-starttls-credentials
-          '(("<your-smtp-server>" 587 "<possibly-domain>/<your-user-id>" nil))
-          starttls-use-gnutls t
-          starttls-gnutls-program "gnutls-cli"
-          starttls-extra-args nil))
+    :custom
+    (message-send-mail-function 'smtpmail-send-it)
+    (send-mail-function 'smtpmail-send-it)
+    (user-mail-address "<your-email-address>")
+    (smtpmail-default-smtp-server "<your-smtp-server>")
+    (smtpmail-smtp-server "<your-smtp-server>")
+    (smtpmail-smtp-service 587)
+    (smtp-stream-type 'starttls)
+    (smtpmail-smtp-user "<your-user-id>")
+    (smtpmail-starttls-credentials
+     '(("<your-smtp-server>" 587 "<possibly-domain>/<your-user-id>" nil)))
+    (starttls-use-gnutls t)
+    (starttls-gnutls-program "gnutls-cli")
+    (starttls-extra-args nil))
 #+end_src
 ** use oauth2ms
 https://github.com/harishkrupo/oauth2ms/blob/main/steps.org
@@ -1703,10 +1707,12 @@ install it with pacman ~mu~
 #+begin_src emacs-lisp
   (use-package mu4e-alert
     :after mu4e
-    :config (mu4e-alert-set-default-style 'libnotify)
-    (setq mu4e-alert-interesting-mail-query
-          (concat "flag:unread"
-                  " AND NOT maildir:\"/news\""))
+    :custom
+    (mu4e-alert-interesting-mail-query
+     (concat "flag:unread"
+             " AND NOT maildir:\"/news\""))
+    :config
+    (mu4e-alert-set-default-style 'libnotify)
     :hook (after-init . mu4e-alert-enable-notifications))
 #+end_src
 * science packages
@@ -1716,12 +1722,12 @@ use other programming languages in interactive environment, similar to how ESS d
 #+begin_src emacs-lisp
   (use-package eval-in-repl
     :hook (comint-mode . (lambda() (setq truncate-lines 1)))
-    :config
-    (setq comint-process-echoes t
+    :custom
+    (comint-process-echoes t
       eir-repl-placement 'below)
-    (setq comint-scroll-to-bottom-on-input t)
-    (setq comint-scroll-to-bottom-on-output t)
-    (setq comint-move-point-for-output t))
+    (comint-scroll-to-bottom-on-input t)
+    (comint-scroll-to-bottom-on-output t)
+    (comint-move-point-for-output t))
 #+end_src
 ** ess
 emacs speaks statistics, work with R etc.
@@ -1756,7 +1762,8 @@ emacs speaks statistics, work with R etc.
                (string= lang "elisp")
                (string= lang "emacs-lisp")
                (string= lang "latex"))))
-    (setq ;; display-buffer-alist
+    :custom
+    ;; display-buffer-alist
           ;; '(("*R Dired*"
           ;;    (display-buffer-reuse-window display-buffer-in-side-window)
           ;;    (side . right)
@@ -1773,15 +1780,15 @@ emacs speaks statistics, work with R etc.
           ;;    (window-width . 0.33)))
           ;; ess-help-own-frame 'one
           ;; ess-auto-width 'window
-          org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate
-          ess-style 'RStudio
-          ess-use-auto-complete nil
-          ess-use-company t
-          ess-indent-with-fancy-comments nil
-          ess-pdf-viewer-pref 'emacsclient
-          inferior-R-args "--no-restore-history --no-save"
-          ess-ask-for-ess-directory nil
-          ess-R-font-lock-keywords
+    (org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+    (ess-style 'RStudio)
+    (ess-use-auto-complete nil)
+    (ess-use-company t)
+    (ess-indent-with-fancy-comments nil)
+    (ess-pdf-viewer-pref 'emacsclient)
+    (inferior-R-args "--no-restore-history --no-save")
+    (ess-ask-for-ess-directory nil)
+    (ess-R-font-lock-keywords
           (quote
            ((ess-R-fl-keyword:modifiers)
             (ess-R-fl-keyword:fun-defs . t)
@@ -1799,7 +1806,7 @@ emacs speaks statistics, work with R etc.
 Put spaces around operators such as +, -, etc.
 #+begin_src emacs-lisp
   (use-package electric-operator
-    :hook ((R-mode ess-r-mode inferior-ess-r-mode). electric-operator-mode)
+    :hook (R ess-r inferior-ess-r)
     ;; :config
     ;; (electric-operator-add-rules-for-mode 'ess-r-mode
     ;;                                       (cons "{{" "{{ ")
@@ -1836,30 +1843,30 @@ if I'm ever required to work in non-open-source
     :init (autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
     :mode ("\\.m\\'" . matlab-mode)
     :interpreter "matlab"
-    :config
-    (setq matlab-indent-function t)
-    (setq matlab-indent-function "matlab"))
+    :custom
+    (matlab-indent-function t)
+    (matlab-indent-function "matlab"))
 #+end_src
 ** pandoc-mode
 exporting markdown
 #+begin_src emacs-lisp
   (use-package pandoc-mode
     :defer t
-    :hook (markdown-mode . pandoc-mode))
+    :hook markdown)
 #+end_src
 ** mermaid
 #+begin_src emacs-lisp
   (use-package ob-mermaid
-    :config
-    (setq ob-mermaid-cli-path "/usr/bin/mmdc"))
+    :custom
+    (ob-mermaid-cli-path "/usr/bin/mmdc"))
 #+end_src
 ** org-pandoc
 https://github.com/kawabata/ox-pandoc
 #+begin_src emacs-lisp
   (use-package ox-pandoc
     :after org
-    :config
-    (setq org-pandoc-options '((bibliography
+    :custom
+    (org-pandoc-options '((bibliography
           . "/home/japhir/Documents/References/PhD.bib"))
           ;; org-pandoc-options-for-docx '((reference-docx
           ;; . "/home/japhir/SurfDrive/PhD/chapters/wordtemplate.docx"))
@@ -1890,8 +1897,7 @@ hmm it does overwrite my nice highlighting of NEXT
     :bind (:map hl-todo-mode-map
                 ("C-c k" . hl-todo-previous)
                 ("C-c j" . hl-todo-next))
-    :hook
-    ((LaTeX-mode ess-mode ess-r-mode org-mode) . hl-todo-mode))
+    :hook (LaTeX ess ess-r org))
 #+end_src
 ** bibtex/ivy-bibtex
 reference manager I use it in conjunction with zotero, which generates the
