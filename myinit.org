@@ -954,6 +954,27 @@ doesn't work :(
                    ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
                    ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))))
 #+end_src
+** org-fragtog
+auto-toggle latex fragments
+#+begin_src emacs-lisp
+  (use-package org-fragtog
+    :after org
+    :hook (org-mode . org-fragtog-mode)
+    :config
+    (setq org-startup-with-latex-preview t)
+    (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5)))
+#+end_src
+** org-appear
+dive into links/formatted entries
+https://github.com/awth13/org-appear
+#+begin_src emacs-lisp
+  (use-package org-appear
+    ;; :straight (org-appear :type git :host github :repo "awth13/org-appear")
+    :hook (org-mode . org-appear-mode)
+    :config
+    (setq org-appear-autolinks t
+          org-appear-autosubmarkers t))
+#+end_src
 ** deft
 :LOGBOOK:
 - Note taken on [2020-07-15 Wed 16:09] \\
@@ -1192,6 +1213,7 @@ https://github.com/weirdNox/org-noter
      ;; org-noter-notes-window-location 'horizontal-split
      ;; Please stop opening frames
      org-noter-always-create-frame nil
+     org-noter-kill-frame-at-session-end nil
      ;; I want to see the whole file
      org-noter-hide-other nil
      ;; Everything is relative to the main notes file
