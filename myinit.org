@@ -8,6 +8,19 @@ is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
   (setq gc-cons-threshold 402653184
         gc-cons-percentage 0.6)
 #+end_src
+
+* log startup time
+stolen from [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org#startup-performance][David Wilson's config]]
+#+begin_src emacs-lisp
+  ;; Profile emacs startup
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (message "*** Emacs loaded in %s with %d garbage collections."
+                       (format "%.2f seconds"
+                               (float-time
+                                (time-subtract after-init-time before-init-time)))
+                       gcs-done)))
+#+end_src
 * use-package
 Use-package is an amazing resource to clean up my init file and have it play
 nice on both my desktop and laptop.
