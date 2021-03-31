@@ -544,7 +544,7 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
         ;; org-fontify-todo-headline t ;; might be nice, but needs customisation of org-headline-todo face
         org-fontify-whole-heading-line t
         org-fontify-quote-and-verse-blocks t
-        org-pretty-entities t
+        org-pretty-entities nil
         org-ellipsis "…" ;▼ … ◦
         org-hide-emphasis-markers t)
 #+end_src
