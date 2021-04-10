@@ -103,7 +103,8 @@ see [[*org-roam][org-roam]]
   ;; prefer utf-8
   (prefer-coding-system 'utf-8-unix)
 
-  (setq mouse-wheel-progressive-speed nil)
+  (blink-cursor-mode 0)
+  ;; (setq mouse-wheel-progressive-speed nil)
 
   ;; automatically re-open files that have been changed on disk
   (global-auto-revert-mode 1)
@@ -158,7 +159,7 @@ insert matching parentheses and jump across them
 #+begin_src emacs-lisp
   (use-package evil-smartparens
     :after evil
-    :hook (prog markdown org))
+    :hook ((prog-mode markdown-mode org-mode) . evil-smartparens-mode))
 #+end_src
 * browsing the documentation
 ** helpful
@@ -186,7 +187,7 @@ Insert demos after describe function https://github.com/xuchunyang/elisp-demos
 matching parenthesis are highlighted with rainbow colours.
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
-    :hook prog-mode LaTeX-mode)
+    :hook ((prog-mode LaTeX-mode) . rainbow-delimiters-mode))
 #+end_src
 ** set the theme
 *** COMMENT clean up previous theme
@@ -238,7 +239,7 @@ Highlight hex colours!
 #+begin_src emacs-lisp
   (use-package rainbow-mode
     :defer t
-    :hook ((html-mode r-mode) . rainbow-mode))
+    :hook (html-mode r-mode))
 #+end_src
 ** pulse
 Highlight the current line when changing focus. It's like beacon-mode but native!
@@ -256,8 +257,9 @@ from https://karthinks.com/software/batteries-included-with-emacs/
 This allows me to write nicely on a widescreen monitor in a single buffer.
 #+begin_src emacs-lisp
   (use-package visual-fill-column
-    :hook visual-line
     :custom
+    (global-visual-line-mode t)
+    (global-visual-fill-column-mode t)
     (visual-fill-column-width 115)
     (split-window-preferred-function 'visual-fill-column-split-window-sensibly)
     (visual-fill-column-center-text t))
@@ -507,8 +509,7 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 #+end_src
 ** hook
 #+begin_src emacs-lisp
-  :hook ((org-mode . visual-line-mode)
-         (before-save . zp/org-set-last-modified)
+  :hook ((before-save . zp/org-set-last-modified)
          (org-capture-prepare-finalize . zp/org-capture-set-created-property))
 #+end_src
 ** start with custom
@@ -573,7 +574,7 @@ possible.
         ;; org-fontify-todo-headline t ;; might be nice, but needs customisation of org-headline-todo face
   (org-fontify-whole-heading-line t)
   (org-fontify-quote-and-verse-blocks t)
-  (org-pretty-entities nil)
+  (org-pretty-entities t)
   (org-ellipsis "…") ;▼ … ◦
   (org-hide-emphasis-markers t)
 #+end_src
@@ -918,7 +919,7 @@ got the function from this [[https://github.com/marcinkoziej/org-pomodoro/issues
   (use-package org-pomodoro
     :after org
     :bind ("C-c p" . org-pomodoro)
-    :hook (org-pomodoro-break-finished-hook . org-pomodoro-prompt)
+    :hook (org-pomodoro-break-finished . org-pomodoro-prompt)
     :custom
     (org-pomodoro-manual-break t)
     (org-pomodoro-long-break-length 15)
@@ -962,7 +963,7 @@ auto-toggle latex fragments
 #+begin_src emacs-lisp
   (use-package org-fragtog
     :after org
-    :hook org
+    :hook (org-mode . org-fragtog-mode)
     :custom
     (org-startup-with-latex-preview t)
     (org-format-latex-options (plist-put org-format-latex-options :scale 1.5)))
@@ -973,8 +974,9 @@ https://github.com/awth13/org-appear
 #+begin_src emacs-lisp
   (use-package org-appear
     ;; :straight (org-appear :type git :host github :repo "awth13/org-appear")
-    :hook org
+    :hook (org-mode . org-appear-mode)
     :custom
+    (org-appear-autoentities t)
     (org-appear-autolinks t)
     (org-appear-autosubmarkers t))
 #+end_src
@@ -1055,13 +1057,13 @@ https://github.com/domtronn/all-the-icons.el
 #+begin_src emacs-lisp
   (use-package all-the-icons-dired
     :after (dired all-the-icons)
-    :hook dired)
+    :hook (dired-mode . all-the-icons-dired-mode))
 #+end_src
 ** COMMENT emojify-mode
 #+begin_src emacs-lisp
   (use-package emojify
     :custom (emojify-emoji-styles 'unicode)
-    :hook (mu4e mu4e-view mu4e-compse org))
+    :hook ((mu4e-mode mu4e-view-mode mu4e-compse-mode org-mode) . emojify-mode))
 #+end_src
 ** yasnippet
 usefull snippets for me: org-mode (fig_, )
@@ -1229,7 +1231,7 @@ https://github.com/zaeph/.emacs.d/blob/master/init.el#L4420
 
 #+begin_src emacs-lisp
   (use-package org-roam
-    :hook (after-init-hook . org-roam-mode)
+    :hook (after-init . org-roam-mode)
     :commands (org-roam-buffer-toggle-display
                org-roam-find-file
                org-roam-graph
@@ -1393,7 +1395,7 @@ https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
 #+begin_src emacs-lisp
   (use-package org-roam-bibtex
     :after (org-roam)
-    :hook org-roam
+    :hook (org-roam-mode . org-roam-bibtex-mode)
     :bind (:map org-mode-map
                 (("C-c n a" . orb-note-actions)))
     :custom
@@ -1475,7 +1477,7 @@ https://github.com/org-roam/org-roam-server
   (use-package org-media-note
     :quelpa (org-media-note :fetcher github :repo "yuchen-lea/org-media-note")
     :ensure nil
-    :hook org
+    :hook (org-mode . org-media-note-mode)
     :bind (("C-c v" . org-media-note-hydra/body))  ;; Main entrance
     :custom
     (org-media-note-screenshot-image-dir "~/SurfDrive/bibliography/notes/imgs/"))
@@ -1664,7 +1666,7 @@ install it with pacman ~mu~
     :load-path "/usr/share/emacs/site-lisp/mu4e/"
     :commands mu4e
     :bind (("C-c m" . mu4e))
-    :hook ((mu4e-view-mode mu4e-compose-mode). visual-fill-column-mode)
+    :hook ((mu4e-view-mode mu4e-compose-mode) . visual-fill-column-mode)
     :init
     (require 'mu4e)  ;; somehow this is needed, because otherwise calling org-store-link doesn't work
     (require 'mu4e-org)
@@ -1744,7 +1746,10 @@ emacs speaks statistics, work with R etc.
   (use-package ess
     ;; :load-path "/usr/share/emacs/site-lisp/ess"
     :init (require 'ess-site)  ;; seems like this is needed to load the minor modes as well keybindings don't work without it
-    :hook ((ess-r-mode inferior-ess-r-mode) . electric-layout-mode)  ;; commented out since new curly-curly operator for rlang
+    :hook (((ess-r-mode inferior-ess-r-mode) . electric-layout-mode)  ;; commented out since new curly-curly operator for rlang
+           (ess-r-post-run . (lambda ()
+              (ess-load-file (make-temp-file nil nil nil
+                                          "Sys.setenv(\"DISPLAY\"=\":0.0\")")))))
     :commands R
     :bind (:map ess-r-mode-map
            (";" . ess-insert-assign)
@@ -1805,7 +1810,7 @@ emacs speaks statistics, work with R etc.
 Put spaces around operators such as +, -, etc.
 #+begin_src emacs-lisp
   (use-package electric-operator
-    :hook (R ess-r inferior-ess-r)
+    :hook ((R-mode ess-r-mode inferior-ess-r-mode) . electric-operator-mode)
     ;; :config
     ;; (electric-operator-add-rules-for-mode 'ess-r-mode
     ;;                                       (cons "{{" "{{ ")
@@ -1851,7 +1856,7 @@ exporting markdown
 #+begin_src emacs-lisp
   (use-package pandoc-mode
     :defer t
-    :hook markdown)
+    :hook markdown-mode)
 #+end_src
 ** mermaid
 #+begin_src emacs-lisp
@@ -1896,7 +1901,7 @@ hmm it does overwrite my nice highlighting of NEXT
     :bind (:map hl-todo-mode-map
                 ("C-c k" . hl-todo-previous)
                 ("C-c j" . hl-todo-next))
-    :hook (LaTeX ess ess-r org))
+    :hook ((LaTeX ess ess-r org) . hl-todo-mode))
 #+end_src
 ** bibtex/ivy-bibtex
 reference manager I use it in conjunction with zotero, which generates the
