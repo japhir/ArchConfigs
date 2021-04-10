@@ -346,8 +346,8 @@ exec nm-applet --indicator # network-manager-applet-indicator from AUR
 # exec ganttproject ~/SurfDrive/PhD/application/2020-09-16_DrIljaKocken.gan  # my long-term planning
 
 # open up emacs with the current paper and a todo scratchpad
-exec swaymsg "workspace $ws3" && sleep 12 && /home/japhir/bin/current_paper.sh
-exec sleep 12 && /home/japhir/bin/pad.sh
+exec swaymsg "workspace $ws3" && /home/japhir/bin/current_paper.sh
+exec /home/japhir/bin/pad.sh
 for_window [title="TODO"] move to scratchpad; resize grow width 600 px or 600 pt
 
 exec zotero  # should move to ws4 automatically
