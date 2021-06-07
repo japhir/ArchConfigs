@@ -1,0 +1,32 @@
+## This file pulls solismail and syncs it to a local folder
+## passwords are stored as encrypted files in my home directory
+
+IMAPAccount solismail
+# Address to connect to
+Host outlook.office365.com
+User i.j.kocken@uu.nl
+# To store the password in an encrypted file use PassCmd instead of Pass
+# To work with 2-factor authentication for Microsoft Office (work) account
+# I've now installed the package oauth2ms from https://github.com/harishkrupo/oauth2ms locally
+PassCmd /home/japhir/bin/oauth2ms
+AuthMechs XOAUTH2
+
+IMAPStore solismail-remote
+Account solismail
+
+MaildirStore solismail-local
+# The trailing "/" is important
+Path ~/Maildir/
+Inbox ~/Maildir/inbox
+SubFolders Verbatim
+
+Channel solismail
+Far :solismail-remote:
+Near :solismail-local:
+Patterns *
+# Automatically create missing mailboxes, both locally and on the server
+Create Both
+# Automatically delete items on both IMAP and local
+Expunge Both
+# Save the synchronization state files in the relevant directory
+SyncState *
