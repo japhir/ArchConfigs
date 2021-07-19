@@ -1283,8 +1283,8 @@ https://github.com/fuxialexander/org-pdftools
 [[file:~/SurfDrive/bibliography/notes//20200427230825-how_to_take_smart_notes.org][How to Take Smart Notes]]
 
 #+begin_src emacs-lisp
+  (setq org-roam-v2-ack t)
   (use-package org-roam
-    :hook (after-init . org-roam-mode)
     :commands (org-roam-buffer-toggle-display
                org-roam-find-file
                org-roam-graph
@@ -1294,32 +1294,56 @@ https://github.com/fuxialexander/org-pdftools
                org-roam-dailies-today
                org-roam-dailies-tomorrow
                org-roam-dailies-yesterday)
-    :bind (:map org-mode-map
-                (("C-c n l" . org-roam)
-                 ("C-c n f" . org-roam-find-file)
-                 ("C-c n b" . org-roam-switch-to-buffer)
-                 ("C-c n d" . org-roam-dailies-capture-today)
-                 ("C-c n g" . org-roam-graph)
-                 ("C-c n i" . org-roam-insert)
-                 :map evil-normal-state-map ;; is there an evil map within org-mode?
-                 ("g[" . org-roam-dailies-find-previous-note)
-                 ("g]" . org-roam-dailies-find-next-note)))
+    :bind (("C-c n f" . org-roam-node-find)
+           ("C-c n d" . org-roam-dailies-capture-today)
+           :map org-mode-map
+           (("C-c n l" . org-roam-buffer-toggle)
+            ("C-c n g" . org-roam-graph)
+            ("C-c n i" . org-roam-node-insert)
+            :map evil-normal-state-map ;; is there an evil map within org-mode?
+            ("g[" . org-roam-dailies-find-previous-note)
+            ("g]" . org-roam-dailies-find-next-note)))
     :custom
     (org-roam-verbose nil) ; https://youtu.be/fn4jIlFwuLU
     (org-roam-buffer-no-delete-other-windows t) ; make org-roam buffer sticky
-    (org-roam-capture-templates '(("d" "default" plain #'org-roam-capture--get-point "%?"
-                                   :file-name "%<%Y%m%d%H%M%S>-${slug}"
-                                   :head "#+title: ${title}\n#+created: %U\n#+last_modified:\n#+roam_tags:\n\n"
+    (org-roam-capture-templates '(("d" "default" plain "%?"
+                                   :if-new  (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                                   "#+title: ${title}\n#+created: %U\n#+last_modified:\n")
+                                   :unnarrowed t)
+                                  ("r" "ref" plain "%?"
+                                   :add-created t
+                                   :if-new (file+head "${citekey}.org"
+                                                      "#+title: ${citekey}: ${title}\n#+roam_key: ${ref}\n#+created: %u\n#+last_modified: %U\n#+roam_tags: articles\n
+
+  - related ::
+  - keywords :: ${keywords}
+
+  ,* ${title}
+  :PROPERTIES:
+  :Custom_ID: ${citekey}
+  :URL: ${url}
+  :AUTHOR: ${author-or-editor}
+  :NOTER_DOCUMENT: ${file}
+  :NOTER_PAGE:
+  :END:")
                                    :unnarrowed t)))
     (org-roam-dailies-capture-templates
-     '(("d" "default" entry #'org-roam-capture--get-point
+     '(("d" "default" entry
         "* %?"
+        :if-new (file+head "%<%Y-%m-%d>.org"
+                           "#+title: %<%Y-%m-%d>\n#+created: %U\n#+last_modified: %U\n")
         :add-created t
-        :file-name "daily/%<%Y-%m-%d>"
-        :head "#+title: %<%Y-%m-%d>\n#+created: %u\n#+last_modified: %U\n#+roam_tags: dailies\n\n")))
+        :jump-to-captured t)))
     :config
+    (add-to-list 'display-buffer-alist
+                 '("\\*org-roam\\*"
+                   (display-buffer-in-direction)
+                   (direction . right)
+                   ;; (window-width . 0.33)
+                   (window-height . fit-window-to-buffer)))
     (require 'org-roam-capture))
 #+end_src
+
 ** org-roam-create-note-from-headline
 https://org-roam.discourse.group/t/creating-an-org-roam-note-from-an-existing-headline/978
 #+begin_src emacs-lisp
@@ -1454,27 +1478,10 @@ https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
     :custom
     (orb-preformat-keywords
      '("citekey" "title" "url" "author-or-editor" "keywords" "file"))
-    (orb-process-file-field t)
-    (orb-file-field-extensions "pdf")
-    (orb-templates
-     '(("r" "ref" plain (function org-roam-capture--get-point)
-        ""
-        :add-created t
-        :file-name "${citekey}"
-        :head "#+title: ${citekey}: ${title}\n#+roam_key: ${ref}\n#+created: %u\n#+last_modified: %U\n#+roam_tags: articles\n
-
-  - related ::
-  - keywords :: ${keywords}
-
-  ,* ${title}
-  :PROPERTIES:
-  :Custom_ID: ${citekey}
-  :URL: ${url}
-  :AUTHOR: ${author-or-editor}
-  :NOTER_DOCUMENT: ${file}
-  :NOTER_PAGE:
-  :END:"))))
+    (orb-process-file-keyword t)
+    (orb-file-field-extensions '("pdf")))
 #+end_src
+
 ** company-org-roam
 for auto-completion
 #+begin_src emacs-lisp
@@ -1513,6 +1520,60 @@ https://github.com/org-roam/org-roam-server
     (org-roam-server-network-label-truncate-length 60)
     (org-roam-server-network-label-wrap-length 20))
 #+end_src
+
+** COMMENT ora-roam-todo
+from [[https://github.com/abo-abo/oremacs/blob/github/modes/ora-org-roam.el#L106][abo-abo's oremacs config]]
+#+begin_src emacs-lisp :tangle no
+  (defun ora-roam-todo ()
+    "An ad-hoc agenda for `org-roam'."
+    (interactive)
+    (let* ((win (next-window))
+           (buf (current-buffer))
+           (bname "*roam-todo*")
+           (b (get-buffer bname)))
+      (if b
+          (progn
+            (switch-to-buffer b)
+            (ivy-occur-revert-buffer))
+        (setq b (get-buffer-create bname))
+        (switch-to-buffer b)
+        (ora-roam-occur)
+        (setq ivy-occur-last (make-ivy-state
+                              :action #'counsel-git-grep-action
+                              :buffer buf
+                              :caller 'ora-roam-todo
+                              :directory default-directory
+                              :re-builder #'ivy--regex-plus
+                              :text ivy-text
+                              :window win)))))
+
+  (ivy-configure 'ora-roam-todo
+    :occur #'ora-roam-occur
+    :parent 'counsel-rg)
+
+  (defun ora-roam-occur (&optional _cands)
+    (unless (eq major-mode 'ivy-occur-grep-mode)
+      (ivy-occur-grep-mode))
+    (setq default-directory org-roam-directory)
+    (setq-local counsel-ag-command
+                '("rg" "--no-heading" "--line-number" "--sortr" "modified" "--color" "never" "-s" "%s"))
+    (ivy-set-text "^\\*+  (TODO|NEXT|WAIT|TICK)")
+    (let ((cands (counsel--split-string
+                  (counsel--call
+                   (cl-subst ivy-regex "%s" counsel-ag-command :test #'equal))))
+          (today (format-time-string "%Y_%m_%d")))
+      (setq cands
+            (cl-remove-if
+             (lambda (s)
+               (and (string-match ":\\([0-9]+_[0-9]+_[0-9]+\\):" s)
+                    (string< today (match-string 1 s))))
+             cands))
+      (swiper--occur-insert-lines (mapcar #'counsel--normalize-grep-match cands))))
+#+end_src
+
+#+RESULTS:
+: ora-roam-occur
+
 * playing videos
 ** emms for playing youtube videos etc.
 #+begin_src emacs-lisp
