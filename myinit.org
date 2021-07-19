@@ -1855,7 +1855,7 @@ emacs speaks statistics, work with R etc.
     (insert "%>%") ;; when R 4.1 hits I can replace this with |>
     (reindent-then-newline-and-indent))
 #+end_src
-*** use-package
+*** ess use-package
 #+begin_src emacs-lisp
   (use-package ess
     ;; :load-path "/usr/share/emacs/site-lisp/ess"
@@ -1919,6 +1919,13 @@ emacs speaks statistics, work with R etc.
             (ess-R-fl-keyword:delimiters)
             (ess-R-fl-keyword:=)
             (ess-R-fl-keyword:F&T)))))
+#+end_src
+*** ess-view
+[[https://github.com/GioBo/ess-view][GioBo/ess-view: A small package to view dataframes within spreadsheet softwares]]
+allows you to quickly look at dataframes in a spreadsheet software (in my case LibreOffice)
+#+begin_src emacs-lisp
+  (use-package ess-view
+    :after ess)
 #+end_src
 *** electric-spacing operator
 Put spaces around operators such as +, -, etc.
