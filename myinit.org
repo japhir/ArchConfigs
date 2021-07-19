@@ -842,6 +842,14 @@ org-export ignore headlines with ~:ignore:~ tag
 #+begin_src emacs-lisp
   (require 'ox-latex)
 #+end_src
+**** org-latex-packages
+#+begin_src emacs-lisp
+  (add-to-list 'org-latex-packages-alist
+               '("version=3" "mhchem"))
+  (add-to-list 'org-latex-packages-alist
+               '("" "siunitx" nil))
+  ;; (setcdr org-latex-packages-alist nil)
+#+end_src
 *** latejx class =ijkarticle=
 #+begin_src emacs-lisp
   (add-to-list 'org-latex-classes
@@ -935,11 +943,14 @@ got the function from this [[https://github.com/marcinkoziej/org-pomodoro/issues
             (org-pomodoro))))
     )
 #+end_src
-** org-pdfview
+** org-pdftools
+used to be org-pdfview
 #+begin_src emacs-lisp
-  (use-package org-pdfview
-    :after (org pdf-tools))
+  (use-package org-pdftools
+    :after (org pdf-tools)
+    :hook (org-mode . org-pdftools-setup-link))
 #+end_src
+
 ** COMMENT view inline pdfs?
 doesn't work :(
 #+begin_src emacs-lisp
@@ -968,7 +979,7 @@ auto-toggle latex fragments
     :after org
     :hook (org-mode . org-fragtog-mode)
     :custom
-    (org-startup-with-latex-preview t)
+    ;; (org-startup-with-latex-preview t)
     (org-format-latex-options (plist-put org-format-latex-options :scale 1.5)))
 #+end_src
 ** org-appear
@@ -981,7 +992,8 @@ https://github.com/awth13/org-appear
     :custom
     (org-appear-autoentities t)
     (org-appear-autolinks t)
-    (org-appear-autosubmarkers t))
+    (org-appear-autosubmarkers t)
+    (org-appear-delay 1))
 #+end_src
 ** deft
 :LOGBOOK:
@@ -1196,7 +1208,7 @@ https://github.com/hlissner/evil-snipe
 https://github.com/weirdNox/org-noter
 #+begin_src emacs-lisp
   (use-package org-noter
-    :after (:any org pdf-view)
+    :after (:any org pdf-view org-noter-pdftools)
     :bind ((:map org-mode-map ("C-c o" . org-noter))
            (:map org-noter-notes-mode-map
                  ("C-c k" . org-noter-create-skeleton)
@@ -1209,9 +1221,11 @@ https://github.com/weirdNox/org-noter
      ;; I want to see the whole file
      (org-noter-hide-other nil)
      ;; Everything is relative to the main notes file
-     (org-noter-notes-search-path (list org_notes)))
+     (org-noter-notes-search-path (list org_notes))
+     :config
+     (require 'org-noter-pdftools))
 #+end_src
-*** org-noter-insert-precice-note-dwim---stolen from zaeph
+*** COMMENT org-noter-insert-precice-note-dwim---stolen from zaeph
 https://github.com/zaeph/.emacs.d/blob/master/init.el#L4420
 #+begin_src emacs-lisp
     (defun zp/org-noter-insert-precise-note-dwim (force-mouse)
@@ -1224,8 +1238,44 @@ https://github.com/zaeph/.emacs.d/blob/master/init.el#L4420
           (let ((pos (if (region-active-p)
                          (min (region-beginning) (point))
                        (point))))
-            (org-noter-insert-note pos))
-        (org-noter-insert-precise-note)))
+            (org-noter-pdftools-insert-note pos))
+        (org-noter-pdftools-insert-precise-note)))
+#+end_src
+** org-noter-pdftools
+https://github.com/fuxialexander/org-pdftools
+#+begin_src emacs-lisp
+  (use-package org-noter-pdftools
+    :after org-noter
+    :config
+    ;; Add a function to ensure precise note is inserted
+    (defun org-noter-pdftools-insert-precise-note (&optional toggle-no-questions)
+      (interactive "P")
+      (org-noter--with-valid-session
+       (let ((org-noter-insert-note-no-questions (if toggle-no-questions
+                                                     (not org-noter-insert-note-no-questions)
+                                                   org-noter-insert-note-no-questions))
+             (org-pdftools-use-isearch-link t)
+             (org-pdftools-use-freestyle-annot 'org-pdftools-use-freepointer-annot))
+         (org-noter-insert-note (org-noter--get-precise-info)))))
+
+    ;; fix https://github.com/weirdNox/org-noter/pull/93/commits/f8349ae7575e599f375de1be6be2d0d5de4e6cbf
+    (defun org-noter-set-start-location (&optional arg)
+      "When opening a session with this document, go to the current location.
+  With a prefix ARG, remove start location."
+      (interactive "P")
+      (org-noter--with-valid-session
+       (let ((inhibit-read-only t)
+             (ast (org-noter--parse-root))
+             (location (org-noter--doc-approx-location (when (called-interactively-p 'any) 'interactive))))
+         (with-current-buffer (org-noter--session-notes-buffer session)
+           (org-with-wide-buffer
+            (goto-char (org-element-property :begin ast))
+            (if arg
+                (org-entry-delete nil org-noter-property-note-location)
+              (org-entry-put nil org-noter-property-note-location
+                             (org-noter--pretty-print-location location))))))))
+    (with-eval-after-load 'pdf-annot
+      (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 #+end_src
 
 ** org-roam
