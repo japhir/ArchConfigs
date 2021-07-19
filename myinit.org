@@ -86,6 +86,7 @@ see [[*org-roam][org-roam]]
 #+begin_src emacs-lisp
   (setq inhibit-splash-screen t)
   (setq initial-major-mode 'org-mode)
+  (setq large-file-warning-threshold 100000000) ;; change to ~100 MB
   (scroll-bar-mode -1)   ; turn off the scroll bar
   (tool-bar-mode -1)     ; turn off the tool bar
   (menu-bar-mode -1)     ; turn off the menu
@@ -257,9 +258,10 @@ from https://karthinks.com/software/batteries-included-with-emacs/
 This allows me to write nicely on a widescreen monitor in a single buffer.
 #+begin_src emacs-lisp
   (use-package visual-fill-column
+    :hook (org-mode . visual-fill-column-mode)
     :custom
     (global-visual-line-mode t)
-    (global-visual-fill-column-mode t)
+    ;; (global-visual-fill-column-mode t)
     (visual-fill-column-width 115)
     (split-window-preferred-function 'visual-fill-column-split-window-sensibly)
     (visual-fill-column-center-text t))
@@ -380,7 +382,7 @@ Sources:
     (if (equal "capture" (frame-parameter nil 'name))
         (delete-frame)))
 #+end_src
-** play bell sound when task is marked as done
+** COMMENT play bell sound when task is marked as done
 from [[https://stackoverflow.com/questions/15345614/how-to-get-emacs-org-mode-to-play-sound-file-on-done-state][this stackoverflow post]]
 #+begin_src emacs-lisp
   (add-hook 'org-after-todo-state-change-hook 'my-org-after-todo-state-change)
@@ -388,7 +390,7 @@ from [[https://stackoverflow.com/questions/15345614/how-to-get-emacs-org-mode-to
     (when (or (string-equal org-state "DONE")
               (string-equal org-state "CANC"))
       (org-clock-out-if-current)
-      (play-sound-file "~/bell.au")))
+      (play-sound-file "~/bell.aif")))
 #+end_src
 * internet stuffs
 ** internet up
@@ -520,7 +522,7 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 basic latex settings
 #+begin_src emacs-lisp
   (org-highlight-latex-and-related '(native script entities))
-  (org-preview-latex-default-program 'imagemagick)
+  ;; (org-preview-latex-default-process 'dvipng)
   ;; (setq org-latex-default-figure-position 'htbp)
   (org-latex-pdf-process
         (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
@@ -552,6 +554,7 @@ possible.
   (org-return-follows-link t)
   ;; (setf org-special-ctrl-a/e t) ; I use evil's 0 and $ anyway
   ;; folded drawers no longer ruin new entries
+  (org-list-allow-alphabetical t) ; allow a. b. c. lists
   (org-M-RET-may-split-line '((default . nil)))
   (org-display-remote-inline-images 'cache)
   (org-startup-with-inline-images t)
@@ -584,7 +587,7 @@ possible.
    '((auto-mode . emacs)
      ("\\.x?html?\\'" . "xdg-open %s")
      ("\\.pdf\\'" . (lambda (file link)
-                      (org-pdfview-open link)))
+                      (org-pdftools-open link)))
      ("\\.mp4\\'" . "xdg-open %s")
      ("\\.webm\\'" . "xdg-open %s")
      ("\\.mkv\\'" . "xdg-open %s")
@@ -702,7 +705,7 @@ Filter tasks by context (sorted by todo state)
           ("Ed" "Braindead" tags-todo "@braindead")
           ("p" . "People")
           ("pm" "Martin" tags-todo "Martin")
-          ("pl" "Luc" tags-todo "Luc")
+          ("pl" "Line" tags-todo "Line")
           ("pa" "Anne" tags-todo "Anne")
           ("pf" "FEST" tags-todo "FEST")
           ("pi" "Inigo" tags-todo "Inigo")))
@@ -784,7 +787,7 @@ customize capture templates
                    ("Work" . ?W) ("Personal" . ?P)
                    (:endgroup . nil)
                    ;; tags to accompany the @agenda context
-                   ("Family" . ?F) ("Martin" . ?M) ("Luc" . ?L) ("Inigo" . ?I) ("Niels" . ?N)))
+                   ("Family" . ?F) ("Martin" . ?M) ("Line" . ?L) ("Inigo" . ?I) ("Niels" . ?N)))
 #+end_src
 *** org src blocks
 #+begin_src emacs-lisp
