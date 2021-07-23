@@ -1120,6 +1120,7 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
           reftex-default-bibliography '("~/SurfDrive/bibliography/references.bib")
           org-ref-bibliography-notes '("~/SurfDrive/bibliography/notes/notes.org")
           org-ref-default-bibliography '("~/SurfDrive/bibliography/references.bib")
+          ;; I think this one never gets used
           org-ref-note-title-format "* TODO %y - %t\n :PROPERTIES:\n  :Custom_ID: %k\n  :NOTER_DOCUMENT: %F\n :ROAM_KEY: cite:%k\n  :AUTHOR: %9a\n  :JOURNAL: %j\n  :YEAR: %y\n  :VOLUME: %v\n  :PAGES: %p\n  :DOI: %D\n  :URL: %U\n :END:\n\n"
           org-ref-notes-directory "~/SurfDrive/bibliography/notes/"
           org-ref-notes-function 'orb-edit-notes
@@ -1304,16 +1305,28 @@ https://github.com/fuxialexander/org-pdftools
             ("g[" . org-roam-dailies-find-previous-note)
             ("g]" . org-roam-dailies-find-next-note)))
     :custom
+    (org-roam-completion-everywhere t)
     (org-roam-verbose nil) ; https://youtu.be/fn4jIlFwuLU
     (org-roam-buffer-no-delete-other-windows t) ; make org-roam buffer sticky
-    (org-roam-capture-templates '(("d" "default" plain "%?"
-                                   :if-new  (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+    (org-roam-capture-templates
+     '(("d" "default" plain
+        "%?"
+        :if-new  (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
                                    "#+title: ${title}\n#+created: %U\n#+last_modified:\n")
-                                   :unnarrowed t)
-                                  ("r" "ref" plain "%?"
-                                   :add-created t
-                                   :if-new (file+head "${citekey}.org"
-                                                      "#+title: ${citekey}: ${title}\n#+roam_key: ${ref}\n#+created: %u\n#+last_modified: %U\n#+roam_tags: articles\n
+        :immediate-finish t
+        :unnarrowed t)))
+    (org-roam-capture-ref-templates
+     '(("r" "ref" plain
+        "%?"
+        ;; currently no longer contains the ROAM_REFS: property!
+        :if-new (file+head "${citekey}.org"
+                           ":properties:
+  :roam_refs: cite:${citekey}
+  :end:
+  ,#+title: ${citekey}: ${title}
+  ,#+created: %u
+  ,#+last_modified: %U
+  ,#+file_tags: articles
 
   - related ::
   - keywords :: ${keywords}
@@ -1326,7 +1339,8 @@ https://github.com/fuxialexander/org-pdftools
   :NOTER_DOCUMENT: ${file}
   :NOTER_PAGE:
   :END:")
-                                   :unnarrowed t)))
+        :add-created t
+        :unnarrowed t)))
     (org-roam-dailies-capture-templates
      '(("d" "default" entry
         "* %?"
@@ -1341,7 +1355,46 @@ https://github.com/fuxialexander/org-pdftools
                    (direction . right)
                    ;; (window-width . 0.33)
                    (window-height . fit-window-to-buffer)))
-    (require 'org-roam-capture))
+    (require 'org-roam-capture)
+    (org-roam-setup))
+#+end_src
+
+#+RESULTS:
+: org-roam-dailies-find-next-note
+
+** patch ox-html so that export with id links works
+https://gist.github.com/jethrokuan/d6f80caaec7f49dedffac7c4fe41d132
+#+begin_src emacs-lisp
+  (defun org-html--reference (datum info &optional named-only)
+    "Return an appropriate reference for DATUM.
+  DATUM is an element or a `target' type object.  INFO is the
+  current export state, as a plist.
+  When NAMED-ONLY is non-nil and DATUM has no NAME keyword, return
+  nil.  This doesn't apply to headlines, inline tasks, radio
+  targets and targets."
+    (let* ((type (org-element-type datum))
+           (user-label
+            (org-element-property
+             (pcase type
+               ((or `headline `inlinetask) :CUSTOM_ID)
+               ((or `radio-target `target) :value)
+               (_ :name))
+             datum))
+           (user-label (or user-label
+                           (when-let ((path (org-element-property :ID datum)))
+                             (concat "ID-" path)))))
+      (cond
+       ((and user-label
+             (or (plist-get info :html-prefer-user-labels)
+                 ;; Used CUSTOM_ID property unconditionally.
+                 (memq type '(headline inlinetask))))
+        user-label)
+       ((and named-only
+             (not (memq type '(headline inlinetask radio-target target)))
+             (not user-label))
+        nil)
+       (t
+        (org-export-get-reference datum info)))))
 #+end_src
 
 ** org-roam-create-note-from-headline
@@ -1472,10 +1525,10 @@ https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
 #+begin_src emacs-lisp
   (use-package org-roam-bibtex
     :after (org-roam)
-    :hook (org-roam-mode . org-roam-bibtex-mode)
     :bind (:map org-mode-map
                 (("C-c n a" . orb-note-actions)))
     :custom
+    (orb-note-actions-interface 'ivy)
     (orb-preformat-keywords
      '("citekey" "title" "url" "author-or-editor" "keywords" "file"))
     (orb-process-file-keyword t)
