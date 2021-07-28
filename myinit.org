@@ -1364,8 +1364,8 @@ https://github.com/fuxialexander/org-pdftools
     (org-roam-setup))
 #+end_src
 
-** COMMENT bibtex-completion
-seems like this is what both [[jethro][jethro]] and [[https://github.com/zaeph/.emacs.d/blob/8243cd8c74775387e011de679f041ca8e3cff41a/init.el#L3865][zaeph]] seem to be using since org-roam v2 update
+** bibtex-completion
+seems like this is what both [[https://github.com/jethrokuan/dots/blob/master/.doom.d/config.el#L454][jethro]] and [[https://github.com/zaeph/.emacs.d/blob/8243cd8c74775387e011de679f041ca8e3cff41a/init.el#L3865][zaeph]] seem to be using since org-roam v2 update
 #+begin_src emacs-lisp
   (use-package bibtex-completion
     :config
@@ -1391,9 +1391,6 @@ seems like this is what both [[jethro][jethro]] and [[https://github.com/zaeph/.
            ":END:\n\n"
            )))
 #+end_src
-
-#+RESULTS:
-: t
 
 ** patch ox-html so that export with id links works
 https://gist.github.com/jethrokuan/d6f80caaec7f49dedffac7c4fe41d132
