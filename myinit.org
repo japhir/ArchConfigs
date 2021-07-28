@@ -69,18 +69,6 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
   (defvar org-cal-file "~/org/calendars/gcal.org"
     "Google Calendar")
 #+end_src
-* org-roam/notes/ref directories
-see [[*org-roam][org-roam]]
-#+begin_src emacs-lisp
-  (setq
-   org_notes (concat (getenv "HOME") "/SurfDrive/bibliography/notes/")
-   zot_bib (concat (getenv "HOME") "/SurfDrive/bibliography/bibliography.bib")
-   org-directory org_notes
-   org-roam-dailies-directory (concat org_notes "daily")
-   deft-directory org_notes
-   org-roam-directory org_notes
-   org-roam-db-location (concat org_notes "org-roam.db"))
-#+end_src
 * interface
 ** turn off UI elements and small tweaks
 #+begin_src emacs-lisp
@@ -283,6 +271,11 @@ git porcelain, essential!
   (use-package magit
     :commands magit-status
     :after with-editor)
+#+end_src
+** org-make-toc for publishing table of contents on github
+https://github.com/alphapapa/org-make-toc
+#+begin_src emacs-lisp
+  (use-package org-make-toc)
 #+end_src
 * custom functions/keyboard shortcuts
 ** revert buffer
@@ -1017,6 +1010,7 @@ https://github.com/awth13/org-appear
             (nospace . "-")
             (case-fn . downcase)))
     :config
+    (setq deft-directory "~/SurfDrive/bibliography/notes/")
     (add-to-list 'deft-extensions "tex"))
 #+end_src
 
@@ -1165,6 +1159,13 @@ from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-me
 
   (global-set-key (kbd "<f8>") 'my/org-ref-open-pdf-at-point)
 #+end_src
+** citeproc
+#+begin_src emacs-lisp
+  (use-package citeproc-org
+    :after org
+    :config
+    (citeproc-org-setup))
+#+end_src
 * COMMENT navigation
 ** COMMENT beginend
 #+begin_src emacs-lisp
@@ -1222,7 +1223,7 @@ https://github.com/weirdNox/org-noter
      ;; I want to see the whole file
      (org-noter-hide-other nil)
      ;; Everything is relative to the main notes file
-     (org-noter-notes-search-path (list org_notes))
+     (org-noter-notes-search-path "~/SurfDrive/bibliography/notes/")
      :config
      (require 'org-noter-pdftools))
 #+end_src
@@ -1284,8 +1285,9 @@ https://github.com/fuxialexander/org-pdftools
 [[file:~/SurfDrive/bibliography/notes//20200427230825-how_to_take_smart_notes.org][How to Take Smart Notes]]
 
 #+begin_src emacs-lisp
-  (setq org-roam-v2-ack t)
   (use-package org-roam
+    :init
+    (setq org-roam-v2-ack t)
     :commands (org-roam-buffer-toggle-display
                org-roam-find-file
                org-roam-graph
@@ -1305,6 +1307,9 @@ https://github.com/fuxialexander/org-pdftools
             ("g[" . org-roam-dailies-find-previous-note)
             ("g]" . org-roam-dailies-find-next-note)))
     :custom
+    (org-roam-directory (file-truename "~/SurfDrive/bibliography/notes/"))
+    (org-roam-dailies-directory "daily/")
+    (org-id-link-to-org-use-id 'create-if-interactive)
     (org-roam-completion-everywhere t)
     (org-roam-verbose nil) ; https://youtu.be/fn4jIlFwuLU
     (org-roam-buffer-no-delete-other-windows t) ; make org-roam buffer sticky
@@ -1359,8 +1364,36 @@ https://github.com/fuxialexander/org-pdftools
     (org-roam-setup))
 #+end_src
 
+** COMMENT bibtex-completion
+seems like this is what both [[jethro][jethro]] and [[https://github.com/zaeph/.emacs.d/blob/8243cd8c74775387e011de679f041ca8e3cff41a/init.el#L3865][zaeph]] seem to be using since org-roam v2 update
+#+begin_src emacs-lisp
+  (use-package bibtex-completion
+    :config
+    (setq bibtex-completion-notes-path "~/SurfDrive/bibliography/notes/"
+          bibtex-completion-bibliography "~/SurfDrive/bibliography/references.bib"
+          bibtex-completion-pdf-field "file"
+          bibtex-completion-notes-template-multiple-files
+          (concat
+           ":PROPERTIES:"
+           ":ROAM_REFS: cite:${=key=}\n"
+           ":END:"
+           "#+title: ${=key=}: ${title}\n"
+           "* TODO Notes\n"
+           ":PROPERTIES:\n"
+           ":Custom_ID: ${=key=}\n"
+           ":NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n"
+           ":AUTHOR: ${author-abbrev}\n"
+           ":JOURNAL: ${journaltitle}\n"
+           ":DATE: ${date}\n"
+           ":YEAR: ${year}\n"
+           ":DOI: ${doi}\n"
+           ":URL: ${url}\n"
+           ":END:\n\n"
+           )))
+#+end_src
+
 #+RESULTS:
-: org-roam-dailies-find-next-note
+: t
 
 ** patch ox-html so that export with id links works
 https://gist.github.com/jethrokuan/d6f80caaec7f49dedffac7c4fe41d132
