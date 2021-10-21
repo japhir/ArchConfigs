@@ -234,6 +234,13 @@ Highlight hex colours!
     :defer t
     :hook (html-mode r-mode))
 #+end_src
+** emojify
+Show plain-text emoji like ~:)~ as images, but also unicode ~☺~ and ~:slight-smile:~. :D
+https://github.com/iqbalansari/emacs-emojify
+#+begin_src emacs-lisp
+  (use-package emojify
+    :hook (after-init-hook . global-emojify-mode))
+#+end_src
 ** pulse
 Highlight the current line when changing focus. It's like beacon-mode but native!
 from https://karthinks.com/software/batteries-included-with-emacs/
@@ -280,6 +287,22 @@ git porcelain, essential!
 https://github.com/alphapapa/org-make-toc
 #+begin_src emacs-lisp
   (use-package org-make-toc)
+#+end_src
+* browsing the documentation
+** helpful
+beautiful help functions
+https://github.com/Wilfred/helpful
+#+begin_src emacs-lisp
+    (use-package helpful
+       :commands (helpful-callable helpful-function helpful-variable helpful-mode))
+#+end_src
+** demos
+Insert demos after describe function https://github.com/xuchunyang/elisp-demos
+#+begin_src emacs-lisp
+  (use-package elisp-demos
+    :after helpful
+    :config
+    (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
 #+end_src
 * custom functions/keyboard shortcuts
 ** revert buffer
@@ -562,6 +585,14 @@ possible.
   (org-log-into-drawer t)
   ;; (org-clock-auto-clockout-timer (* 10 60))
 #+end_src
+** org-clock-reminder
+#+begin_src emacs-lisp
+  (use-package org-clock-reminder
+    :config
+    (setq org-clock-reminder-interval 600)
+    (setq org-clock-reminder-remind-inactivity 't)
+    (org-clock-reminder-activate))
+#+end_src
 ** theming
 #+begin_src emacs-lisp
   (org-tags-column -65)
@@ -698,6 +729,7 @@ Filter tasks by context (sorted by todo state)
           ("E" . "Energy")
           ("Ef" "Focus" tags-todo "@focus")
           ("Ed" "Braindead" tags-todo "@braindead")
+          ("D" "DataSteward" tags-todo "DataSteward")
           ("p" . "People")
           ("pm" "Martin" tags-todo "Martin")
           ("pl" "Line" tags-todo "Line")
@@ -781,6 +813,7 @@ customize capture templates
                    (:startgroup . nil)
                    ("Work" . ?W) ("Personal" . ?P)
                    (:endgroup . nil)
+                   ("DataSteward" . ?D)
                    ;; tags to accompany the @agenda context
                    ("Family" . ?F) ("Martin" . ?M) ("Line" . ?L) ("Inigo" . ?I) ("Niels" . ?N)))
 #+end_src
@@ -997,23 +1030,14 @@ https://github.com/awth13/org-appear
 :END:
 #+begin_src emacs-lisp :eval never :tangle no
   (use-package deft
-    :commands deft
-    :bind ("C-c d" . deft)
-    :init
-    (setq deft-default-extension "org"
-          ;; de-couples filename and note title:
-          deft-use-filename-as-title nil
-          deft-use-filter-string-for-filename t
-          ;; disable auto-save
-          deft-auto-save-interval -1.0
-          ;; converts the filter string into a readable file-name using kebab-case:
-          deft-file-naming-rules
-          '((noslash . "-")
-            (nospace . "-")
-            (case-fn . downcase)))
-    :config
-    (setq deft-directory "~/SurfDrive/bibliography/notes/")
-    (add-to-list 'deft-extensions "tex"))
+    :after org
+    :bind
+    ("C-c n d" . deft)
+    :custom
+    (deft-recursive t)
+    (deft-use-filter-string-for-filename t)
+    (deft-default-extension "org")
+    (deft-directory org-roam-directory))
 #+end_src
 
 ** COMMENT pdf preview in org
@@ -1208,6 +1232,14 @@ https://github.com/hlissner/evil-snipe
     ;; swiper doesn't play nice with pdf-tools, so I disable it.
     (:map pdf-view-mode-map ("C-s" . isearch-forward)))
 #+end_src
+** NEXT COMMENT org-xournalpp
+#+begin_src emacs-lisp :tangle no
+  (use-package org-xournalpp
+    :ensure t
+    :quelpa (org-xournalpp :fetcher gitlab :repo "vherrmann/org-xournalpp" :files ("*.el" "resources"))
+    :config
+    (add-hook 'org-mode-hook 'org-xournalpp-mode))
+#+end_src
 ** org-noter
 https://github.com/weirdNox/org-noter
 #+begin_src emacs-lisp
@@ -1215,7 +1247,7 @@ https://github.com/weirdNox/org-noter
     :after (:any org pdf-view org-noter-pdftools)
     :bind ((:map org-mode-map ("C-c o" . org-noter))
            (:map org-noter-notes-mode-map
-                 ("C-c k" . org-noter-create-skeleton)
+                 ("C-c k" . org-noter-pdftools-create-skeleton)
                  ("C-c q" . org-noter-kill-session)))
     :custom
     ;; org-noter-notes-window-location 'horizontal-split
@@ -1301,13 +1333,15 @@ https://github.com/fuxialexander/org-pdftools
                org-roam-dailies-yesterday)
     :bind (("C-c n f" . org-roam-node-find)
            ("C-c n d" . org-roam-dailies-capture-today)
+           :map org-roam-mode-map
+           ("<mouse-1>" . org-roam-visit-thing)
            :map org-mode-map
            (("C-c n l" . org-roam-buffer-toggle)
             ("C-c n g" . org-roam-graph)
             ("C-c n i" . org-roam-node-insert)
             :map evil-normal-state-map ;; is there an evil map within org-mode?
-            ("g[" . org-roam-dailies-find-previous-note)
-            ("g]" . org-roam-dailies-find-next-note)))
+            ("g[" . org-roam-dailies-goto-previous-note)
+            ("g]" . org-roam-dailies-goto-next-note)))
     :custom
     (org-roam-directory (file-truename "~/SurfDrive/bibliography/notes/"))
     (org-roam-dailies-directory "daily/")
@@ -1321,31 +1355,25 @@ https://github.com/fuxialexander/org-pdftools
         :if-new  (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
                                    "#+title: ${title}\n#+created: %U\n#+last_modified:\n")
         :immediate-finish t
+        :unnarrowed t)
+       ("p" "people" plain
+          "%?"
+          :if-new  (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+title: ${title}\n#+created: %U\n#+last_modified:\n\n#+filetags: people")
+          :immediate-finish t
+          :unnarrowed t)
+       ("r" "bibliography reference" plain
+        (file "/home/japhir/ArchConfigs/org-roam-bibtex-capture.org")
+        :if-new
+        (file+head "${citekey}.org" "#+title: ${citekey}: ${title}\n")
+        :add-created t
         :unnarrowed t)))
     (org-roam-capture-ref-templates
      '(("r" "ref" plain
         "%?"
-        ;; currently no longer contains the ROAM_REFS: property!
-        :if-new (file+head "${citekey}.org"
-                           ":properties:
-  :roam_refs: cite:${citekey}
-  :end:
-  ,#+title: ${citekey}: ${title}
-  ,#+created: %u
-  ,#+last_modified: %U
-  ,#+file_tags: articles
-
-  - related ::
-  - keywords :: ${keywords}
-
-  ,* ${title}
-  :PROPERTIES:
-  :Custom_ID: ${citekey}
-  :URL: ${url}
-  :AUTHOR: ${author-or-editor}
-  :NOTER_DOCUMENT: ${file}
-  :NOTER_PAGE:
-  :END:")
+        :if-new (file+head "${citekey.org}"
+                           "#+title: ${citekey}: ${title}\n")
+        :immediate-finish t
         :add-created t
         :unnarrowed t)))
     (org-roam-dailies-capture-templates
@@ -1356,6 +1384,7 @@ https://github.com/fuxialexander/org-pdftools
         :add-created t
         :jump-to-captured t)))
     :config
+    (org-roam-setup)
     (add-to-list 'display-buffer-alist
                  '("\\*org-roam\\*"
                    (display-buffer-in-direction)
@@ -1363,10 +1392,10 @@ https://github.com/fuxialexander/org-pdftools
                    ;; (window-width . 0.33)
                    (window-height . fit-window-to-buffer)))
     (require 'org-roam-capture)
-    (org-roam-setup))
+    (org-roam-bibtex-mode))
 #+end_src
 
-** bibtex-completion
+** COMMENT bibtex-completion
 seems like this is what both [[https://github.com/jethrokuan/dots/blob/master/.doom.d/config.el#L454][jethro]] and [[https://github.com/zaeph/.emacs.d/blob/8243cd8c74775387e011de679f041ca8e3cff41a/init.el#L3865][zaeph]] seem to be using since org-roam v2 update
 #+begin_src emacs-lisp
   (use-package bibtex-completion
@@ -1554,17 +1583,19 @@ https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
 #+end_src
 
 ** org-roam-bibtex
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package org-roam-bibtex
-    :after (org-roam)
+    :after org-roam
     :bind (:map org-mode-map
                 (("C-c n a" . orb-note-actions)))
     :custom
     (orb-note-actions-interface 'ivy)
     (orb-preformat-keywords
-     '("citekey" "title" "url" "author-or-editor" "keywords" "file"))
+     '("citekey" "title" "url" "author-or-editor" "journal" "keywords" "file"))
     (orb-process-file-keyword t)
-    (orb-file-field-extensions '("pdf")))
+    (orb-file-field-extensions '("pdf"))
+    :config
+    (require 'org-ref))
 #+end_src
 
 ** company-org-roam
@@ -1585,25 +1616,23 @@ Since the org module lazy loads org-protocol (waits until an org URL is detected
       :after org-protocol)
 #+end_src
 
-** org-roam-server
-https://github.com/org-roam/org-roam-server
+** COMMENT org-roam-ui
+https://github.com/org-roam/org-roam-ui
 #+begin_src emacs-lisp
-  (use-package org-roam-server
-    :after org-roam
-    :bind (:map org-roam-mode-map
-                (("C-c n G" . org-roam-server-mode)))
-    :custom
-    (org-roam-server-host "127.0.0.1")
-    (org-roam-server-port 8080)
-    (org-roam-server-authenticate nil)
-    (org-roam-server-export-inline-images t)
-    (org-roam-server-serve-files nil)
-    (org-roam-server-served-file-extensions '("pdf" "mp4" "ogv"))
-    (org-roam-server-network-poll t)
-    (org-roam-server-network-arrows nil)
-    (org-roam-server-network-label-truncate t)
-    (org-roam-server-network-label-truncate-length 60)
-    (org-roam-server-network-label-wrap-length 20))
+  (use-package org-roam-ui
+    :straight
+      (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+      :after org-roam
+      ;; :hook
+      ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+      ;;         a hookable mode anymore, you're advised to pick something yourself
+      ;;         if you don't care about startup time, use
+      ;;  :hook (after-init . org-roam-ui-mode)
+      :config
+      (setq org-roam-ui-sync-theme t
+            org-roam-ui-follow t
+            org-roam-ui-update-on-save t
+            org-roam-ui-open-on-start t))
 #+end_src
 
 ** COMMENT ora-roam-todo
@@ -1719,7 +1748,7 @@ very nice search replacement
 #+begin_src emacs-lisp
   (use-package counsel
     :init (counsel-mode 1)
-    :diminish counsel-mode
+    :delight counsel-mode
     :bind
     ("C-x l" . counsel-locate)
     ("C-c g" . counsel-git)
@@ -1788,7 +1817,7 @@ See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for 
 #+begin_src emacs-lisp
   (use-package company
     :hook (after-init . global-company-mode)
-    :diminish company-mode
+    :delight company-mode
     :config
     ;; (setq ;; company-require-match nil
           ;; company-async-timeout 6
@@ -1879,8 +1908,8 @@ install it with pacman ~mu~
             ("/Deleted Items" . ?d)
             ("/news" . ?n)
             ("/Important backlog" . ?l)
-            ;("/Sent Items" . ?s)
-            ("/Junk Email" . ?s)
+            ("/Sent Items" . ?s)
+            ("/Junk Email" . ?t)
             ("/archive" . ?r)))
     (setq mu4e-change-filenames-when-moving t ; important for isync
           mu4e-headers-date-format "%Y-%m-%d %H:%M"
@@ -1902,6 +1931,14 @@ install it with pacman ~mu~
     ;; (when (fboundp 'imagemagick-register-types)
     ;;   (imagemagick-register-types))
     (setq mu4e-org-link-query-in-headers-mode nil))
+#+end_src
+** SOME COMMENT mu4e-thread-folding
+:LOGBOOK:
+- State "SOME"       from              [2021-09-26 Sun 13:14]
+:END:
+#+begin_src emacs-lisp
+  (use-package mu4e-thread-folding
+    :quelpa (mu4e-thread-folding :fetcher github :repo "rougier/mu4e-thread-folding"))
 #+end_src
 ** mu4e-alert
 #+begin_src emacs-lisp
@@ -1929,17 +1966,26 @@ use other programming languages in interactive environment, similar to how ESS d
     (comint-scroll-to-bottom-on-output t)
     (comint-move-point-for-output t))
 #+end_src
+
+#+RESULTS:
+| lambda | nil | (setq truncate-lines 1) |
+
 ** ess
+https://ess.r-project.org/
 emacs speaks statistics, work with R etc.
-*** insert pipe ~%>%~ function
+*** insert pipe ~|>~ function
 #+begin_src emacs-lisp
   (defun japhir/insert-r-pipe ()
-    "Insert the pipe operator in R, %>%"
+    "Insert the pipe operator in R, |>"
     (interactive)
     (just-one-space 1)
-    (insert "%>%") ;; when R 4.1 hits I can replace this with |>
+    (insert "|>")
     (reindent-then-newline-and-indent))
 #+end_src
+
+#+RESULTS:
+: japhir/insert-r-pipe
+
 *** ess use-package
 #+begin_src emacs-lisp
   (use-package ess
@@ -1962,6 +2008,7 @@ emacs speaks statistics, work with R etc.
     :config
     (defun my-org-confirm-babel-evaluate (lang body)
       (not (or (string= lang "R")
+               (string= lang "python")
                (string= lang "elisp")
                (string= lang "emacs-lisp")
                (string= lang "latex"))))
@@ -2005,6 +2052,10 @@ emacs speaks statistics, work with R etc.
             (ess-R-fl-keyword:=)
             (ess-R-fl-keyword:F&T)))))
 #+end_src
+
+#+RESULTS:
+: japhir/insert-r-pipe
+
 *** ess-view
 [[https://github.com/GioBo/ess-view][GioBo/ess-view: A small package to view dataframes within spreadsheet softwares]]
 allows you to quickly look at dataframes in a spreadsheet software (in my case LibreOffice)
@@ -2012,6 +2063,9 @@ allows you to quickly look at dataframes in a spreadsheet software (in my case L
   (use-package ess-view
     :after ess)
 #+end_src
+
+#+RESULTS:
+
 *** electric-spacing operator
 Put spaces around operators such as +, -, etc.
 #+begin_src emacs-lisp
@@ -2024,20 +2078,48 @@ Put spaces around operators such as +, -, etc.
     :custom
     (electric-operator-R-named-argument-style 'spaced))
 #+end_src
+
+#+RESULTS:
+| electric-operator-mode | electric-layout-mode |
+
 *** compilation window height
 #+begin_src emacs-lisp
   (setq compilation-window-height 15)
 #+end_src
+
+#+RESULTS:
+: 15
+
 *** flycheck
 #+begin_src emacs-lisp
   (use-package flycheck
     :init (global-flycheck-mode))
 #+end_src
+
+#+RESULTS:
+
+** stan
+https://mc-stan.org/
+check out this worg entry on working inline with stan models! https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-stan.html
+#+begin_src emacs-lisp
+  (use-package stan-mode
+    :config
+    ;; I've used cmdstanr to install cmdstan because it's not in my repositories
+    ;; don't forget to update this after updating from within an R session!
+    (setq org-babel-stan-cmdstan-directory "/home/japhir/.cmdstanr/cmdstan-2.28.0"))
+#+end_src
+
+#+RESULTS:
+: t
+
 ** markdown-mode
 markdown mode for writing
 #+begin_src emacs-lisp
   (use-package markdown-mode :defer t)
 #+end_src
+
+#+RESULTS:
+
 ** polymode
 for working with .Rmd files etc.
 #+begin_src emacs-lisp
@@ -2045,6 +2127,9 @@ for working with .Rmd files etc.
   (use-package poly-markdown :defer t)
   ;; (use-package poly-R)
 #+end_src
+
+#+RESULTS:
+
 ** COMMENT matlab
 if I'm ever required to work in non-open-source
 #+begin_src emacs-lisp
@@ -2057,6 +2142,10 @@ if I'm ever required to work in non-open-source
     (matlab-indent-function t)
     (matlab-indent-function "matlab"))
 #+end_src
+
+#+RESULTS:
+: ((matlab . matlab) (r . ess-r-mode) (Rscript . ess-r-mode) (ruby1.8 . ruby-mode) (ruby1.9 . ruby-mode) (jruby . ruby-mode) (rbx . ruby-mode) (ruby . ruby-mode) (python[0-9.]* . python-mode) (rhino . js-mode) (gjs . js-mode) (nodejs . js-mode) (node . js-mode) (gawk . awk-mode) (nawk . awk-mode) (mawk . awk-mode) (awk . awk-mode) (pike . pike-mode) (\(mini\)?perl5? . perl-mode) (wishx? . tcl-mode) (tcl\(sh\)? . tcl-mode) (expect . tcl-mode) (octave . octave-mode) (scm . scheme-mode) ([acjkwz]sh . sh-mode) (r?bash2? . sh-mode) (dash . sh-mode) (mksh . sh-mode) (\(dt\|pd\|w\)ksh . sh-mode) (es . sh-mode) (i?tcsh . sh-mode) (oash . sh-mode) (rc . sh-mode) (rpm . sh-mode) (sh5? . sh-mode) (tail . text-mode) (more . text-mode) (less . text-mode) (pg . text-mode) (make . makefile-gmake-mode) (guile . scheme-mode) (clisp . lisp-mode) (emacs . emacs-lisp-mode))
+
 ** pandoc-mode
 exporting markdown
 #+begin_src emacs-lisp
@@ -2064,12 +2153,19 @@ exporting markdown
     :defer t
     :hook markdown-mode)
 #+end_src
+
+#+RESULTS:
+| pandoc-mode |
+
 ** mermaid
 #+begin_src emacs-lisp
   (use-package ob-mermaid
     :custom
     (ob-mermaid-cli-path "/usr/bin/mmdc"))
 #+end_src
+
+#+RESULTS:
+
 ** org-pandoc
 https://github.com/kawabata/ox-pandoc
 #+begin_src emacs-lisp
@@ -2082,6 +2178,9 @@ https://github.com/kawabata/ox-pandoc
           ;; . "/home/japhir/SurfDrive/PhD/chapters/wordtemplate.docx"))
           ))
 #+end_src
+
+#+RESULTS:
+
 ** LaTeX (AUCTeX, RefTeX)
 for working with \LaTeX
 #+begin_src emacs-lisp
@@ -2089,7 +2188,6 @@ for working with \LaTeX
   ;(load "preview-latex.el" nil t t)
   (use-package tex
     :load-path "/usr/share/emacs/site-lisp/auctex/"
-    ;; :diminish reftex-mode
     :hook
     (LaTeX-mode . turn-on-reftex)
     (LaTeX-mode . turn-on-auto-fill)
@@ -2100,6 +2198,10 @@ for working with \LaTeX
     (setq-default TeX-master nil)
     (setq reftex-plug-into-AUCTeX t))
 #+end_src
+
+#+RESULTS:
+| prettify-symbols-mode | turn-on-auto-fill | turn-on-reftex | rainbow-delimiters-mode |
+
 ** COMMENT hl-todo
 hmm it does overwrite my nice highlighting of NEXT
 #+begin_src emacs-lisp
@@ -2109,6 +2211,9 @@ hmm it does overwrite my nice highlighting of NEXT
                 ("C-c j" . hl-todo-next))
     :hook ((LaTeX ess ess-r org) . hl-todo-mode))
 #+end_src
+
+#+RESULTS:
+
 ** bibtex/ivy-bibtex
 reference manager I use it in conjunction with zotero, which generates the
 .bib files, and org-ref, to insert citations in org files.
@@ -2122,6 +2227,10 @@ reference manager I use it in conjunction with zotero, which generates the
           '("/home/japhir/SurfDrive/bibliography/references.bib"
             "/home/japhir/Documents/References/PhD.bib")))
 #+end_src
+
+#+RESULTS:
+: t
+
 ** helm-bibtex
 #+begin_src emacs-lisp
   (setq
@@ -2146,6 +2255,29 @@ reference manager I use it in conjunction with zotero, which generates the
    ":URL: ${url}\n"
    ":END:\n\n"))
 #+end_src
+
+#+RESULTS:
+#+begin_example
+,#+title: ${title}
+,#+created: %u
+,#+last_modified: %U
+,#+roam_key: cite:${=key=}
+
+
+,* TODO Notes
+:PROPERTIES:
+:Custom_ID: ${=key=}
+:NOTER_DOCUMENT: %(orb-process-file-field "${=key=}")
+:AUTHOR: ${author-abbrev}
+:JOURNAL: ${journaltitle}
+:DATE: ${date}
+:YEAR: ${year}
+:DOI: ${doi}
+:URL: ${url}
+:END:
+
+#+end_example
+
 * secret directories
 These are all the settings that require secret directories, such as my org
 agenda files and google calendar. They overwrite the settings with "<...>"
