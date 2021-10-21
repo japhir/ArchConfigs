@@ -9,19 +9,13 @@ is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
   (setq gc-cons-threshold 402653184
         gc-cons-percentage 0.6)
 #+end_src
-* log startup time
-stolen from [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org#startup-performance][David Wilson's config]]
+* package archive
+** melpa
 #+begin_src emacs-lisp
-  ;; Profile emacs startup
-  (add-hook 'emacs-startup-hook
-            (lambda ()
-              (message "*** Emacs loaded in %s with %d garbage collections."
-                       (format "%.2f seconds"
-                               (float-time
-                                (time-subtract after-init-time before-init-time)))
-                       gcs-done)))
+  (require 'package)
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 #+end_src
-* use-package
+** use-package
 Use-package is an amazing resource to clean up my init file and have it play
 nice on both my desktop and laptop.
 #+begin_src emacs-lisp
@@ -29,11 +23,20 @@ nice on both my desktop and laptop.
     (require 'use-package))
   (setq use-package-always-ensure t)
   (setq use-package-verbose t)
-  (use-package diminish)  ; to omit lines from the mode-line
+  (use-package diminish)  ; to abbreviate lines from the mode-line
+  (use-package delight)  ; to omit lines from the mode-line
   (use-package bind-key)  ; for easy keybindings
 #+end_src
-* COMMENT straight.el
-#+begin_src emacs-lisp
+** COMMENT quelpa
+#+begin_src emacs-lisp :tangle no
+  (quelpa
+   '(quelpa-use-package
+     :fetcher git
+     :url "https://github.com/quelpa/quelpa-use-package.git"))
+  (require 'quelpa-use-package)
+#+end_src
+** COMMENT straight.el
+#+begin_src emacs-lisp :tangle no
   (defvar bootstrap-version)
   (let ((bootstrap-file
          (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -46,6 +49,19 @@ nice on both my desktop and laptop.
         (goto-char (point-max))
         (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
+#+end_src
+
+* log startup time
+stolen from [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org#startup-performance][David Wilson's config]]
+#+begin_src emacs-lisp
+  ;; Profile emacs startup
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (message "*** Emacs loaded in %s with %d garbage collections."
+                       (format "%.2f seconds"
+                               (float-time
+                                (time-subtract after-init-time before-init-time)))
+                       gcs-done)))
 #+end_src
 * dirvar
 define dirvars 'org-in-file', 'org-gtd-file', etc.
@@ -137,34 +153,22 @@ use C-M-= and C-M-- to increase/decrease font size globally.
   (electric-pair-mode 1) ; auto-insert matching bracket
   (show-paren-mode 1)    ; turn on paren match highlighting
 #+end_src
-*** smartparens
+*** COMMENT smartparens
+https://github.com/Fuco1/smartparens
 insert matching parentheses and jump across them
+
+it's been pretty slow and annoying for pasting stuff in R live repls
 #+begin_src emacs-lisp
   (use-package smartparens
-    :hook ((prog-mode markdown-mode org-mode) . turn-on-smartparens-strict-mode)
+    :hook ((prog-mode markdown-mode org-mode inferior-ess-mode inferior-ess-r-mode) . turn-on-smartparens-strict-mode)
     :config (show-smartparens-global-mode t))
 #+end_src
-*** evil-smartparens
+*** COMMENT evil-smartparens
+https://github.com/expez/evil-smartparens
 #+begin_src emacs-lisp
   (use-package evil-smartparens
     :after evil
-    :hook ((prog-mode markdown-mode org-mode) . evil-smartparens-mode))
-#+end_src
-* browsing the documentation
-** helpful
-beautiful help functions
-https://github.com/Wilfred/helpful
-#+begin_src emacs-lisp
-    (use-package helpful
-       :commands (helpful-callable helpful-function helpful-variable helpful-mode))
-#+end_src
-** demos
-Insert demos after describe function https://github.com/xuchunyang/elisp-demos
-#+begin_src emacs-lisp
-  (use-package elisp-demos
-    :after helpful
-    :config
-    (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
+    :hook (smartparens-enabled . evil-smartparens-mode))
 #+end_src
 * change appearance
 ** line spacing, underline
@@ -425,7 +429,7 @@ evil keymap for org-mode
 #+begin_src emacs-lisp
     (use-package evil-org
       :after (:any org evil)
-      :diminish evil-org-mode
+      :delight evil-org-mode
       :hook (((org-mode org-agenda-mode). evil-org-mode)
              (evil-org-mode . (lambda ()
                                 (evil-org-set-key-theme
@@ -484,11 +488,9 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
   #+end_src
 ** setup
 #+begin_src emacs-lisp
-  ;; get latest org-mode from other repo than elpa
-  (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
   (use-package org
     :pin org
-    :diminish org-indent-mode
+    :delight org-indent-mode
     :ensure org-plus-contrib
 #+end_src
 ** keybindings
@@ -726,7 +728,7 @@ customize capture templates
       ("w" "Website" entry (file org-in-file)
        "* %?\nEntered on %U\n %i\n %a")
       ("r" "Weekly Review" entry (file "~/org/log.org")
-       (file "~/org/weekly_review.org") :clock-in t :clock-keep t)
+       (file "~/org/weekly_review.org") :clock-in t :clock-keep t :jump-to-captured t)
       ("p" "Protocol" entry (file org-in-file)
        "* %:description%? :@web:\n[[%:link][%:description]]\n#+begin_quote\n%:initial\n#+end_quote\n" :add-created t)
       ("L" "Protocol Link" entry (file org-in-file)
@@ -1080,7 +1082,7 @@ usefull snippets for me: org-mode (fig_, )
   (use-package yasnippet
     :init
     (yas-global-mode 1)
-    :diminish yas-mode
+    :delight yas-mode
     :config
     (require 'warnings)
     (add-to-list 'warning-suppress-types '(yasnippet backquote-change))
@@ -1186,7 +1188,7 @@ lines if you forgot to press 10j. https://github.com/PythonNut/evil-easymotion/
 https://github.com/hlissner/evil-snipe
 #+begin_src emacs-lisp
   (use-package evil-snipe
-    :diminish evil-snipe-mode
+    :delight evil-snipe-mode
     :config
     (evil-snipe-mode 1)
     (evil-snipe-override-mode 1))
@@ -1701,7 +1703,7 @@ very nice search replacement
 #+begin_src emacs-lisp
   (use-package swiper
     :init (ivy-mode 1)
-    :diminish ivy-mode
+    :delight ivy-mode
     :config
     (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
     :custom
