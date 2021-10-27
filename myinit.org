@@ -1,13 +1,36 @@
 #+title: My Literate emacs config
 This is my config file for [[emacs.org]]!
 
-* set gc-cons threshold
+* speedups
+** gc-cons threshold
 The gc-cons-threshold is set to a superlarge number for faster startup time. It
 is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
 
 #+begin_src emacs-lisp
   (setq gc-cons-threshold 402653184
         gc-cons-percentage 0.6)
+#+end_src
+** make long lines faster
+I like to write my org-mode scientific papers such that each line has one sentence.
+This allows me to make more meaningful git commits per line.
+Often, these lines are quite long, however, and this makes emacs very slow.
+https://emacs.stackexchange.com/questions/598/how-do-i-prevent-extremely-long-lines-making-emacs-slow
+#+begin_src emacs-lisp
+  (setq-default bidi-paragraph-direction 'left-to-right)
+  (setq-default bidi-inhibit-bpa t)
+  ;; (setq-default bidi-display-reordering nil)  ;; officially unsupported
+#+end_src
+* log startup time
+stolen from [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org#startup-performance][David Wilson's config]]
+#+begin_src emacs-lisp
+  ;; Profile emacs startup
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (message "*** Emacs loaded in %s with %d garbage collections."
+                       (format "%.2f seconds"
+                               (float-time
+                                (time-subtract after-init-time before-init-time)))
+                       gcs-done)))
 #+end_src
 * package archive
 ** melpa
@@ -50,19 +73,19 @@ nice on both my desktop and laptop.
         (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
 #+end_src
-
-* log startup time
-stolen from [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org#startup-performance][David Wilson's config]]
+** automatic package updates
+from the [[https://github.com/daviwil/emacs-from-scratch/blob/master/Emacs.org#automatic-package-updates][emacs from scratch]] series
 #+begin_src emacs-lisp
-  ;; Profile emacs startup
-  (add-hook 'emacs-startup-hook
-            (lambda ()
-              (message "*** Emacs loaded in %s with %d garbage collections."
-                       (format "%.2f seconds"
-                               (float-time
-                                (time-subtract after-init-time before-init-time)))
-                       gcs-done)))
+  (use-package auto-package-update
+    :custom
+    (auto-package-update-interval 7)
+    (auto-package-update-prompt-before-update t)
+    (auto-package-update-hide-results t)
+    :config
+    (auto-package-update-maybe)
+    (auto-package-update-at-time "09:00"))
 #+end_src
+
 * dirvar
 define dirvars 'org-in-file', 'org-gtd-file', etc.
 #+begin_src emacs-lisp
@@ -238,8 +261,8 @@ Highlight hex colours!
 Show plain-text emoji like ~:)~ as images, but also unicode ~☺~ and ~:slight-smile:~. :D
 https://github.com/iqbalansari/emacs-emojify
 #+begin_src emacs-lisp
-  (use-package emojify
-    :hook (after-init-hook . global-emojify-mode))
+    (use-package emojify
+      :init (global-emojify-mode))
 #+end_src
 ** pulse
 Highlight the current line when changing focus. It's like beacon-mode but native!
@@ -548,6 +571,8 @@ basic latex settings
   (customize-set-value 'org-latex-hyperref-template "
   \\hypersetup{\n pdfauthor={%a},\n pdftitle={%t},\n pdfkeywords={%k},
    pdfsubject={%d},\n pdfcreator={%c},\n pdflang={%L},\n colorlinks=true}\n")
+  (org-export-with-sub-superscripts '{})
+  (org-use-sub-superscripts '{})
 #+end_src
 *** org-entities-user
 These are nice shorthands for commands I use often. In org-source they look
@@ -691,7 +716,7 @@ Filter tasks by context (sorted by todo state)
           (tags priority-down todo-state-up category-keep)
           (search category-keep)))
   (org-agenda-custom-commands
-        '(("i" "Inbox" tags "in")
+        '(("i" "Inbox" tags "inbox")
           ("I" "Important"
            ((tags "PRIORITY=\"A\"/PROJ"
                   ((org-agenda-overriding-header "High-priority projects:")))
@@ -921,10 +946,11 @@ org-export ignore headlines with ~:ignore:~ tag
 https://github.com/integral-dw/org-superstar-mode
 
 Here are some symbol options for my various todo-states
-NEXT: ☐
-DONE: ☑🗹
+inbox: 📨📥
+NEXT: ☐⏭
+DONE: ☑🗹✅
 TICK: →🗓📅📆
-WAIT: ☕…
+WAIT: ☕📨…
 SOME: ☁⛅⛈🌤🌧🌥🌪⛱☼
 CANC: ❌☒✗⮽🗳🗵🗷✘╳❌
 
@@ -936,13 +962,13 @@ see e.g. https://emojipedia.org/calendar/ for emoji!
     (org-mode . (lambda () (org-superstar-mode 1)))
     :custom
     (org-superstar-headline-bullets-list
-     '("◉" "●" "○" "♦" "◆" "►" "▸"))
-    (org-superstar-todo-bullet-alist '(("NEXT" " ☐" ?☐)
+     '("◉" "●" "○" "⁍" "◆" "►" "▸"))
+    (org-superstar-todo-bullet-alist '(("NEXT" " ⏭ " ?⏭)
                                        ("TICK" " 🗓" ?🗓)
-                                       ("WAIT" " …" ?…)
-                                       ("SOME" " ☼" ?☼)
+                                       ("WAIT" " 📨" ?📨)
+                                       ("SOME" " ☁" ?☁)
                                        ("DONE" " ☑" ?☑)
-                                       ("CANC" " ❌" ?❌)))
+                                       ("CANC" " 🗑" ?🗑)))
     (org-superstar-special-todo-items t))
 #+end_src
 
@@ -1131,23 +1157,42 @@ usefull snippets for me: org-mode (fig_, )
     (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE " . "#\\+END_EXAMPLE$")))
 #+end_src
 ** org-ref
+*** bibtex/ivy-bibtex
+reference manager I use it in conjunction with zotero, which generates the
+.bib files, and org-ref, to insert citations in org files.
+
+#+begin_src emacs-lisp
+  (use-package ivy-bibtex
+    :after ivy
+    :init
+    (setq bibtex-completion-bibliography
+          '("~/SurfDrive/bibliography/references.bib"
+            "~/Documents/References/PhD.bib")
+          bibtex-completion-library-path '("~/SurfDrive/bibliography/")
+          bibtex-completion-notes-path "~/SurfDrive/bibliography/notes"
+          bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
+
+          bibtex-completion-additional-search-fields '(keywords)
+          bibtex-completion-display-formats
+          '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
+            (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
+            (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+            (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+            (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
+          bibtex-completion-pdf-open-function
+          (lambda (fpath)
+            (call-process "open" nil 0 nil fpath))))
+#+end_src
+
+*** org-ref itself
 https://github.com/jkitchin/org-ref/blob/master/org-ref.org
 #+begin_src emacs-lisp
   (use-package org-ref
     :init
-    (setq org-ref-completion-library 'org-ref-ivy-cite
-          org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
-          reftex-default-bibliography '("~/SurfDrive/bibliography/references.bib")
-          org-ref-bibliography-notes '("~/SurfDrive/bibliography/notes/notes.org")
-          org-ref-default-bibliography '("~/SurfDrive/bibliography/references.bib")
-          ;; I think this one never gets used
-          org-ref-note-title-format "* TODO %y - %t\n :PROPERTIES:\n  :Custom_ID: %k\n  :NOTER_DOCUMENT: %F\n :ROAM_KEY: cite:%k\n  :AUTHOR: %9a\n  :JOURNAL: %j\n  :YEAR: %y\n  :VOLUME: %v\n  :PAGES: %p\n  :DOI: %D\n  :URL: %U\n :END:\n\n"
-          org-ref-notes-directory "~/SurfDrive/bibliography/notes/"
-          org-ref-notes-function 'orb-edit-notes
-          ;; org-ref-pdf-directory '("~/SurfDrive/bibliography/bibtex-pdfs/")
-          bibtex-completion-pdf-open-function 'org-open-file)
+    (require 'bibtex)
     :bind
-    (:map org-mode-map ("C-c ]" . org-ref-ivy-insert-cite-link))
+      (:map org-mode-map
+           ("C-c ]" . org-ref-insert-link))
     :custom
     (bibtex-autokey-year-length 4)
     (bibtex-autokey-name-year-separator "")
@@ -1157,13 +1202,11 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
     (bibtex-autokey-titlewords-stretch 1)
     (bibtex-autokey-titleword-length 5)
     :config
-    ;; (require 'doi-utils)
-    ;; (require 'org-id)
-    ;; (require 'org-ref-wos)
+    (require 'org-ref-ivy)
+    ;; (require 'org-ref-archiv)
     ;; (require 'org-ref-scopus)
-    ;; (require 'org-ref-pubmed)
-    ;; (require 'org-ref-sci-id)
-    (require 'org-ref))
+    ;; (require 'org-ref-wos)
+    )
 #+end_src
 *** open zotero pdf at point
 from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-mendeley-jabref-and-zotero-users][the manual]]
@@ -1185,10 +1228,11 @@ from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-me
 
   (global-set-key (kbd "<f8>") 'my/org-ref-open-pdf-at-point)
 #+end_src
-** citeproc
+** COMMENT citeproc
 #+begin_src emacs-lisp
   (use-package citeproc-org
     :after org
+    :disabled
     :config
     (citeproc-org-setup))
 #+end_src
@@ -1399,6 +1443,7 @@ https://github.com/fuxialexander/org-pdftools
 seems like this is what both [[https://github.com/jethrokuan/dots/blob/master/.doom.d/config.el#L454][jethro]] and [[https://github.com/zaeph/.emacs.d/blob/8243cd8c74775387e011de679f041ca8e3cff41a/init.el#L3865][zaeph]] seem to be using since org-roam v2 update
 #+begin_src emacs-lisp
   (use-package bibtex-completion
+    :disabled
     :config
     (setq bibtex-completion-notes-path "~/SurfDrive/bibliography/notes/"
           bibtex-completion-bibliography "~/SurfDrive/bibliography/references.bib"
@@ -1593,9 +1638,7 @@ https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
     (orb-preformat-keywords
      '("citekey" "title" "url" "author-or-editor" "journal" "keywords" "file"))
     (orb-process-file-keyword t)
-    (orb-file-field-extensions '("pdf"))
-    :config
-    (require 'org-ref))
+    (orb-file-field-extensions '("pdf")))
 #+end_src
 
 ** company-org-roam
@@ -1816,7 +1859,7 @@ perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collec
 See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for where I got it from.
 #+begin_src emacs-lisp
   (use-package company
-    :hook (after-init . global-company-mode)
+    :init (global-company-mode)
     :delight company-mode
     :config
     ;; (setq ;; company-require-match nil
@@ -2112,6 +2155,12 @@ check out this worg entry on working inline with stan models! https://orgmode.or
 #+RESULTS:
 : t
 
+** ob-stan
+org-mode babel intergation for stan
+#+begin_src emacs-lisp
+   (use-package org-contrib
+      :config (require 'ob-stan))
+#+end_src
 ** markdown-mode
 markdown mode for writing
 #+begin_src emacs-lisp
@@ -2213,23 +2262,6 @@ hmm it does overwrite my nice highlighting of NEXT
 #+end_src
 
 #+RESULTS:
-
-** bibtex/ivy-bibtex
-reference manager I use it in conjunction with zotero, which generates the
-.bib files, and org-ref, to insert citations in org files.
-#+begin_src emacs-lisp
-  (use-package ivy-bibtex
-    :after ivy
-    :config
-    ;; (autoload 'ivy-bibtex "ivy-bibtex" "" t)
-    (require 'ivy-bibtex)
-    (setq bibtex-completion-bibliography
-          '("/home/japhir/SurfDrive/bibliography/references.bib"
-            "/home/japhir/Documents/References/PhD.bib")))
-#+end_src
-
-#+RESULTS:
-: t
 
 ** helm-bibtex
 #+begin_src emacs-lisp
