@@ -1124,7 +1124,8 @@ prettify the todo keywords
      (shell . t)
      (stan . t)
      (latex . t)
-     (R . t)))
+     (R . t)
+     (julia-vterm . t)))
 #+end_src
 *** org-export odt
 #+begin_src emacs-lisp
@@ -1169,6 +1170,12 @@ org-export ignore headlines with ~:ignore:~ tag
   ;; TODO figure out how to add multiple items to the list
   (add-to-list 'org-structure-template-alist
                '("sr" . "src R
+  "))
+  (add-to-list 'org-structure-template-alist
+               '("sp" . "src python
+  "))
+  (add-to-list 'org-structure-template-alist
+               '("sj" . "src julia
   "))
 #+end_src
 ** org-protocol
@@ -2299,6 +2306,7 @@ emacs speaks statistics, work with R etc.
                (string= lang "python")
                (string= lang "elisp")
                (string= lang "emacs-lisp")
+               (string= lang "julia")
                (string= lang "latex"))))
     :custom
     ;; display-buffer-alist
@@ -2385,6 +2393,13 @@ Put spaces around operators such as +, -, etc.
 #+end_src
 
 #+RESULTS:
+
+** julia
+#+begin_src emacs-lisp
+  (use-package julia-mode)
+  (use-package ob-julia-vterm
+    :config (defalias 'org-babel-execute:julia 'org-babel-execute:julia-vterm))
+#+end_src
 
 ** stan
 https://mc-stan.org/
