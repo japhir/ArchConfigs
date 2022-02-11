@@ -82,7 +82,6 @@ from the [[https://github.com/daviwil/emacs-from-scratch/blob/master/Emacs.org#a
     (auto-package-update-prompt-before-update t)
     (auto-package-update-hide-results t)
     :config
-    (auto-package-update-maybe)
     (auto-package-update-at-time "09:00"))
 #+end_src
 
@@ -112,7 +111,7 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
 ** turn off UI elements and small tweaks
 #+begin_src emacs-lisp
   (setq inhibit-splash-screen t)
-  (setq initial-major-mode 'org-mode)
+  ;; (setq initial-major-mode 'org-mode)
   (setq large-file-warning-threshold 100000000) ;; change to ~100 MB
   (scroll-bar-mode -1)   ; turn off the scroll bar
   (tool-bar-mode -1)     ; turn off the tool bar
