@@ -1204,7 +1204,7 @@ DONE: ☑🗹✅
 TICK: →🗓📅📆
 WAIT: ☕📨…
 SOME: ☁⛅⛈🌤🌧🌥🌪⛱☼
-CANC: ❌☒✗⮽🗳🗵🗷✘╳❌
+CANC: ❌☒✗⮽🗳🗵🗷✘╳❌ ❎🗑
 
 see e.g. https://emojipedia.org/calendar/ for emoji!
 
@@ -1214,14 +1214,15 @@ see e.g. https://emojipedia.org/calendar/ for emoji!
     (org-mode . (lambda () (org-superstar-mode 1)))
     :custom
     (org-superstar-headline-bullets-list
-     '("◉" "●" "○" "⁍" "◆" "►" "▸"))
-    (org-superstar-todo-bullet-alist '(("NEXT" " ⏭ " ?⏭)
-                                       ("TICK" " 🗓" ?🗓)
-                                       ("WAIT" " 📨" ?📨)
-                                       ("SOME" " ☁" ?☁)
-                                       ("DONE" " ☑" ?☑)
-                                       ("CANC" " 🗑" ?🗑)))
-    (org-superstar-special-todo-items t))
+     '("◉" "●" "○" "⬡" "◆" "►" "▸"))
+    ;; (org-superstar-todo-bullet-alist '(("NEXT" " ⏭ " ?⏭)
+    ;;                                    ("TICK" " 🗓" ?🗓)
+    ;;                                    ("WAIT" " 📨" ?📨)
+    ;;                                    ("SOME" " ☁" ?☁)
+    ;;                                    ("DONE" " ☑" ?☑)
+    ;;                                    ("CANC" " 🗑" ?🗑)))
+    ;;(org-superstar-special-todo-items t)
+    )
 #+end_src
 
 ** ob-async
@@ -1399,8 +1400,8 @@ usefull snippets for me: org-mode (fig_, )
 ** flyspell
 #+begin_src emacs-lisp
   (use-package flyspell
-    :hook ((text-mode-hook . flyspell-mode)
-           (prog-mode-hook . flyspell-prog-mode))
+    :hook ((org-mode . flyspell-mode)
+           (prog-mode . flyspell-prog-mode))
     :config
     (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
     (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC" . "#\\+END_SRC"))
@@ -1409,6 +1410,7 @@ usefull snippets for me: org-mode (fig_, )
     (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE " . "#\\+END_EXAMPLE$")))
 #+end_src
 ** org-ref
+I use most of the minimal setup in this [[https://github.com/jkitchin/org-ref/blob/master/melpa/init-ivy.el][init-ivy]] config.
 *** bibtex/ivy-bibtex
 reference manager I use it in conjunction with zotero, which generates the
 .bib files, and org-ref, to insert citations in org files.
@@ -1421,7 +1423,7 @@ reference manager I use it in conjunction with zotero, which generates the
           '("~/SurfDrive/bibliography/references.bib"
             "~/Documents/References/PhD.bib")
           bibtex-completion-library-path '("~/SurfDrive/bibliography/")
-          bibtex-completion-notes-path "~/SurfDrive/bibliography/notes"
+          bibtex-completion-notes-path "~/SurfDrive/bibliography/notes/"
           bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
 
           bibtex-completion-additional-search-fields '(keywords)
@@ -1435,16 +1437,33 @@ reference manager I use it in conjunction with zotero, which generates the
           (lambda (fpath)
             (call-process "open" nil 0 nil fpath))))
 #+end_src
-
+*** automatically generating bibtex keys
+#+begin_src emacs-lisp
+  (use-package bibtex
+    :custom
+    (bibtex-autokey-year-length 4)
+    (bibtex-autokey-name-year-separator "-" )
+    (bibtex-autokey-year-title-separator "-")
+    (bibtex-autokey-titlewords 0)
+    (bibtex-autokey-titlewords-stretch 0)
+    (bibtex-autokey-titleword-length 0)
+    ;; org-ref-bibtex-hydra-key-binding (kbd "")
+    )
+#+end_src
 *** org-ref itself
 https://github.com/jkitchin/org-ref/blob/master/org-ref.org
 #+begin_src emacs-lisp
   (use-package org-ref
+    :after ivy-bibtex
     :init
     (require 'bibtex)
     :bind
-      (:map org-mode-map
-           ("C-c ]" . org-ref-insert-link))
+    (:map org-mode-map
+          ("s-[" . org-ref-insert-link-hydra/body)
+          ("C-c ]" . org-ref-insert-link))
+    :hook
+    (org-export-before-parsing . org-ref-glossary-before-parsing)
+    (org-export-before-parsing . org-ref-acronyms-before-parsing)
     :custom
     (bibtex-autokey-year-length 4)
     (bibtex-autokey-name-year-separator "")
@@ -1453,8 +1472,13 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
     (bibtex-autokey-titlewords 0)
     (bibtex-autokey-titlewords-stretch 1)
     (bibtex-autokey-titleword-length 5)
-    :config
+    :init
     (require 'org-ref-ivy)
+    (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
+          org-ref-insert-cite-function 'org-ref-cite-insert-ivy
+          org-ref-insert-label-function 'org-ref-insert-label-link
+          org-ref-insert-ref-function 'org-ref-insert-ref-link
+          org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body)))
     ;; (require 'org-ref-archiv)
     ;; (require 'org-ref-scopus)
     ;; (require 'org-ref-wos)
@@ -1479,6 +1503,10 @@ from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-me
   ;; (setq org-ref-get-pdf-filename-function 'bibtex-completion-find-pdf-in-field)
 
   (global-set-key (kbd "<f8>") 'my/org-ref-open-pdf-at-point)
+#+end_src
+*** citeproc
+#+begin_src emacs-lisp
+  (use-package citeproc)
 #+end_src
 ** COMMENT citeproc
 #+begin_src emacs-lisp
@@ -1911,18 +1939,16 @@ Since the org module lazy loads org-protocol (waits until an org URL is detected
       :after org-protocol)
 #+end_src
 
-** COMMENT org-roam-ui
+** org-roam-ui
 https://github.com/org-roam/org-roam-ui
 #+begin_src emacs-lisp
   (use-package org-roam-ui
-    :straight
-      (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
       :after org-roam
       ;; :hook
       ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
       ;;         a hookable mode anymore, you're advised to pick something yourself
       ;;         if you don't care about startup time, use
-      ;;  :hook (after-init . org-roam-ui-mode)
+      ;; :hook (after-init . org-roam-ui-mode)
       :config
       (setq org-roam-ui-sync-theme t
             org-roam-ui-follow t
@@ -1993,8 +2019,8 @@ from [[https://github.com/abo-abo/oremacs/blob/github/modes/ora-org-roam.el#L106
     (emms-all)
     (emms-default-players))
 #+end_src
-** org-media-note
-#+begin_src emacs-lisp
+** COMMENT org-media-note
+#+begin_src emacs-lisp :tangle no
   (use-package quelpa-use-package)
   (use-package pretty-hydra)
   (use-package org-media-note
@@ -2076,6 +2102,17 @@ very nice search replacement
     :ensure nil
     :custom
     (dired-listing-switches "-lh"))
+#+end_src
+** dirvish
+:PROPERTIES:
+:CREATED:  [2021-12-28 Tue 16:10]
+:END:
+https://github.com/alexluigit/dirvish
+#+begin_src emacs-lisp
+  (use-package dirvish
+    :bind (:map dirvish-mode-map
+                ("l" . dirvish-find-file)
+                ("h" . dirvish-up-directory)))
 #+end_src
 ** ranger
 #+begin_src emacs-lisp
@@ -2231,7 +2268,7 @@ install it with pacman ~mu~
 :LOGBOOK:
 - State "SOME"       from              [2021-09-26 Sun 13:14]
 :END:
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package mu4e-thread-folding
     :quelpa (mu4e-thread-folding :fetcher github :repo "rougier/mu4e-thread-folding"))
 #+end_src
@@ -2286,10 +2323,12 @@ emacs speaks statistics, work with R etc.
   (use-package ess
     ;; :load-path "/usr/share/emacs/site-lisp/ess"
     :init (require 'ess-site)  ;; seems like this is needed to load the minor modes as well keybindings don't work without it
-    :hook (((ess-r-mode inferior-ess-r-mode) . electric-layout-mode)  ;; commented out since new curly-curly operator for rlang
-           (ess-r-post-run . (lambda ()
-              (ess-load-file (make-temp-file nil nil nil
-                                          "Sys.setenv(\"DISPLAY\"=\":0.0\")")))))
+    :hook (
+           ((ess-r-mode inferior-ess-r-mode) . electric-layout-mode)
+           ;; (ess-r-post-run . (lambda ()
+           ;;    (ess-load-file (make-temp-file nil nil nil
+           ;;                                "Sys.setenv(\"DISPLAY\"=\":0.0\")")))
+           )
     :commands R
     :bind (:map ess-r-mode-map
            (";" . ess-insert-assign)
