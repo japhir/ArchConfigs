@@ -18,6 +18,7 @@ https://emacs.stackexchange.com/questions/598/how-do-i-prevent-extremely-long-li
 #+begin_src emacs-lisp
   (setq-default bidi-paragraph-direction 'left-to-right)
   (setq-default bidi-inhibit-bpa t)
+  (global-so-long-mode 1)
   ;; (setq-default bidi-display-reordering nil)  ;; officially unsupported
 #+end_src
 * log startup time
@@ -135,8 +136,10 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
 
   ;; automatically re-open files that have been changed on disk
   (global-auto-revert-mode 1)
+  (setq global-auto-revert-non-file-buffers t)
 
   (defalias 'yes-or-no-p 'y-or-n-p)
+  (setq use-dialog-box nil) ; do not use graphical ui dialog boxes but use echo area (esp. for org-pomodoro)
 
   ;; always follow symlinks w/o asking
   (require 'vc-hooks)
@@ -157,6 +160,15 @@ auto-save when I exit normal mode
         backup-inhibited t
         confirm-nonexistent-file-or-buffer nil
         create-lockfiles nil)
+#+end_src
+** history
+#+begin_src emacs-lisp
+  (recentf-mode 1)
+  ;; Save what you enter into minibuffer prompts
+  (setq history-length 25)
+  (savehist-mode 1)
+  ;; Remember and restore the last cursor location of opened files
+  (save-place-mode 1)
 #+end_src
 ** COMMENT frames-only-mode
 let my window manager handle screen creation
@@ -261,7 +273,8 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
 #+end_src
 ** set variable font
 #+begin_src emacs-lisp
-  (set-face-attribute 'default nil :family "Iosevka" :height 120)
+  (set-face-attribute 'default nil :family "Iosevka" :height 130)
+  ;; (set-face-attribute 'default nil :family "Comic Neue" :height 150) ;; to annoy people
   (set-face-attribute 'variable-pitch nil :family "Tex Gyre Pagella" :height 1.0)
   (set-face-attribute 'fixed-pitch nil :family "Iosevka" :height 1.0)
 #+end_src
@@ -1264,7 +1277,7 @@ doesn't work :(
   (add-to-list 'image-type-file-name-regexps '("\\.pdf\\'" . imagemagick))
   (add-to-list 'image-file-name-extensions "pdf")
   (setq imagemagick-types-inhibit (remove 'PDF imagemagick-types-inhibit))
-  (setq org-image-actual-width 600)
+  (setq org-image-actual-width (list 800))
 #+end_src
 ** org-beamer
 #+begin_src emacs-lisp
@@ -2406,10 +2419,31 @@ Put spaces around operators such as +, -, etc.
 #+begin_src emacs-lisp
   (use-package electric-operator
     :hook ((R-mode ess-r-mode inferior-ess-r-mode) . electric-operator-mode)
-    ;; :config
-    ;; (electric-operator-add-rules-for-mode 'ess-r-mode
-    ;;                                       (cons "{{" "{{ ")
-    ;;                                       (cons "}" " }"))
+    :config
+    (electric-operator-add-rules-for-mode 'stan-mode
+                                          (cons "," ", ")
+                                          (cons "~" " ~ "))
+
+    (electric-operator-add-rules-for-mode 'ess-r-mode
+                                          (cons ".+" " . + ")
+                                          ;; these should never have spacing around them
+                                          (cons ":" ":") ;; for ranges, should not add space
+                                          (cons "::" "::") ;; to call a function from a package
+                                          (cons ":::" ":::") ;; to call an internal function from a package
+                                          (cons ":=" " := ") ;; walrus operator
+                                          (cons "? " "?")
+                                          (cons "){" ") {")
+                                          (cons "}else{" "} else {")
+                                          (cons "for(" "for (")
+                                          (cons "if(" "if (")
+                                          (cons "while(" "while (")
+                                          (cons "{{" " {{ ") ;; curly-curly tidyverse
+                                          (cons "}}" " }} ")
+                                          (cons "!!" " !!")
+                                          (cons "!!!" " !!!")
+                                          (cons "^" "^") ;;
+                                          (cons "|>" " |> ") ;; r 4.0 built-in pipe
+                                          )
     :custom
     (electric-operator-R-named-argument-style 'spaced))
 #+end_src
