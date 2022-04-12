@@ -273,11 +273,15 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
 #+end_src
 ** set variable font
 #+begin_src emacs-lisp
-  (set-face-attribute 'default nil :family "Iosevka" :height 130)
-  ;; (set-face-attribute 'default nil :family "Comic Neue" :height 150) ;; to annoy people
-  (set-face-attribute 'variable-pitch nil :family "Tex Gyre Pagella" :height 1.0)
-  (set-face-attribute 'fixed-pitch nil :family "Iosevka" :height 1.0)
+  ;; (set-face-attribute 'default nil :family "Noto Mono" :height 130)
+  (set-face-attribute 'default nil :family "Noto Sans Mono" :height 150)
+  (set-face-attribute 'variable-pitch nil :family "Noto Serif" :height 1.0)
+  ;;Tex Gyre Pagella
+  (set-face-attribute 'fixed-pitch nil :family "Noto Sans Mono" :height 1.0)
 #+end_src
+
+#+RESULTS:
+
 ** rainbow-mode
 Highlight hex colours!
 #+begin_src emacs-lisp
@@ -320,10 +324,10 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
 *** org-todo-next
 #+begin_src emacs-lisp
   (defface org-todo-next
-    '((((class color) (min-colors 16) (background light)) (:family "Iosevka" :foreground "light goldenrod yellow" :bold t :background "red" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 16) (background dark))  (:family "Iosevka" :foreground "light goldenrod yellow" :bold t :background "red" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)  (background light)) (:family "Iosevka" :foreground "light goldenrod yellow" :bold t :background "red" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)  (background dark))  (:family "Iosevka" :foreground "light goldenrod yellow" :bold t :background "red" :box (:line-width 2 :style released-button)))
+    '((((class color) (min-colors 16) (background light)) (:family "Noto Sans Mono" :foreground "light goldenrod yellow" :bold t :background "red" :box (:line-width 2 :style released-button)))
+      (((class color) (min-colors 16) (background dark))  (:family "Noto Sans Mono" :foreground "light goldenrod yellow" :bold t :background "red" :box (:line-width 2 :style released-button)))
+      (((class color) (min-colors 8)  (background light)) (:family "Noto Sans Mono" :foreground "light goldenrod yellow" :bold t :background "red" :box (:line-width 2 :style released-button)))
+      (((class color) (min-colors 8)  (background dark))  (:family "Noto Sans Mono" :foreground "light goldenrod yellow" :bold t :background "red" :box (:line-width 2 :style released-button)))
       (t (:inverse-video t :bold t)))
     "Face for NEXT TODO keyword"
     :group 'org-faces)
@@ -332,10 +336,10 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
 *** org-todo-waiting
 #+begin_src emacs-lisp
   (defface org-todo-waiting
-    '((((class color) (min-colors 16) (background light)) (:family "Iosevka" :foreground "dim gray" :bold t :background "yellow" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 16) (background dark))  (:family "Iosevka" :foreground "dim gray" :bold t :background "yellow" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)  (background light)) (:family "Iosevka" :foreground "dim gray" :bold t :background "yellow" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)  (background dark))  (:family "Iosevka" :foreground "dim gray" :bold t :background "yellow" :box (:line-width 2 :style released-button)))
+    '((((class color) (min-colors 16) (background light)) (:family "Noto Sans Mono" :foreground "dim gray" :bold t :background "yellow" :box (:line-width 2 :style released-button)))
+      (((class color) (min-colors 16) (background dark))  (:family "Noto Sans Mono" :foreground "dim gray" :bold t :background "yellow" :box (:line-width 2 :style released-button)))
+      (((class color) (min-colors 8)  (background light)) (:family "Noto Sans Mono" :foreground "dim gray" :bold t :background "yellow" :box (:line-width 2 :style released-button)))
+      (((class color) (min-colors 8)  (background dark))  (:family "Noto Sans Mono" :foreground "dim gray" :bold t :background "yellow" :box (:line-width 2 :style released-button)))
       (t (:inverse-video t :bold t)))
     "Face for WAIT TODO keyword"
     :group 'org-faces)
@@ -344,10 +348,10 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
 *** org-todo-tick
 #+begin_src emacs-lisp
   (defface org-todo-tick
-    '((((class color) (min-colors 16) (background light)) (:family "Iosevka" :bold t :background "light slate blue" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 16) (background dark))  (:family "Iosevka" :bold t :background "light slate blue" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)  (background light)) (:family "Iosevka" :bold t :background "light slate blue" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)  (background dark))  (:family "Iosevka" :bold t :background "light slate blue" :box (:line-width 2 :style released-button)))
+    '((((class color) (min-colors 16) (background light)) (:family "Noto Sans Mono" :bold t :background "light slate blue" :box (:line-width 2 :style released-button)))
+      (((class color) (min-colors 16) (background dark))  (:family "Noto Sans Mono" :bold t :background "light slate blue" :box (:line-width 2 :style released-button)))
+      (((class color) (min-colors 8)  (background light)) (:family "Noto Sans Mono" :bold t :background "light slate blue" :box (:line-width 2 :style released-button)))
+      (((class color) (min-colors 8)  (background dark))  (:family "Noto Sans Mono" :bold t :background "light slate blue" :box (:line-width 2 :style released-button)))
       (t (:inverse-video t :bold t)))
     "Face for TICK TODO keyword"
     :group 'org-faces)
@@ -356,10 +360,10 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
 *** org-todo-someday
 #+begin_src emacs-lisp
   (defface org-todo-someday
-    '((((class color) (min-colors 16) (background light)) (:family "Iosevka" :foreground "ghost white" :bold t :background "deep sky blue" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 16) (background dark))  (:family "Iosevka" :foreground "ghost white" :bold t :background "deep sky blue" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)  (background light)) (:family "Iosevka" :foreground "ghost white" :bold t :background "deep sky blue" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)  (background dark))  (:family "Iosevka" :foreground "ghost white" :bold t :background "deep sky blue" :box (:line-width 2 :style released-button)))
+    '((((class color) (min-colors 16) (background light)) (:family "Noto Sans Mono" :foreground "ghost white" :bold t :background "deep sky blue" :box (:line-width 2 :style released-button)))
+      (((class color) (min-colors 16) (background dark))  (:family "Noto Sans Mono" :foreground "ghost white" :bold t :background "deep sky blue" :box (:line-width 2 :style released-button)))
+      (((class color) (min-colors 8)  (background light)) (:family "Noto Sans Mono" :foreground "ghost white" :bold t :background "deep sky blue" :box (:line-width 2 :style released-button)))
+      (((class color) (min-colors 8)  (background dark))  (:family "Noto Sans Mono" :foreground "ghost white" :bold t :background "deep sky blue" :box (:line-width 2 :style released-button)))
       (t (:inverse-video t :bold t)))
     "Face for SOME TODO keyword"
     :group 'org-faces)
@@ -368,9 +372,9 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
 *** org-done-done
 #+begin_src emacs-lisp
   (defface org-done-done
-    '((((class color) (min-colors 16) (background light)) (:family "Iosevka" :foreground "green4" :bold t :background "pale green" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 16) (background dark)) (:family "Iosevka" :foreground "green4" :bold t :background "pale green" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)) (:family "Iosevka" :foreground "green" :background "pale green" :box (:line-width 2 :style released-button)))
+    '((((class color) (min-colors 16) (background light)) (:family "Noto Sans Mono" :foreground "green4" :bold t :background "pale green" :box (:line-width 2 :style released-button)))
+      (((class color) (min-colors 16) (background dark)) (:family "Noto Sans Mono" :foreground "green4" :bold t :background "pale green" :box (:line-width 2 :style released-button)))
+      (((class color) (min-colors 8)) (:family "Noto Sans Mono" :foreground "green" :background "pale green" :box (:line-width 2 :style released-button)))
       (t (:bold t)))
     "Face used for todo keywords that indicate DONE items."
     :group 'org-faces)
@@ -1058,12 +1062,12 @@ customize capture templates
 prettify the todo keywords
 #+begin_src emacs-lisp
   (org-todo-keyword-faces
-   '(("NEXT" . 'org-todo-next)
-     ("WAIT" . 'org-todo-waiting)
-     ("TICK" . 'org-todo-tick)
-     ("SOME" . 'org-todo-someday)
-     ("DONE" . 'org-done-done)
-     ("CANC" . 'org-done-cancelled)))
+   '(("NEXT" . org-todo-next)
+     ("WAIT" . org-todo-waiting)
+     ("TICK" . org-todo-tick)
+     ("SOME" . org-todo-someday)
+     ("DONE" . org-done-done)
+     ("CANC" . org-done-cancelled)))
 #+end_src
 *** context tags
 #+begin_src emacs-lisp
