@@ -74,7 +74,8 @@ nice on both my desktop and laptop.
         (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
 #+end_src
-** automatic package updates
+
+** COMMENT automatic package updates
 from the [[https://github.com/daviwil/emacs-from-scratch/blob/master/Emacs.org#automatic-package-updates][emacs from scratch]] series
 #+begin_src emacs-lisp
   (use-package auto-package-update
@@ -107,6 +108,8 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
     "Lists of Movies etc.")
   (defvar org-cal-file "~/org/calendars/gcal.org"
     "Google Calendar")
+  (setq my/org-roam-files
+        (directory-files "~/SurfDrive/bibliography/notes/daily" t "org$"))
 #+end_src
 * interface
 ** turn off UI elements and small tweaks
@@ -316,7 +319,7 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
     :custom
     (global-visual-line-mode t)
     ;; (global-visual-fill-column-mode t)
-    (visual-fill-column-width 115)
+    ;; (visual-fill-column-width 115) ;; instead prefer fill-column-width
     (split-window-preferred-function 'visual-fill-column-split-window-sensibly)
     (visual-fill-column-center-text t))
 #+end_src
@@ -324,22 +327,38 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
 *** org-todo-next
 #+begin_src emacs-lisp
   (defface org-todo-next
-    '((((class color) (min-colors 16) (background light)) (:family "Noto Sans Mono" :foreground "light goldenrod yellow" :bold t :background "red" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 16) (background dark))  (:family "Noto Sans Mono" :foreground "light goldenrod yellow" :bold t :background "red" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)  (background light)) (:family "Noto Sans Mono" :foreground "light goldenrod yellow" :bold t :background "red" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)  (background dark))  (:family "Noto Sans Mono" :foreground "light goldenrod yellow" :bold t :background "red" :box (:line-width 2 :style released-button)))
+    '((((class color) (min-colors 16) (background light))
+       (:family "Noto Sans Mono" :foreground "light goldenrod yellow"
+		:bold t :background "red"))
+      (((class color) (min-colors 16) (background dark))
+       (:family "Noto Sans Mono" :foreground "light goldenrod yellow"
+		:bold t :background "red"))
+      (((class color) (min-colors 8) (background light))
+       (:family "Noto Sans Mono" :foreground "light goldenrod yellow"
+		:bold t :background "red"))
+      (((class color) (min-colors 8) (background dark))
+       (:family "Noto Sans Mono" :foreground "light goldenrod yellow"
+		:bold t :background "red"))
       (t (:inverse-video t :bold t)))
-    "Face for NEXT TODO keyword"
-    :group 'org-faces)
+      "Face for NEXT TODO keyword"
+      :group 'org-faces)
 #+end_src
 
 *** org-todo-waiting
 #+begin_src emacs-lisp
   (defface org-todo-waiting
-    '((((class color) (min-colors 16) (background light)) (:family "Noto Sans Mono" :foreground "dim gray" :bold t :background "yellow" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 16) (background dark))  (:family "Noto Sans Mono" :foreground "dim gray" :bold t :background "yellow" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)  (background light)) (:family "Noto Sans Mono" :foreground "dim gray" :bold t :background "yellow" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)  (background dark))  (:family "Noto Sans Mono" :foreground "dim gray" :bold t :background "yellow" :box (:line-width 2 :style released-button)))
+    '((((class color) (min-colors 16) (background light))
+       (:family "Noto Sans Mono" :foreground "dim gray" :bold t
+       :background "yellow"))
+      (((class color) (min-colors 16) (background dark))
+       (:family "Noto Sans Mono" :foreground "dim gray" :bold t
+       :background "yellow"))
+      (((class color) (min-colors 8) (background light))
+       (:family "Noto Sans Mono" :foreground "dim gray" :bold t
+       :background "yellow"))
+      (((class color) (min-colors 8) (background dark))
+       (:family "Noto Sans Mono" :foreground "dim gray" :bold t
+       :background "yellow"))
       (t (:inverse-video t :bold t)))
     "Face for WAIT TODO keyword"
     :group 'org-faces)
@@ -348,10 +367,14 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
 *** org-todo-tick
 #+begin_src emacs-lisp
   (defface org-todo-tick
-    '((((class color) (min-colors 16) (background light)) (:family "Noto Sans Mono" :bold t :background "light slate blue" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 16) (background dark))  (:family "Noto Sans Mono" :bold t :background "light slate blue" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)  (background light)) (:family "Noto Sans Mono" :bold t :background "light slate blue" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)  (background dark))  (:family "Noto Sans Mono" :bold t :background "light slate blue" :box (:line-width 2 :style released-button)))
+    '((((class color) (min-colors 16) (background light))
+       (:family "Noto Sans Mono" :bold t :background "light slate blue"))
+      (((class color) (min-colors 16) (background dark))
+       (:family "Noto Sans Mono" :bold t :background "light slate blue"))
+      (((class color) (min-colors 8)  (background light))
+       (:family "Noto Sans Mono" :bold t :background "light slate blue"))
+      (((class color) (min-colors 8)  (background dark))
+       (:family "Noto Sans Mono" :bold t :background "light slate blue"))
       (t (:inverse-video t :bold t)))
     "Face for TICK TODO keyword"
     :group 'org-faces)
@@ -360,10 +383,18 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
 *** org-todo-someday
 #+begin_src emacs-lisp
   (defface org-todo-someday
-    '((((class color) (min-colors 16) (background light)) (:family "Noto Sans Mono" :foreground "ghost white" :bold t :background "deep sky blue" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 16) (background dark))  (:family "Noto Sans Mono" :foreground "ghost white" :bold t :background "deep sky blue" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)  (background light)) (:family "Noto Sans Mono" :foreground "ghost white" :bold t :background "deep sky blue" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)  (background dark))  (:family "Noto Sans Mono" :foreground "ghost white" :bold t :background "deep sky blue" :box (:line-width 2 :style released-button)))
+    '((((class color) (min-colors 16) (background light))
+       (:family "Noto Sans Mono" :foreground "ghost white" :bold t
+       :background "deep sky blue"))
+      (((class color) (min-colors 16) (background dark))
+       (:family "Noto Sans Mono" :foreground "ghost white" :bold t
+       :background "deep sky blue"))
+      (((class color) (min-colors 8) (background light))
+       (:family "Noto Sans Mono" :foreground "ghost white" :bold t
+       :background "deep sky blue"))
+      (((class color) (min-colors 8) (background dark))
+       (:family "Noto Sans Mono" :foreground "ghost white" :bold t
+       :background "deep sky blue"))
       (t (:inverse-video t :bold t)))
     "Face for SOME TODO keyword"
     :group 'org-faces)
@@ -372,9 +403,15 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
 *** org-done-done
 #+begin_src emacs-lisp
   (defface org-done-done
-    '((((class color) (min-colors 16) (background light)) (:family "Noto Sans Mono" :foreground "green4" :bold t :background "pale green" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 16) (background dark)) (:family "Noto Sans Mono" :foreground "green4" :bold t :background "pale green" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)) (:family "Noto Sans Mono" :foreground "green" :background "pale green" :box (:line-width 2 :style released-button)))
+    '((((class color) (min-colors 16) (background light))
+       (:family "Noto Sans Mono" :foreground "green4" :bold t
+       :background "pale green"))
+      (((class color) (min-colors 16) (background dark))
+       (:family "Noto Sans Mono" :foreground "green4" :bold t
+       :background "pale green"))
+      (((class color) (min-colors 8))
+       (:family "Noto Sans Mono" :foreground "green"
+       :background "pale green"))
       (t (:bold t)))
     "Face used for todo keywords that indicate DONE items."
     :group 'org-faces)
@@ -382,14 +419,20 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
 *** org-done-cancelled
 #+begin_src emacs-lisp
   (defface org-done-cancelled
-    '((((class color) (min-colors 16) (background light)) (:family "Iosevka" :foreground "dim gray" :bold t :background "gray" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 16) (background dark)) (:family "Iosevka" :foreground "dim gray" :bold t :background "gray" :box (:line-width 2 :style released-button)))
-      (((class color) (min-colors 8)) (:family "Iosevka" :foreground "dim gray" :background "gray" :box (:line-width 2 :style released-button)))
+    '((((class color) (min-colors 16) (background light))
+       (:family "Noto Sans Mono" :foreground "dim gray" :bold t
+       :background "gray"))
+      (((class color) (min-colors 16) (background dark))
+       (:family "Noto Sans Mono" :foreground "dim gray" :bold t
+       :background "gray"))
+      (((class color) (min-colors 8))
+       (:family "Noto Sans Mono" :foreground "dim gray"
+       :background "gray"))
       (t (:bold t)))
     "Face used for todo keywords that indicate CANC items."
     :group 'org-faces)
 #+end_src
-** svg-tag-mode
+** COMMENT svg-tag-mode
 #+begin_src emacs-lisp
   (require 'svg-tag-mode)
 
@@ -637,8 +680,8 @@ from [[https://stackoverflow.com/questions/15345614/how-to-get-emacs-org-mode-to
 
 ** firefox as default browser
 #+begin_src emacs-lisp
-  (setq browse-url-browser-function 'browse-url-generic
-	browse-url-generic-program "firefox")
+  (setq browse-url-generic-program (executable-find "firefox")
+        browse-url-browser-function 'browse-url-generic)
 #+end_src
 * evil
 Evil allows me to use vi(m) keybindings in emacs.
@@ -649,6 +692,9 @@ vim emulator
     :init
     (setq evil-want-integration t)
     (setq evil-want-keybinding nil)
+    (setq evil-want-C-i-jump t) ; jump forward instead of tab insert
+    (setq evil-want-Y-yank-to-eol t)
+    (setq evil-want-fine-undo t) ;; make smaller undo steps within insert mode
     ;; (setq evil-cross-lines t)
     ;; (setq evil-want-C-u-scroll t) ; C-u scrolls up half page
     :config
@@ -657,7 +703,7 @@ vim emulator
 ** evil-collection
 #+begin_src emacs-lisp
   (use-package evil-collection
-    :after evil
+    :after evil vterm
     :config
     (evil-collection-init))
 #+end_src
@@ -748,6 +794,7 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 ** hook
 #+begin_src emacs-lisp
   :hook (
+         (org-mode . variable-pitch-mode)
          ;; update last-modified upon save
          (before-save . zp/org-set-last-modified)
          ;; set created property on captures
@@ -772,9 +819,9 @@ basic latex settings
   (org-latex-pdf-process
         (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
   (org-latex-prefer-user-labels t)
-  (customize-set-value 'org-latex-hyperref-template "
-  \\hypersetup{\n pdfauthor={%a},\n pdftitle={%t},\n pdfkeywords={%k},
-   pdfsubject={%d},\n pdfcreator={%c},\n pdflang={%L},\n colorlinks=true}\n")
+  ;; (customize-set-value 'org-latex-hyperref-template "
+  ;; \\hypersetup{\n pdfauthor={%a},\n pdftitle={%t},\n pdfkeywords={%k},
+   ;; pdfsubject={%d},\n pdfcreator={%c},\n pdflang={%L},\n colorlinks=true}\n")
   (org-export-with-sub-superscripts '{})
   (org-use-sub-superscripts '{})
 #+end_src
@@ -894,10 +941,10 @@ https://emacs.stackexchange.com/questions/42281/org-mode-is-it-possible-to-displ
 *** agenda files
 all the org-files in my org-directory
 #+begin_src emacs-lisp
-  ;(setq org-directory "~/org/") ;; changed for org-roam capture
+  ;(setq org-directory "~/org/") ;; changed org-roam capture
   (org-agenda-files (append
                      (directory-files-recursively "~/org" "\\.org$")
-                     (directory-files-recursively "~/SurfDrive/bibliography/notes/daily" "\\.org$")))
+                     my/org-roam-files))
 #+end_src
 *** refile targets
 swyper makes refiling amazing!
@@ -908,9 +955,12 @@ swyper makes refiling amazing!
                                    (org-notes-file :maxlevel . 2)
                                    (org-lists-file :maxlevel . 2)
                                    (org-someday-file :maxlevel . 2)
-                                   (org-clumped-file :maxlevel . 4))))
+                                   (org-clumped-file :maxlevel . 4)
+                                   ;; (my/org-roam-files :maxlevel . 1) ;; comment out since org-roam-refile
+                                   )))
   (org-outline-path-complete-in-steps nil)   ;; Refile in a single go
-  (org-refile-use-outline-path t)            ;; Show full paths for refiling
+  (org-refile-use-outline-path 'file)            ;; Show full paths for refiling
+  (org-refile-allow-creating-parent-nodes 'confirm)
 #+end_src
 *** agenda filters
 Filter tasks by context (sorted by todo state)
@@ -1022,8 +1072,8 @@ Filter tasks by context (sorted by todo state)
 *** stuck projects
 #+begin_src emacs-lisp
   (org-tags-exclude-from-inheritance '("prj")
-                                     org-stuck-projects '("+prj/-CANC-SOME-DONE"
-                                                          ("NEXT" "WAIT" "TICK") ()))  ;;  "SOME"
+   org-stuck-projects '("+prj/-CANC-SOME-DONE"
+                        ("NEXT" "WAIT" "TICK") ()))  ;;  "SOME"
   (org-hierarchical-todo-statistics nil) ;; look for not-done tasks recursively
   ;; (org-provide-todo-statistics '(("NEXT", "TICK") ("CANC", "SOME", "DONE", "WAIT")))
 #+end_src
@@ -1059,9 +1109,20 @@ customize capture templates
                "DONE(d)" "CANC(c)")))
   #+end_src
 
-prettify the todo keywords
+*** prettify the todo keywords
 #+begin_src emacs-lisp
   (org-todo-keyword-faces
+   '(("NEXT" . org-todo-next)
+     ("WAIT" . org-todo-waiting)
+     ("TICK" . org-todo-tick)
+     ("SOME" . org-todo-someday)
+     ("DONE" . org-done-done)
+     ("CANC" . org-done-cancelled)))
+#+end_src
+
+*** prettify the org-modern todo keyword faces
+#+begin_src emacs-lisp
+  (org-modern-todo-faces
    '(("NEXT" . org-todo-next)
      ("WAIT" . org-todo-waiting)
      ("TICK" . org-todo-tick)
@@ -1139,7 +1200,7 @@ prettify the todo keywords
      (python . t)
      (latex . t)
      (shell . t)
-     (stan . t)
+     ;; (stan . t)
      (latex . t)
      (R . t)
      (julia-vterm . t)))
@@ -1151,17 +1212,20 @@ prettify the todo keywords
 *** ox-extra
 org-export ignore headlines with ~:ignore:~ tag
 #+begin_src emacs-lisp
-  (require 'ox-extra)
-  (ox-extras-activate '(latex-header-blocks ignore-headlines))
+  (use-package org-contrib
+    :config
+    (require 'ox-extra)
+    (ox-extras-activate '(ignore-headlines)))
 #+end_src
 *** ox-latex
 #+begin_src emacs-lisp
   (require 'ox-latex)
 #+end_src
-**** org-latex-packages
+**** COMMENT org-latex-packages
+I prefer to set this for each paper separately, just to be sure.
 #+begin_src emacs-lisp
   (add-to-list 'org-latex-packages-alist
-               '("version=3" "mhchem"))
+               '("version=4" "mhchem"))
   (add-to-list 'org-latex-packages-alist
                '("" "siunitx" nil))
   ;; (setcdr org-latex-packages-alist nil)
@@ -1241,6 +1305,12 @@ see e.g. https://emojipedia.org/calendar/ for emoji!
     ;;(org-superstar-special-todo-items t)
     )
 #+end_src
+** org-modern
+#+begin_src emacs-lisp
+  (use-package org-modern
+    :after org
+    :config (global-org-modern-mode))
+#+end_src
 
 ** ob-async
 allow asyncronous code block evaluation https://github.com/astahlman/ob-async
@@ -1266,6 +1336,19 @@ got the function from this [[https://github.com/marcinkoziej/org-pomodoro/issues
           (progn
             (org-pomodoro))))
     )
+#+end_src
+** COMMENT org-hyperscheduler
+not sure if I like it enough yet, but looks promising!
+https://github.com/dmitrym0/org-hyperscheduler
+#+begin_src emacs-lisp
+  (use-package org-hyperscheduler
+    :straight
+    (org-hyperscheduler
+     :repo "dmitrym0/org-hyperscheduler"
+     :host github
+     :branch "main"
+     :type git
+     :files ("*")))
 #+end_src
 ** org-pdftools
 used to be org-pdfview
@@ -1304,7 +1387,7 @@ auto-toggle latex fragments
     :hook (org-mode . org-fragtog-mode)
     :custom
     ;; (org-startup-with-latex-preview t)
-    (org-format-latex-options (plist-put org-format-latex-options :scale 1.5)))
+    (org-format-latex-options (plist-put org-format-latex-options :scale 2.5)))
 #+end_src
 ** org-appear
 dive into links/formatted entries
@@ -1428,6 +1511,16 @@ usefull snippets for me: org-mode (fig_, )
 #+end_src
 ** org-ref
 I use most of the minimal setup in this [[https://github.com/jkitchin/org-ref/blob/master/melpa/init-ivy.el][init-ivy]] config.
+*** bibtex
+#+begin_src emacs-lisp
+  (add-hook 'bibtex-mode-hook 'flyspell-mode)
+  (setq bibtex-user-optional-fields
+        '(("keywords" "Keywords to describe the entry" "")
+          ("file" "Link to document file." ":"))
+        bibtex-align-at-equal-sign t)
+  (setq bibtex-dialect 'biblatex)
+#+end_src
+
 *** bibtex/ivy-bibtex
 reference manager I use it in conjunction with zotero, which generates the
 .bib files, and org-ref, to insert citations in org files.
@@ -1454,6 +1547,8 @@ reference manager I use it in conjunction with zotero, which generates the
           (lambda (fpath)
             (call-process "open" nil 0 nil fpath))))
 #+end_src
+
+#+RESULTS:
 *** automatically generating bibtex keys
 #+begin_src emacs-lisp
   (use-package bibtex
@@ -1467,11 +1562,14 @@ reference manager I use it in conjunction with zotero, which generates the
     ;; org-ref-bibtex-hydra-key-binding (kbd "")
     )
 #+end_src
+
+#+RESULTS:
+
 *** org-ref itself
 https://github.com/jkitchin/org-ref/blob/master/org-ref.org
 #+begin_src emacs-lisp
   (use-package org-ref
-    :after ivy-bibtex
+    :after org
     :init
     (require 'bibtex)
     :bind
@@ -1493,6 +1591,7 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
     (require 'org-ref-ivy)
     (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
           org-ref-insert-cite-function 'org-ref-cite-insert-ivy
+          org-ref-default-citation-link 'parencite
           org-ref-insert-label-function 'org-ref-insert-label-link
           org-ref-insert-ref-function 'org-ref-insert-ref-link
           org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body)))
@@ -1501,6 +1600,10 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
     ;; (require 'org-ref-wos)
     )
 #+end_src
+
+#+RESULTS:
+: org-ref-insert-link
+
 *** open zotero pdf at point
 from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-mendeley-jabref-and-zotero-users][the manual]]
 #+begin_src emacs-lisp
@@ -1521,10 +1624,17 @@ from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-me
 
   (global-set-key (kbd "<f8>") 'my/org-ref-open-pdf-at-point)
 #+end_src
+
+#+RESULTS:
+: my/org-ref-open-pdf-at-point
+
 *** citeproc
 #+begin_src emacs-lisp
   (use-package citeproc)
 #+end_src
+
+#+RESULTS:
+
 ** COMMENT citeproc
 #+begin_src emacs-lisp
   (use-package citeproc-org
@@ -1938,15 +2048,6 @@ https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
     (orb-file-field-extensions '("pdf")))
 #+end_src
 
-** company-org-roam
-for auto-completion
-#+begin_src emacs-lisp
-  (use-package company-org-roam
-    :ensure t
-    :config
-    (push 'company-org-roam company-backends))
-#+end_src
-
 ** COMMENT org-roam-protocol
 this bit errors out if I use-package it.
 
@@ -2089,7 +2190,7 @@ very nice search replacement
     :delight counsel-mode
     :bind
     ("C-x l" . counsel-locate)
-    ("C-c g" . counsel-git)
+    ;; ("C-c g" . counsel-git)
     ("M-x" . counsel-M-x)
     ("C-c s" . counsel-rg))
 #+end_src
@@ -2104,8 +2205,7 @@ very nice search replacement
 * system
 ** vterm
 #+begin_src emacs-lisp
-  (use-package vterm
-    :defer t)
+  (use-package vterm)
 #+end_src
 ** systemd
 #+begin_src emacs-lisp
@@ -2130,6 +2230,16 @@ https://github.com/alexluigit/dirvish
     :bind (:map dirvish-mode-map
                 ("l" . dirvish-find-file)
                 ("h" . dirvish-up-directory)))
+#+end_src
+** COMMENT zel
+https://github.com/emacsattic/zel
+find recent files ranked by frequency of use, just like z in the shell
+#+begin_src emacs-lisp
+  (use-package zel
+    :ensure t
+    :demand t
+    :bind (("C-x C-r" . zel-find-file-frecent))
+    :config (zel-install))
 #+end_src
 ** ranger
 #+begin_src emacs-lisp
@@ -2269,7 +2379,7 @@ install it with pacman ~mu~
             (:subject       .  nil))
           mu4e-get-mail-command "env PATH=/usr/bin:/home/japhir/bin: mbsync -a"
           mu4e-headers-include-related t
-          mu4e-compose-format-flowed t  ; plain-text nice to read on phone
+          ;; mu4e-compose-format-flowed t  ; plain-text nice to read on phone
           ;; use-hard-newlines t             ; above doesn't work for Outlooks, so disabled for colleagues
           mu4e-confirm-quit nil
           mu4e-view-show-images t)
@@ -2295,8 +2405,9 @@ install it with pacman ~mu~
     :after mu4e
     :custom
     (mu4e-alert-interesting-mail-query
-     (concat "flag:unread"
-             " AND NOT maildir:\"/news\""))
+     (concat "flag:unread AND maildir:/inbox"
+             ;; " AND NOT maildir:\"/news\""
+             ))
     :config
     (mu4e-alert-set-default-style 'libnotify)
     :hook (after-init . mu4e-alert-enable-notifications))
@@ -2492,8 +2603,10 @@ check out this worg entry on working inline with stan models! https://orgmode.or
 #+RESULTS:
 : t
 
-** ob-stan
+** COMMENT ob-stan
 org-mode babel intergation for stan
+
+this has now migrated away from org-contrib to https://git.kyleam.com/ob-stan/ so if I want to get this to work I should probably figure out a straight recipe for it.
 #+begin_src emacs-lisp
    (use-package org-contrib
       :config (require 'ob-stan))
@@ -2654,6 +2767,15 @@ syntax above.
 #+begin_src emacs-lisp
   ;; (use-package emacsdirs)
   (load "~/.emacs.d/secretdirs.el" t)
+#+end_src
+
+* tree-sitter
+:PROPERTIES:
+:CREATED:  [2022-09-27 Tue 16:46]
+:END:
+#+begin_src emacs-lisp
+  (use-package tree-sitter)
+  (use-package tree-sitter-langs)
 #+end_src
 * reset gc-cons-threshold
 #+begin_src emacs-lisp
