@@ -1,6 +1,27 @@
 #+title: My Literate emacs config
 This is my config file for [[emacs.org]]!
 
+* WARNING: migration in progress!
+<2023-06-05 Mon> I'm trying to clean up this biiiiiig file and simplify as needed. I'm using
+https://github.com/SystemCrafters/crafted-emacs as a base for a new config!
+
+For now, I'm going to start editing [[file:~/.emacs.d/early-init.el]] and [[file:~/.emacs.d/init.el]] directly, without the org-mode wrapper around it!
+
+I will keep this file around until I've taken all the useful things out of it.
+
+* early-init
+I tangle this manually hoping that it'll work.
+#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
+  ;;; early-init.el --- Emacs early initialization for Crafted Emacs (optional) -*- lexical-binding: t; -*-
+  ;;; Commentary:
+  ;;
+  ;;; Code:
+
+  ;; Configures `package.el'
+  (load "~/crafted-emacs/modules/crafted-early-init-config")
+  (provide 'early-init)
+  ;;; early-init.el ends here
+#+end_src
 * speedups
 ** gc-cons threshold
 The gc-cons-threshold is set to a superlarge number for faster startup time. It
@@ -21,7 +42,8 @@ https://emacs.stackexchange.com/questions/598/how-do-i-prevent-extremely-long-li
   (global-so-long-mode 1)
   ;; (setq-default bidi-display-reordering nil)  ;; officially unsupported
 #+end_src
-* log startup time
+
+* COMMENT log startup time
 stolen from [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org#startup-performance][David Wilson's config]]
 #+begin_src emacs-lisp
   ;; Profile emacs startup
@@ -265,14 +287,19 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
 #+end_src
 *** circadian: dark theme at night, light theme during the day
 #+begin_src emacs-lisp
-  (use-package circadian
-    :custom
-    (calendar-latitude 52.08)
-    (calendar-longitude 5.11)
-    (circadian-themes '((:sunrise . modus-operandi)
-                        (:sunset  . modus-vivendi)))
-    :config
-    (circadian-setup))
+   (use-package circadian
+     :custom
+     ;; current location on earth for auto toggle between light and dark theme
+  ;   (calendar-latitude 52.08)
+  ;   (calendar-longitude 5.11)
+     (calendar-latitude 21.25) ;; Honolulu
+     (calendar-longitude -157.8)
+     ;; (calendar-latitude 40.5) ;; New York
+     ;; (calendar-longitude -74.5)
+     (circadian-themes '((:sunrise . modus-operandi)
+                         (:sunset  . modus-vivendi)))
+     :config
+     (circadian-setup))
 #+end_src
 ** set variable font
 #+begin_src emacs-lisp
@@ -539,7 +566,8 @@ git porcelain, essential!
 #+begin_src emacs-lisp
   (use-package magit
     :commands magit-status
-    :after with-editor)
+    ;; :after with-editor
+    )
 #+end_src
 ** org-make-toc for publishing table of contents on github
 https://github.com/alphapapa/org-make-toc
@@ -754,6 +782,11 @@ evil keybindings for magit
     :config
     (evil-set-initial-state 'magit-log-edit-mode 'insert))
 #+end_src
+* short-doc
+No idea why but suddently I've been getting issues about the function =define-short-documentation-group= not existing. This may fix it?
+#+begin_src emacs-lisp
+  (require 'shortdoc)
+#+end_src
 * org-mode
 ** my gtd and inbox files finding functions
 org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
@@ -810,22 +843,19 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 #+begin_src emacs-lisp
   :custom
 #+end_src
-*** org-latex export settings
+** org-latex export settings
 basic latex settings
 #+begin_src emacs-lisp
   (org-highlight-latex-and-related '(native script entities))
   ;; (org-preview-latex-default-process 'dvipng)
   ;; (setq org-latex-default-figure-position 'htbp)
   (org-latex-pdf-process
-        (list "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode -output-directory %o' -f -pdf %f"))
+   (list "latexmk -pdflatex='lualatex -shell-escape -interaction nonstopmode' -pdf -f %f"))
   (org-latex-prefer-user-labels t)
-  ;; (customize-set-value 'org-latex-hyperref-template "
-  ;; \\hypersetup{\n pdfauthor={%a},\n pdftitle={%t},\n pdfkeywords={%k},
-   ;; pdfsubject={%d},\n pdfcreator={%c},\n pdflang={%L},\n colorlinks=true}\n")
   (org-export-with-sub-superscripts '{})
   (org-use-sub-superscripts '{})
 #+end_src
-*** org-entities-user
+** COMMENT org-entities-user
 These are nice shorthands for commands I use often. In org-source they look
 nice, and they export to both \LaTeX and =html= correctly. Note that
 unfortunately, special entity names cannot contain numerics, so =\d18O= is not
@@ -1203,7 +1233,8 @@ customize capture templates
      ;; (stan . t)
      (latex . t)
      (R . t)
-     (julia-vterm . t)))
+     ;; (julia-vterm . t)
+     ))
 #+end_src
 *** org-export odt
 #+begin_src emacs-lisp
@@ -1221,16 +1252,42 @@ org-export ignore headlines with ~:ignore:~ tag
 #+begin_src emacs-lisp
   (require 'ox-latex)
 #+end_src
-**** COMMENT org-latex-packages
+*** org-latex-packages
+:LOGBOOK:
+- Note taken on [2023-06-05 Mon 14:55] \\
+  I've re-enabled this and added biblatex default options
+:END:
 I prefer to set this for each paper separately, just to be sure.
 #+begin_src emacs-lisp
   (add-to-list 'org-latex-packages-alist
                '("version=4" "mhchem"))
   (add-to-list 'org-latex-packages-alist
                '("" "siunitx" nil))
-  ;; (setcdr org-latex-packages-alist nil)
+  (add-to-list 'org-latex-packages-alist
+               '("giveninits=true,uniquename=init,citestyle=authoryear-comp,bibstyle=authoryear-comp,date=year,hyperref=true,mincitenames=1,maxcitenames=3,backend=biber,backref,url=false,isbn=false" "biblatex" nil))
+  ;; append colorlinks, allcolors, hidelinks here
+  ;; (customize-set-value 'org-latex-hyperref-template "
+  ;; \\hypersetup{\n pdfauthor={%a},\n pdftitle={%t},\n pdfkeywords={%k},
+  ;;  pdfsubject={%d},\n pdfcreator={%c},\n pdflang={%L},\n colorlinks=true}\n")  % colorlinks=true,
+  ;; % allcolors=blue,%
 #+end_src
-*** latejx class =ijkarticle=
+*** org bibliography
+:PROPERTIES:
+:CREATED:  [2023-06-05 Mon 13:46]
+:END:
+#+begin_src emacs-lisp
+  (customize-set-variable 'org-cite-global-bibliography '("/home/japhir/SurfDrive/bibliography/references.bib"))
+  (setq org-cite-csl-styles-dir "~/Zotero/styles")
+  ;; (setq org-cite-csl--fallback-style-file "/home/japhir/Zotero/styles/paleoceanography.csl") ; doesn't have a bibliography style!
+  (setq org-cite-csl--fallback-style-file "/home/japhir/Zotero/styles/apa.csl")
+  ;; (setq org-cite-csl--fallback-style-file "/home/japhir/Zotero/styles/nature.csl")
+  ;; use biblatex for latex and csl for html.
+  (setq org-cite-export-processors '((latex biblatex)
+                                     (t csl)))
+  ;; (setq org-cite-biblatex-options bibstyle=authoryear-comp)
+  (add-to-list 'load-path "/usr/bin/vendor_perl/")
+#+end_src
+*** COMMENT latejx class =ijkarticle=
 #+begin_src emacs-lisp
   (add-to-list 'org-latex-classes
          '("ijkarticle"
@@ -1309,7 +1366,7 @@ see e.g. https://emojipedia.org/calendar/ for emoji!
 #+begin_src emacs-lisp
   (use-package org-modern
     :after org
-    :config (global-org-modern-mode))
+    :config (global-org-modern-mode 1))
 #+end_src
 
 ** ob-async
@@ -1460,7 +1517,7 @@ https://github.com/domtronn/all-the-icons.el
   (use-package all-the-icons)
   (setq inhibit-compacting-font-caches t)
 #+end_src
-*** all-the-icons-ivy
+*** COMMENT all-the-icons-ivy
 #+begin_src emacs-lisp
   (use-package all-the-icons-ivy
     :after (ivy all-the-icons)
@@ -1474,7 +1531,7 @@ https://github.com/domtronn/all-the-icons.el
     :hook (dired-mode . all-the-icons-dired-mode))
 #+end_src
 ** COMMENT emojify-mode
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package emojify
     :custom (emojify-emoji-styles 'unicode)
     :hook ((mu4e-mode mu4e-view-mode mu4e-compse-mode org-mode) . emojify-mode))
@@ -1509,9 +1566,9 @@ usefull snippets for me: org-mode (fig_, )
     (add-to-list 'ispell-skip-region-alist '("^#\\+begin_example " . "#\\+end_example$"))
     (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE " . "#\\+END_EXAMPLE$")))
 #+end_src
-** org-ref
+** COMMENT org-ref
 I use most of the minimal setup in this [[https://github.com/jkitchin/org-ref/blob/master/melpa/init-ivy.el][init-ivy]] config.
-*** bibtex
+*** COMMENT bibtex
 #+begin_src emacs-lisp
   (add-hook 'bibtex-mode-hook 'flyspell-mode)
   (setq bibtex-user-optional-fields
@@ -1521,7 +1578,7 @@ I use most of the minimal setup in this [[https://github.com/jkitchin/org-ref/bl
   (setq bibtex-dialect 'biblatex)
 #+end_src
 
-*** bibtex/ivy-bibtex
+*** COMMENT bibtex/ivy-bibtex
 reference manager I use it in conjunction with zotero, which generates the
 .bib files, and org-ref, to insert citations in org files.
 
@@ -1565,11 +1622,11 @@ reference manager I use it in conjunction with zotero, which generates the
 
 #+RESULTS:
 
-*** org-ref itself
+*** COMMENT org-ref itself
 https://github.com/jkitchin/org-ref/blob/master/org-ref.org
 #+begin_src emacs-lisp
   (use-package org-ref
-    :after org
+    ;; :after org
     :init
     (require 'bibtex)
     :bind
@@ -1588,7 +1645,7 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
     (bibtex-autokey-titlewords-stretch 1)
     (bibtex-autokey-titleword-length 5)
     :init
-    (require 'org-ref-ivy)
+    ;(require 'org-ref-ivy)
     (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
           org-ref-insert-cite-function 'org-ref-cite-insert-ivy
           org-ref-default-citation-link 'parencite
@@ -1635,14 +1692,6 @@ from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-me
 
 #+RESULTS:
 
-** COMMENT citeproc
-#+begin_src emacs-lisp
-  (use-package citeproc-org
-    :after org
-    :disabled
-    :config
-    (citeproc-org-setup))
-#+end_src
 * COMMENT navigation
 ** COMMENT beginend
 #+begin_src emacs-lisp
@@ -1681,7 +1730,8 @@ https://github.com/hlissner/evil-snipe
     (pdf-view-display-size 'fit-width)
     :bind
     ;; swiper doesn't play nice with pdf-tools, so I disable it.
-    (:map pdf-view-mode-map ("C-s" . isearch-forward)))
+    ;(:map pdf-view-mode-map ("C-s" . isearch-forward))
+   )
 #+end_src
 ** NEXT COMMENT org-xournalpp
 #+begin_src emacs-lisp :tangle no
@@ -1695,7 +1745,7 @@ https://github.com/hlissner/evil-snipe
 https://github.com/weirdNox/org-noter
 #+begin_src emacs-lisp
   (use-package org-noter
-    :after (:any org pdf-view org-noter-pdftools)
+    :config
     :bind ((:map org-mode-map ("C-c o" . org-noter))
            (:map org-noter-notes-mode-map
                  ("C-c k" . org-noter-pdftools-create-skeleton)
@@ -1709,8 +1759,43 @@ https://github.com/weirdNox/org-noter
      (org-noter-hide-other nil)
      ;; Everything is relative to the main notes file
      (org-noter-notes-search-path "~/SurfDrive/bibliography/notes/")
-     :config
-     (require 'org-noter-pdftools))
+    (require 'org-noter-pdftools))
+
+  (use-package org-pdftools
+    :hook (org-mode . org-pdftools-setup-link))
+
+  (use-package org-noter-pdftools
+    :after org-noter
+    :config
+    ;; Add a function to ensure precise note is inserted
+    (defun org-noter-pdftools-insert-precise-note (&optional toggle-no-questions)
+      (interactive "P")
+      (org-noter--with-valid-session
+       (let ((org-noter-insert-note-no-questions (if toggle-no-questions
+                                                     (not org-noter-insert-note-no-questions)
+                                                   org-noter-insert-note-no-questions))
+             (org-pdftools-use-isearch-link t)
+             (org-pdftools-use-freepointer-annot t))
+         (org-noter-insert-note (org-noter--get-precise-info)))))
+
+    ;; fix https://github.com/weirdNox/org-noter/pull/93/commits/f8349ae7575e599f375de1be6be2d0d5de4e6cbf
+    (defun org-noter-set-start-location (&optional arg)
+      "When opening a session with this document, go to the current location.
+  With a prefix ARG, remove start location."
+      (interactive "P")
+      (org-noter--with-valid-session
+       (let ((inhibit-read-only t)
+             (ast (org-noter--parse-root))
+             (location (org-noter--doc-approx-location (when (called-interactively-p 'any) 'interactive))))
+         (with-current-buffer (org-noter--session-notes-buffer session)
+           (org-with-wide-buffer
+            (goto-char (org-element-property :begin ast))
+            (if arg
+                (org-entry-delete nil org-noter-property-note-location)
+              (org-entry-put nil org-noter-property-note-location
+                             (org-noter--pretty-print-location location))))))))
+    (with-eval-after-load 'pdf-annot
+      (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 #+end_src
 *** COMMENT org-noter-insert-precice-note-dwim---stolen from zaeph
 https://github.com/zaeph/.emacs.d/blob/master/init.el#L4420
@@ -1846,6 +1931,15 @@ https://github.com/fuxialexander/org-pdftools
     (org-roam-bibtex-mode))
 #+end_src
 
+** org-transclusion
+:PROPERTIES:
+:CREATED:  [2023-06-03 Sat 07:49]
+:END:
+#+begin_src emacs-lisp
+  (use-package org-transclusion)
+  (define-key org-mode-map (kbd "<f12>") #'org-transclusion-add)
+  (define-key org-mode-map (kbd "C-n t") #'org-transclusion-mode)
+#+end_src
 ** COMMENT bibtex-completion
 seems like this is what both [[https://github.com/jethrokuan/dots/blob/master/.doom.d/config.el#L454][jethro]] and [[https://github.com/zaeph/.emacs.d/blob/8243cd8c74775387e011de679f041ca8e3cff41a/init.el#L3865][zaeph]] seem to be using since org-roam v2 update
 #+begin_src emacs-lisp
@@ -2041,7 +2135,7 @@ https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
     :bind (:map org-mode-map
                 (("C-c n a" . orb-note-actions)))
     :custom
-    (orb-note-actions-interface 'ivy)
+    ;(orb-note-actions-interface 'ivy)
     (orb-preformat-keywords
      '("citekey" "title" "url" "author-or-editor" "journal" "keywords" "file"))
     (orb-process-file-keyword t)
@@ -2108,8 +2202,9 @@ from [[https://github.com/abo-abo/oremacs/blob/github/modes/ora-org-roam.el#L106
     (unless (eq major-mode 'ivy-occur-grep-mode)
       (ivy-occur-grep-mode))
     (setq default-directory org-roam-directory)
-    (setq-local counsel-ag-command
-                '("rg" "--no-heading" "--line-number" "--sortr" "modified" "--color" "never" "-s" "%s"))
+    ;; (setq-local counsel-ag-command
+    ;;             '("rg" "--no-heading" "--line-number" "--sortr" "modified" "--color" "never" "-s" "%s"))
+    (setq-local counsel-ag-command '("ug" "--colour=never" "--sort=rused" "--binary-files=without-match" "%s"))
     (ivy-set-text "^\\*+  (TODO|NEXT|WAIT|TICK)")
     (let ((cands (counsel--split-string
                   (counsel--call
@@ -2135,7 +2230,7 @@ from [[https://github.com/abo-abo/oremacs/blob/github/modes/ora-org-roam.el#L106
     :config
     (require 'emms-setup)
     (emms-all)
-    (emms-default-players))
+    (default-players))
 #+end_src
 ** COMMENT org-media-note
 #+begin_src emacs-lisp :tangle no
@@ -2166,7 +2261,7 @@ play videos from orgmode!
 #+end_src
 it's not working so far
 
-* swiper / ivy
+* COMMENT swiper / ivy
 very nice search replacement
 #+begin_src emacs-lisp
   (use-package swiper
@@ -2191,7 +2286,7 @@ very nice search replacement
     :bind
     ("C-x l" . counsel-locate)
     ;; ("C-c g" . counsel-git)
-    ("M-x" . counsel-M-x)
+    ;; ("M-x" . counsel-M-x)
     ("C-c s" . counsel-rg))
 #+end_src
 ** link-hint
@@ -2202,6 +2297,40 @@ very nice search replacement
     :bind ((:map evil-normal-state-map ("SPC f" . link-hint-open-link))))
 ;;(:map mu4e-view-mode-map ("f" . link-hint-open-link))
 #+end_src
+
+* load systemcrafters completion config
+:PROPERTIES:
+:CREATED:  [2023-04-11 Tue 09:17]
+:END:
+It's been recently updated to become even more customizable <3
+https://github.com/SystemCrafters/crafted-emacs/blob/craftedv2alpha/README-new.org
+
+-> disable ivy, ivy-bibtex, org-ref-ivy
+#+begin_src emacs-lisp
+  (load "~/crafted-emacs/modules/crafted-init-config")
+
+  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (when (and custom-file
+             (file-exists-p custom-file))
+    (load custom-file nil :nomessage))
+
+  (require 'crafted-completion-packages)  ; must come first to install
+                                          ; the packages
+
+  (package-install-selected-packages :noconfirm) ; install the packages
+                                          ; from the bundle
+                                          ; mentioned above.
+
+  (require 'crafted-defaults-config)
+  (require 'crafted-startup-config)
+  (require 'crafted-completion-config)
+
+  (keymap-global-set "C-c s" 'consult-ripgrep)
+  ;; I thought this one was set already but it's not working for me
+  (keymap-global-set "C-s" 'consult-line)
+  ;; (keymap-set vertico-map "M-RET" 'vertico-quit-insert)
+#+end_src
+
 * system
 ** vterm
 #+begin_src emacs-lisp
@@ -2220,7 +2349,32 @@ very nice search replacement
     :custom
     (dired-listing-switches "-lh"))
 #+end_src
-** dirvish
+#+begin_src emacs-lisp
+  (use-package dired-single)
+
+  (use-package dired
+    :ensure nil
+    :commands (dired dired-jump)
+    :bind (("C-x C-j" . dired-jump))
+    :custom ((dired-listing-switches "-agho --group-directories-first --time-style=iso"))
+    :config
+    (evil-collection-define-key 'normal 'dired-mode-map
+      "h" 'dired-single-up-directory
+      "l" 'dired-single-buffer))
+
+  (use-package dired-open
+    :config
+    (setq dired-open-extensions '(("png" . "imv")
+                                  ("mkv" . "mpv")
+                                  ("mp4" . "mpv"))))
+
+  (use-package dired-hide-dotfiles
+    :hook (dired-mode . dired-hide-dotfiles-mode)
+    :config
+    (evil-collection-define-key 'normal 'dired-mode-map
+      "H" 'dired-hide-dotfiles-mode))
+    #+end_src
+** COMMENT dirvish
 :PROPERTIES:
 :CREATED:  [2021-12-28 Tue 16:10]
 :END:
@@ -2240,11 +2394,6 @@ find recent files ranked by frequency of use, just like z in the shell
     :demand t
     :bind (("C-x C-r" . zel-find-file-frecent))
     :config (zel-install))
-#+end_src
-** ranger
-#+begin_src emacs-lisp
-  (use-package ranger
-    :defer t)
 #+end_src
 ** emacs-pkgbuild-mode
 Install it with Pacman
@@ -2278,7 +2427,7 @@ See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for 
     :init (global-company-mode)
     :delight company-mode
     :config
-    ;; (setq ;; company-require-match nil
+    ;; company-require-match nil
           ;; company-async-timeout 6
           ;; company-idle-delay 0.25 ;; default 0.5,
           ;; company-minimum-prefix-length 2 ;; default 3
@@ -2399,8 +2548,8 @@ install it with pacman ~mu~
   (use-package mu4e-thread-folding
     :quelpa (mu4e-thread-folding :fetcher github :repo "rougier/mu4e-thread-folding"))
 #+end_src
-** mu4e-alert
-#+begin_src emacs-lisp
+** COMMENT mu4e-alert
+#+begin_src emacs-lisp :tangle no
   (use-package mu4e-alert
     :after mu4e
     :custom
@@ -2582,8 +2731,8 @@ Put spaces around operators such as +, -, etc.
 
 #+RESULTS:
 
-** julia
-#+begin_src emacs-lisp
+** COMMENT julia
+#+begin_src emacs-lisp :tangle no
   (use-package julia-mode)
   (use-package ob-julia-vterm
     :config (defalias 'org-babel-execute:julia 'org-babel-execute:julia-vterm))
@@ -2593,11 +2742,11 @@ Put spaces around operators such as +, -, etc.
 https://mc-stan.org/
 check out this worg entry on working inline with stan models! https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-stan.html
 #+begin_src emacs-lisp
-  (use-package stan-mode
-    :config
-    ;; I've used cmdstanr to install cmdstan because it's not in my repositories
-    ;; don't forget to update this after updating from within an R session!
-    (setq org-babel-stan-cmdstan-directory "/home/japhir/.cmdstanr/cmdstan-2.28.0"))
+   (use-package stan-mode
+     :config
+     ;; I've used cmdstanr to install cmdstan because it's not in my repositories
+     ;; don't forget to update this after updating from within an R session!
+     (setq org-babel-stan-cmdstan-directory  "/home/japhir/.cmdstan/cmdstan-2.32.0"))
 #+end_src
 
 #+RESULTS:
@@ -2624,7 +2773,7 @@ for working with .Rmd files etc.
 #+begin_src emacs-lisp
   (use-package polymode :defer t)
   (use-package poly-markdown :defer t)
-  ;; (use-package poly-R)
+  (use-package poly-R)
 #+end_src
 
 #+RESULTS:
@@ -2698,9 +2847,6 @@ for working with \LaTeX
     (setq reftex-plug-into-AUCTeX t))
 #+end_src
 
-#+RESULTS:
-| prettify-symbols-mode | turn-on-auto-fill | turn-on-reftex | rainbow-delimiters-mode |
-
 ** COMMENT hl-todo
 hmm it does overwrite my nice highlighting of NEXT
 #+begin_src emacs-lisp
@@ -2713,7 +2859,7 @@ hmm it does overwrite my nice highlighting of NEXT
 
 #+RESULTS:
 
-** helm-bibtex
+** COMMENT helm-bibtex
 #+begin_src emacs-lisp
   (setq
    bibtex-completion-notes-path "/home/japhir/SurfDrive/bibliography/notes/"
@@ -2762,7 +2908,7 @@ hmm it does overwrite my nice highlighting of NEXT
 
 * secret directories
 These are all the settings that require secret directories, such as my org
-agenda files and google calendar. They overwrite the settings with "<...>"
+agenda files and google overwrite the settings with "<...>"
 syntax above.
 #+begin_src emacs-lisp
   ;; (use-package emacsdirs)
