@@ -9,7 +9,7 @@ For now, I'm going to start editing [[file:~/.emacs.d/early-init.el]] and [[file
 
 I will keep this file around until I've taken all the useful things out of it.
 
-* early-init
+* COMMENT early-init
 I tangle this manually hoping that it'll work.
 #+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
   ;;; early-init.el --- Emacs early initialization for Crafted Emacs (optional) -*- lexical-binding: t; -*-
@@ -326,7 +326,7 @@ https://github.com/iqbalansari/emacs-emojify
     (use-package emojify
       :init (global-emojify-mode))
 #+end_src
-** pulse
+** COMMENT pulse
 Highlight the current line when changing focus. It's like beacon-mode but native!
 from https://karthinks.com/software/batteries-included-with-emacs/
 #+begin_src emacs-lisp
@@ -763,9 +763,11 @@ evil keymap for org-mode
     (evil-define-key 'motion 'org-agenda-mode-map (kbd "]") 'org-agenda-later))
 #+end_src
 
-** evil-commentary
+** COMMENT evil-commentary
 https://github.com/linktohack/evil-commentary
 comment/uncomment with gc
+over on systemcrafters they use evil-nerd-commentary, which has different keybindings by default
+main one: M-; or <leader>lc
 #+begin_src emacs-lisp
   (use-package evil-commentary
     :config
@@ -1205,7 +1207,7 @@ customize capture templates
 #+begin_src emacs-lisp
   :config
 #+end_src
-**** quick-capture
+**** COMMENT quick-capture
 #+begin_src emacs-lisp
   (define-key global-map (kbd "C-c h")
   (lambda () (interactive) (org-capture nil "x")))
@@ -1325,14 +1327,14 @@ I prefer to set this for each paper separately, just to be sure.
 #+begin_src emacs-lisp
   )
 #+end_src
-** display PROPERTIES in agenda
+** COMMENT display PROPERTIES in agenda
 #+begin_src emacs-lisp
   (use-package org-agenda-property
     :custom
     (org-agenda-property-list '("DELEGATED_TO"))
     (org-agenda-property-position 'next-line))
 #+end_src
-** org-superstar-mode
+** COMMENT org-superstar-mode
 https://github.com/integral-dw/org-superstar-mode
 
 Here are some symbol options for my various todo-states
@@ -1459,7 +1461,7 @@ https://github.com/awth13/org-appear
     (org-appear-autosubmarkers t)
     (org-appear-delay 1))
 #+end_src
-** deft
+** COMMENT deft
 :LOGBOOK:
 - Note taken on [2020-07-15 Wed 16:09] \\
   added it based on [[file:~/SurfDrive/bibliography/notes//20200715160129-an_orgmode_note_workflow.org][An Orgmode Note Workflow]]
@@ -2734,7 +2736,7 @@ Put spaces around operators such as +, -, etc.
 ** COMMENT julia
 #+begin_src emacs-lisp :tangle no
   (use-package julia-mode)
-  (use-package ob-julia-vterm
+  (use-ob-julia-vterm
     :config (defalias 'org-babel-execute:julia 'org-babel-execute:julia-vterm))
 #+end_src
 

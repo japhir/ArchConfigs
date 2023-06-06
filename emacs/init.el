@@ -19,34 +19,38 @@
 ;;; Packages phase
 
 ;; Collect list of packages to install.
- ; add packages to the `package-selected-packages' list
-(require 'crafted-org-packages)
+;; add packages to the `package-selected-packages' list
 (require 'crafted-writing-packages) ; how do i call (crafted-writing-install-pdf-tools)?
 (require 'crafted-completion-packages)
 (require 'crafted-evil-packages)
+(require 'crafted-org-packages)
 (require 'crafted-ide-packages)
 (require 'crafted-ui-packages)
+
+;; my custom modules
+(require 'japhir-gtd-packages)
 
 ;; Install the packages listed in the `package-selected-packages' list.
 (package-install-selected-packages :noconfirm)
 
 ;;; Configuration phase
-
-;; Some example modules to configure Emacs.
-(require 'crafted-defaults-config)
+;; (require 'crafted-defaults-config) ; this does some stuff I don't like
 (require 'crafted-startup-config)
-(require 'crafted-org-config)
 (require 'crafted-writing-config)
 (require 'crafted-completion-config)
 (require 'crafted-evil-config)
+(require 'crafted-org-config) ; make sure to load it after evil because we also load evil-org here
 (require 'crafted-ide-config)
 (require 'crafted-ui-config)
+
+;; my custom modules
+(require 'japhir-gtd-config)
+(require 'japhir-theme-config)
 
 (unless crafted-startup-inhibit-splash
   (setq initial-buffer-choice #'crafted-startup-screen))
 
-
-;;; Optional configuration
+;;; Configuration
 (keymap-global-set "C-c s" 'consult-ripgrep)
 ;; I thought this one was set already but it's not working for me
 (keymap-global-set "C-s" 'consult-line)
@@ -57,18 +61,3 @@
           (lambda ()
             (message "Crafted Emacs loaded in %s."
                      (emacs-init-time))))
-
-
-
-;; ;; Set default coding system (especially for Windows)
-;; (set-default-coding-systems 'utf-8)
-
-;; (let ((file-name-handler-alist nil))
-;;   (require 'package)
-;;   (setq package-enable-at-startup nil)
-;;   (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-;;   (package-initialize)
-;;   (org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org"))
-;;   (setq custom-file "~/.emacs.d/emacs-custom.el")
-;;   (load custom-file))
-;; (put 'erase-buffer 'disabled nil)
