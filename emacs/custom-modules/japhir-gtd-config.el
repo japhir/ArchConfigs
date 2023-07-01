@@ -108,14 +108,14 @@ it can be passed in POS."
 (add-hook 'org-occur-hook (lambda () (org-remove-occur-highlights nil nil nil)))
 
 ;;; my keybindings
-(keymap-set org-mode-map "C-c l" 'org-store-link)
-(keymap-global-set "C-c a" 'org-agenda)
-(keymap-global-set "C-c c" 'org-capture)
+(keymap-set org-mode-map "C-c l" #'org-store-link)
+(keymap-global-set "C-c a" #'org-agenda)
+(keymap-global-set "C-c c" #'org-capture)
 ;; TODO: this is still a bit stupid
 ;; I want to open up specific files with very few keypresses
-(keymap-global-set "C-c g" 'open-gtd-file)
-(keymap-global-set "C-c i" 'open-inbox-file)
-(keymap-global-set "C-c t" 'open-clumped-file)
+(keymap-global-set "C-c g" #'open-gtd-file)
+(keymap-global-set "C-c i" #'open-inbox-file)
+(keymap-global-set "C-c t" #'open-clumped-file)
 ;; ("C-c !" . org-time-stamp-inactive)) ;; I never use this! I cycle with C-j on the ~<~ of the timestamp
 
 ;; basic settings that I like, not covered in crafted-org-config
@@ -128,7 +128,7 @@ it can be passed in POS."
 (customize-set-variable 'org-startup-with-inline-images t)
 
 ;;; TODO keywords
-(setq org-todo-keywords
+(customize-set-variable 'org-todo-keywords
                         '((sequence "NEXT(n)" "WAIT(w!/!)" "TICK(t)" "SOME(s!/!)" "|"
                                     "DONE(d)" "CANC(c)")))
 
@@ -136,13 +136,13 @@ it can be passed in POS."
 (require 'japhir-theme-config)
 
 ;; assign my custom todo faces
-(setq org-todo-keyword-faces
-      '(("NEXT" . org-todo-next)
-        ("WAIT" . org-todo-waiting)
-        ("TICK" . org-todo-tick)
-        ("SOME" . org-todo-someday)
-        ("DONE" . org-done-done)
-        ("CANC" . org-done-cancelled)))
+(customize-set-variable 'org-todo-keyword-faces
+                        '(("NEXT" . org-todo-next)
+                          ("WAIT" . org-todo-waiting)
+                          ("TICK" . org-todo-tick)
+                          ("SOME" . org-todo-someday)
+                          ("DONE" . org-done-done)
+                          ("CANC" . org-done-cancelled)))
 
 ;;; context tags
 (customize-set-variable 'org-fast-tag-selection-single-key t)
@@ -404,23 +404,24 @@ it can be passed in POS."
 "))
 
 ;;; LaTeX export settings
-(setq org-highlight-latex-and-related
-                         '(native script entities))
+(customize-set-variable 'org-highlight-latex-and-related '(native script entities))
+
   ;; (org-preview-latex-default-process 'dvipng)
   ;; (setq org-latex-default-figure-position 'htbp)
-(setq org-latex-pdf-process
+(customize-set-variable
+ 'org-latex-pdf-process
  (list "latexmk -pdflatex='lualatex -shell-escape -interaction nonstopmode' -pdf -f %f"))
-(setq org-latex-prefer-user-labels t)
+(customize-set-variable 'org-latex-prefer-user-labels t)
 ;; (customize-save-variable org-export-with-sub-superscripts '{})
 ;; (customize-save-variable org-use-sub-superscripts '{})
 
 ;;; latex default packages
-(add-to-list 'org-latex-packages-alist
-             '("version=4" "mhchem"))
-(add-to-list 'org-latex-packages-alist
-             '("" "siunitx" nil))
-(add-to-list 'org-latex-packages-alist
-             '("giveninits=true,uniquename=init,citestyle=authoryear-comp,bibstyle=authoryear-comp,date=year,hyperref=true,mincitenames=1,maxcitenames=3,backend=biber,backref,url=false,isbn=false" "biblatex" nil))
+(add-to-list 'org-latex-packages-alist '("version=4" "mhchem"))
+(add-to-list 'org-latex-packages-alist '("" "siunitx" nil))
+(add-to-list
+ 'org-latex-packages-alist
+ '("giveninits=true,uniquename=init,citestyle=authoryear-comp,bibstyle=authoryear-comp,date=year,hyperref=true,mincitenames=1,maxcitenames=3,backend=biber,backref,url=false,isbn=false" "biblatex" nil))
+
 ;; append colorlinks, allcolors, hidelinks here
 ;; (customize-set-value 'org-latex-hyperref-template "
 ;; \\hypersetup{\n pdfauthor={%a},\n pdftitle={%t},\n pdfkeywords={%k},
@@ -428,13 +429,15 @@ it can be passed in POS."
 ;; % allcolors=blue,%
 
 ;;; bibliography
-(customize-set-variable 'org-cite-global-bibliography
-                        '("/home/japhir/SurfDrive/bibliography/references.bib"))
-(setq org-cite-csl-styles-dir "~/Zotero/styles")
-(setq org-cite-csl--fallback-style-file "/home/japhir/Zotero/styles/apa.csl")
+(customize-set-variable
+ 'org-cite-global-bibliography '("/home/japhir/SurfDrive/bibliography/references.bib"))
+(customize-set-variable 'org-cite-csl-styles-dir "~/Zotero/styles")
+(customize-set-variable
+ 'org-cite-csl--fallback-style-file "/home/japhir/Zotero/styles/apa.csl")
 ;; use biblatex for latex and csl for html.
-(setq org-cite-export-processors '((latex biblatex)
-                                   (t csl)))
+(customize-set-variable 'org-cite-export-processors
+                        '((latex biblatex)
+                          (t csl)))
 ;; (setq org-cite-biblatex-options bibstyle=authoryear-comp)
 ;; (add-to-list 'load-path "/usr/bin/vendor_perl/") ; let's test if this is needed
 
@@ -443,7 +446,9 @@ it can be passed in POS."
 (ox-extras-activate '(ignore-headlines))
 
 ;;; org-roam
-(customize-set-variable 'org-roam-directory (file-truename "~/SurfDrive/bibliography/notes/"))
+(customize-set-variable
+ 'org-roam-directory
+ (file-truename "~/SurfDrive/bibliography/notes/"))
 
 (provide 'japhir-gtd-config)
 ;;; japhir-gtd-config.el ends here
