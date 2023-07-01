@@ -16,8 +16,8 @@ Account solismail
 
 MaildirStore solismail-local
 # The trailing "/" is important
-Path ~/Maildir/
-Inbox ~/Maildir/inbox
+Path ~/Maildir/solismail/
+Inbox ~/Maildir/solismail/inbox
 SubFolders Verbatim
 
 Channel solismail
@@ -29,4 +29,30 @@ Create Both
 # Automatically delete items on both IMAP and local
 Expunge Both
 # Save the synchronization state files in the relevant directory
+SyncState *
+
+
+
+# second account, work email gmail for ikocken@hawaii.edu
+IMAPAccount hawaii
+Host imap.gmail.com
+User ikocken@hawaii.edu
+PassCmd "cat ~/.hawaiipass"
+AuthMechs PLAIN
+SSLType IMAPS
+CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+IMAPStore hawaii-remote
+Account hawaii
+
+MaildirStore hawaii-local
+Subfolders Verbatim
+Path ~/Maildir/hawaii/
+Inbox ~/Maildir/hawaii/Inbox
+
+Channel hawaii
+Far :hawaii-remote:
+Near :hawaii-local:
+Patterns * ![Gmail]* "[Gmail]/Sent Mail" "[Gmail]/Starred" "[Gmail]/All Mail" "[Gmail]/Trash"
+Create Both
 SyncState *
