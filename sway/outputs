@@ -1,0 +1,20 @@
+output "eDP-1" {
+    mode  1920x1080@60.02Hz
+    # pos 0 0
+    pos 3840 980
+    transform normal
+    scale 1.0
+    scale_filter nearest
+    adaptive_sync off
+    dpms on
+}
+# giant screen at office in Honolulu
+output "DP-1" {
+    mode 3840x1600@74.977Hz
+    pos 0 0
+    transform normal
+    scale 1.0
+    scale_filter nearest
+    adaptive_sync off
+    dpms on
+}

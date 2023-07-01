@@ -1,0 +1,40 @@
+# Input configuration
+# default keyboard settings
+input type:keyboard {
+      xkb_layout us
+      xkb_options ctrl:nocaps,compose:ralt
+      xkb_numlock enabled
+}
+# laptop touchpad
+input "1739:0:Synaptics_TM3145-007" {
+      # touchpad settings
+      dwt enabled
+      tap enabled
+      natural_scroll enabled
+      middle_emulation enabled
+      pointer_accel 0.5
+}
+# tablet should have some slower accelleration because it's bigger
+input "1386:209:Wacom_Bamboo_2FG_4x5_Pad" {
+      pointer_accel 0.6
+      tap enabled
+      natural_scroll enabled
+}
+input "1386:209:Wacom_Bamboo_2FG_4x5_Finger" {
+      pointer_accel 0.35
+      tap enabled
+      natural_scroll enabled
+}
+input "1386:209:Wacom_Bamboo_2FG_4x5_Pen" {
+      #  map tablet to secondary screen if present
+      map_to_output HDMI-A-2
+      # attempts at getting the buttons to remap to MMB and RMB
+      #scroll_button 331
+      #middle_emulation enabled
+}
+# mouse at work (scrolling isn't working correctly)
+input "1112:311:PixArt_USB_Optical_Mouse" {
+      natural_scroll disabled
+      pointer_accel 0.9
+      scroll_factor 1
+}

@@ -15,9 +15,7 @@ exec /usr/bin/xrdb /home/japhir/.Xresources			# load urxvt customisations moved 
 exec sh ~/.profile                      # load environment variables
 seat seat0 xcursor_theme Yaru 24
 
-# Your preferred terminal emulator
-set $term alacritty
-## get colours/bg from pywal -> nope I now use ubuntu's new theme!
+## get colours/bg from pywal -> nope I now use the Ubuntu theme!
 # include "$HOME/.cache/wal/colors-sway"
 # client.focused $color0 $color9 $foreground $color7 $color7
 # ubuntu orange with dark border and light text: border bg text
@@ -31,7 +29,7 @@ exec_always import-gsettings \
     cursor-theme:gtk-cursor-theme-name
 
 # Your preferred application launcher
-# Note: it's recommended that you pass the final command to sway
+# Note: it is recommended that you pass the final command to sway
 # set $menu dmenu_path | rofi -dmenu | xargs swaymsg exec --
 set $menu wofi --show drun --allow-images --allow-markup swaymsg exec --
 # --color=/home/japhir/.cache/wal/colors-rofi-dark.rasi
@@ -85,7 +83,11 @@ input "1739:0:Synaptics_TM3145-007" {
       middle_emulation enabled
       pointer_accel 0.5
 }
-# tablet should have some slower accelleration because it's bigger
+# mouse at home
+input "1133:49233:Logitech_USB-PS/2_Optical_Mouse" {
+      pointer_accel 0.5
+}
+# tablet should have some slower accelleration because it is bigger
 input "1386:209:Wacom_Bamboo_2FG_4x5_Pad" {
       pointer_accel 0.6
       tap enabled
@@ -103,7 +105,7 @@ input "1386:209:Wacom_Bamboo_2FG_4x5_Pen" {
       #scroll_button 331
       #middle_emulation enabled
 }
-# mouse at work (scrolling isn't working correctly)
+# mouse at work (scrolling isn not working correctly)
 input "1112:311:PixArt_USB_Optical_Mouse" {
       natural_scroll disabled
       pointer_accel 0.9
@@ -173,14 +175,14 @@ set $ws9 "9:graphs"
 set $ws10 "10:spotify"
 
 # assign workspaces to screens
-workspace $ws1 output $bigscreen
-workspace $ws2 output $bigscreen
-workspace $ws3 output $bigscreen
-workspace $ws4 output $bigscreen
-workspace $ws5 output $smallscreen
-workspace $ws7 output $bigscreen
-workspace $ws9 output $smallscreen
-workspace $ws10 output $bigscreen
+# workspace $ws1 output $bigscreen
+# workspace $ws2 output $bigscreen
+# workspace $ws3 output $bigscreen
+# workspace $ws4 output $bigscreen
+# workspace $ws5 output $smallscreen
+# workspace $ws7 output $bigscreen
+# workspace $ws9 output $smallscreen
+# workspace $ws10 output $bigscreen
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
@@ -333,16 +335,20 @@ bindsym Print exec grim ~/Pictures/Screenshots/$(date +'%F-%T.png')
 bindsym --release Shift+Print exec slurp | grim -g - -c ~/Pictures/Screenshots/$(date +'%F-%T_region.png')
 
 # startup software
-exec redshift -l 52.1:5.12 -m wayland -t 5500:2500 # make screen display orange less blue at night
+# exec redshift -l 52.1:5.12 -m wayland -t 5500:2500 # make screen display orange less blue at night
+# try to have wlsunset replace this
 exec flashfocus           # highlight focused screen
-exec mako                  # notification daemon
+# exec mako                  # notification daemon
+# try to have replacement from nwg
 exec volnoti               # volume change notification
 # exec pulseaudio                 # pulseaudio volume control, manage with pamixer # pactl command not found but audio works fine
 exec blueman-applet        # bluetooth status applet
 # exec nextcloud
 exec sleep 5 && owncloud
-exec nm-applet --indicator # network-manager-applet-indicator from AUR
+# exec nm-applet --indicator # network-manager-applet-indicator from AUR
 # exec teams                 # microsoft teams
+# we now try the edge browser with teams, may perform better than native teams app?
+exec microsoft-edge-dev --app=https://teams.microsoft.com
 # exec ganttproject ~/SurfDrive/PhD/application/2020-09-16_DrIljaKocken.gan  # my long-term planning
 
 # open up emacs with the current paper and a todo scratchpad
@@ -385,3 +391,12 @@ for_window [shell=".*"] title_format "%title :: %shell"
 
 include /etc/sway/config.d/*
 exec "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+
+# The file we include below is created and will be overwritten by nwg-shell-config GUI!
+#
+include ~/.config/sway/variables
+include ~/.config/sway/outputs
+# include ~/.config/sway/autostart
+include ~/.config/sway/workspaces
+#

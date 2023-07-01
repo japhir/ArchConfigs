@@ -1,0 +1,15 @@
+### move programs to specific workspaces ###
+assign [class="^Mendeley Desktop$"] $ws4
+assign [class="^Zotero$"] $ws4
+assign [title="^GanttProject"] $ws4
+# assign [class="^Slack$"] $ws5
+# assign [class="^Riot$"] $ws5
+# assign [class="^Trello$"] $ws5
+assign [class="^discord"] $ws5
+assign [class="^Microsoft Teams"] $ws5
+assign [class="^Inkscape$"] $ws6
+assign [class="^VirtualBox$" title="^Win10"] $ws8
+assign [class="R_x11"] $ws9
+# doesn't work because of long-standing spotify bug
+#assign [class="Spotify"] $ws10
+for_window [class="Spotify"] move to workspace $ws10, workspace --no-auto-back-and-forth $ws10
