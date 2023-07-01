@@ -1,0 +1,3 @@
+#!/usr/bin/sh
+# dex ~/.local/share/applications/emacs-popup.desktop
+emacsclient -c -F "((name . \"emacs-popup\") (height . 20) (width . 80))" "$@"
