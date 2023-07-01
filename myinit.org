@@ -1,35 +1,50 @@
 #+title: My Literate emacs config
-This is my config file for [[emacs.org]]!
+This is my config file for [[https://www.gnu.org/software/emacs/][emacs]]!
 
-* WARNING: migration in progress!
-<2023-06-05 Mon> I'm trying to clean up this biiiiiig file and simplify as needed. I'm using
-https://github.com/SystemCrafters/crafted-emacs as a base for a new config!
+* [#A] WARNING: migration in progress!
+<2023-06-05 Mon>
+I'm trying to clean up this biiiiiig file and simplify as needed.
 
-For now, I'm going to start editing [[file:~/.emacs.d/early-init.el]] and [[file:~/.emacs.d/init.el]] directly, without the org-mode wrapper around it!
+I'm using https://github.com/SystemCrafters/crafted-emacs as a base for a new config!
 
-I will keep this file around until I've taken all the useful things out of it.
+For now, I'm going to start editing [[file:~/.config/emacs/early-init.el]] and
+[[file:~/.config/emacs/init.el]] directly, without the org-mode wrapper around it!
 
-* COMMENT early-init
-I tangle this manually hoping that it'll work.
-#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
-  ;;; early-init.el --- Emacs early initialization for Crafted Emacs (optional) -*- lexical-binding: t; -*-
-  ;;; Commentary:
-  ;;
-  ;;; Code:
+The new config is located in [[file:emacs/]], because I've also migrated to using
+the XDG config directory for emacs (meaning I have symlinked the files there to
+~~/.config/emacs/~).
 
-  ;; Configures `package.el'
-  (load "~/crafted-emacs/modules/crafted-early-init-config")
-  (provide 'early-init)
-  ;;; early-init.el ends here
+By default this file, located in ~~/.emacs.d/myinit.el~, will be used to launch
+my emacs daemon.
+
+If I want to try out the new config, I should launch emacs with:
+#+begin_src shell
+  emacs --debug-init --init-directory=/home/japhir/.config/emacs/
 #+end_src
+
+I will keep this massive org file around until I've taken all the useful things out of it.
+
 * speedups
 ** gc-cons threshold
 The gc-cons-threshold is set to a superlarge number for faster startup time. It
 is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
 
 #+begin_src emacs-lisp
-  (setq gc-cons-threshold 402653184
-        gc-cons-percentage 0.6)
+  ;; (setq gc-cons-threshold 402653184
+  ;;       gc-cons-percentage 0.6)
+#+end_src
+
+** TICK report gc-cons threshold behaviour to maintainers
+SCHEDULED: <2023-07-12 Wed>
+#+begin_src emacs-lisp
+  (require 'emacs-gc-stats)
+  ;; Optionally reset Emacs GC settings to default values (recommended)
+  (setq emacs-gc-stats-gc-defaults 'emacs-defaults)
+  ;; Optionally set reminder to upload the stats after 3 weeks.
+  (setq emacs-gc-stats-remind t) ; can also be a number of days
+  ;; Optionally disable logging the command names
+  ;; (setq emacs-gc-stats-inhibit-command-name-logging t)
+  (emacs-gc-stats-mode +1)
 #+end_src
 ** make long lines faster
 I like to write my org-mode scientific papers such that each line has one sentence.
@@ -56,10 +71,18 @@ stolen from [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org#startup-
                        gcs-done)))
 #+end_src
 * package archive
-** melpa
+** COMMENT setup package archive in init.el
+this is handled in [[file:~/.emacs.d/init.el]]
 #+begin_src emacs-lisp
-  (require 'package)
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  (let ((file-name-handler-alist nil))
+    (require 'package)
+    (setq package-enable-at-startup nil)
+    (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+    (package-initialize)
+    (org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org"))
+    (setq custom-file "~/.emacs.d/emacs-custom.el")
+    (load custom-file))
+  (put 'erase-buffer 'disabled nil)
 #+end_src
 ** use-package
 Use-package is an amazing resource to clean up my init file and have it play
@@ -763,11 +786,13 @@ evil keymap for org-mode
     (evil-define-key 'motion 'org-agenda-mode-map (kbd "]") 'org-agenda-later))
 #+end_src
 
-** COMMENT evil-commentary
+** evil-commentary
 https://github.com/linktohack/evil-commentary
 comment/uncomment with gc
 over on systemcrafters they use evil-nerd-commentary, which has different keybindings by default
 main one: M-; or <leader>lc
+
+this uses gc <word>
 #+begin_src emacs-lisp
   (use-package evil-commentary
     :config
@@ -810,9 +835,12 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 ** setup
 #+begin_src emacs-lisp
   (use-package org
-    :pin org
+    :ensure nil ; use the org-mode version included in Emacs
+    ;; I had this setup before, but the org archive has been deprecated since version 9.6:
+    ;; IMPORTANT: please install Org from GNU ELPA as Org ELPA will close
+    ;; :ensure org-plus-contrib ; this is version 9.4.6
+    ;; :pin org
     :delight org-indent-mode
-    ;; :ensure org-plus-contrib
 #+end_src
 
 ** keybindings
@@ -987,7 +1015,7 @@ swyper makes refiling amazing!
                                    (org-notes-file :maxlevel . 2)
                                    (org-lists-file :maxlevel . 2)
                                    (org-someday-file :maxlevel . 2)
-                                   (org-clumped-file :maxlevel . 4)
+                                   (org-clumped-file :maxlevel . 5)
                                    ;; (my/org-roam-files :maxlevel . 1) ;; comment out since org-roam-refile
                                    )))
   (org-outline-path-complete-in-steps nil)   ;; Refile in a single go
@@ -1096,6 +1124,7 @@ Filter tasks by context (sorted by todo state)
           ("D" "DataSteward" tags-todo "DataSteward")
           ("p" . "People")
           ("pm" "Martin" tags-todo "Martin")
+          ("pr" "Richard" tags-todo "Richard")
           ("pl" "Line" tags-todo "Line")
           ("pa" "Anne" tags-todo "Anne")
           ("pf" "FEST" tags-todo "FEST")
@@ -1195,7 +1224,12 @@ customize capture templates
                    (:endgroup . nil)
                    ("DataSteward" . ?D)
                    ;; tags to accompany the @agenda context
-                   ("Family" . ?F) ("Martin" . ?M) ("Line" . ?L) ("Inigo" . ?I) ("Niels" . ?N)))
+                   ("Family" . ?F)
+                   ("Martin" . ?M)
+                   ("Richard" . ?R)
+                   ("Line" . ?L)
+                   ("Inigo" . ?I)
+                   ("Niels" . ?N)))
 #+end_src
 *** org src blocks
 #+begin_src emacs-lisp
@@ -1316,6 +1350,9 @@ I prefer to set this for each paper separately, just to be sure.
   "))
   (add-to-list 'org-structure-template-alist
                '("sj" . "src julia
+  "))
+  (add-to-list 'org-structure-template-alist
+               '("ss" . "src sh
   "))
 #+end_src
 ** org-protocol
