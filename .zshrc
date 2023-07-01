@@ -84,7 +84,7 @@ export LANG=en_US.UTF-8
 if [[ -n $SSH_CONNECTION ]]; then
     export EDITOR='vim'
 else
-    export EDITOR="emacsclient -cn"
+    export EDITOR="emacsclient -t"
     export SUDO_EDITOR='vim'
     export VISUAL="emacsclient -cn"
 fi
@@ -132,4 +132,14 @@ vterm_printf(){
     else
         printf "\e]%s\e\\" "$1"
     fi
+}
+
+# countdown in seconds
+# useful to countdown block_distractions
+function countdown(){
+   date1=$((`date +%s` + $1));
+   while [ "$date1" -ge `date +%s` ]; do
+     echo -ne "$(date -u --date @$(($date1 - `date +%s`)) +%H:%M:%S)\r";
+     sleep 0.1
+   done
 }
