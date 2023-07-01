@@ -1556,7 +1556,7 @@ https://github.com/domtronn/all-the-icons.el
   (use-package all-the-icons)
   (setq inhibit-compacting-font-caches t)
 #+end_src
-*** COMMENT all-the-icons-ivy
+*** all-the-icons-ivy
 #+begin_src emacs-lisp
   (use-package all-the-icons-ivy
     :after (ivy all-the-icons)
@@ -1605,9 +1605,9 @@ usefull snippets for me: org-mode (fig_, )
     (add-to-list 'ispell-skip-region-alist '("^#\\+begin_example " . "#\\+end_example$"))
     (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE " . "#\\+END_EXAMPLE$")))
 #+end_src
-** COMMENT org-ref
+** org-ref
 I use most of the minimal setup in this [[https://github.com/jkitchin/org-ref/blob/master/melpa/init-ivy.el][init-ivy]] config.
-*** COMMENT bibtex
+*** bibtex
 #+begin_src emacs-lisp
   (add-hook 'bibtex-mode-hook 'flyspell-mode)
   (setq bibtex-user-optional-fields
@@ -1617,7 +1617,7 @@ I use most of the minimal setup in this [[https://github.com/jkitchin/org-ref/bl
   (setq bibtex-dialect 'biblatex)
 #+end_src
 
-*** COMMENT bibtex/ivy-bibtex
+*** bibtex/ivy-bibtex
 reference manager I use it in conjunction with zotero, which generates the
 .bib files, and org-ref, to insert citations in org files.
 
@@ -1684,7 +1684,7 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
     (bibtex-autokey-titlewords-stretch 1)
     (bibtex-autokey-titleword-length 5)
     :init
-    ;(require 'org-ref-ivy)
+    (require 'org-ref-ivy)
     (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
           org-ref-insert-cite-function 'org-ref-cite-insert-ivy
           org-ref-default-citation-link 'parencite
@@ -1696,9 +1696,6 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
     ;; (require 'org-ref-wos)
     )
 #+end_src
-
-#+RESULTS:
-: org-ref-insert-link
 
 *** open zotero pdf at point
 from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-mendeley-jabref-and-zotero-users][the manual]]
@@ -1970,7 +1967,7 @@ https://github.com/fuxialexander/org-pdftools
     (org-roam-bibtex-mode))
 #+end_src
 
-** org-transclusion
+** COMMENT org-transclusion
 :PROPERTIES:
 :CREATED:  [2023-06-03 Sat 07:49]
 :END:
@@ -2167,7 +2164,7 @@ https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
       (zp/org-set-time-file-property "LAST_MODIFIED")))
 #+end_src
 
-** org-roam-bibtex
+** COMMENT org-roam-bibtex
 #+begin_src emacs-lisp :tangle no
   (use-package org-roam-bibtex
     :after org-roam
@@ -2300,7 +2297,7 @@ play videos from orgmode!
 #+end_src
 it's not working so far
 
-* COMMENT swiper / ivy
+* swiper / ivy
 very nice search replacement
 #+begin_src emacs-lisp
   (use-package swiper
@@ -2337,14 +2334,19 @@ very nice search replacement
 ;;(:map mu4e-view-mode-map ("f" . link-hint-open-link))
 #+end_src
 
-* load systemcrafters completion config
+* COMMENT load systemcrafters completion config
 :PROPERTIES:
 :CREATED:  [2023-04-11 Tue 09:17]
 :END:
 It's been recently updated to become even more customizable <3
 https://github.com/SystemCrafters/crafted-emacs/blob/craftedv2alpha/README-new.org
 
--> disable ivy, ivy-bibtex, org-ref-ivy
+-> disable
+[[file:~/ArchConfigs/myinit.org::*swiper / ivy][swiper / ivy]]
+[[file:~/ArchConfigs/myinit.org::*bibtex/ivy-bibtex][bibtex/ivy-bibtex]]
+org-ref-ivy, a line in [[file:~/ArchConfigs/myinit.org::*org-ref itself][org-ref itself]]
+[[file:~/ArchConfigs/myinit.org::*all-the-icons-ivy][all-the-icons-ivy]]
+
 #+begin_src emacs-lisp
   (load "~/crafted-emacs/modules/crafted-init-config")
 
@@ -2360,7 +2362,7 @@ https://github.com/SystemCrafters/crafted-emacs/blob/craftedv2alpha/README-new.o
                                           ; from the bundle
                                           ; mentioned above.
 
-  (require 'crafted-defaults-config)
+  ;; (require 'crafted-defaults-config) ; I don't like winner-mode and some of the keybindings in here
   (require 'crafted-startup-config)
   (require 'crafted-completion-config)
 
@@ -2542,22 +2544,49 @@ install it with pacman ~mu~
     :commands mu4e
     :bind (("C-c m" . mu4e))
     :hook ((mu4e-view-mode mu4e-compose-mode) . visual-fill-column-mode)
-    :init
+    :config
+    ;; :init ; had init before
     (require 'mu4e)  ;; somehow this is needed, because otherwise calling org-store-link doesn't work
     (require 'mu4e-org)
-    (setq mu4e-drafts-folder "/Drafts"
-          mu4e-sent-folder "/Sent Items"
-          mu4e-trash-folder "/Deleted Items")
+    (setq mu4e-contexts
+          `(
+            ,(make-mu4e-context
+              :name "solismail"
+              :match-func (lambda (msg)
+                            (when msg
+                              (string-prefix-p "^/solismail" (mu4e-message-field msg :maildir))))
+              :vars '( (user-mail-address . "i.j.kocken@uu.nl")
+                       (user-full-name . "Ilja Kocken")
+                       (message-user-organization . "Utrecht University")
+                       (mu4e-drafts-folder . "/solismail/Drafts")
+                       (mu4e-sent-folder . "/solismail/Sent Items")
+                       (mu4e-trash-folder . "/solismail/Deleted Items")))
+            ,(make-mu4e-context
+              :name "hawaii"
+              :enter-func (lambda () (mu4e-message "Switch to Hawaiʻi context"))
+              :match-func (lambda (msg)
+                            (when msg
+                              (string-match-p "^/hawaii" (mu4e-message-field msg :maildir))))
+              :vars '( (user-mail-address . "ikocken@hawaii.edu")
+                       (user-full-name . "Ilja Kocken")
+                       (message-user-organization . "University of Hawaiʻi at Mānoa")
+                       (mu4e-drafts-folder . "/hawaii/[Gmail]/Drafts")
+                       (mu4e-sent-folder . "/hawaii/[Gmail]/Sent Mail")
+                       (mu4e-refile-folder . "/hawaii/[Gmail]/All Mail")
+                       (mu4e-trash-folder . "/hawaii/[Gmail]/Trash")))))
+
     (setq mu4e-maildir-shortcuts
-          '(("/inbox" . ?i)
+          '(("/solismail/inbox" . ?i)
+            ("/hawaii/Inbox" . ?I)
             ;;("/NEXT" . ?n)
-            ("/Waiting" . ?w)
-            ("/Deleted Items" . ?d)
-            ("/news" . ?n)
-            ("/Important backlog" . ?l)
-            ("/Sent Items" . ?s)
-            ("/Junk Email" . ?t)
-            ("/archive" . ?r)))
+            ("/solismail/Waiting" . ?w)
+            ("/solismail/Deleted Items" . ?d)
+            ("/solismail/news" . ?n)
+            ("/solismail/Important backlog" . ?l)
+            ("/solismail/Sent Items" . ?s)
+            ("/solismail/Junk Email" . ?t)
+            ("/solismail/archive" . ?r)))
+
     (setq mu4e-change-filenames-when-moving t ; important for isync
           mu4e-headers-date-format "%Y-%m-%d %H:%M"
           mu4e-headers-fields
@@ -2662,6 +2691,7 @@ emacs speaks statistics, work with R etc.
                (string= lang "elisp")
                (string= lang "emacs-lisp")
                (string= lang "julia")
+               (string= lang "sh")
                (string= lang "latex"))))
     :custom
     ;; display-buffer-alist
