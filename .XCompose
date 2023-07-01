@@ -1,11 +1,12 @@
 include "%L"
 
-<Multi_key> <g> <a> : "α"
-<Multi_key> <g> <b> : "β"
-<Multi_key> <g> <y> : "ɣ"
-<Multi_key> <g> <d> : "δ"
-<Multi_key> <g> <D> : "Δ"
-<Multi_key> <g> <m> : "µ"
-<Multi_key> <g> <u> : "µ"
-<Multi_key> <g> <p> : "π"
-<Multi_key> <g> <s> : "σ"
+<Multi_key> <g> <a> : "α"   alpha   # GREEK SMALL LETTER ALPHA
+<Multi_key> <g> <b> : "β"   beta    # GREEK SMALL LETTER BETA
+<Multi_key> <g> <y> : "ɣ"   gamma   # GREEK SMALL LETTER GAMMA
+<Multi_key> <g> <d> : "δ"   delta   # GREEK SMALL LETTER DELTA
+<Multi_key> <g> <D> : "Δ"   Delta   # GREEK CAPITAL LETTER DELTA
+<Multi_key> <g> <m> : "µ"   mu      # GREEK SMALL LETTER MU
+<Multi_key> <g> <u> : "µ"   mu      # GREEK SMALL LETTER MU
+<Multi_key> <g> <p> : "π"   pi      # GREEK SMALL LETTER PI
+<Multi_key> <g> <s> : "σ"   sigma   # GREEK SMALL LETTER SIGMA
+<Multi_key> <grave> <grave> : "ʻ"   U02BB    # MODIFIED LETTER TURNED COMMA = Hawaiian `okina
