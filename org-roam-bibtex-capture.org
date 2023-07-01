@@ -1,0 +1,18 @@
+#+CREATED: %U
+#+LAST_MODIFIED: %U
+#+FILETAGS: articles
+
+- tags :: %?
+- keywords :: %^{keywords}
+
+* %^{title}
+:PROPERTIES:
+:Custom_ID: %^{citekey}
+:URL: %^{url}
+:AUTHOR: %^{author-or-editor}
+:DATE: %^{date}
+:JOURNAL: %^{journal}
+:TYPE: %^{entry-type}
+:NOTER_DOCUMENT: %^{file}
+:NOTER_PAGE:
+:END:
