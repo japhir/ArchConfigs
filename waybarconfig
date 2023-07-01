@@ -5,7 +5,7 @@
     "height": 24, // Waybar height
     "width": 1920, // Waybar width
     // Choose the order of the modules
-    "modules-left": ["sway/workspaces", "sway/mode", "sway/window"], // , "custom/spotify", "sway/window",
+    "modules-left": ["sway/workspaces", "sway/window", "sway/mode"], // , "custom/spotify", "sway/window",
     "modules-center": ["custom/fuzzyclock"],
     "modules-right": ["cpu", "memory", "battery", "clock", "tray"], // "pulseaudio", // "network",
     // Modules configuration
@@ -56,7 +56,7 @@
         "format": "mem: {}% "
     },
     "battery": {
-	"bat": "BAT1",
+	"bat": "BAT0",
 	"interval": 60,
         "states": {
             "good": 95,
