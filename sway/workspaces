@@ -1,3 +1,4 @@
+# -*- mode: conf -*-
 # workspace gaps
 set $ws1 "1:term"
 set $ws2 "2:web"

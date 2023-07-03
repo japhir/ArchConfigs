@@ -1,18 +1,19 @@
 # -*- mode: conf -*-
 # Read `man 5 sway` for a complete reference.
 
-### Variables
-#
-# Logo key. Use Mod1 for Alt.
-set $mod Mod4
-# Home row direction keys, like vim
-set $left h
-set $down j
-set $up k
-set $right l
+# The file we include below is created and will be overwritten by nwg-shell-config GUI!
+include ~/.config/sway/variables
+include ~/.config/sway/inputs
+include ~/.config/sway/outputs
+include ~/.config/sway/autostart
+include ~/.config/sway/workspaces
+include ~/.config/sway/software_workspaces
+# i've tweaked them manually.
 
-exec /usr/bin/xrdb /home/japhir/.Xresources			# load urxvt customisations moved them over to ~/.Xdefaults, which should be loaded automatically
-exec sh ~/.profile                      # load environment variables
+# load urxvt customisations moved them over to ~/.Xdefaults, which should be loaded automatically
+exec /usr/bin/xrdb /home/jahir/.Xresources
+# load environment variables
+exec sh ~/.profile
 seat seat0 xcursor_theme Yaru 24
 
 ## get colours/bg from pywal -> nope I now use the Ubuntu theme!
@@ -33,30 +34,6 @@ exec_always import-gsettings \
 # set $menu dmenu_path | rofi -dmenu | xargs swaymsg exec --
 set $menu wofi --show drun --allow-images --allow-markup swaymsg exec --
 # --color=/home/japhir/.cache/wal/colors-rofi-dark.rasi
-### Output configuration
-
-# Default wallpaper (more resolutions are available in __DATADIR__/backgrounds/sway/)
-output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
-
-set $wallpaper ~/Pictures/wallpapers/Landscapes/1454722946236.jpg
-# set $wallpaper ~/SurfDrive/PhD/application/kocken_simplified_gantt_clean.svg
-
-# main laptop screen
-set $smallscreen eDP-1
-output eDP-1 {
-       background $wallpaper fill
-       resolution 1920x1080
-       position 1920 10
-}
-# HDMI screen at office above laptop
-set $bigscreen HDMI-A-2
-output HDMI-A-2 {
-       background $wallpaper fill
-       resolution 1920x1080
-       position 0 0
-}
-# You can get the names of your outputs by running: swaymsg -t get_outputs
-
 ### Idle configuration
 exec swayidle -w \
          timeout 300 'swaylock -f -c 000000' \
@@ -67,51 +44,6 @@ exec swayidle -w \
 # your displays after another 300 seconds, and turn your screens back on when
 # resumed. It will also lock your screen before your computer goes to sleep.
 
-### Input configuration
-# default keyboard settings
-input type:keyboard {
-      xkb_layout us
-      xkb_options ctrl:nocaps,compose:ralt
-      xkb_numlock enabled
-}
-# laptop touchpad
-input "1739:0:Synaptics_TM3145-007" {
-      # touchpad settings
-      dwt enabled
-      tap enabled
-      natural_scroll enabled
-      middle_emulation enabled
-      pointer_accel 0.5
-}
-# mouse at home
-input "1133:49233:Logitech_USB-PS/2_Optical_Mouse" {
-      pointer_accel 0.5
-}
-# tablet should have some slower accelleration because it is bigger
-input "1386:209:Wacom_Bamboo_2FG_4x5_Pad" {
-      pointer_accel 0.6
-      tap enabled
-      natural_scroll enabled
-}
-input "1386:209:Wacom_Bamboo_2FG_4x5_Finger" {
-      pointer_accel 0.35
-      tap enabled
-      natural_scroll enabled
-}
-input "1386:209:Wacom_Bamboo_2FG_4x5_Pen" {
-      #  map tablet to secondary screen if present
-      map_to_output HDMI-A-2
-      # attempts at getting the buttons to remap to MMB and RMB
-      #scroll_button 331
-      #middle_emulation enabled
-}
-# mouse at work (scrolling isn not working correctly)
-input "1112:311:PixArt_USB_Optical_Mouse" {
-      natural_scroll disabled
-      pointer_accel 0.9
-      scroll_factor 1
-}
-#
 # hide the cursor after a while
 # seat seat0 hide_cursor 1500
 # You can get the names of your inputs by running: swaymsg -t get_inputs
@@ -134,7 +66,8 @@ input "1112:311:PixArt_USB_Optical_Mouse" {
     bindsym $mod+Shift+c reload
 
     # exit sway (logs you out of your Wayland session)
-    bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'
+    # bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b
+    # 'Yes, exit sway' 'swaymsg exit'
 #
 # Moving around:
 #
@@ -159,73 +92,6 @@ input "1112:311:PixArt_USB_Optical_Mouse" {
     bindsym $mod+Shift+Down move down 30
     bindsym $mod+Shift+Up move up 30
     bindsym $mod+Shift+Right move right 30
-#
-# Workspaces:
-#
-# workspace gaps
-set $ws1 "1:term"
-set $ws2 "2:web"
-set $ws3 "3:emacs"
-set $ws4 "4:refs"
-set $ws5 "5:slack"
-set $ws6 "6:inkscape"
-set $ws7 "7:vid"
-set $ws8 "8:windows"
-set $ws9 "9:graphs"
-set $ws10 "10:spotify"
-
-# assign workspaces to screens
-# workspace $ws1 output $bigscreen
-# workspace $ws2 output $bigscreen
-# workspace $ws3 output $bigscreen
-# workspace $ws4 output $bigscreen
-# workspace $ws5 output $smallscreen
-# workspace $ws7 output $bigscreen
-# workspace $ws9 output $smallscreen
-# workspace $ws10 output $bigscreen
-
-# switch to workspace
-bindsym $mod+1 workspace $ws1
-bindsym $mod+2 workspace $ws2
-bindsym $mod+3 workspace $ws3
-bindsym $mod+4 workspace $ws4
-bindsym $mod+5 workspace $ws5
-bindsym $mod+6 workspace $ws6
-bindsym $mod+7 workspace $ws7
-bindsym $mod+8 workspace $ws8
-bindsym $mod+9 workspace $ws9
-bindsym $mod+0 workspace $ws10
-
-# switch to previous workspace by repeatedly tapping
-workspace_auto_back_and_forth yes
-
-# move focused container to workspace
-bindsym $mod+Shift+1 move container to workspace $ws1
-bindsym $mod+Shift+2 move container to workspace $ws2
-bindsym $mod+Shift+3 move container to workspace $ws3
-bindsym $mod+Shift+4 move container to workspace $ws4
-bindsym $mod+Shift+5 move container to workspace $ws5
-bindsym $mod+Shift+6 move container to workspace $ws6
-bindsym $mod+Shift+7 move container to workspace $ws7
-bindsym $mod+Shift+8 move container to workspace $ws8
-bindsym $mod+Shift+9 move container to workspace $ws9
-bindsym $mod+Shift+0 move container to workspace $ws10
-
-### move programs to specific workspaces ###
-assign [class="^Mendeley Desktop$"] $ws4
-assign [class="^Zotero$"] $ws4
-assign [title="^GanttProject"] $ws4
-# assign [class="^Slack$"] $ws5
-# assign [class="^Riot$"] $ws5
-# assign [class="^Trello$"] $ws5
-assign [class="^discord"] $ws5
-assign [class="^Microsoft Teams"] $ws5
-assign [class="^Inkscape$"] $ws6
-assign [class="^VirtualBox$" title="^Win10"] $ws8
-assign [class="R_x11"] $ws9
-# doesn't work because of long-standing spotify bug
-#assign [class="Spotify"] $ws10
-for_window [class="Spotify"] move to workspace $ws10, workspace --no-auto-back-and-forth $ws10
 
 #
 # Layout stuff:
@@ -239,9 +105,7 @@ for_window [class="Spotify"] move to workspace $ws10, workspace --no-auto-back-a
     # Switch the current container between different layout styles
     # bindsym $mod+s layout stacking  # I never use stacking
     bindsym $mod+w layout tabbed
-    bindsym $mod+e layout toggle split
-
-    # Make the current focus fullscreen
+    bindsym $mod+e layout toggle Make the current focus fullscreen
     bindsym $mod+f fullscreen
 
     # Toggle the current focus between tiling and floating mode
@@ -283,25 +147,6 @@ bindsym $mod+Shift+o resize grow   width  20 px or 20 ppt
 # mouse button for dragging.
 floating_modifier $mod normal
 
-# media keys
-# Increase volume
-bindsym XF86AudioRaiseVolume exec "amixer set Master 2%+ && volnoti-show $(amixer get Master | grep -Po '[0-9]+(?=%)' | head -1)"
-bindsym XF86AudioLowerVolume exec "amixer set Master 2%- && volnoti-show $(amixer get Master | grep -Po '[0-9]+(?=%)' | head -1)"
-bindsym --locked XF86AudioMute exec "amixer set Master toggle && if amixer get Master | grep -Fq '[off]'; then volnoti-show -m; else volnoti-show $(amixer get Master | grep -Po '[0-9]+(?=%)' | head -1); fi"
-# Suspend also locks
-bindsym XF86Sleep             exec "systemctl suspend"
-bindsym --locked XF86AudioPlay         exec playerctl play-pause
-#bindsym XF86AudioPause        exec playerctl pause
-bindsym XF86AudioNext         exec playerctl next
-bindsym XF86AudioPrev         exec playerctl previous
-bindsym XF86AudioMicMute      exec amixer set Capture toggle
-bindsym XF86MonBrightnessDown exec "brightnessctl set 10%- && /home/japhir/bin/brightness-show"
-bindsym XF86MonBrightnessUp   exec "brightnessctl set +10% && /home/japhir/bin/brightness-show"
-bindsym XF86Display           exec "swaymsg 'output eDP-1 toggle'"
-bindsym XF86WLAN              exec sudo systemctl restart NetworkManager
-# bindsym XF86Tools             exec "swaymsg 'output eDP-1 toggle'"
-bindsym XF86Bluetooth         exec bluetooth toggle
-
 # lock screen
 bindsym $mod+Shift+Delete exec systemctl suspend && swaylock -c 000000
 bindsym $mod+Delete exec swaylock -c 000000
@@ -310,9 +155,9 @@ bindsym $mod+Delete exec swaylock -c 000000
 #
 # Read `man 5 sway-bar` for more information about this section.
 
-bar {
-   swaybar_command waybar
-}
+# bar {
+#    swaybar_command waybar
+# }
 
 # launch software with key binding
 # keybinding        software                                        mnemonic(ish?)
@@ -334,30 +179,6 @@ for_window [title="Picture-in-Picture"] floating enable
 bindsym Print exec grim ~/Pictures/Screenshots/$(date +'%F-%T.png')
 bindsym --release Shift+Print exec slurp | grim -g - -c ~/Pictures/Screenshots/$(date +'%F-%T_region.png')
 
-# startup software
-# exec redshift -l 52.1:5.12 -m wayland -t 5500:2500 # make screen display orange less blue at night
-# try to have wlsunset replace this
-exec flashfocus           # highlight focused screen
-# exec mako                  # notification daemon
-# try to have replacement from nwg
-exec volnoti               # volume change notification
-# exec pulseaudio                 # pulseaudio volume control, manage with pamixer # pactl command not found but audio works fine
-exec blueman-applet        # bluetooth status applet
-# exec nextcloud
-exec sleep 5 && owncloud
-# exec nm-applet --indicator # network-manager-applet-indicator from AUR
-# exec teams                 # microsoft teams
-# we now try the edge browser with teams, may perform better than native teams app?
-exec microsoft-edge-dev --app=https://teams.microsoft.com
-# exec ganttproject ~/SurfDrive/PhD/application/2020-09-16_DrIljaKocken.gan  # my long-term planning
-
-# open up emacs with the current paper and a todo scratchpad
-exec swaymsg "workspace $ws3" && /home/japhir/bin/current_paper.sh
-exec /home/japhir/bin/pad.sh
-for_window [title="TODO"] move to scratchpad; resize grow width 600 px or 600 pt
-
-exec zotero  # should move to ws4 automatically
-
 # gaps
 smart_gaps on
 default_border pixel 1
@@ -376,12 +197,11 @@ bindsym $mod+Shift+z gaps outer current minus 5
 # inhibit swayidle in fullscreen ff xwayland version
 for_window [class="Firefox"] inhibit_idle fullscreen
 for_window [class="popcorntime"] inhibit_idle fullscreen
-# wayland vesion
+# wayland version
 for_window [app_id="firefox"] inhibit_idle fullscreen
 
-for_window [class="^URxvt"] opacity 0.7
+for_window [class="^foot"] opacity 0.7
 for_window [title="capture"] floating enable
-
 # for_window [class="^Emacs$"] opacity 0.95
 
 # add X or wayland session to title
@@ -392,11 +212,3 @@ for_window [shell=".*"] title_format "%title :: %shell"
 include /etc/sway/config.d/*
 exec "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
-
-# The file we include below is created and will be overwritten by nwg-shell-config GUI!
-#
-include ~/.config/sway/variables
-include ~/.config/sway/outputs
-# include ~/.config/sway/autostart
-include ~/.config/sway/workspaces
-#

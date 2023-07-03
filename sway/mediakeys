@@ -1,3 +1,4 @@
+# -*- mode: conf -*-
 # Increase volume
 bindsym XF86AudioRaiseVolume exec "pamixer --increase 5 && volnoti-show $(pamixer --get-volume)"
 bindsym XF86AudioLowerVolume exec "pamixer --decrease 5 && volnoti-show $(pamixer --get-volume)"

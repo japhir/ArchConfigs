@@ -10,14 +10,15 @@ I use:
   - [ess](https://ess.r-project.org/) data analysis in R
   - [modus-themes](https://gitlab.com/protesilaos/modus-themes/) beautiful light and dark theme
 - [sway](https://swaywm.org/) window manager
-  - [waybar](https://github.com/Alexays/Waybar/) for workspaces, bar, and other nice widgets
   - [wofi](https://hg.sr.ht/~scoopta/wofi) for launching programs that I don't have a keybinding for
-  - [mako](https://github.com/emersion/mako) for notifications
-- [alacritty](https://github.com/alacritty/alacritty) terminal emulator
+  - [nwg-panel](https://github.com/nwg-piotr/nwg-panel) for workspaces, bar, and other nice widgets
+  - [swaync](https://github.com/ErikReider/SwayNotificationCenter) for notifications
+  - [wlsunset](https://sr.ht/~kennylevinsen/wlsunset/) to change display brightness/colour in the evening
+- [foot](https://codeberg.org/dnkl/foot) terminal emulator
  - [zsh](https://grml.org/zsh/) bash alternative
  - [fzf](https://github.com/junegunn/fzf) fuzzy file finder, this makes terminal's <kbd>ctrl</kbd>+<kbd>r</kbd> so nice!
 - [firefox](https://firefox.org/) browser
-  - [vim-vixen](https://github.com/ueokande/vim-vixen/releases/tag/0.30) vim keybindings in firefox
+  - [tridactyl](https://github.com/tridactyl/tridactyl) vim keybindings in firefox (I've moved around a lot between extensions...)
   - [org-capture](https://github.com/sprig/org-capture-extension) capture websites into emacs org-mode
 
 Personal scripts are in /bin and user services in /services.
@@ -25,7 +26,7 @@ Personal scripts are in /bin and user services in /services.
 If you want to use (some) of my configs, I recommend that you proceed with caution and use only the bits that you like!
 
 Simply git clone in where you want and symlink the files to their proper destination.
-You can also just execute the `symlink` file to link everything in one go, but I'm not keeping it fully up to date.
+I'm slowly moving things around so that in the future I'll be able to just git clone this directory to my `~/.config` without any symlinking.
 
 For individual entries type: `ln -s {target-filename} {symbolic filename}`, for example for i3: `ln -s i3config ~/.config/i3/config`
 

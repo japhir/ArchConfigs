@@ -1,3 +1,4 @@
+# -*- mode: conf -*-
 ### move programs to specific workspaces ###
 assign [class="^Mendeley Desktop$"] $ws4
 assign [class="^Zotero$"] $ws4

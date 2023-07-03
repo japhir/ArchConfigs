@@ -1,3 +1,4 @@
+# -*- mode: conf -*-
 # Input configuration
 # default keyboard settings
 input type:keyboard {

@@ -1,3 +1,4 @@
+# -*- mode: conf -*-
 # Logo key. Use Mod1 for Alt.
 set $mod Mod4
 # Home row direction keys, like vim
@@ -13,5 +14,8 @@ set $editor emacsclient -c -n -e '(switch-to-buffer nil)'
 # set $launcher nwg-drawer -c 6 -is 64 -fscol 2 -s preset-1.css -term foot
 set $launcher wofi --show drun --allow-images --allow-markup swaymsg exec --
 set $exit nwg-bar -p center -a middle -i 48 -s preset-1.css
-set $wallpaper /home/japhir/Pictures/wallpapers/Landscapes/1454722946236.jpg
+# set $wallpaper /home/japhir/Pictures/wallpapers/Landscapes/1454722946236.jpg
 # set $wallpaper ~/SurfDrive/PhD/application/kocken_simplified_gantt_clean.svg
+set $wallpaper ~/Pictures/wallpapers/Landscapes/1454722946236.jpg
+set $smallscreen eDP-1
+set $bigscreen HDMI-A-2
