@@ -736,16 +736,26 @@ from [[https://stackoverflow.com/questions/15345614/how-to-get-emacs-org-mode-to
 #+end_src
 * evil
 Evil allows me to use vi(m) keybindings in emacs.
+** COMMENT undo-tree
+this shouldn't be needed with emacs 28 or later
+#+begin_src emacs-lisp
+  (use-package undo-tree
+    :config
+    (global-undo-tree-mode))
+#+end_src
 ** evil
 vim emulator
 #+begin_src emacs-lisp
   (use-package evil
     :init
     (setq evil-want-integration t)
-    (setq evil-want-keybinding nil)
-    (setq evil-want-C-i-jump t) ; jump forward instead of tab insert
+    (setq evil-want-keybinding nil) ; this is needed for evil-collection
+    ;; (setq evil-want-C-i-jump t) ; jump forward instead of tab insert
     (setq evil-want-Y-yank-to-eol t)
+    (setq evil-v$-excludes-newline t) ; make v$ consistent with $ as motion
     (setq evil-want-fine-undo t) ;; make smaller undo steps within insert mode
+    (customize-set-variable 'evil-respect-visual-line-mode nil)
+    (customize-set-variable 'evil-undo-system nil)
     ;; (setq evil-cross-lines t)
     ;; (setq evil-want-C-u-scroll t) ; C-u scrolls up half page
     :config
@@ -770,10 +780,14 @@ evil keymap for org-mode
     :hook (((org-mode org-agenda-mode). evil-org-mode)
            (evil-org-mode . (lambda ()
                               (evil-org-set-key-theme
-                               '(textobjects insert navigation
-                                             additional
-                                             shift
-                                             todo heading))))
+                               '(textobjects
+                                 insert
+                                 navigation
+                                 ;; calendar ; M-h M-l next/previous day etc.
+                                 additional
+                                 shift
+                                 todo ;; heading
+                                 ))))
            ;; I want to immediately type when I capture or log
            (org-log-buffer-setup . evil-insert-state)
            (org-capture-mode . evil-insert-state)
@@ -1661,7 +1675,7 @@ reference manager I use it in conjunction with zotero, which generates the
 
 #+RESULTS:
 
-*** COMMENT org-ref itself
+*** org-ref itself
 https://github.com/jkitchin/org-ref/blob/master/org-ref.org
 #+begin_src emacs-lisp
   (use-package org-ref
@@ -2340,6 +2354,9 @@ very nice search replacement
 :END:
 It's been recently updated to become even more customizable <3
 https://github.com/SystemCrafters/crafted-emacs/blob/craftedv2alpha/README-new.org
+
+now switched to beta
+https://github.com/SystemCrafters/crafted-emacs/blob/craftedv2beta/README.org
 
 -> disable
 [[file:~/ArchConfigs/myinit.org::*swiper / ivy][swiper / ivy]]
