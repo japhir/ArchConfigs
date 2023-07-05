@@ -7,6 +7,7 @@
 output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 
 # main laptop screen
+# also $smallscreen
 output "eDP-1" {
     background $wallpaper fill
     mode  1920x1080@60.02Hz
@@ -19,12 +20,14 @@ output "eDP-1" {
     dpms on
 }
 # HDMI screen at office above laptop
-output HDMI-A-2 {
+# also $bigscreen
+output "HDMI-A-2" {
     background $wallpaper fill
     resolution 1920x1080
     position 0 0
 }
 # giant screen at office in Honolulu
+# also $bigscreen
 output "DP-1" {
     background $wallpaper fill
     mode 3840x1600@74.977Hz

@@ -18,4 +18,5 @@ set $exit nwg-bar -p center -a middle -i 48 -s preset-1.css
 # set $wallpaper ~/SurfDrive/PhD/application/kocken_simplified_gantt_clean.svg
 set $wallpaper ~/Pictures/wallpapers/Landscapes/1454722946236.jpg
 set $smallscreen eDP-1
-set $bigscreen HDMI-A-2
+# set $bigscreen HDMI-A-2
+set $bigscreen DP-1

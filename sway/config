@@ -3,6 +3,7 @@
 
 # The file we include below is created and will be overwritten by nwg-shell-config GUI!
 include ~/.config/sway/variables
+include ~/.config/sway/mediakeys
 include ~/.config/sway/inputs
 include ~/.config/sway/outputs
 include ~/.config/sway/autostart
@@ -194,11 +195,10 @@ bindsym $mod+Shift+d gaps inner current set 0; gaps outer current set 0
 bindsym $mod+z       gaps outer current plus 5
 bindsym $mod+Shift+z gaps outer current minus 5
 
-# inhibit swayidle in fullscreen ff xwayland version
-for_window [class="Firefox"] inhibit_idle fullscreen
-for_window [class="popcorntime"] inhibit_idle fullscreen
 # wayland version
 for_window [app_id="firefox"] inhibit_idle fullscreen
+# inhibit swayidle in fullscreen ff xwayland version
+for_window [class="Firefox"] inhibit_idle fullscreen
 
 for_window [class="^foot"] opacity 0.7
 for_window [title="capture"] floating enable
