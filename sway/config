@@ -69,6 +69,7 @@ exec swayidle -w \
     # exit sway (logs you out of your Wayland session)
     # bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b
     # 'Yes, exit sway' 'swaymsg exit'
+    bindsym $mod+Shift+e exec $exit
 #
 # Moving around:
 #
@@ -161,15 +162,15 @@ bindsym $mod+Delete exec swaylock -c 000000
 # }
 
 # launch software with key binding
-# keybinding        software                                        mnemonic(ish?)
-bindsym $mod+b exec firefox                                       # firefox browser
-bindsym $mod+c exec emacsclient -e '(make-capture-frame)'
-bindsym $mod+x exec nautilus                                      # xxx file manager
-bindsym $mod+m exec emacsclient -c -n -e '(switch-to-buffer nil)' # emacs
+# keybinding        software                                      mnemonic(ish?)
+bindsym $mod+b exec $browser                                      # browser
+bindsym $mod+x exec $filemanager                                  # gnome files
 bindsym $mod+i exec inkscape
-bindsym $mod+s exec slack                                         # slack messages
 bindsym $mod+o exec libreoffice                                   # office
-bindsym $mod+p exec spotify                                       # music
+bindsym $mod+s exec $music                                        # music
+bindsym $mod+m exec $editor                                       # eMacs
+bindsym $mod+c exec emacsclient -e '(make-capture-frame)'         # Capture from anywhere
+for_window [title="capture"] floating enable
 
 # add the webcam screen for video recording
 bindsym $mod+Shift+w exec mpv --no-osc --demuxer-lavf-format=video4linux2 --demuxer-lavf-o-set=input_format=mjpeg av://v4l2:/dev/video0 || notify-send "failed to start webcam"
@@ -201,7 +202,6 @@ for_window [app_id="firefox"] inhibit_idle fullscreen
 for_window [class="Firefox"] inhibit_idle fullscreen
 
 for_window [class="^foot"] opacity 0.7
-for_window [title="capture"] floating enable
 # for_window [class="^Emacs$"] opacity 0.95
 
 # add X or wayland session to title
