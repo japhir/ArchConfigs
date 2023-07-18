@@ -30,13 +30,13 @@ The gc-cons-threshold is set to a superlarge number for faster startup time. It
 is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
 
 #+begin_src emacs-lisp
-  ;; (setq gc-cons-threshold 402653184
-  ;;       gc-cons-percentage 0.6)
+  (setq gc-cons-threshold 402653184
+        gc-cons-percentage 0.6)
 #+end_src
 
-** TICK report gc-cons threshold behaviour to maintainers
-SCHEDULED: <2023-07-12 Wed>
-#+begin_src emacs-lisp
+** DONE COMMENT report gc-cons threshold behaviour to maintainers
+CLOSED: [2023-07-13 Thu 11:16] SCHEDULED: <2023-07-12 Wed>
+#+begin_src emacs-lisp :tangle no
   (require 'emacs-gc-stats)
   ;; Optionally reset Emacs GC settings to default values (recommended)
   (setq emacs-gc-stats-gc-defaults 'emacs-defaults)
@@ -46,6 +46,8 @@ SCHEDULED: <2023-07-12 Wed>
   ;; (setq emacs-gc-stats-inhibit-command-name-logging t)
   (emacs-gc-stats-mode +1)
 #+end_src
+
+whoops I had not disabled the lowest codeblock that sets the threshold to something.
 ** make long lines faster
 I like to write my org-mode scientific papers such that each line has one sentence.
 This allows me to make more meaningful git commits per line.
@@ -613,6 +615,11 @@ Insert demos after describe function https://github.com/xuchunyang/elisp-demos
     :config
     (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
 #+end_src
+** which-key
+#+begin_src emacs-lisp
+  (use-package which-key
+    :config (which-key-mode))
+#+end_src
 * custom functions/keyboard shortcuts
 ** revert buffer
 #+begin_src emacs-lisp
@@ -881,23 +888,14 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
          ;; make sure the tags in the org-agenda aren't line-wrapped
          (org-agenda-mode . (lambda ()
                                    (visual-line-mode -1)
-                                   (toggle-truncate-lines 1))))
+                                   (toggle-truncate-lines 1)))
+         (org-babel-after-execute-hook . org-redisplay-inline-images)
+         (org-babel-after-execute-hook . my/babel-ansi)
+         )
 #+end_src
 ** start with custom
 #+begin_src emacs-lisp
   :custom
-#+end_src
-** org-latex export settings
-basic latex settings
-#+begin_src emacs-lisp
-  (org-highlight-latex-and-related '(native script entities))
-  ;; (org-preview-latex-default-process 'dvipng)
-  ;; (setq org-latex-default-figure-position 'htbp)
-  (org-latex-pdf-process
-   (list "latexmk -pdflatex='lualatex -shell-escape -interaction nonstopmode' -pdf -f %f"))
-  (org-latex-prefer-user-labels t)
-  (org-export-with-sub-superscripts '{})
-  (org-use-sub-superscripts '{})
 #+end_src
 ** COMMENT org-entities-user
 These are nice shorthands for commands I use often. In org-source they look
@@ -927,6 +925,18 @@ possible.
   (org-display-remote-inline-images 'cache)
   (org-startup-with-inline-images t)
 #+end_src
+** org-latex export settings
+basic latex settings
+#+begin_src emacs-lisp
+  ;; (org-highlight-latex-and-related '(native script entities)) this gives me errors now <2023-07-18 Tue>
+  ;; (org-preview-latex-default-process 'dvipng)
+  ;; (setq org-latex-default-figure-position 'htbp)
+  (org-latex-pdf-process
+   (list "latexmk -pdflatex='lualatex -shell-escape -interaction nonstopmode' -pdf -f %f"))
+  (org-latex-prefer-user-labels t)
+  (org-export-with-sub-superscripts '{})
+  (org-use-sub-superscripts '{})
+#+end_src
 ** clocking/logging
 #+begin_src emacs-lisp
   (org-check-running-clock t)
@@ -934,14 +944,6 @@ possible.
   (org-log-done 'time)
   (org-log-into-drawer t)
   ;; (org-clock-auto-clockout-timer (* 10 60))
-#+end_src
-** org-clock-reminder
-#+begin_src emacs-lisp
-  (use-package org-clock-reminder
-    :config
-    (setq org-clock-reminder-interval 600)
-    (setq org-clock-reminder-remind-inactivity 't)
-    (org-clock-reminder-activate))
 #+end_src
 ** theming
 #+begin_src emacs-lisp
@@ -1251,28 +1253,27 @@ customize capture templates
   (org-src-tab-acts-natively t)
   (org-src-window-setup 'current-window)
 #+end_src
-*** config start
+** config start
 #+begin_src emacs-lisp
   :config
 #+end_src
-**** COMMENT quick-capture
+*** COMMENT quick-capture
 #+begin_src emacs-lisp
   (define-key global-map (kbd "C-c h")
   (lambda () (interactive) (org-capture nil "x")))
 #+end_src
-**** effort estimates
+*** effort estimates
 #+begin_src emacs-lisp
   (add-to-list 'org-global-properties
                '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
 #+end_src
-**** habits
+*** habits
 #+begin_src emacs-lisp
   (add-to-list 'org-modules 'org-habit t)
 #+end_src
 ** exporting
 *** org-babel languages
 #+begin_src emacs-lisp
-  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
@@ -1285,6 +1286,24 @@ customize capture templates
      (R . t)
      ;; (julia-vterm . t)
      ))
+#+end_src
+*** org-babel ANSI colours
+https://emacs.stackexchange.com/questions/44664/apply-ansi-color-escape-sequences-for-org-babel-results
+This will apply the ANSI colour escape codes to source block outputs.
+
+However, it will not store the results so it won't show on export or the next time you open the file. The text will be plain, colourless, instead.
+
+I still prefer this option because I have colours during my session/in the ESS process.
+
+#+begin_src emacs-lisp
+  (defun my/babel-ansi ()
+    (when-let ((beg (org-babel-where-is-src-block-result nil nil)))
+      (save-excursion
+        (goto-char beg)
+        (when (looking-at org-babel-result-regexp)
+          (let ((end (org-babel-result-end))
+                (ansi-color-context-region nil))
+            (ansi-color-apply-on-region beg end))))))
 #+end_src
 *** org-export odt
 #+begin_src emacs-lisp
@@ -1314,7 +1333,7 @@ I prefer to set this for each paper separately, just to be sure.
   (add-to-list 'org-latex-packages-alist
                '("" "siunitx" nil))
   (add-to-list 'org-latex-packages-alist
-               '("giveninits=true,uniquename=init,citestyle=authoryear-comp,bibstyle=authoryear-comp,date=year,hyperref=true,mincitenames=1,maxcitenames=3,backend=biber,backref,url=false,isbn=false" "biblatex" nil))
+               '("giveninits=true,uniquename=false,uniquelist=false,citestyle=authoryear-comp,bibstyle=authoryear-comp,date=year,hyperref=true,mincitenames=1,maxcitenames=2,backend=biber,backref,doi=true,url=false,isbn=false" "biblatex" nil))
   ;; append colorlinks, allcolors, hidelinks here
   ;; (customize-set-value 'org-latex-hyperref-template "
   ;; \\hypersetup{\n pdfauthor={%a},\n pdftitle={%t},\n pdfkeywords={%k},
@@ -1378,6 +1397,16 @@ I prefer to set this for each paper separately, just to be sure.
 #+begin_src emacs-lisp
   )
 #+end_src
+** org-num settings
+#+begin_src emacs-lisp
+  (customize-set-variable 'org-num-skip-unnumbered t)
+  (customize-set-variable 'org-num-skip-commented t)
+  (customize-set-variable 'org-num-skip-tags '("ignore" "nolatex" "noexport"))
+#+end_src
+
+#+RESULTS:
+| ignore | nolatex | noexport |
+
 ** COMMENT display PROPERTIES in agenda
 #+begin_src emacs-lisp
   (use-package org-agenda-property
@@ -1537,6 +1566,14 @@ https://github.com/awth13/org-appear
   ;       org-image-actual-width t)
 #+end_src
 
+** COMMENT org-clock-reminder
+#+begin_src emacs-lisp
+  (use-package org-clock-reminder
+    :config
+    (setq org-clock-reminder-interval 600)
+    (setq org-clock-reminder-remind-inactivity 't)
+    (org-clock-reminder-activate))
+#+end_src
 * presenting
 ** org-tree-slide-mode
 #+begin_src emacs-lisp
@@ -1738,6 +1775,7 @@ from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-me
 *** citeproc
 #+begin_src emacs-lisp
   (use-package citeproc)
+  (use-package citeproc-org)
 #+end_src
 
 #+RESULTS:
@@ -1929,6 +1967,7 @@ https://github.com/fuxialexander/org-pdftools
             ("g[" . org-roam-dailies-goto-previous-note)
             ("g]" . org-roam-dailies-goto-next-note)))
     :custom
+    ;; the file-truename part makes it follow symbolic links!
     (org-roam-directory (file-truename "~/SurfDrive/bibliography/notes/"))
     (org-roam-dailies-directory "daily/")
     (org-id-link-to-org-use-id 'create-if-interactive)
@@ -2565,6 +2604,14 @@ install it with pacman ~mu~
     ;; :init ; had init before
     (require 'mu4e)  ;; somehow this is needed, because otherwise calling org-store-link doesn't work
     (require 'mu4e-org)
+    (require 'smtpmail)
+    (setq message-send-mail-function 'smtpmail-send-it)
+    (setq send-mail-function 'smtpmail-send-it)
+    (setq starttls-use-gnutls t)
+    (setq starttls-gnutls-program "gnutls-cli")
+    (setq starttls-extra-args nil)
+    ;; (setq smtpmail-auth-credentials (expand-file-name "~/.authinfo"))
+
     (setq mu4e-contexts
           `(
             ,(make-mu4e-context
@@ -2573,11 +2620,32 @@ install it with pacman ~mu~
                             (when msg
                               (string-prefix-p "^/solismail" (mu4e-message-field msg :maildir))))
               :vars '( (user-mail-address . "i.j.kocken@uu.nl")
-                       (user-full-name . "Ilja Kocken")
-                       (message-user-organization . "Utrecht University")
-                       (mu4e-drafts-folder . "/solismail/Drafts")
+                       (user-full-name . "Ilja J. Kocken")
+                       (smtpmail-smtp-server . "smtp.office365.com")
+                       (smtpmail-smtp-service . 587)
+                       (smtpmail-stream-type . starttls)
+                       (smtpmail-starttls-credentials . (("outlook.office365.com" 587 nil nil)))
+                       (smtpmail-auth-credentials . (("outlook.office365.com" 587 "i.j.kocken@uu.nl" nil)))
+                       (message-user-organization . "Utrecht University") (mu4e-drafts-folder . "/solismail/Drafts")
                        (mu4e-sent-folder . "/solismail/Sent Items")
-                       (mu4e-trash-folder . "/solismail/Deleted Items")))
+                       (mu4e-trash-folder . "/solismail/Deleted Items")
+                       (mu4e-compose-ure .
+                        (concat
+                         "Ilja Kocken\n"
+                         "Utrecht University | Vening Meinesz Gebouw A\n"
+                         "Room 3.58 | Princetonlaan 8a, 3584 CB Utrecht | i.j.kocken@uu.nl\n"))
+                       (mu4e-maildir-shortcuts .
+                        (("/solismail/inbox" . ?i)
+                          ;;("/NEXT" . ?n)
+                         ("/solismail/Waiting" . ?w)
+                         ("/solismail/Drafts" . ?c)
+                         ("/solismail/Deleted Items" . ?d)
+                         ("/solismail/news" . ?n)
+                         ("/solismail/Important backlog" . ?l)
+                         ("/solismail/Sent Items" . ?s)
+                         ("/solismail/Junk Email" . ?t)
+                         ("/solismail/archive" . ?r)))
+                        ))
             ,(make-mu4e-context
               :name "hawaii"
               :enter-func (lambda () (mu4e-message "Switch to Hawaiʻi context"))
@@ -2585,24 +2653,34 @@ install it with pacman ~mu~
                             (when msg
                               (string-match-p "^/hawaii" (mu4e-message-field msg :maildir))))
               :vars '( (user-mail-address . "ikocken@hawaii.edu")
-                       (user-full-name . "Ilja Kocken")
+                       (user-full-name . "Ilja J. Kocken")
+                       (smtpmail-smtp-server . "smtp.gmail.com")
+                       (smtpmail-smtp-service . 587)
+                       (smtpmail-stream-type . starttls)
+                       (smtpmail-starttls-credentials . (("smtp.gmail.com" 587 nil nil)))
+                       (smtpmail-auth-credentials . (("smtp.gmail.com" 587 "ikocken@hawaii.edu" nil)))
                        (message-user-organization . "University of Hawaiʻi at Mānoa")
-                       (mu4e-drafts-folder . "/hawaii/[Gmail]/Drafts")
-                       (mu4e-sent-folder . "/hawaii/[Gmail]/Sent Mail")
-                       (mu4e-refile-folder . "/hawaii/[Gmail]/All Mail")
-                       (mu4e-trash-folder . "/hawaii/[Gmail]/Trash")))))
-
-    (setq mu4e-maildir-shortcuts
-          '(("/solismail/inbox" . ?i)
-            ("/hawaii/Inbox" . ?I)
-            ;;("/NEXT" . ?n)
-            ("/solismail/Waiting" . ?w)
-            ("/solismail/Deleted Items" . ?d)
-            ("/solismail/news" . ?n)
-            ("/solismail/Important backlog" . ?l)
-            ("/solismail/Sent Items" . ?s)
-            ("/solismail/Junk Email" . ?t)
-            ("/solismail/archive" . ?r)))
+                       (mu4e-drafts-folder . "/hawaii/Drafts")
+                       (mu4e-sent-folder . "/hawaii/Sent Mail")
+                       (mu4e-refile-folder . "/hawaii/Archive")
+                       (mu4e-trash-folder . "/hawaii/Trash")
+                       (mu4e-compose-signature .
+                        (concat
+                         "Dr. Ilja J. Kocken | Postdoc Researcher at SOEST |\n"
+                         "University of Hawaii at Mānoa | 1000 Pope Road |\n"
+                         "MSB 504 | Honolulu, HI 96822, USA\n"))
+                       (mu4e-maildir-shortcuts .
+                        (("/hawaii/Inbox" . ?i)
+                         ("/hawaii/Trash" . ?d)
+                         ("/hawaii/Drafts" . ?c) ; not synched!
+                         ("/hawaii/Sent Mail" . ?s) ; deleted!
+                         ("/hawaii/Junk Email" . ?t)
+                         ("/hawaii/Archive" . ?r)))
+                       ;; delete gmail sent items because they're also stored in All Mail/Archive.
+                       (mu4e-sent-messages-behavior . delete)
+                       ))))
+    ;; go to
+    (setq mu4e-context-policy 'pick-first)
 
     (setq mu4e-change-filenames-when-moving t ; important for isync
           mu4e-headers-date-format "%Y-%m-%d %H:%M"
@@ -2625,6 +2703,7 @@ install it with pacman ~mu~
     ;;   (imagemagick-register-types))
     (setq mu4e-org-link-query-in-headers-mode nil))
 #+end_src
+
 ** SOME COMMENT mu4e-thread-folding
 :LOGBOOK:
 - State "SOME"       from              [2021-09-26 Sun 13:14]
@@ -2828,24 +2907,59 @@ Put spaces around operators such as +, -, etc.
 https://mc-stan.org/
 check out this worg entry on working inline with stan models! https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-stan.html
 #+begin_src emacs-lisp
-   (use-package stan-mode
-     :config
-     ;; I've used cmdstanr to install cmdstan because it's not in my repositories
-     ;; don't forget to update this after updating from within an R session!
-     (setq org-babel-stan-cmdstan-directory  "/home/japhir/.cmdstan/cmdstan-2.32.0"))
+  (use-package stan-mode
+    :mode ("\\.stan\\'" . stan-mode)
+    :hook (stan-mode . stan-mode-setup)
+    :config
+    (setq stan-indentation-offset 2)
+    ;; I've used cmdstanr to install cmdstan because it's not in my repositories
+    ;; don't forget to update this after updating from within an R session!
+    (setq org-babel-stan-cmdstan-directory  "/home/japhir/.cmdstan/cmdstan-2.32.2"))
+
+  (use-package company-stan
+    :hook (stan-mode . company-stan-setup))
+
+  (use-package eldoc-stan
+    :hook (stan-mode . eldoc-stan-setup))
+
+  (use-package flycheck-stan
+    :hook ((stan-mode . flycheck-stan-stanc2-setup)
+           (stan-mode . flycheck-stan-stanc3-setup))
+    :config
+    (setq flycheck-stanc-executable nil)
+    (setq flycheck-stanc3-executable nil))
+
+  ;;; stan-snippets.el
+  (use-package stan-snippets
+    :hook (stan-mode . stan-snippets-initialize)
+    ;;
+    :config
+    ;; No configuration options as of now.
+    )
 #+end_src
 
 #+RESULTS:
 : t
 
-** COMMENT ob-stan
+** ob-stan
 org-mode babel intergation for stan
 
 this has now migrated away from org-contrib to https://git.kyleam.com/ob-stan/ so if I want to get this to work I should probably figure out a straight recipe for it.
-#+begin_src emacs-lisp
-   (use-package org-contrib
-      :config (require 'ob-stan))
+
+I've evaluated this once to install it, but straight was interfering with my regular setup.
+#+begin_src emacs-lisp :eval never :tangle no
+  (use-package ob-stan
+    :straight (ob-stan
+               :type git
+               :host nil
+               :repo "https://git.kyleam.com/ob-stan"))
 #+end_src
+
+So for now we just load it manually with:
+#+begin_src emacs-lisp
+  (load "~/.emacs.d/straight/repos/ob-stan/ob-stan.el")
+#+end_src
+
 ** markdown-mode
 markdown mode for writing
 #+begin_src emacs-lisp
