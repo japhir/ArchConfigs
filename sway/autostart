@@ -8,18 +8,16 @@ exec wlsunset -l 21.3 -L -157.8 -t 4500 -T 6500 -g 1.0 # Honolulu
 # notification daemon
 # exec mako
 exec swaync -s /home/japhir/.config/swaync/preset-1.css
-exec nm-applet --indicator
+exec nm-applet --indicator # network manager indicator
 
 # exec waybar
 exec_always nwg-panel -c preset-1 -s preset-1.css
 exec flashfocus           # highlight focused screen
 exec volnoti              # volume change notification
-# exec pulseaudio         # pulseaudio volume control, manage with pamixer # pactl command not found but audio works fine
 exec blueman-applet       # bluetooth status applet
 # exec nextcloud
 exec sleep 5 && owncloud
 
-# exec nm-applet --indicator # network-manager-applet-indicator from AUR
 # exec teams                 # microsoft teams
 # we now try the edge browser with teams, may perform better than native teams app?
 # exec microsoft-edge-dev --app=https://teams.microsoft.com
