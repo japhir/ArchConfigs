@@ -3120,10 +3120,53 @@ syntax above.
 :PROPERTIES:
 :CREATED:  [2022-09-27 Tue 16:46]
 :END:
+https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
 #+begin_src emacs-lisp
-  (use-package tree-sitter)
-  (use-package tree-sitter-langs)
+  (require 'treesit)
+  (global-tree-sitter-mode)
+  (add-hook 'ess-r-mode-hook #'tree-sitter-hl-mode)
+  (add-hook 'ess-r-mode-hook #'tree-sitter-indent-mode)
+  (customize-set-variable 'treesit-font-lock-level 4)
+  (use-package tree-sitter-indent)
+  (use-package tree-sitter-ispell)
+  (use-package tree-sitter-ess-r
+    :hook (ess-r-mode-hook . tree-sitter-ess-r-mode-activate))
+  (use-package evil-textobj-tree-sitter
+    ;; copied from https://github.com/meain/evil-textobj-tree-sitter README
+    :config
+    ;; bind `function.outer`(entire function block) to `f` for use in things like `vaf`, `yaf`
+    (define-key evil-outer-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.outer"))
+    ;; bind `function.inner`(function block without name and args) to `f` for use in things like `vif`, `yif`
+    (define-key evil-inner-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.inner"))
+    ;; You can also bind multiple items and we will match the first one we can find
+    (define-key evil-outer-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj ("conditional.outer" "loop.outer")))
+    ;; The first arguemnt to `evil-textobj-tree-sitter-get-textobj' will be the capture group to use
+    ;; and the second arg will be an alist mapping major-mode to the corresponding query to use.
+    (define-key evil-outer-text-objects-map "m" (evil-textobj-tree-sitter-get-textobj "import"
+                                                  '((python-mode . [(import_statement) @import])
+                                                    (c-mode . [(preproc_include) @import]))))
+    ;; Goto start of next function
+    (define-key evil-normal-state-map (kbd "]f") (lambda ()
+                                                   (interactive)
+                                                   (evil-textobj-tree-sitter-goto-textobj "function.outer")))
+    ;; Goto start of previous function
+    (define-key evil-normal-state-map (kbd "[f") (lambda ()
+                                                   (interactive)
+                                                   (evil-textobj-tree-sitter-goto-textobj "function.outer" t)))
+    ;; Goto end of next function
+    (define-key evil-normal-state-map (kbd "]F") (lambda ()
+                                                   (interactive)
+                                                   (evil-textobj-tree-sitter-goto-textobj "function.outer" nil t)))
+    ;; Goto end of previous function
+    (define-key evil-normal-state-map (kbd "[F") (lambda ()
+                                                   (interactive)
+                                                   (evil-textobj-tree-sitter-goto-textobj "function.outer" t t)))
+    )
 #+end_src
+
+#+RESULTS:
+: t
+
 * reset gc-cons-threshold
 #+begin_src emacs-lisp
   (setq gc-cons-threshold 16777216
