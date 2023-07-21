@@ -1026,12 +1026,12 @@ all the org-files in my org-directory
 swyper makes refiling amazing!
 #+begin_src emacs-lisp
   (org-refile-targets (quote ((nil :maxlevel . 9)  ;; current file
-                                   (org-gtd-file :maxlevel . 3)
+                                   (org-gtd-file :maxlevel . 6)
                                    (org-tickler-file :maxlevel . 2)
                                    (org-notes-file :maxlevel . 2)
                                    (org-lists-file :maxlevel . 2)
                                    (org-someday-file :maxlevel . 2)
-                                   (org-clumped-file :maxlevel . 5)
+                                   (org-clumped-file :maxlevel . 6)
                                    ;; (my/org-roam-files :maxlevel . 1) ;; comment out since org-roam-refile
                                    )))
   (org-outline-path-complete-in-steps nil)   ;; Refile in a single go
@@ -1304,6 +1304,7 @@ I still prefer this option because I have colours during my session/in the ESS p
           (let ((end (org-babel-result-end))
                 (ansi-color-context-region nil))
             (ansi-color-apply-on-region beg end))))))
+  (add-hook 'org-babel-after-execute-hook #'my/babel-ansi)
 #+end_src
 *** org-export odt
 #+begin_src emacs-lisp
