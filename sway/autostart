@@ -1,8 +1,8 @@
 # -*- mode: conf -*-
 # make the screen display less blue at night
 # exec redshift -l 52.1:5.12 -m wayland -t 5500:2500 # make screen display orange less blue at night
-# exec wlsunset -l 52.4 -L 4.9 -t 4500 -T 6500 -g 1.0 # Utrecht
-exec wlsunset -l 21.3 -L -157.8 -t 4500 -T 6500 -g 1.0 # Honolulu
+exec wlsunset -l 52.4 -L 4.9 -t 4500 -T 6500 -g 1.0 # Utrecht
+# exec wlsunset -l 21.3 -L -157.8 -t 4500 -T 6500 -g 1.0 # Honolulu
 # exec wlsunset -l 40.5 -L -74.5 -t 4500 -T 6500 -g 1.0 # New Brunswick conf
 
 # notification daemon
