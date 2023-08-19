@@ -38,7 +38,7 @@ IMAPAccount hawaii
 Host imap.gmail.com
 User ikocken@hawaii.edu
 PassCmd "cat ~/.hawaiipass"
-AuthMechs PLAIN
+AuthMechs LOGIN
 SSLType IMAPS
 CertificateFile /etc/ssl/certs/ca-certificates.crt
 
@@ -50,9 +50,62 @@ Subfolders Verbatim
 Path ~/Maildir/hawaii/
 Inbox ~/Maildir/hawaii/Inbox
 
-Channel hawaii
-Far :hawaii-remote:
-Near :hawaii-local:
-Patterns * ![Gmail]* "[Gmail]/Sent Mail" "[Gmail]/Starred" "[Gmail]/All Mail" "[Gmail]/Trash"
+# sync everything at once
+# Channel hawaii
+# Far :hawaii-remote:
+# Near :hawaii-local:
+# Patterns * ![Gmail]* "[Gmail]/Sent Mail" "[Gmail]/Starred" "[Gmail]/All Mail" "[Gmail]/Trash"
+# Create Both
+# Expunge Both
+# SyncState *
+
+# sync channel by channel so we can drop the [Gmail] prefix
+# copied from: https://github.com/danielfleischer/mu4easy
+Channel hawaii-inbox
+Far :hawaii-remote:"INBOX"
+Near :hawaii-local:"Inbox"
+CopyArrivalDate yes
 Create Both
+Expunge Both
 SyncState *
+
+Channel hawaii-trash
+Far :hawaii-remote:"[Gmail]/Trash"
+Near :hawaii-local:"Trash"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel hawaii-spam
+Far :hawaii-remote:"[Gmail]/Spam"
+Near :hawaii-local:"Spam"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel hawaii-all
+Far :hawaii-remote:"[Gmail]/All Mail"
+Near :hawaii-local:"Archive"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+# drafts often give sync issues...
+# Channel hawaii-drafts
+# Far :hawaii-remote:"[Gmail]/Drafts"
+# Near :hawaii-local:"Drafts"
+# CopyArrivalDate yes
+# Create Both
+# Expunge Both
+# SyncState *
+
+Group hawaii
+Channel hawaii-inbox
+Channel hawaii-trash
+Channel hawaii-all
+Channel hawaii-spam
+# Channel hawaii-drafts
+# note: no Sent items b/c they're in All Mail already!
