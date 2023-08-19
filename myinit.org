@@ -312,19 +312,19 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
 #+end_src
 *** circadian: dark theme at night, light theme during the day
 #+begin_src emacs-lisp
-   (use-package circadian
-     :custom
-     ;; current location on earth for auto toggle between light and dark theme
-  ;   (calendar-latitude 52.08)
-  ;   (calendar-longitude 5.11)
-     (calendar-latitude 21.25) ;; Honolulu
-     (calendar-longitude -157.8)
-     ;; (calendar-latitude 40.5) ;; New York
-     ;; (calendar-longitude -74.5)
-     (circadian-themes '((:sunrise . modus-operandi)
-                         (:sunset  . modus-vivendi)))
-     :config
-     (circadian-setup))
+  (use-package circadian
+    :custom
+    ;; current location on earth for auto toggle between light and dark theme
+    (calendar-latitude 52.08) ;; Utrecht
+    (calendar-longitude 5.11)
+    ;; (calendar-latitude 21.25) ;; Honolulu
+    ;; (calendar-longitude -157.8)
+    ;; (calendar-latitude 40.5) ;; New York
+    ;; (calendar-longitude -74.5)
+    (circadian-themes '((:sunrise . modus-operandi)
+                        (:sunset  . modus-vivendi)))
+    :config
+    (circadian-setup))
 #+end_src
 ** set variable font
 #+begin_src emacs-lisp
@@ -889,8 +889,8 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
          (org-agenda-mode . (lambda ()
                                    (visual-line-mode -1)
                                    (toggle-truncate-lines 1)))
-         (org-babel-after-execute-hook . org-redisplay-inline-images)
-         (org-babel-after-execute-hook . my/babel-ansi)
+         (org-babel-after-execute . org-redisplay-inline-images)
+         (org-babel-after-execute . my/babel-ansi)
          )
 #+end_src
 ** start with custom
@@ -1238,7 +1238,7 @@ customize capture templates
                    (:startgroup . nil)
                    ("Work" . ?W) ("Personal" . ?P)
                    (:endgroup . nil)
-                   ("DataSteward" . ?D)
+                   ;; ("DataSteward" . ?D)
                    ;; tags to accompany the @agenda context
                    ("Family" . ?F)
                    ("Martin" . ?M)
@@ -2605,16 +2605,20 @@ install it with pacman ~mu~
     ;; :init ; had init before
     (require 'mu4e)  ;; somehow this is needed, because otherwise calling org-store-link doesn't work
     (require 'mu4e-org)
+    ;; send email using smtp
+    ;; see https://www.djcbsoftware.nl/code/mu/mu4e/Gmail-configuration.html#Settings
     (require 'smtpmail)
-    (setq message-send-mail-function 'smtpmail-send-it)
-    (setq send-mail-function 'smtpmail-send-it)
-    (setq starttls-use-gnutls t)
-    (setq starttls-gnutls-program "gnutls-cli")
-    (setq starttls-extra-args nil)
-    ;; (setq smtpmail-auth-credentials (expand-file-name "~/.authinfo"))
+    (setq message-send-mail-function 'smtpmail-send-it
+          send-mail-function 'smtpmail-send-it
+          starttls-use-gnutls t
+          starttls-gnutls-program "gnutls-cli"
+          starttls-extra-args nil
+          smtpmail-auth-credentials (expand-file-name "~/.authinfo"))
 
     (setq mu4e-contexts
           `(
+
+            ;; Utrecht University
             ,(make-mu4e-context
               :name "solismail"
               :match-func (lambda (msg)
@@ -2622,10 +2626,12 @@ install it with pacman ~mu~
                               (string-prefix-p "^/solismail" (mu4e-message-field msg :maildir))))
               :vars '( (user-mail-address . "i.j.kocken@uu.nl")
                        (user-full-name . "Ilja J. Kocken")
+                       (smtpmail-default-smtp-server . "smtp.office365.com")
                        (smtpmail-smtp-server . "smtp.office365.com")
                        (smtpmail-smtp-service . 587)
                        (smtpmail-stream-type . starttls)
-                       (smtpmail-starttls-credentials . (("outlook.office365.com" 587 nil nil)))
+                       (smtpmail-smtp-user . "i.j.kocken@uu.nl")
+                       (smtpmail-starttls-credentials . (("outlook.office365.com" 587 "i.j.kocken@uu.nl" nil)))
                        (smtpmail-auth-credentials . (("outlook.office365.com" 587 "i.j.kocken@uu.nl" nil)))
                        (message-user-organization . "Utrecht University") (mu4e-drafts-folder . "/solismail/Drafts")
                        (mu4e-sent-folder . "/solismail/Sent Items")
@@ -2633,8 +2639,8 @@ install it with pacman ~mu~
                        (mu4e-compose-ure .
                         (concat
                          "Ilja Kocken\n"
-                         "Utrecht University | Vening Meinesz Gebouw A\n"
-                         "Room 3.58 | Princetonlaan 8a, 3584 CB Utrecht | i.j.kocken@uu.nl\n"))
+                         "Utrecht University | Vening Meinesz Gebouw A |\n"
+                         "Princetonlaan 8a, 3584 CB Utrecht | i.j.kocken@uu.nl\n"))
                        (mu4e-maildir-shortcuts .
                         (("/solismail/inbox" . ?i)
                           ;;("/NEXT" . ?n)
@@ -2647,6 +2653,8 @@ install it with pacman ~mu~
                          ("/solismail/Junk Email" . ?t)
                          ("/solismail/archive" . ?r)))
                         ))
+
+            ;; University of Hawaii
             ,(make-mu4e-context
               :name "hawaii"
               :enter-func (lambda () (mu4e-message "Switch to Hawaiʻi context"))
@@ -2655,10 +2663,13 @@ install it with pacman ~mu~
                               (string-match-p "^/hawaii" (mu4e-message-field msg :maildir))))
               :vars '( (user-mail-address . "ikocken@hawaii.edu")
                        (user-full-name . "Ilja J. Kocken")
+                       (smtpmail-default-smtp-server . "smtp.gmail.com")
                        (smtpmail-smtp-server . "smtp.gmail.com")
                        (smtpmail-smtp-service . 587)
                        (smtpmail-stream-type . starttls)
+                       (smtpmail-smtp-user . "ikocken@hawaii.edu")
                        (smtpmail-starttls-credentials . (("smtp.gmail.com" 587 nil nil)))
+
                        (smtpmail-auth-credentials . (("smtp.gmail.com" 587 "ikocken@hawaii.edu" nil)))
                        (message-user-organization . "University of Hawaiʻi at Mānoa")
                        (mu4e-drafts-folder . "/hawaii/Drafts")
@@ -2788,6 +2799,7 @@ emacs speaks statistics, work with R etc.
                (string= lang "elisp")
                (string= lang "emacs-lisp")
                (string= lang "julia")
+               (string= lang "stan")
                (string= lang "sh")
                (string= lang "latex"))))
     :custom
@@ -3125,12 +3137,14 @@ https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
   (require 'treesit)
   (global-tree-sitter-mode)
   (add-hook 'ess-r-mode-hook #'tree-sitter-hl-mode)
-  (add-hook 'ess-r-mode-hook #'tree-sitter-indent-mode)
+  (add-hook 'c-mode-hook #'tree-sitter-hl-mode)
+  ;; (add-hook 'ess-r-mode-hook #'tree-sitter-indent-mode)
   (customize-set-variable 'treesit-font-lock-level 4)
-  (use-package tree-sitter-indent)
-  (use-package tree-sitter-ispell)
-  (use-package tree-sitter-ess-r
-    :hook (ess-r-mode-hook . tree-sitter-ess-r-mode-activate))
+  ;; (use-package tree-sitter-indent)
+  ;; (use-package tree-sitter-ispell)
+  ;; (use-package tree-sitter-ess-r
+  ;;   :hook (ess-r-mode-hook . tree-sitter-ess-r-mode-activate))
+
   (use-package evil-textobj-tree-sitter
     ;; copied from https://github.com/meain/evil-textobj-tree-sitter README
     :config
