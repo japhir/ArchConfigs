@@ -1,0 +1,13 @@
+profile home {
+    # main screen goes right on the stand
+    output eDP-1 mode 1920x1080@60.020Hz position 1920,0
+    # big screen goes left
+    output HDMI-A-2 mode 1920x1080@60.020Hz position 0,0
+}
+
+profile work {
+    # main screen goes to the bottom middle
+    output eDP-1 mode 1920x1080@60.020Hz position 320,1440
+    # Signe's big screen goes to the top
+    output DP-4 mode 2560x1440@59.951Hz position 0,0
+}

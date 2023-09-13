@@ -41,6 +41,8 @@ PassCmd "cat ~/.hawaiipass"
 AuthMechs LOGIN
 SSLType IMAPS
 CertificateFile /etc/ssl/certs/ca-certificates.crt
+Pipelinedepth 50
+Timeout 60
 
 IMAPStore hawaii-remote
 Account hawaii
@@ -108,4 +110,84 @@ Channel hawaii-trash
 Channel hawaii-all
 Channel hawaii-spam
 # Channel hawaii-drafts
+# note: no Sent items b/c they're in All Mail already!
+
+
+# third account, personal gmail
+IMAPAccount gmail
+Host imap.gmail.com
+User iljakocken@gmail.com
+PassCmd "cat ~/.gmailpass"
+AuthMechs LOGIN
+SSLType IMAPS
+CertificateFile /etc/ssl/certs/ca-certificates.crt
+Pipelinedepth 50
+Timeout 60
+
+IMAPStore gmail-remote
+Account gmail
+
+MaildirStore gmail-local
+Subfolders Verbatim
+Path ~/Maildir/gmail/
+Inbox ~/Maildir/gmail/Inbox
+
+# sync everything at once
+# Channel hawaii
+# Far :hawaii-remote:
+# Near :hawaii-local:
+# Patterns * ![Gmail]* "[Gmail]/Sent Mail" "[Gmail]/Starred" "[Gmail]/All Mail" "[Gmail]/Trash"
+# Create Both
+# Expunge Both
+# SyncState *
+
+# sync channel by channel so we can drop the [Gmail] prefix
+# copied from: https://github.com/danielfleischer/mu4easy
+Channel gmail-inbox
+Far :gmail-remote:"INBOX"
+Near :gmail-local:"Inbox"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel gmail-trash
+Far :gmail-remote:"[Gmail]/Trash"
+Near :gmail-local:"Trash"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel gmail-spam
+Far :gmail-remote:"[Gmail]/Spam"
+Near :gmail-local:"Spam"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel gmail-all
+Far :gmail-remote:"[Gmail]/All Mail"
+Near :gmail-local:"Archive"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+# drafts often give sync issues...
+# Channel hawaii-drafts
+# Far :hawaii-remote:"[Gmail]/Drafts"
+# Near :hawaii-local:"Drafts"
+# CopyArrivalDate yes
+# Create Both
+# Expunge Both
+# SyncState *
+
+Group gmail
+Channel gmail-inbox
+Channel gmail-trash
+Channel gmail-all
+Channel gmail-spam
+# Channel gmail-drafts
 # note: no Sent items b/c they're in All Mail already!

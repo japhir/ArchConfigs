@@ -209,6 +209,7 @@ for_window [class="^foot"] opacity 0.7
 for_window [shell=".*"] title_format "%title :: %shell"
 
 # exec waybar
+exec kanshi
 
 include /etc/sway/config.d/*
 exec "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
