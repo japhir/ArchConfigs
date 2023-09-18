@@ -11,3 +11,10 @@ profile work {
     # Signe's big screen goes to the top
     output DP-4 mode 2560x1440@59.951Hz position 0,0
 }
+
+profile work2 {
+    # main screen goes to the bottom middle
+    output eDP-1 mode 1920x1080@60.020Hz position 320,1440
+    # Signe's big screen goes to the top
+    output DP-5 mode 2560x1440@59.951Hz position 0,0
+}
