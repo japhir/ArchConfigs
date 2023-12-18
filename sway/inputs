@@ -39,3 +39,9 @@ input "1112:311:PixArt_USB_Optical_Mouse" {
       pointer_accel 0.9
       scroll_factor 1
 }
+# new mouse at work is moving too slow
+input "1121:19744:USB_Optical_Mouse" {
+      natural_scroll disabled
+      pointer_accel 1
+      scroll_factor 1
+}
