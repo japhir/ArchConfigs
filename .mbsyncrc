@@ -17,19 +17,69 @@ Account solismail
 MaildirStore solismail-local
 # The trailing "/" is important
 Path ~/Maildir/solismail/
-Inbox ~/Maildir/solismail/inbox
+Inbox ~/Maildir/solismail/Inbox
 SubFolders Verbatim
 
-Channel solismail
+# sync solismail channel-by-channel to standardize names
+Channel solismail-archive
+Far :solismail-remote:"archive"
+Near :solismail-local:"Archive"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel solismail-trash
+Far :solismail-remote:"Deleted Items"
+Near :solismail-local:"Trash"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel solismail-spam
+Far :solismail-remote:"Junk Email"
+Near :solismail-local:"Spam"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel solismail-sent
+Far :solismail-remote:"Sent Items"
+Near :solismail-local:"Sent"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel solismail-all
 Far :solismail-remote:
 Near :solismail-local:
-Patterns *
-# Automatically create missing mailboxes, both locally and on the server
+Patterns "INBOX" "Drafts" "Important backlog" "NEXT" "news"
+CopyArrivalDate yes
 Create Both
-# Automatically delete items on both IMAP and local
 Expunge Both
-# Save the synchronization state files in the relevant directory
 SyncState *
+
+Group solismail
+Channel hawaii-archive
+Channel hawaii-trash
+Channel hawaii-spam
+Channel hawaii-sent
+Channel hawaii-all
+
+# this just synced all of solismail, copying the remote folder structure as-is
+# Channel solismail
+# Far :solismail-remote:
+# Near :solismail-local:
+# Patterns *
+# # Automatically create missing mailboxes, both locally and on the server
+# Create Both
+# # Automatically delete items on both IMAP and local
+# Expunge Both
+# # Save the synchronization state files in the relevant directory
+# SyncState *
 
 
 
