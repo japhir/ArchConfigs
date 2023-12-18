@@ -2,19 +2,18 @@ profile home {
     # main screen goes right on the stand
     output eDP-1 mode 1920x1080@60.020Hz position 1920,0
     # big screen goes left
-    output HDMI-A-2 mode 1920x1080@60.020Hz position 0,0
+    output "LG Electronics W2261 0x0000CF35" mode 1920x1080@60.020Hz position 0,0
+}
+
+profile homecinema {
+    output eDP-1 mode 1920x1080@60.020Hz position 0,0
+    output "Philips Consumer Electronics Company PHL19PFL3405 0x00000101" mode 1920x1080@60.000Hz position 1920,0
+    # exec wl-mirror eDP-1
 }
 
 profile work {
     # main screen goes to the bottom middle
-    output eDP-1 mode 1920x1080@60.020Hz position 320,1440
+    output eDP-1 mode 1920x1080@60.020Hz position 2560,360
     # Signe's big screen goes to the top
-    output DP-4 mode 2560x1440@59.951Hz position 0,0
-}
-
-profile work2 {
-    # main screen goes to the bottom middle
-    output eDP-1 mode 1920x1080@60.020Hz position 320,1440
-    # Signe's big screen goes to the top
-    output DP-5 mode 2560x1440@59.951Hz position 0,0
+    output "HP Inc. HP E273q 6CM9300JV4" mode 2560x1440@59.951Hz position 0,0
 }
