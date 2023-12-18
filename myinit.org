@@ -1049,9 +1049,9 @@ Filter tasks by context (sorted by todo state)
   (org-agenda-custom-commands
         '(("i" "Inbox" tags "inbox")
           ("I" "Important"
-           ((tags "PRIORITY=\"A\"/PROJ"
+           ((tags "PRIORITY=\"A\"/prj"
                   ((org-agenda-overriding-header "High-priority projects:")))
-            (tags "PRIORITY=\"A\"/!-PROJ"
+            (tags "PRIORITY=\"A\"/!-prj"
                   ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
                    (org-agenda-overriding-header "High-priority unfinished tasks:")))))
           ;; ("A" agenda*)
@@ -1327,14 +1327,16 @@ org-export ignore headlines with ~:ignore:~ tag
 - Note taken on [2023-06-05 Mon 14:55] \\
   I've re-enabled this and added biblatex default options
 :END:
-I prefer to set this for each paper separately, just to be sure.
+# I preferRED to set this for each paper separately, just to be sure.
 #+begin_src emacs-lisp
-  (add-to-list 'org-latex-packages-alist
-               '("version=4" "mhchem"))
-  (add-to-list 'org-latex-packages-alist
-               '("" "siunitx" nil))
-  (add-to-list 'org-latex-packages-alist
-               '("giveninits=true,uniquename=false,uniquelist=false,citestyle=authoryear-comp,bibstyle=authoryear-comp,date=year,hyperref=true,mincitenames=1,maxcitenames=2,backend=biber,backref,doi=true,url=false,isbn=false" "biblatex" nil))
+  (customize-set-variable 'org-latex-packages-alist
+        '(("version=4" "mhchem" t)
+          ("" "siunitx" t)
+          ("giveninits=true,uniquename=false,uniquelist=false,citestyle=authoryear-comp,bibstyle=authoryear-comp,date=year,hyperref=true,mincitenames=1,maxcitenames=2,backend=biber,backref,doi=true,url=false,isbn=false" "biblatex" t)
+          ("" "amsmath" t)
+          ("" "hyperref" t)
+          ;; cleveref must be loaded after hyperref and amsmath
+          ("capitalise,nameinlink,noabbrev" "cleveref" t)))
   ;; append colorlinks, allcolors, hidelinks here
   ;; (customize-set-value 'org-latex-hyperref-template "
   ;; \\hypersetup{\n pdfauthor={%a},\n pdftitle={%t},\n pdfkeywords={%k},
@@ -1346,7 +1348,7 @@ I prefer to set this for each paper separately, just to be sure.
 :CREATED:  [2023-06-05 Mon 13:46]
 :END:
 #+begin_src emacs-lisp
-  (customize-set-variable 'org-cite-global-bibliography '("/home/japhir/SurfDrive/bibliography/references.bib"))
+  ;; (customize-set-variable 'org-cite-global-bibliography '("/home/japhir/SurfDrive/bibliography/references.bib"))
   (setq org-cite-csl-styles-dir "~/Zotero/styles")
   ;; (setq org-cite-csl--fallback-style-file "/home/japhir/Zotero/styles/paleoceanography.csl") ; doesn't have a bibliography style!
   (setq org-cite-csl--fallback-style-file "/home/japhir/Zotero/styles/apa.csl")
@@ -1357,18 +1359,18 @@ I prefer to set this for each paper separately, just to be sure.
   ;; (setq org-cite-biblatex-options bibstyle=authoryear-comp)
   (add-to-list 'load-path "/usr/bin/vendor_perl/")
 #+end_src
-*** COMMENT latejx class =ijkarticle=
+*** latejx class =ijkarticle=
 #+begin_src emacs-lisp
   (add-to-list 'org-latex-classes
          '("ijkarticle"
-  "\\documentclass{article}
-  \\usepackage[citestyle=authoryear,bibstyle=authoryear,hyperref=true,maxcitenames=3,url=true,backend=biber,natbib=true]{biblatex}"
+  "\\documentclass{article}"
                    ("\\section{%s}" . "\\section*{%s}")
                    ("\\subsection{%s}" . "\\subsection*{%s}")
                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 #+end_src
+
 *** add emacs and R source blocks
 [[https://emacs.stackexchange.com/a/47370/9748][Nice answer on how to have point on a blank line in code block]]
 #+begin_src emacs-lisp
@@ -1378,6 +1380,9 @@ I prefer to set this for each paper separately, just to be sure.
   ;; TODO figure out how to add multiple items to the list
   (add-to-list 'org-structure-template-alist
                '("sr" . "src R
+  "))
+  (add-to-list 'org-structure-template-alist
+               '("sc" . "src c
   "))
   (add-to-list 'org-structure-template-alist
                '("sp" . "src python
@@ -1519,7 +1524,7 @@ doesn't work :(
                    ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
                    ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))))
 #+end_src
-** org-fragtog
+** COMMENT org-fragtog
 auto-toggle latex fragments
 #+begin_src emacs-lisp
   (use-package org-fragtog
@@ -1661,15 +1666,15 @@ usefull snippets for me: org-mode (fig_, )
 I use most of the minimal setup in this [[https://github.com/jkitchin/org-ref/blob/master/melpa/init-ivy.el][init-ivy]] config.
 *** bibtex
 #+begin_src emacs-lisp
-  (add-hook 'bibtex-mode-hook 'flyspell-mode)
+  ;(add-hook 'bibtex-mode-hook 'flyspell-mode)
   (setq bibtex-user-optional-fields
         '(("keywords" "Keywords to describe the entry" "")
           ("file" "Link to document file." ":"))
         bibtex-align-at-equal-sign t)
-  (setq bibtex-dialect 'biblatex)
+  ;; (setq bibtex-dialect 'biblatex)
 #+end_src
 
-*** bibtex/ivy-bibtex
+*** COMMENT bibtex/ivy-bibtex
 reference manager I use it in conjunction with zotero, which generates the
 .bib files, and org-ref, to insert citations in org files.
 
@@ -1697,7 +1702,7 @@ reference manager I use it in conjunction with zotero, which generates the
 #+end_src
 
 #+RESULTS:
-*** automatically generating bibtex keys
+*** COMMENT automatically generating bibtex keys
 #+begin_src emacs-lisp
   (use-package bibtex
     :custom
@@ -2017,7 +2022,13 @@ https://github.com/fuxialexander/org-pdftools
                    (direction . right)
                    ;; (window-width . 0.33)
                    (window-height . fit-window-to-buffer)))
-    (require 'org-roam-capture)
+    (require 'org-roam-capture))
+#+end_src
+
+** org-roam-bibtex
+#+begin_src emacs-lisp
+  (use-package org-roam-bibtex
+    :config
     (org-roam-bibtex-mode))
 #+end_src
 
@@ -2555,19 +2566,10 @@ See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for 
   (use-package smtpmail
     :ensure nil
     :custom
+    ;; default config from https://www.djcbsoftware.nl/code/mu/mu4e/Gmail-configuration.html#Settings
     (message-send-mail-function 'smtpmail-send-it)
-    (send-mail-function 'smtpmail-send-it)
-    (user-mail-address "<your-email-address>")
-    (smtpmail-default-smtp-server "<your-smtp-server>")
-    (smtpmail-smtp-server "<your-smtp-server>")
-    (smtpmail-smtp-service 587)
-    (smtp-stream-type 'starttls)
-    (smtpmail-smtp-user "<your-user-id>")
-    (smtpmail-starttls-credentials
-     '(("<your-smtp-server>" 587 "<possibly-domain>/<your-user-id>" nil)))
     (starttls-use-gnutls t)
-    (starttls-gnutls-program "gnutls-cli")
-    (starttls-extra-args nil))
+    (smtp-stream-type 'starttls))
 #+end_src
 ** use oauth2ms
 https://github.com/harishkrupo/oauth2ms/blob/main/steps.org
@@ -2599,100 +2601,142 @@ install it with pacman ~mu~
     :ensure nil
     :load-path "/usr/share/emacs/site-lisp/mu4e/"
     :commands mu4e
-    :bind (("C-c m" . mu4e))
-    :hook ((mu4e-view-mode mu4e-compose-mode) . visual-fill-column-mode)
+    :bind (("C-c m" . mu4e) ("C-c C-o" . shr-browse-url))
+    :hook ((mu4e-view-mode mu4e-compose-mode) . visual-line-mode)
     :config
-    ;; :init ; had init before
     (require 'mu4e)  ;; somehow this is needed, because otherwise calling org-store-link doesn't work
     (require 'mu4e-org)
+    ;; Use Ivy for mu4e completions (maildir folders, etc)
+    (setq mu4e-completing-read-function #'ivy-completing-read)
+
     ;; send email using smtp
     ;; see https://www.djcbsoftware.nl/code/mu/mu4e/Gmail-configuration.html#Settings
+    ;; see also the smtp heading
     (require 'smtpmail)
-    (setq message-send-mail-function 'smtpmail-send-it
+    (setq mail-user-agent 'mu4e-user-agent
+          message-send-mail-function 'smtpmail-send-it
           send-mail-function 'smtpmail-send-it
+          ;; this is the same for both mail clients
+          smtpmail-default-smtp-server "smtp.gmail.com"
+          smtpmail-smtp-service 587
+          smtpmail-stream-type 'starttls
           starttls-use-gnutls t
           starttls-gnutls-program "gnutls-cli"
-          starttls-extra-args nil
-          smtpmail-auth-credentials (expand-file-name "~/.authinfo"))
+          starttls-extra-arguments nil
+          smtpmail-auth-credentials (expand-file-name "~/.authinfo")
+          smtpmail-debug-info t
+          smtpmail-debug-verb t)
+
+    (setq user-full-name "Ilja J. Kocken")
 
     (setq mu4e-contexts
-          `(
+          (list
+            ;; University of Hawaii
+            (make-mu4e-context
+             :name "hawaii"
+             :enter-func (lambda () (mu4e-message "Switch to Hawaiʻi context"))
+             :match-func (lambda (msg)
+                           (when msg
+                             (string-prefix-p "/hawaii" (mu4e-message-field msg :maildir))))
+             :vars '((user-mail-address . "ikocken@hawaii.edu")
+                     (message-user-organization . "University of Hawaiʻi at Mānoa")
+                     ;; sending email
+                     (smtpmail-smtp-user . "ikocken@hawaii.edu")
+                     (smtpmail-smtp-server . "smtp.gmail.com")
+                     (smtpmail-smtp-service . 587)
+                     ;; (smtpmail-starttls-credentials . '(("smtp.gmail.com" 587 nil nil)))
+                     ;; (smtpmail-auth-credentials . '(("smtp.gmail.com" 587 "ikocken@hawaii.edu" nil)))
+                     (mu4e-drafts-folder . "/hawaii/Drafts")
+                     (mu4e-sent-folder . "/hawaii/Sent")
+                     (mu4e-refile-folder . "/hawaii/Archive")
+                     (mu4e-trash-folder . "/hawaii/Trash")
+                     (mu4e-compose-signature .
+                                             (concat
+                                              "Dr. Ilja J. Kocken | Postdoc Researcher at SOEST |\n"
+                                              "University of Hawaii at Mānoa | 1000 Pope Road |\n"
+                                              "MSB 504 | Honolulu, HI 96822, USA\n"))
+                     (mu4e-maildir-shortcuts .
+                                             (("/hawaii/Inbox" . ?i)
+                                              ;; ("/hawaii/Drafts" . ?d) ; not synched!
+                                              ("/hawaii/Trash" . ?t)
+                                              ;; ("/hawaii/Sent Mail" . ?s) ; deleted!
+                                              ;; ("/hawaii/Junk Email" . ?t)
+                                              ("/hawaii/Archive" . ?r)))
+                       ;; delete gmail sent items because they're also stored in All Mail/Archive.
+                     (mu4e-sent-messages-behavior . delete)))
 
             ;; Utrecht University
-            ,(make-mu4e-context
-              :name "solismail"
-              :match-func (lambda (msg)
-                            (when msg
-                              (string-prefix-p "^/solismail" (mu4e-message-field msg :maildir))))
-              :vars '( (user-mail-address . "i.j.kocken@uu.nl")
-                       (user-full-name . "Ilja J. Kocken")
-                       (smtpmail-default-smtp-server . "smtp.office365.com")
-                       (smtpmail-smtp-server . "smtp.office365.com")
-                       (smtpmail-smtp-service . 587)
-                       (smtpmail-stream-type . starttls)
-                       (smtpmail-smtp-user . "i.j.kocken@uu.nl")
-                       (smtpmail-starttls-credentials . (("outlook.office365.com" 587 "i.j.kocken@uu.nl" nil)))
-                       (smtpmail-auth-credentials . (("outlook.office365.com" 587 "i.j.kocken@uu.nl" nil)))
-                       (message-user-organization . "Utrecht University") (mu4e-drafts-folder . "/solismail/Drafts")
-                       (mu4e-sent-folder . "/solismail/Sent Items")
-                       (mu4e-trash-folder . "/solismail/Deleted Items")
-                       (mu4e-compose-ure .
-                        (concat
-                         "Ilja Kocken\n"
-                         "Utrecht University | Vening Meinesz Gebouw A |\n"
-                         "Princetonlaan 8a, 3584 CB Utrecht | i.j.kocken@uu.nl\n"))
-                       (mu4e-maildir-shortcuts .
-                        (("/solismail/inbox" . ?i)
-                          ;;("/NEXT" . ?n)
-                         ("/solismail/Waiting" . ?w)
-                         ("/solismail/Drafts" . ?c)
-                         ("/solismail/Deleted Items" . ?d)
-                         ("/solismail/news" . ?n)
-                         ("/solismail/Important backlog" . ?l)
-                         ("/solismail/Sent Items" . ?s)
-                         ("/solismail/Junk Email" . ?t)
-                         ("/solismail/archive" . ?r)))
-                        ))
+            (make-mu4e-context
+             :name "solismail"
+             :match-func (lambda (msg)
+                           (when msg
+                             (string-prefix-p "/solismail" (mu4e-message-field msg :maildir))))
+             :vars '((user-mail-address . "i.j.kocken@uu.nl")
+                     (message-user-organization . "Utrecht University")
+                     ;; sending email
+                     (smtpmail-smtp-user . "i.j.kocken@uu.nl")
+                     (smtpmail-smtp-server . "smtp.office365.com")
+                     (smtpmail-smtp-service . 587)
+                     (smtpmail-stream-type . starttls)
+                     (smtpmail-starttls-credentials . (("outlook.office365.com" 587 "i.j.kocken@uu.nl" nil)))
+                     (smtpmail-auth-credentials . (("outlook.office365.com" 587 "i.j.kocken@uu.nl" nil)))
+                     (mu4e-drafts-folder . "/solismail/Drafts")
+                     (mu4e-sent-folder . "/solismail/Sent")
+                     (mu4e-refile-folder . "/solismail/Archive")
+                     (mu4e-trash-folder . "/solismail/Trash")
+                     (mu4e-compose-signature .
+                                             (concat
+                                              "Dr. Ilja Kocken\n"
+                                              "Utrecht University | Vening Meinesz Gebouw A |\n"
+                                              "Princetonlaan 8a, 3584 CB Utrecht, the Netherlands\n"))
+                     (mu4e-maildir-shortcuts .
+                                             (("/solismail/Inbox" . ?i)
+                                              ;;("/NEXT" . ?n)
+                                              ;; ("/solismail/Waiting" . ?w)
+                                              ;; ("/solismail/Drafts" . ?c)
+                                              ("/solismail/Trash" . ?t)
+                                              ("/solismail/news" . ?n)
+                                              ("/solismail/Important backlog" . ?l)
+                                              ("/solismail/Sent" . ?s)
+                                              ;; ("/solismail/Spam" . ?t)
+                                              ("/solismail/Archive" . ?r)))
+                     ))
 
-            ;; University of Hawaii
-            ,(make-mu4e-context
-              :name "hawaii"
-              :enter-func (lambda () (mu4e-message "Switch to Hawaiʻi context"))
-              :match-func (lambda (msg)
-                            (when msg
-                              (string-match-p "^/hawaii" (mu4e-message-field msg :maildir))))
-              :vars '( (user-mail-address . "ikocken@hawaii.edu")
-                       (user-full-name . "Ilja J. Kocken")
-                       (smtpmail-default-smtp-server . "smtp.gmail.com")
-                       (smtpmail-smtp-server . "smtp.gmail.com")
-                       (smtpmail-smtp-service . 587)
-                       (smtpmail-stream-type . starttls)
-                       (smtpmail-smtp-user . "ikocken@hawaii.edu")
-                       (smtpmail-starttls-credentials . (("smtp.gmail.com" 587 nil nil)))
-
-                       (smtpmail-auth-credentials . (("smtp.gmail.com" 587 "ikocken@hawaii.edu" nil)))
-                       (message-user-organization . "University of Hawaiʻi at Mānoa")
-                       (mu4e-drafts-folder . "/hawaii/Drafts")
-                       (mu4e-sent-folder . "/hawaii/Sent Mail")
-                       (mu4e-refile-folder . "/hawaii/Archive")
-                       (mu4e-trash-folder . "/hawaii/Trash")
-                       (mu4e-compose-signature .
-                        (concat
-                         "Dr. Ilja J. Kocken | Postdoc Researcher at SOEST |\n"
-                         "University of Hawaii at Mānoa | 1000 Pope Road |\n"
-                         "MSB 504 | Honolulu, HI 96822, USA\n"))
-                       (mu4e-maildir-shortcuts .
-                        (("/hawaii/Inbox" . ?i)
-                         ("/hawaii/Trash" . ?d)
-                         ("/hawaii/Drafts" . ?c) ; not synched!
-                         ("/hawaii/Sent Mail" . ?s) ; deleted!
-                         ("/hawaii/Junk Email" . ?t)
-                         ("/hawaii/Archive" . ?r)))
+            (make-mu4e-context
+             :name "gmail"
+             :enter-func (lambda () (mu4e-message "Switch to Personal context"))
+             :match-func (lambda (msg)
+                           (when msg
+                             (string-prefix-p "/gmail" (mu4e-message-field msg :maildir))))
+             :vars '((user-mail-address . "iljakocken@gmail.com")
+                     (message-user-organization . "Personal")
+                     ;; sending email
+                     (smtpmail-stream-type . starttls)
+                     (smtpmail-smtp-user . "iljakocken@gmail.com")
+                     (smtpmail-smtp-server . "smtp.gmail.com")
+                     (smtpmail-smtp-service . 587)
+                     ;; (smtpmail-starttls-credentials . '(("smtp.gmail.com" 587 nil nil)))
+                     ;; (smtpmail-auth-credentials . '(("smtp.gmail.com" 587 "iljakocken@gmail.com" nil)))
+                     (mu4e-drafts-folder . "/gmail/Drafts")
+                     (mu4e-sent-folder . "/gmail/Sent")
+                     (mu4e-refile-folder . "/gmail/Archive")
+                     (mu4e-trash-folder . "/gmail/Trash")
+                     (mu4e-compose-signature .
+                                             (concat
+                                              "Ilja"))
+                     (mu4e-maildir-shortcuts .
+                                             (("/gmail/Inbox" . ?i)
+                                              ;; ("/gmail/Drafts" . ?d) ; not synched!
+                                              ("/gmail/Trash" . ?t)
+                                              ;; ("/gmail/Sent" . ?s) ; deleted!
+                                              ;; ("/gmail/Junk Email" . ?t)
+                                              ("/gmail/Archive" . ?r)))
                        ;; delete gmail sent items because they're also stored in All Mail/Archive.
-                       (mu4e-sent-messages-behavior . delete)
-                       ))))
-    ;; go to
-    (setq mu4e-context-policy 'pick-first)
+                     (mu4e-sent-messages-behavior . delete)))
+
+            ))
+
+    (setq mu4e-context-policy 'pick-first) ;; default to hawaii gmail
 
     (setq mu4e-change-filenames-when-moving t ; important for isync
           mu4e-headers-date-format "%Y-%m-%d %H:%M"
@@ -2703,7 +2747,7 @@ install it with pacman ~mu~
             (:subject       .  nil))
           mu4e-get-mail-command "env PATH=/usr/bin:/home/japhir/bin: mbsync -a"
           mu4e-headers-include-related t
-          ;; mu4e-compose-format-flowed t  ; plain-text nice to read on phone
+          mu4e-compose-format-flowed t  ; plain-text nice to read on phone
           ;; use-hard-newlines t             ; above doesn't work for Outlooks, so disabled for colleagues
           mu4e-confirm-quit nil
           mu4e-view-show-images t)
@@ -2713,7 +2757,18 @@ install it with pacman ~mu~
     ;; use imagemagick, if available
     ;; (when (fboundp 'imagemagick-register-types)
     ;;   (imagemagick-register-types))
-    (setq mu4e-org-link-query-in-headers-mode nil))
+    (setq mu4e-org-link-query-in-headers-mode nil)
+
+    ;; maybe I want this at some point? currently not working, mu must have changed it query syntax
+    (add-to-list 'mu4e-bookmarks
+                 '(:name "All Inboxes"
+                   :query "maildir:/hawaii/Inbox OR maildir:/solismail/inbox OR maildir:/gmail/Inbox"
+                         :key ?i))
+    (add-to-list 'mu4e-bookmarks
+                 '(:name "All sent mail"
+                   :query "from:ikocken@hawaii.edu OR from:iljakocken@gmail.com OR from:i.j.kocken@uu.nl"
+                   :key ?s))
+    )
 #+end_src
 
 ** SOME COMMENT mu4e-thread-folding
@@ -2954,7 +3009,7 @@ check out this worg entry on working inline with stan models! https://orgmode.or
 #+RESULTS:
 : t
 
-** ob-stan
+** COMMENT ob-stan
 org-mode babel intergation for stan
 
 this has now migrated away from org-contrib to https://git.kyleam.com/ob-stan/ so if I want to get this to work I should probably figure out a straight recipe for it.
@@ -3138,12 +3193,18 @@ https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
   (global-tree-sitter-mode)
   (add-hook 'ess-r-mode-hook #'tree-sitter-hl-mode)
   (add-hook 'c-mode-hook #'tree-sitter-hl-mode)
+  (add-hook 'rust-mode-hook #'tree-sitter-hl-mode)
   ;; (add-hook 'ess-r-mode-hook #'tree-sitter-indent-mode)
   (customize-set-variable 'treesit-font-lock-level 4)
   ;; (use-package tree-sitter-indent)
   ;; (use-package tree-sitter-ispell)
   ;; (use-package tree-sitter-ess-r
   ;;   :hook (ess-r-mode-hook . tree-sitter-ess-r-mode-activate))
+  (setq major-mode-remap-alist
+   '((bash-mode . bash-ts-mode)
+     (c-mode . rust-c-mode)
+     (python-mode . python-ts-mode)
+     (rust-mode . rust-ts-mode)))
 
   (use-package evil-textobj-tree-sitter
     ;; copied from https://github.com/meain/evil-textobj-tree-sitter README
