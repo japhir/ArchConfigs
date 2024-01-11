@@ -1284,6 +1284,7 @@ customize capture templates
      ;; (stan . t)
      (latex . t)
      (R . t)
+     (julia . t)
      ;; (julia-vterm . t)
      ))
 #+end_src
@@ -2964,11 +2965,23 @@ Put spaces around operators such as +, -, etc.
 
 #+RESULTS:
 
-** COMMENT julia
+** julia
 #+begin_src emacs-lisp :tangle no
   (use-package julia-mode)
-  (use-ob-julia-vterm
-    :config (defalias 'org-babel-execute:julia 'org-babel-execute:julia-vterm))
+  (use-package org-contrib
+    :init
+    (require 'ob-julia)
+    :commands org-babel-execute:julia
+    :config
+    ;; (setq org-babel-julia-command-arguments
+    ;;       `("--sysimage"
+    ;;         ,(when-let ((img "~/.local/lib/julia.so")
+    ;;                     (exists? (file-exists-p img)))
+    ;;            (expand-file-name img))
+    ;;         "--threads"
+    ;;         ,(number-to-string (- (doom-system-cpus) 2))
+    ;;         "--banner=no"))
+    )
 #+end_src
 
 ** stan
