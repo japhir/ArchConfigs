@@ -23,7 +23,7 @@ options(
   crayon.enabled = TRUE,
   usethis.full_name = "Ilja Kocken",
   usethis.description = list(
-    `Authors@R` = 'person("Ilja", "Kocken", email = "i.j.kocken@uu.nl", role = c("aut", "cre"),
+    `Authors@R` = 'person("Ilja", "Kocken", email = "ikocken@hawaii.edu", role = c("aut", "cre"),
     comment = c(ORCID = "0000-0003-2196-8718"))',
     Version = "0.0.0.9000"
  ),
