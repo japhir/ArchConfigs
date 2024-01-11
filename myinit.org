@@ -741,6 +741,18 @@ from [[https://stackoverflow.com/questions/15345614/how-to-get-emacs-org-mode-to
   (setq browse-url-generic-program (executable-find "firefox")
         browse-url-browser-function 'browse-url-generic)
 #+end_src
+
+** allow editing text fields in firefox
+from https://chainsawriot.com/postmannheim/2022/12/16/aoe16.html
+#+begin_src emacs-lisp
+  (use-package atomic-chrome
+    :config
+    (atomic-chrome-start-server)
+    (setq atomic-chrome-buffer-open-style 'full)
+    (setq atomic-chrome-url-major-mode-alist
+          '(("github\\.com" . poly-markdown+r-mode)
+            ("overleaf\\.com" . latex-mode))))
+#+end_src
 * evil
 Evil allows me to use vi(m) keybindings in emacs.
 ** COMMENT undo-tree
