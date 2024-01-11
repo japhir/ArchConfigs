@@ -1,2 +1,2 @@
 #!/usr/bin/sh
-notify-send 'OK, back to focus mode!' && sudo sed -e 's/##//' -i /etc/hosts && killall -e /usr/lib/firefox/firefox && exit 0
+notify-send 'OK, back to focus mode!' && sudo sed -e 's/^## 127/127/' -i /etc/hosts && killall -e /usr/lib/firefox/firefox && exit 0

@@ -29,7 +29,7 @@ sleep $(($wt-10))s && echo '…you can cancel anytime! Just press C-c!…'
 countdown 10 && echo '…ok, but please only for a short time!'
 
 # unblock
-sudo sed -e 's/127.0.0.1/##127.0.0.1/' -i /etc/hosts && notify-send "unblocking distractions for $bt minutes"
+sudo sed -e 's/^127.0.0.1/## 127.0.0.1/' -i /etc/hosts && notify-send "unblocking distractions for $bt minutes"
 
 # re-block after timer
 # I put this in the background to make it harder to C-c out of it!
