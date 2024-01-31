@@ -8,7 +8,8 @@ if (interactive()) {
   Sys.setenv("DISPLAY" = ":0.0") # this is needed for interactive x11 displays on Wayland
   # suppressMessages(require(devtools))
   # suppressMessages(require(usethis))
-  # suppressMessages(rethinking::set_ulam_cmdstan(TRUE))
+  suppressMessages(rethinking::set_ulam_cmdstan(TRUE))
+  suppressMessages(cmdstanr::set_cmdstan_path("/opt/cmdstan"))
   dat <- tibble::tibble(a = 1:10,
                         b = 11:20,
                         c = stats::rnorm(10),
