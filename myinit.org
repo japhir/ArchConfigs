@@ -1959,8 +1959,6 @@ https://github.com/fuxialexander/org-pdftools
 
 #+begin_src emacs-lisp
   (use-package org-roam
-    :init
-    (setq org-roam-v2-ack t)
     :commands (org-roam-buffer-toggle-display
                org-roam-find-file
                org-roam-graph
@@ -2024,18 +2022,19 @@ https://github.com/fuxialexander/org-pdftools
         :add-created t
         :jump-to-captured t)))
     :config
-    (org-roam-setup)
+    ;; (org-roam-setup)
     (add-to-list 'display-buffer-alist
                  '("\\*org-roam\\*"
                    (display-buffer-in-direction)
                    (direction . right)
                    ;; (window-width . 0.33)
                    (window-height . fit-window-to-buffer)))
-    (require 'org-roam-capture))
+    (org-roam-db-autosync-mode)
+    (require 'org-roam-protocol))
 #+end_src
 
-** org-roam-bibtex
-#+begin_src emacs-lisp
+** COMMENT org-roam-bibtex
+#+begin_src emacs-lisp :tangle no
   (use-package org-roam-bibtex
     :config
     (org-roam-bibtex-mode))
