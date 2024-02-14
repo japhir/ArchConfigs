@@ -9,7 +9,7 @@ if (interactive()) {
   # suppressMessages(require(devtools))
   # suppressMessages(require(usethis))
   suppressMessages(rethinking::set_ulam_cmdstan(TRUE))
-  suppressMessages(cmdstanr::set_cmdstan_path("/opt/cmdstan"))
+  ## suppressMessages(cmdstanr::set_cmdstan_path("/opt/cmdstan"))
   dat <- tibble::tibble(a = 1:10,
                         b = 11:20,
                         c = stats::rnorm(10),
