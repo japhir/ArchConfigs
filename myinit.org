@@ -593,6 +593,8 @@ git porcelain, essential!
 #+begin_src emacs-lisp
   (use-package magit
     :commands magit-status
+    :config
+    (customize-set-variable 'magit-diff-refine-hunk t)
     ;; :after with-editor
     )
 #+end_src
