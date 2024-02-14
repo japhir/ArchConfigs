@@ -3126,8 +3126,11 @@ for working with \LaTeX
     :load-path "/usr/share/emacs/site-lisp/auctex/"
     :hook
     (LaTeX-mode . turn-on-reftex)
-    (LaTeX-mode . turn-on-auto-fill)
+    ;; (LaTeX-mode . turn-on-auto-fill) ;; I actually don't like this!
     (LaTeX-mode . prettify-symbols-mode)
+    (LaTeX-mode . visual-fill-column-mode)
+
+    (LaTeX-mode . menu-bar--display-line-numbers-mode-relative)
     :init
     (setq TeX-auto-save t)
     (setq TeX-parse-self t)
