@@ -1719,8 +1719,9 @@ reference manager I use it in conjunction with zotero, which generates the
 #+end_src
 
 #+RESULTS:
+
 *** COMMENT automatically generating bibtex keys
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package bibtex
     :custom
     (bibtex-autokey-year-length 4)
@@ -1739,7 +1740,7 @@ reference manager I use it in conjunction with zotero, which generates the
 https://github.com/jkitchin/org-ref/blob/master/org-ref.org
 #+begin_src emacs-lisp
   (use-package org-ref
-    ;; :after org
+    :after org ivy-bibtex
     :init
     (require 'bibtex)
     :bind
@@ -1749,14 +1750,6 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
     :hook
     (org-export-before-parsing . org-ref-glossary-before-parsing)
     (org-export-before-parsing . org-ref-acronyms-before-parsing)
-    :custom
-    (bibtex-autokey-year-length 4)
-    (bibtex-autokey-name-year-separator "")
-    (bibtex-autokey-year-title-separator "-")
-    (bibtex-autokey-titleword-separator "-")
-    (bibtex-autokey-titlewords 0)
-    (bibtex-autokey-titlewords-stretch 1)
-    (bibtex-autokey-titleword-length 5)
     :init
     (require 'org-ref-ivy)
     (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
@@ -1764,7 +1757,8 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
           org-ref-default-citation-link 'parencite
           org-ref-insert-label-function 'org-ref-insert-label-link
           org-ref-insert-ref-function 'org-ref-insert-ref-link
-          org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body)))
+          org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body))
+          )
     ;; (require 'org-ref-archiv)
     ;; (require 'org-ref-scopus)
     ;; (require 'org-ref-wos)
@@ -1796,12 +1790,10 @@ from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-me
 : my/org-ref-open-pdf-at-point
 
 *** citeproc
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package citeproc)
   (use-package citeproc-org)
 #+end_src
-
-#+RESULTS:
 
 * COMMENT navigation
 ** COMMENT beginend
