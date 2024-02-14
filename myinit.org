@@ -196,21 +196,23 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
   (setq vc-follow-symlinks t)
 #+end_src
 ** auto-save
-auto-save when I exit normal mode
-#+begin_src emacs-lisp
-  (defun my-save-if-bufferfilename ()
-    (if (buffer-file-name)
-        (progn (save-buffer))
-          (message "no file is associated to this buffer: do nothing")))
-  (add-hook 'evil-insert-state-exit-hook 'my-save-if-bufferfilename)
-#+end_src
-
 #+begin_src emacs-lisp
   (setq auto-save-default t  ;; let's try autosave for a while
         backup-inhibited t
         confirm-nonexistent-file-or-buffer nil
         create-lockfiles nil)
 #+end_src
+
+** auto-save when I exit normal mode
+#+begin_src emacs-lisp
+  (defun my-save-if-bufferfilename ()
+    (if (buffer-file-name)
+        (progn (save-buffer))
+          (message "no file is associated to this buffer: do nothing")))
+  ;; this may be a bit too slow, especially with my whitespace remove hook.
+  ;(add-hook 'evil-insert-state-exit-hook 'my-save-if-bufferfilename)
+#+end_src
+
 ** history
 #+begin_src emacs-lisp
   (recentf-mode 1)
