@@ -901,7 +901,7 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
          (org-agenda-mode . (lambda ()
                                    (visual-line-mode -1)
                                    (toggle-truncate-lines 1)))
-         (org-babel-after-execute . org-redisplay-inline-images)
+         ;; (org-babel-after-execute . org-redisplay-inline-images)
          (org-babel-after-execute . my/babel-ansi)
          )
 #+end_src
@@ -934,8 +934,8 @@ possible.
   ;; folded drawers no longer ruin new entries
   (org-list-allow-alphabetical t) ; allow a. b. c. lists
   (org-M-RET-may-split-line '((default . nil)))
-  (org-display-remote-inline-images 'cache)
-  (org-startup-with-inline-images t)
+  ;; (org-display-remote-inline-images 'cache)
+  ;; (org-startup-with-inline-images t)
 #+end_src
 ** org-latex export settings
 basic latex settings
