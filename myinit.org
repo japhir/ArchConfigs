@@ -24,6 +24,8 @@ If I want to try out the new config, I should launch emacs with:
 
 I will keep this massive org file around until I've taken all the useful things out of it.
 
+<2024-02-26 Mon 11:52> hmm still haven't made much progress because I needed to get actual work done. For now just jumped to different minibuffer framework after watching [[https://protesilaos.com/codelog/2024-02-17-emacs-modern-minibuffer-packages/][Prot]]'s new video.
+
 * speedups
 ** gc-cons threshold
 The gc-cons-threshold is set to a superlarge number for faster startup time. It
@@ -75,7 +77,7 @@ stolen from [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org#startup-
 * package archive
 ** COMMENT setup package archive in init.el
 this is handled in [[file:~/.emacs.d/init.el]]
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (let ((file-name-handler-alist nil))
     (require 'package)
     (setq package-enable-at-startup nil)
@@ -2452,7 +2454,7 @@ org-ref-ivy, a line in [[file:~/ArchConfigs/myinit.org::*org-ref itself][org-ref
   ;; (keymap-set vertico-map "M-RET" 'vertico-quit-insert)
 #+end_src
 
-* extend default completion
+* extend default completion packages
 :PROPERTIES:
 :CREATED:  [2024-02-24 Sat 15:27]
 :END:
@@ -2504,6 +2506,14 @@ https://protesilaos.com/codelog/2024-02-17-emacs-modern-minibuffer-packages/
 ** embark-consult
 #+begin_src emacs-lisp
   (use-package embark-consult)
+#+end_src
+** wgrep
+#+begin_src emacs-lisp
+  (use-package wgrep
+    :bind ( :map grep-mode-map
+            ("e" . wgrep-change-to-wgrep-mode)
+            ("C-x C-q" . wgrep-change-to-wgrep-mode)
+            ("C-c C-c" . wgrep-finish-edit)))
 #+end_src
 * system
 ** vterm
