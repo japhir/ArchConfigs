@@ -798,6 +798,7 @@ https://github.com/Somelauw/evil-org-mode
 evil keymap for org-mode
 #+begin_src emacs-lisp
   (use-package evil-org
+    :demand ; do not defer
     :after (:any org evil)
     :init
     (fset 'evil-redirect-digit-argument 'ignore)
@@ -874,11 +875,11 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 ** setup
 #+begin_src emacs-lisp
   (use-package org
+    :demand ; do not defer
     :ensure nil ; use the org-mode version included in Emacs
     ;; I had this setup before, but the org archive has been deprecated since version 9.6:
     ;; IMPORTANT: please install Org from GNU ELPA as Org ELPA will close
     ;; :ensure org-plus-contrib ; this is version 9.4.6
-    ;; :pin org
     :delight org-indent-mode
 #+end_src
 
@@ -1965,6 +1966,7 @@ https://github.com/fuxialexander/org-pdftools
 
 #+begin_src emacs-lisp
   (use-package org-roam
+    :demand ; do not defer
     :commands (org-roam-buffer-toggle-display
                org-roam-find-file
                org-roam-graph
