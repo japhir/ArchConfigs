@@ -2,13 +2,17 @@ profile home {
     # main screen goes right on the stand
     output eDP-1 mode 1920x1080@60.020Hz position 1920,0
     # big screen goes left
-    output "LG Electronics W2261 0x0000CF35" mode 1920x1080@60.020Hz position 0,0
+    output "LG Electronics W2261 0x0002CF35" mode 1920x1080@60.020Hz position 0,0
 }
 
 profile homecinema {
     output eDP-1 mode 1920x1080@60.020Hz position 0,0
-    output "Philips Consumer Electronics Company PHL19PFL3405 0x00000101" mode 1920x1080@60.000Hz position 1920,0
+    output "Philips Consumer Electronics Company PHL19PFL3405 0x01010101" mode 1920x1080@60.000Hz position 0,-1080
+    # mirror eDP-1 and map it to a full-screen second monitor
     # exec wl-mirror eDP-1
+    # exec pkill wlsunset
+    # exec swaymsg "for_window [title='Wayland Output Mirror for eDP-1'] move container to workspace $ws10, inhibit_idle fullscreen"
+    # exec 'swaymsg for_window [title="Wayland Output Mirror for eDP-1"] move container to workspace $ws10'
 }
 
 profile work {
@@ -16,4 +20,11 @@ profile work {
     output eDP-1 mode 1920x1080@60.020Hz position 2560,360
     # Signe's big screen goes to the top
     output "HP Inc. HP E273q 6CM9300JV4" mode 2560x1440@59.951Hz position 0,0
+}
+
+profile workhawaii {
+    # main screen goes bottom right
+    output eDP-1 mode 1920x1080@60.020Hz position 3840,520
+    # big screen goes left
+    output "LG Electronics LG HDR WQHD+ 209NTTQGN817" mode 3840x1600@74.977Hz position 0,0
 }
