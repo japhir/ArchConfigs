@@ -908,7 +908,7 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
          (org-agenda-mode . (lambda ()
                                    (visual-line-mode -1)
                                    (toggle-truncate-lines 1)))
-         ;; (org-babel-after-execute . org-redisplay-inline-images)
+         (org-babel-after-execute . org-redisplay-inline-images)
          (org-babel-after-execute . my/babel-ansi)
          )
 #+end_src
@@ -2486,11 +2486,11 @@ https://protesilaos.com/codelog/2024-02-17-emacs-modern-minibuffer-packages/
 #+begin_src emacs-lisp
   (use-package consult
     :bind (;; A recursive grep
-           ("M-s M-g" . consult-grep) ;; previously counsel-rg
+           ("C-c s" . consult-ripgrep) ;; previously counsel-rg
            ;; Search for files names recursively
            ("C-x f" . consult-find)
            ;; Search through the outline (headings) of the file
-           ("M-s M-o" . consult-outline)
+           ("C-c o" . consult-outline)
            ;; Search the current buffer
            ("C-s" . consult-line) ;; previously swiper
            ;; Switch to another buffer, or bookmarked file, or recently
@@ -2516,6 +2516,96 @@ https://protesilaos.com/codelog/2024-02-17-emacs-modern-minibuffer-packages/
             ("e" . wgrep-change-to-wgrep-mode)
             ("C-x C-q" . wgrep-change-to-wgrep-mode)
             ("C-c C-c" . wgrep-finish-edit)))
+#+end_src
+** COMMENT company
+:LOGBOOK:
+- Note taken on [2024-02-29 Thu 16:33] \\
+  switched away from company to corfu + cape
+:END:
+See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for where I got it from.
+#+begin_src emacs-lisp
+  (use-package company
+    :init (global-company-mode)
+    :delight company-mode
+    :config
+    ;; company-require-match nil
+          ;; company-async-timeout 6
+          ;; company-idle-delay 0.25 ;; default 0.5,
+          ;; company-minimum-prefix-length 2 ;; default 3
+          ;; completion-ignore-case t
+          ;; company-global-modes '(not term-mode))
+    (require 'company-capf)
+    (require 'company-files)
+    (require 'company-math)
+    (delete-dups (push 'company-math-symbols-unicode company-backends))
+    (delete-dups (push 'company-capf company-backends))
+    (delete-dups (push 'company-files company-backends))
+    (setq tab-always-indent 'complete)
+    :bind
+    (:map company-active-map
+          ("C-n" . company-select-next)
+          ("C-p" . company-select-previous)
+          ("<tab>" . company-complete-common)
+          ("<backtab>" . company-select-previous))
+    (:map company-mode-map
+          ([remap indent-for-tab-command] . company-indent-or-complete-common)
+          ("C-M-i" . company-complete)
+          ("C-M-S-i" . counsel-company)))
+#+end_src
+** corfu
+:PROPERTIES:
+:CREATED:  [2024-02-29 Thu 16:20]
+:END:
+autocompletion replacement!
+#+begin_src emacs-lisp
+  (use-package corfu
+    :config
+    (unless (display-graphic-p)
+      (when (require 'corfu-terminal nil :noerror)
+        (corfu-terminal-mode +1)))
+
+    ;; Setup corfu for popup like completion
+    (customize-set-variable 'corfu-cycle t)        ; Allows cycling through candidates
+    (customize-set-variable 'corfu-auto t)         ; Enable auto completion
+    (customize-set-variable 'corfu-auto-prefix 2)  ; Complete with less prefix keys
+
+    (global-corfu-mode 1)
+    (when (require 'corfu-popupinfo nil :noerror)
+
+      (corfu-popupinfo-mode 1)
+      (eldoc-add-command #'corfu-insert)
+      (keymap-set corfu-map "M-p" #'corfu-popupinfo-scroll-down)
+      (keymap-set corfu-map "M-n" #'corfu-popupinfo-scroll-up)
+      (keymap-set corfu-map "M-d" #'corfu-popupinfo-toggle)))
+#+end_src
+** cape
+:PROPERTIES:
+:CREATED:  [2024-02-29 Thu 16:21]
+:END:
+completion at point
+#+begin_src emacs-lisp
+  (use-package cape
+    :config
+    ;; Add useful defaults completion sources from cape
+    (add-to-list 'completion-at-point-functions #'cape-file)
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+
+    ;; Silence the pcomplete capf, no errors or messages!
+    ;; Important for corfu
+    (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
+
+    ;; Ensure that pcomplete does not write to the buffer
+    ;; and behaves as a pure `completion-at-point-function'.
+    (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify)
+
+    ;; No auto-completion or completion-on-quit in eshell
+    (defun crafted-completion-corfu-eshell ()
+      "Special settings for when using corfu with eshell."
+      (setq-local corfu-quit-at-boundary t
+                  corfu-quit-no-match t
+                  corfu-auto nil)
+      (corfu-mode))
+    (add-hook 'eshell-mode-hook #'crafted-completion-corfu-eshell))
 #+end_src
 * system
 ** vterm
@@ -2605,37 +2695,6 @@ perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collec
     (calendar-week-start 1)
     :bind
     ("C-c o" . cfw:open-org-calendar))
-#+end_src
-** company
-See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for where I got it from.
-#+begin_src emacs-lisp
-  (use-package company
-    :init (global-company-mode)
-    :delight company-mode
-    :config
-    ;; company-require-match nil
-          ;; company-async-timeout 6
-          ;; company-idle-delay 0.25 ;; default 0.5,
-          ;; company-minimum-prefix-length 2 ;; default 3
-          ;; completion-ignore-case t
-          ;; company-global-modes '(not term-mode))
-    (require 'company-capf)
-    (require 'company-files)
-    (require 'company-math)
-    (delete-dups (push 'company-math-symbols-unicode company-backends))
-    (delete-dups (push 'company-capf company-backends))
-    (delete-dups (push 'company-files company-backends))
-    (setq tab-always-indent 'complete)
-    :bind
-    (:map company-active-map
-          ("C-n" . company-select-next)
-          ("C-p" . company-select-previous)
-          ("<tab>" . company-complete-common)
-          ("<backtab>" . company-select-previous))
-    (:map company-mode-map
-          ([remap indent-for-tab-command] . company-indent-or-complete-common)
-          ("C-M-i" . company-complete)
-          ("C-M-S-i" . counsel-company)))
 #+end_src
 * email
 ** smtp
