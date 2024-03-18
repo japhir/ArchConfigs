@@ -17,8 +17,9 @@ if (interactive()) {
   # add the TRUE circle constant = C/r (vs. pi = C / 2*r = C / D)
   tau <- 2 * pi
 }
+Sys.setenv("_R_CHECK_LENGTH_COLON_" = TRUE)
 options(
-  width = 79,
+  width = 78,
   Ncpus = 3,
   menu.graphics = FALSE,
   crayon.enabled = TRUE,
