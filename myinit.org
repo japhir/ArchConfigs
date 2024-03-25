@@ -2993,6 +2993,7 @@ emacs speaks statistics, work with R etc.
                (string= lang "stan")
                (string= lang "sh")
                (string= lang "latex"))))
+    (setq ess-use-ido nil) ; disable ido, so that vertico etc. are used
     :custom
     ;; display-buffer-alist
           ;; '(("*R Dired*"
@@ -3013,8 +3014,8 @@ emacs speaks statistics, work with R etc.
           ;; ess-auto-width 'window
     (org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
     (ess-style 'RStudio)
-    (ess-use-auto-complete nil)
-    (ess-use-company t)
+    ;; (ess-use-auto-complete nil)
+    ;; (ess-use-company t) ; I now use corfu!
     (ess-indent-with-fancy-comments nil)
     (ess-pdf-viewer-pref 'emacsclient)
     (inferior-R-args "--no-restore-history --no-save")
@@ -3132,8 +3133,8 @@ check out this worg entry on working inline with stan models! https://orgmode.or
     ;; don't forget to update this after updating from within an R session!
     (setq org-babel-stan-cmdstan-directory  "/home/japhir/.cmdstan/cmdstan-2.32.2"))
 
-  (use-package company-stan
-    :hook (stan-mode . company-stan-setup))
+  ;; (use-package company-stan
+  ;;   :hook (stan-mode . company-stan-setup))
 
   (use-package eldoc-stan
     :hook (stan-mode . eldoc-stan-setup))
