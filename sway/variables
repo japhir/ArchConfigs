@@ -21,4 +21,4 @@ set $exit nwg-bar
 set $wallpaper ~/Pictures/wallpapers/Landscapes/1454722946236.jpg
 # set $wallpaper ~/Pictures/wallpapers/onething.jpg
 set $smallscreen eDP-1
-set $bigscreen HDMI-A-2 DP-4 DP-5
+set $bigscreen HDMI-A-2 DP-1 DP-4 DP-5
