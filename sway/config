@@ -174,6 +174,8 @@ bindsym $mod+c exec emacsclient -e '(make-capture-frame)'         # Capture from
 for_window [title="capture"] floating enable
 
 for_window [title="^zoom$"] floating enable
+for_window [title="^Progress$" app_id="Zotero"] floating enable
+for_window [title="^Progress$" app_id="Zotero"] resize set width 300 px height 64 px
 
 # add the webcam screen for video recording
 bindsym $mod+Shift+w exec mpv --no-osc --demuxer-lavf-format=video4linux2 --demuxer-lavf-o-set=input_format=mjpeg av://v4l2:/dev/video0 || notify-send "failed to start webcam"

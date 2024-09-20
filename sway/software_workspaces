@@ -1,7 +1,7 @@
 # -*- mode: conf -*-
 ### move programs to specific workspaces ###
 assign [class="^Mendeley Desktop$"] $ws4
-assign [class="^Zotero$"] $ws4
+assign [app_id="^Zotero$"] $ws4
 assign [title="^GanttProject"] $ws4
 # assign [class="^Slack$"] $ws5
 # assign [class="^Riot$"] $ws5
