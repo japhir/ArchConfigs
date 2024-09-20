@@ -48,6 +48,9 @@ else
     export SUDO_EDITOR='vim'
     export VISUAL="emacsclient -cn"
 fi
+export ALTERNATE_EDITOR=""
+# Compilation flags
+# export ARCHFLAGS="-arch x86_64"
 
 alias R='R --quiet --no-save --no-restore'
 alias o='xdg-open'
@@ -58,16 +61,33 @@ alias pg="cd ~/SurfDrive/PhD/programming"
 alias prj="cd ~/SurfDrive/Postdoc1/prj"
 alias pacsize="expac -H M '%m\t%n' | sort -h"
 alias killorphans="sudo pacman -Rnsc $(pacman -Qtdq)"
+alias pi="pacman -Qq | fzf --preview 'pacman -Qil {}' --layout=reverse --bind 'enter:execute(pacman -Qil {} | less)'"
 
 # oxidize
-alias ls="exa --icons -a --group-directories-first"
+#alias ls="exa --icons -a --group-directories-first"
 alias cat="bat"
 alias cd="z"
 alias zz="z -"
 alias weather='curl "wttr.in/Utrecht?format=v2"'
+alias fetch="fastfetch"
+alias neofetch="fastfetch"
+
+eval "$(zoxide init zsh)"
 # my new custom prompt
 eval "$(starship init zsh)"
 
+# countdown in seconds
+# useful to countdown block_distractions
+function countdown(){
+   date1=$((`date +%s` + $1));
+   while [ "$date1" -ge `date +%s` ]; do
+     echo -ne "$(date -u --date @$(($date1 - `date +%s`)) +%H:%M:%S)\r";
+     sleep 0.1
+   done
+}
+
+# the remainder is vterm stuff for emacs!
+# https://github.com/akermu/emacs-libvterm/blob/master/etc/emacs-vterm-zsh.sh
 vterm_printf(){
     if [ -n "$TMUX" ]; then
         # Tell tmux to pass the escape sequences through
@@ -81,12 +101,31 @@ vterm_printf(){
     fi
 }
 
-# countdown in seconds
-# useful to countdown block_distractions
-function countdown(){
-   date1=$((`date +%s` + $1));
-   while [ "$date1" -ge `date +%s` ]; do
-     echo -ne "$(date -u --date @$(($date1 - `date +%s`)) +%H:%M:%S)\r";
-     sleep 0.1
-   done
+# enable clearing the full buffer from emacs vterm
+if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
+    alias clear='vterm_printf "51;Evterm-clear-scrollback";tput clear'
+fi
+
+# escape elisp directly in vterm
+vterm_cmd() {
+    local vterm_elisp
+    vterm_elisp=""
+    while [ $# -gt 0 ]; do
+        vterm_elisp="$vterm_elisp""$(printf '"%s" ' "$(printf "%s" "$1" | sed -e 's|\\|\\\\|g' -e 's|"|\\"|g')")"
+        shift
+    done
+    vterm_printf "51;E$vterm_elisp"
 }
+
+# change the title of the buffer based on information provided by the shell.
+# See, http://tldp.org/HOWTO/Xterm-Title-4.html, for the meaning of the various
+# symbols.
+autoload -U add-zsh-hook
+add-zsh-hook -Uz chpwd (){ print -Pn "\e]2;%m:%2~\a" }
+
+# communicate prompt location to vterm
+vterm_prompt_end() {
+    vterm_printf "51;A$(whoami)@worktop:$(pwd)"
+}
+setopt PROMPT_SUBST
+PROMPT=$PROMPT'%{$(vterm_prompt_end)%}'
