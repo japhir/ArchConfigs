@@ -25,8 +25,10 @@ exec sleep 5 && owncloud
 # exec ganttproject ~/SurfDrive/PhD/application/2020-09-16_DrIljaKocken.gan  # my long-term planning
 
 # open up emacs with the current paper and a todo scratchpad
-exec swaymsg "workspace $ws3" && /home/japhir/bin/current_paper.sh
+exec swaymsg "workspace $ws3"
+# exec emacsclient -n -c
+exec /home/japhir/bin/current_paper.sh
 exec /home/japhir/bin/pad.sh
 for_window [title="TODO"] move to scratchpad; resize grow 15 ppt
 
-exec zotero  # should move to ws4 automatically
+exec zotero 

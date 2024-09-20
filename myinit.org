@@ -230,12 +230,13 @@ let my window manager handle screen creation
   (use-package frames-only-mode
     :custom (frames-only-mode nil))
 #+end_src
-** default-text-scale
+** COMMENT default-text-scale
 use C-M-= and C-M-- to increase/decrease font size globally.
 #+begin_src emacs-lisp
   (use-package default-text-scale
     :custom (default-text-scale-mode t))
 #+end_src
+commented out because the C-x + C-x - are fine...
 ** play nice with parentheses
 #+begin_src emacs-lisp
   (electric-pair-mode 1) ; auto-insert matching bracket
@@ -603,15 +604,16 @@ git porcelain, essential!
 ** org-make-toc for publishing table of contents on github
 https://github.com/alphapapa/org-make-toc
 #+begin_src emacs-lisp
-  (use-package org-make-toc)
+  (use-package org-make-toc
+    :defer t)
 #+end_src
 * browsing the documentation
 ** helpful
 beautiful help functions
 https://github.com/Wilfred/helpful
 #+begin_src emacs-lisp
-    (use-package helpful
-       :commands (helpful-callable helpful-function helpful-variable helpful-mode))
+  (use-package helpful
+    :commands (helpful-callable helpful-function helpful-variable helpful-mode))
 #+end_src
 ** demos
 Insert demos after describe function https://github.com/xuchunyang/elisp-demos
@@ -734,6 +736,25 @@ from [[https://stackoverflow.com/questions/15345614/how-to-get-emacs-org-mode-to
       (org-clock-out-if-current)
       (play-sound-file "~/bell.aif")))
 #+end_src
+** org-babel ANSI colours
+https://emacs.stackexchange.com/questions/44664/apply-ansi-color-escape-sequences-for-org-babel-results
+This will apply the ANSI colour escape codes to source block outputs.
+
+However, it will not store the results so it won't show on export or the next time you open the file. The text will be plain, colourless, instead.
+
+I still prefer this option because I have colours during my session/in the ESS process.
+
+#+begin_src emacs-lisp
+  (defun my/babel-ansi ()
+    (when-let ((beg (org-babel-where-is-src-block-result nil nil)))
+      (save-excursion
+        (goto-char beg)
+        (when (looking-at org-babel-result-regexp)
+          (let ((end (org-babel-result-end))
+                (ansi-color-context-region nil))
+            (ansi-color-apply-on-region beg end))))))
+  (add-hook 'org-babel-after-execute-hook #'my/babel-ansi)
+#+end_src
 * internet stuffs
 ** internet up
 #+begin_src emacs-lisp
@@ -780,6 +801,7 @@ vim emulator
     (setq evil-v$-excludes-newline t) ; make v$ consistent with $ as motion
     (setq evil-want-fine-undo t) ;; make smaller undo steps within insert mode
     (customize-set-variable 'evil-respect-visual-line-mode nil)
+    ;; TODO: decide if I want to use undo-tree?
     (customize-set-variable 'evil-undo-system nil)
     ;; (setq evil-cross-lines t)
     ;; (setq evil-want-C-u-scroll t) ; C-u scrolls up half page
@@ -791,6 +813,7 @@ vim emulator
   (use-package evil-collection
     :after evil vterm
     :config
+    ;; (add-hook 'evil-insert-state-entry-hook #'vterm-reset-cursor-point nil t)
     (evil-collection-init))
 #+end_src
 ** evil-org
@@ -948,6 +971,7 @@ possible.
 basic latex settings
 #+begin_src emacs-lisp
   ;; (org-highlight-latex-and-related '(native script entities)) this gives me errors now <2023-07-18 Tue>
+  ;; (org-latex-src-block-backend 'engraved)
   ;; (org-preview-latex-default-process 'dvipng)
   ;; (setq org-latex-default-figure-position 'htbp)
   (org-latex-pdf-process
@@ -1307,25 +1331,6 @@ customize capture templates
      ;; (julia-vterm . t)
      ))
 #+end_src
-*** org-babel ANSI colours
-https://emacs.stackexchange.com/questions/44664/apply-ansi-color-escape-sequences-for-org-babel-results
-This will apply the ANSI colour escape codes to source block outputs.
-
-However, it will not store the results so it won't show on export or the next time you open the file. The text will be plain, colourless, instead.
-
-I still prefer this option because I have colours during my session/in the ESS process.
-
-#+begin_src emacs-lisp
-  (defun my/babel-ansi ()
-    (when-let ((beg (org-babel-where-is-src-block-result nil nil)))
-      (save-excursion
-        (goto-char beg)
-        (when (looking-at org-babel-result-regexp)
-          (let ((end (org-babel-result-end))
-                (ansi-color-context-region nil))
-            (ansi-color-apply-on-region beg end))))))
-  (add-hook 'org-babel-after-execute-hook #'my/babel-ansi)
-#+end_src
 *** org-export odt
 #+begin_src emacs-lisp
   (require 'ob-org)
@@ -1414,6 +1419,41 @@ org-export ignore headlines with ~:ignore:~ tag
                '("ss" . "src sh
   "))
 #+end_src
+*** patch ox-html so that export with id links works
+https://gist.github.com/jethrokuan/d6f80caaec7f49dedffac7c4fe41d132
+#+begin_src emacs-lisp
+  (defun org-html--reference (datum info &optional named-only)
+    "Return an appropriate reference for DATUM.
+  DATUM is an element or a `target' type object.  INFO is the
+  current export state, as a plist.
+  When NAMED-ONLY is non-nil and DATUM has no NAME keyword, return
+  nil.  This doesn't apply to headlines, inline tasks, radio
+  targets and targets."
+    (let* ((type (org-element-type datum))
+           (user-label
+            (org-element-property
+             (pcase type
+               ((or `headline `inlinetask) :CUSTOM_ID)
+               ((or `radio-target `target) :value)
+               (_ :name))
+             datum))
+           (user-label (or user-label
+                           (when-let ((path (org-element-property :ID datum)))
+                             (concat "ID-" path)))))
+      (cond
+       ((and user-label
+             (or (plist-get info :html-prefer-user-labels)
+                 ;; Used CUSTOM_ID property unconditionally.
+                 (memq type '(headline inlinetask))))
+        user-label)
+       ((and named-only
+             (not (memq type '(headline inlinetask radio-target target)))
+             (not user-label))
+        nil)
+       (t
+        (org-export-get-reference datum info)))))
+#+end_src
+
 ** org-protocol
 #+begin_src emacs-lisp
   (require 'org-protocol)
@@ -1531,7 +1571,7 @@ doesn't work :(
   (setq imagemagick-types-inhibit (remove 'PDF imagemagick-types-inhibit))
   (setq org-image-actual-width (list 800))
 #+end_src
-** org-beamer
+** COMMENT org-beamer
 #+begin_src emacs-lisp
   (use-package ox-latex
     :after org
@@ -1633,7 +1673,7 @@ https://github.com/domtronn/all-the-icons.el
   (use-package all-the-icons)
   (setq inhibit-compacting-font-caches t)
 #+end_src
-*** all-the-icons-ivy
+*** COMMENT all-the-icons-ivy
 #+begin_src emacs-lisp
   (use-package all-the-icons-ivy
     :after (ivy all-the-icons)
@@ -1696,6 +1736,8 @@ I use most of the minimal setup in this [[https://github.com/jkitchin/org-ref/bl
 
 *** COMMENT bibtex/ivy-bibtex
 :LOGBOOK:
+- Note taken on [2024-05-20 Mon 09:13] \\
+  ~tmalsburg~ commented that I can disable auto reloading with bibtex-completion-watch-bibliography
 - Note taken on [2024-02-01 Thu 11:07] \\
   this is what makes the package reload my bibtex entries every now and then, causing my whole emacs session to hang
 :END:
@@ -1843,7 +1885,7 @@ https://github.com/hlissner/evil-snipe
     ;(:map pdf-view-mode-map ("C-s" . isearch-forward))
    )
 #+end_src
-** NEXT COMMENT org-xournalpp
+** COMMENT org-xournalpp
 #+begin_src emacs-lisp :tangle no
   (use-package org-xournalpp
     :ensure t
@@ -1856,7 +1898,7 @@ https://github.com/weirdNox/org-noter
 #+begin_src emacs-lisp
   (use-package org-noter
     :config
-    :bind ((:map org-mode-map ("C-c o" . org-noter))
+    :bind (;(:map org-mode-map ("C-c o" . org-noter))
            (:map org-noter-notes-mode-map
                  ("C-c k" . org-noter-pdftools-create-skeleton)
                  ("C-c q" . org-noter-kill-session)))
@@ -1923,7 +1965,9 @@ https://github.com/zaeph/.emacs.d/blob/master/init.el#L4420
             (org-noter-pdftools-insert-note pos))
         (org-noter-pdftools-insert-precise-note)))
 #+end_src
-** org-noter-pdftools
+** COMMENT org-noter-pdftools
+I have switched to using Zotero's PDF reader directly...
+
 https://github.com/fuxialexander/org-pdftools
 #+begin_src emacs-lisp
   (use-package org-noter-pdftools
@@ -2086,41 +2130,6 @@ seems like this is what both [[https://github.com/jethrokuan/dots/blob/master/.d
            )))
 #+end_src
 
-** patch ox-html so that export with id links works
-https://gist.github.com/jethrokuan/d6f80caaec7f49dedffac7c4fe41d132
-#+begin_src emacs-lisp
-  (defun org-html--reference (datum info &optional named-only)
-    "Return an appropriate reference for DATUM.
-  DATUM is an element or a `target' type object.  INFO is the
-  current export state, as a plist.
-  When NAMED-ONLY is non-nil and DATUM has no NAME keyword, return
-  nil.  This doesn't apply to headlines, inline tasks, radio
-  targets and targets."
-    (let* ((type (org-element-type datum))
-           (user-label
-            (org-element-property
-             (pcase type
-               ((or `headline `inlinetask) :CUSTOM_ID)
-               ((or `radio-target `target) :value)
-               (_ :name))
-             datum))
-           (user-label (or user-label
-                           (when-let ((path (org-element-property :ID datum)))
-                             (concat "ID-" path)))))
-      (cond
-       ((and user-label
-             (or (plist-get info :html-prefer-user-labels)
-                 ;; Used CUSTOM_ID property unconditionally.
-                 (memq type '(headline inlinetask))))
-        user-label)
-       ((and named-only
-             (not (memq type '(headline inlinetask radio-target target)))
-             (not user-label))
-        nil)
-       (t
-        (org-export-get-reference datum info)))))
-#+end_src
-
 ** org-roam-create-note-from-headline
 https://org-roam.discourse.group/t/creating-an-org-roam-note-from-an-existing-headline/978
 #+begin_src emacs-lisp
@@ -2268,7 +2277,11 @@ Since the org module lazy loads org-protocol (waits until an org URL is detected
       :after org-protocol)
 #+end_src
 
-** org-roam-ui
+** SOME COMMENT org-roam-ui
+:LOGBOOK:
+- State "SOME"       from              [2024-09-20 Fri 18:32]
+:END:
+this is actually really cool but I rarely use it!
 https://github.com/org-roam/org-roam-ui
 #+begin_src emacs-lisp
   (use-package org-roam-ui
@@ -2339,8 +2352,8 @@ from [[https://github.com/abo-abo/oremacs/blob/github/modes/ora-org-roam.el#L106
 #+RESULTS:
 : ora-roam-occur
 
-* playing videos
-** emms for playing youtube videos etc.
+* COMMENT playing videos
+** COMMENT emms for playing youtube videos etc.
 #+begin_src emacs-lisp
   (use-package emms
     :defer t
@@ -2406,7 +2419,7 @@ very nice search replacement
     ;; ("M-x" . counsel-M-x)
     ("C-c s" . counsel-rg))
 #+end_src
-** link-hint
+** COMMENT link-hint
 #+begin_src emacs-lisp
   (use-package link-hint
     :ensure t
@@ -2611,6 +2624,7 @@ completion at point
 ** vterm
 #+begin_src emacs-lisp
   (use-package vterm)
+  ;; (define-key vterm-mode-map (kbd "C-c C-l") #'vterm-clear)
 #+end_src
 ** systemd
 #+begin_src emacs-lisp
@@ -2618,13 +2632,6 @@ completion at point
     :defer t)
 #+end_src
 ** dired
-#+begin_src emacs-lisp
-  (use-package dired
-    :commands dired
-    :ensure nil
-    :custom
-    (dired-listing-switches "-lh"))
-#+end_src
 #+begin_src emacs-lisp
   (use-package dired-single)
 
@@ -2994,6 +3001,14 @@ emacs speaks statistics, work with R etc.
                (string= lang "sh")
                (string= lang "latex"))))
     (setq ess-use-ido nil) ; disable ido, so that vertico etc. are used
+    (add-to-list 'display-buffer-alist
+                 '(("\\*R:"
+                    display-buffer-in-side-window
+                    (inhibit-same-window . t)
+                    (side . right)
+                    ;; (slot . 2)
+                    ;; (window-width . 0.5)
+                    )))
     :custom
     ;; display-buffer-alist
           ;; '(("*R Dired*"
@@ -3101,9 +3116,17 @@ Put spaces around operators such as +, -, etc.
 
 #+RESULTS:
 
-** COMMENT julia
+** julia
 #+begin_src emacs-lisp :tangle no
-  (use-package julia-mode)
+  (use-package julia-mode) ;; for syntax highlighting
+  (require 'julia-repl)
+  ;; (use-package julia-repl-mode ;; for fancy REPL
+  ;;   :hook (julia-mode . julia-repl-mode)
+  ;;   :config
+  ;; (setq julia-repl-switches "--threads 4")
+  (julia-repl-set-terminal-backend 'vterm)
+  (add-hook 'julia-mode-hook 'julia-repl-mode)
+
   (use-package org-contrib
     :init
     (require 'ob-julia)
@@ -3211,7 +3234,7 @@ if I'm ever required to work in non-open-source
 #+RESULTS:
 : ((matlab . matlab) (r . ess-r-mode) (Rscript . ess-r-mode) (ruby1.8 . ruby-mode) (ruby1.9 . ruby-mode) (jruby . ruby-mode) (rbx . ruby-mode) (ruby . ruby-mode) (python[0-9.]* . python-mode) (rhino . js-mode) (gjs . js-mode) (nodejs . js-mode) (node . js-mode) (gawk . awk-mode) (nawk . awk-mode) (mawk . awk-mode) (awk . awk-mode) (pike . pike-mode) (\(mini\)?perl5? . perl-mode) (wishx? . tcl-mode) (tcl\(sh\)? . tcl-mode) (expect . tcl-mode) (octave . octave-mode) (scm . scheme-mode) ([acjkwz]sh . sh-mode) (r?bash2? . sh-mode) (dash . sh-mode) (mksh . sh-mode) (\(dt\|pd\|w\)ksh . sh-mode) (es . sh-mode) (i?tcsh . sh-mode) (oash . sh-mode) (rc . sh-mode) (rpm . sh-mode) (sh5? . sh-mode) (tail . text-mode) (more . text-mode) (less . text-mode) (pg . text-mode) (make . makefile-gmake-mode) (guile . scheme-mode) (clisp . lisp-mode) (emacs . emacs-lisp-mode))
 
-** pandoc-mode
+** COMMENT pandoc-mode
 exporting markdown
 #+begin_src emacs-lisp
   (use-package pandoc-mode
@@ -3231,7 +3254,7 @@ exporting markdown
 
 #+RESULTS:
 
-** org-pandoc
+** COMMENT org-pandoc
 https://github.com/kawabata/ox-pandoc
 #+begin_src emacs-lisp
   (use-package ox-pandoc
@@ -3335,7 +3358,7 @@ syntax above.
   (load "~/.emacs.d/secretdirs.el" t)
 #+end_src
 
-* tree-sitter
+* NEXT tree-sitter
 :PROPERTIES:
 :CREATED:  [2022-09-27 Tue 16:46]
 :END:
