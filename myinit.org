@@ -1,31 +1,6 @@
 #+title: My Literate emacs config
 This is my config file for [[https://www.gnu.org/software/emacs/][emacs]]!
 
-* [#A] WARNING: migration in progress!
-<2023-06-05 Mon>
-I'm trying to clean up this biiiiiig file and simplify as needed.
-
-I'm using https://github.com/SystemCrafters/crafted-emacs as a base for a new config!
-
-For now, I'm going to start editing [[file:~/.config/emacs/early-init.el]] and
-[[file:~/.config/emacs/init.el]] directly, without the org-mode wrapper around it!
-
-The new config is located in [[file:emacs/]], because I've also migrated to using
-the XDG config directory for emacs (meaning I have symlinked the files there to
-~~/.config/emacs/~).
-
-By default this file, located in ~~/.emacs.d/myinit.el~, will be used to launch
-my emacs daemon.
-
-If I want to try out the new config, I should launch emacs with:
-#+begin_src shell
-  emacs --debug-init --init-directory=/home/japhir/.config/emacs/
-#+end_src
-
-I will keep this massive org file around until I've taken all the useful things out of it.
-
-<2024-02-26 Mon 11:52> hmm still haven't made much progress because I needed to get actual work done. For now just jumped to different minibuffer framework after watching [[https://protesilaos.com/codelog/2024-02-17-emacs-modern-minibuffer-packages/][Prot]]'s new video.
-
 * speedups
 ** gc-cons threshold
 The gc-cons-threshold is set to a superlarge number for faster startup time. It
@@ -35,6 +10,13 @@ is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
   (setq gc-cons-threshold 402653184
         gc-cons-percentage 0.6)
 #+end_src
+** SOME figure out optimal GC-cons threshold for my system
+:PROPERTIES:
+:CREATED:  [2024-09-20 Fri 18:43]
+:END:
+:LOGBOOK:
+- State "SOME"       from "NEXT"       [2024-09-20 Fri 18:43]
+:END:
 
 ** DONE COMMENT report gc-cons threshold behaviour to maintainers
 CLOSED: [2023-07-13 Thu 11:16] SCHEDULED: <2023-07-12 Wed>
