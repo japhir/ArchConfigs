@@ -9,6 +9,7 @@ include ~/.config/sway/outputs
 include ~/.config/sway/autostart
 include ~/.config/sway/workspaces
 include ~/.config/sway/software_workspaces
+include ~/.config/sway/for_window
 # i've tweaked them manually.
 
 # load urxvt customisations moved them over to ~/.Xdefaults, which should be loaded automatically
@@ -171,18 +172,9 @@ bindsym $mod+o exec libreoffice                                   # office
 bindsym $mod+s exec $music                                        # music
 bindsym $mod+m exec $editor                                       # eMacs
 bindsym $mod+c exec emacsclient -e '(make-capture-frame)'         # Capture from anywhere
-for_window [title="capture"] floating enable
-
-for_window [title="^zoom$"] floating enable
-for_window [title="^Progress$" app_id="Zotero"] floating enable
-for_window [title="^Progress$" app_id="Zotero"] resize set width 300 px height 64 px
 
 # add the webcam screen for video recording
 bindsym $mod+Shift+w exec mpv --no-osc --demuxer-lavf-format=video4linux2 --demuxer-lavf-o-set=input_format=mjpeg av://v4l2:/dev/video0 || notify-send "failed to start webcam"
-for_window [title="^video0 - mpv$"] floating enable, sticky enable, resize set height 260 px, move absolute position 0 px 820 px, border none
-for_window [title="Firefox — Sharing Indicator$"] floating enable, resize set height 16 px, move absolute position 0 px 820 px, border none
-for_window [title="Picture-in-Picture"] floating enable
-
 bindsym Print exec grim ~/Pictures/Screenshots/$(date +'%F-%T.png')
 bindsym --release Shift+Print exec slurp | grim -g - -c ~/Pictures/Screenshots/$(date +'%F-%T_region.png')
 
@@ -200,20 +192,6 @@ bindsym $mod+Shift+t gaps inner current set 15; gaps outer current set 15
 bindsym $mod+Shift+d gaps inner current set 0; gaps outer current set 0
 bindsym $mod+z       gaps outer current plus 5
 bindsym $mod+Shift+z gaps outer current minus 5
-
-# wayland version
-for_window [app_id="firefox"] inhibit_idle fullscreen
-# inhibit swayidle in fullscreen ff xwayland version
-for_window [class="Firefox"] inhibit_idle fullscreen
-
-for_window [class="^foot"] opacity 0.7
-# for_window [class="^Emacs$"] opacity 0.95
-
-# add X or wayland session to title
-for_window [shell=".*"] title_format "%title :: %shell"
-
-# exec waybar
-exec_always kanshi
 
 include /etc/sway/config.d/*
 exec "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
