@@ -1,9 +1,3 @@
-# start sway if on tty1
-if [ "$(tty)" = "/dev/tty1" ]; then
-    sway
-    exit 0
-fi
-
 # The following lines were added by compinstall
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
@@ -129,3 +123,10 @@ vterm_prompt_end() {
 }
 setopt PROMPT_SUBST
 PROMPT=$PROMPT'%{$(vterm_prompt_end)%}'
+
+# moved to end of file so that above config is available within sway maybe?
+# start sway if on tty1
+if [ "$(tty)" = "/dev/tty1" ]; then
+    sway
+    exit 0
+fi

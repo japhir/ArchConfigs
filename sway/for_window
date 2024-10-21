@@ -10,7 +10,10 @@ for_window [class="Firefox"] inhibit_idle fullscreen
 for_window [title="Firefox — Sharing Indicator$"] floating enable, resize set height 16 px, move absolute position 0 px 820 px, border none
 
 # for_window [class="^Emacs$"] opacity 0.95
-for_window [title="TODO"] move to scratchpad; resize grow 15 ppt
+for_window [title="TODO"] move to scratchpad
+# ideally I'd shrink the TODO frame a little!
+# for_window [title="TODO"] resize set height 200 px height 200 px
+# resize shrink height 20 px or 20 ppt
 for_window [title="capture"] floating enable
 
 for_window [title="^zoom$"] floating enable

@@ -30,6 +30,7 @@ exec zotero
 
 # open up emacs with the current paper and a todo scratchpad
 exec swaymsg "workspace $ws3"
-# exec emacsclient -n -c
-exec bash /home/japhir/bin/current_paper.sh
-exec bash /home/japhir/bin/pad.sh
+
+exec 'emacs --fg-daemon'
+exec current_paper.sh
+exec pad.sh
