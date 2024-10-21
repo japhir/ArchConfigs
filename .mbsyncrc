@@ -82,7 +82,6 @@ Channel hawaii-all
 # SyncState *
 
 
-
 # second account, work email gmail for ikocken@hawaii.edu
 IMAPAccount hawaii
 Host imap.gmail.com
