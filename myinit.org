@@ -10,6 +10,7 @@ is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
   (setq gc-cons-threshold 402653184
         gc-cons-percentage 0.6)
 #+end_src
+
 ** SOME figure out optimal GC-cons threshold for my system
 :PROPERTIES:
 :CREATED:  [2024-09-20 Fri 18:43]
@@ -20,7 +21,7 @@ is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
 
 ** DONE COMMENT report gc-cons threshold behaviour to maintainers
 CLOSED: [2023-07-13 Thu 11:16] SCHEDULED: <2023-07-12 Wed>
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (require 'emacs-gc-stats)
   ;; Optionally reset Emacs GC settings to default values (recommended)
   (setq emacs-gc-stats-gc-defaults 'emacs-defaults)
@@ -59,7 +60,7 @@ stolen from [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org#startup-
 * package archive
 ** COMMENT setup package archive in init.el
 this is handled in [[file:~/.emacs.d/init.el]]
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (let ((file-name-handler-alist nil))
     (require 'package)
     (setq package-enable-at-startup nil)
@@ -83,7 +84,7 @@ nice on both my desktop and laptop.
   (use-package bind-key)  ; for easy keybindings
 #+end_src
 ** COMMENT quelpa
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (quelpa
    '(quelpa-use-package
      :fetcher git
@@ -91,7 +92,7 @@ nice on both my desktop and laptop.
   (require 'quelpa-use-package)
 #+end_src
 ** COMMENT straight.el
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (defvar bootstrap-version)
   (let ((bootstrap-file
          (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -208,7 +209,7 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
 #+end_src
 ** COMMENT frames-only-mode
 let my window manager handle screen creation
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (use-package frames-only-mode
     :custom (frames-only-mode nil))
 #+end_src
@@ -336,9 +337,9 @@ Show plain-text emoji like ~:)~ as images, but also unicode ~☺~ and ~:slight-s
 https://github.com/iqbalansari/emacs-emojify
 #+begin_src emacs-lisp
     (use-package emojify
-      :init (global-emojify-mode))
+      :hook (mu4e-mode . emojify-mode))
 #+end_src
-** COMMENT pulse
+** pulse
 Highlight the current line when changing focus. It's like beacon-mode but native!
 from https://karthinks.com/software/batteries-included-with-emacs/
 #+begin_src emacs-lisp
@@ -844,10 +845,14 @@ this uses gc <word>
     (evil-commentary-mode))
 #+end_src
 ** evil-magit
+:LOGBOOK:
+- Note taken on [2024-10-20 Sun 20:18] \\
+  no longer works, changed evil-magit to magit so my config can live on?
+:END:
 evil keybindings for magit
 #+begin_src emacs-lisp
-  (use-package evil-magit
-    :after (magit evil)
+  (use-package magit
+    ; :after (magit evil)
     :hook
     (git-commit-mode . evil-insert-state)
     (magit-mode . turn-off-evil-snipe-override-mode)
@@ -885,7 +890,7 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
     ;; I had this setup before, but the org archive has been deprecated since version 9.6:
     ;; IMPORTANT: please install Org from GNU ELPA as Org ELPA will close
     ;; :ensure org-plus-contrib ; this is version 9.4.6
-    :delight org-indent-mode
+    ;; :delight org-indent-mode
 #+end_src
 
 ** keybindings
@@ -1594,7 +1599,7 @@ https://github.com/awth13/org-appear
 - Note taken on [2020-07-15 Wed 16:09] \\
   added it based on [[file:~/SurfDrive/bibliography/notes//20200715160129-an_orgmode_note_workflow.org][An Orgmode Note Workflow]]
 :END:
-#+begin_src emacs-lisp :eval never :tangle no
+#+begin_src emacs-lisp :eval never
   (use-package deft
     :after org
     :bind
@@ -1607,7 +1612,7 @@ https://github.com/awth13/org-appear
 #+end_src
 
 ** COMMENT pdf preview in org
-#+begin_src emacs-lisp :eval never :tangle no
+#+begin_src emacs-lisp :eval never
   ; (add-to-list 'image-type-file-name-regexps '("\\.pdf\\'" . imagemagick))
   ; (add-to-list 'image-file-name-extensions "pdf")
   ; (setq imagemagick-types-inhibit (remove 'PDF imagemagick-types-inhibit)
@@ -1669,7 +1674,7 @@ https://github.com/domtronn/all-the-icons.el
     :hook (dired-mode . all-the-icons-dired-mode))
 #+end_src
 ** COMMENT emojify-mode
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (use-package emojify
     :custom (emojify-emoji-styles 'unicode)
     :hook ((mu4e-mode mu4e-view-mode mu4e-compse-mode org-mode) . emojify-mode))
@@ -1695,10 +1700,11 @@ usefull snippets for me: org-mode (fig_, )
 ** flyspell
 #+begin_src emacs-lisp
   (use-package flyspell
-    :hook ((org-mode . flyspell-mode)
+    :hook (;(org-mode . flyspell-mode)
            (prog-mode . flyspell-prog-mode))
     :config
     (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
+    (add-to-list 'ispell-skip-region-alist '("#\\+begin_abstract" . "#\\+end_abstract"))
     (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC" . "#\\+END_SRC"))
     (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
     (add-to-list 'ispell-skip-region-alist '("^#\\+begin_example " . "#\\+end_example$"))
@@ -1706,9 +1712,10 @@ usefull snippets for me: org-mode (fig_, )
 #+end_src
 ** org-ref
 I use most of the minimal setup in this [[https://github.com/jkitchin/org-ref/blob/master/melpa/init-ivy.el][init-ivy]] config.
+Note that I've stopped using ivy, however.
 *** bibtex
 #+begin_src emacs-lisp
-  (add-hook 'bibtex-mode-hook 'flyspell-mode)
+  ; (add-hook 'bibtex-mode-hook 'flyspell-mode)
   (setq bibtex-user-optional-fields
         '(("keywords" "Keywords to describe the entry" "")
           ("file" "Link to document file." ":"))
@@ -1726,7 +1733,7 @@ I use most of the minimal setup in this [[https://github.com/jkitchin/org-ref/bl
 reference manager I use it in conjunction with zotero, which generates the
 .bib files, and org-ref, to insert citations in org files.
 
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (use-package ivy-bibtex
     :after ivy
     :init
@@ -1752,7 +1759,7 @@ reference manager I use it in conjunction with zotero, which generates the
 #+RESULTS:
 
 *** COMMENT automatically generating bibtex keys
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (use-package bibtex
     :custom
     (bibtex-autokey-year-length 4)
@@ -1771,7 +1778,7 @@ reference manager I use it in conjunction with zotero, which generates the
 https://github.com/jkitchin/org-ref/blob/master/org-ref.org
 #+begin_src emacs-lisp
   (use-package org-ref
-    :after org ivy-bibtex
+    :after org ;ivy-bibtex
     :init
     (require 'bibtex)
     :bind
@@ -1782,14 +1789,14 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
     (org-export-before-parsing . org-ref-glossary-before-parsing)
     (org-export-before-parsing . org-ref-acronyms-before-parsing)
     :init
-    (require 'org-ref-ivy)
-    (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
-          org-ref-insert-cite-function 'org-ref-cite-insert-ivy
-          org-ref-default-citation-link 'parencite
-          org-ref-insert-label-function 'org-ref-insert-label-link
-          org-ref-insert-ref-function 'org-ref-insert-ref-link
-          org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body))
-          )
+    ;(require 'org-ref-ivy)
+    ;; (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
+    ;;       org-ref-insert-cite-function 'org-ref-cite-insert-ivy
+    ;;       org-ref-default-citation-link 'parencite
+    ;;       org-ref-insert-label-function 'org-ref-insert-label-link
+    ;;       org-ref-insert-ref-function 'org-ref-insert-ref-link
+    ;;       org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body))
+    ;;       )
     ;; (require 'org-ref-archiv)
     ;; (require 'org-ref-scopus)
     ;; (require 'org-ref-wos)
@@ -1820,8 +1827,8 @@ from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-me
 #+RESULTS:
 : my/org-ref-open-pdf-at-point
 
-*** citeproc
-#+begin_src emacs-lisp :tangle no
+*** COMMENT citeproc
+#+begin_src emacs-lisp
   (use-package citeproc)
   (use-package citeproc-org)
 #+end_src
@@ -1868,7 +1875,7 @@ https://github.com/hlissner/evil-snipe
    )
 #+end_src
 ** COMMENT org-xournalpp
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (use-package org-xournalpp
     :ensure t
     :quelpa (org-xournalpp :fetcher gitlab :repo "vherrmann/org-xournalpp" :files ("*.el" "resources"))
@@ -2018,7 +2025,7 @@ https://github.com/fuxialexander/org-pdftools
     (org-roam-directory (file-truename "~/SurfDrive/bibliography/notes/"))
     (org-roam-dailies-directory "daily/")
     (org-id-link-to-org-use-id 'create-if-interactive)
-    (org-roam-completion-everywhere t)
+    ;; (org-roam-completion-everywhere t) ;; this was a bit excessive
     (org-roam-verbose nil) ; https://youtu.be/fn4jIlFwuLU
     (org-roam-buffer-no-delete-other-windows t) ; make org-roam buffer sticky
     (org-roam-capture-templates
@@ -2068,7 +2075,7 @@ https://github.com/fuxialexander/org-pdftools
 #+end_src
 
 ** COMMENT org-roam-bibtex
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (use-package org-roam-bibtex
     :config
     (org-roam-bibtex-mode))
@@ -2145,8 +2152,6 @@ https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
   (defvar zp/org-created-property-name "CREATED"
       "The name of the org-mode property that stores the creation date of the entry")
 
-  ;; TODO: Find the source for this because I’ve improved something which
-  ;; already existed
   (defun zp/org-set-created-property (&optional active name)
     "Set a property on the entry giving the creation time.
   By default the property is called CREATED. If given, the ‘NAME’
@@ -2237,7 +2242,7 @@ https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
 #+end_src
 
 ** COMMENT org-roam-bibtex
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (use-package org-roam-bibtex
     :after org-roam
     :bind (:map org-mode-map
@@ -2282,7 +2287,7 @@ https://github.com/org-roam/org-roam-ui
 
 ** COMMENT ora-roam-todo
 from [[https://github.com/abo-abo/oremacs/blob/github/modes/ora-org-roam.el#L106][abo-abo's oremacs config]]
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (defun ora-roam-todo ()
     "An ad-hoc agenda for `org-roam'."
     (interactive)
@@ -2345,7 +2350,7 @@ from [[https://github.com/abo-abo/oremacs/blob/github/modes/ora-org-roam.el#L106
     (default-players))
 #+end_src
 ** COMMENT org-media-note
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (use-package quelpa-use-package)
   (use-package pretty-hydra)
   (use-package org-media-note
@@ -2459,23 +2464,27 @@ https://protesilaos.com/codelog/2024-02-17-emacs-modern-minibuffer-packages/
 ** vertico
 #+begin_src emacs-lisp
   (use-package vertico
-    :config
-    (setq vertico-cycle t)
-    (setq vertico-resize nil)
+    :custom
+    (vertico-cycle t)
+    (vertico-resize nil)
+    :init
     (vertico-mode 1))
 #+end_src
+it also likes savehist-mode, which I already had enabled.
 ** marginalia
 #+begin_src emacs-lisp
   (use-package marginalia
-    :config
-    (marginalia-mode 1))
+    :init
+    (marginalia-mode))
 #+end_src
 ** orderless
 #+begin_src emacs-lisp
   (use-package orderless
     :ensure t
-    :config
-    (setq completion-styles '(orderless basic)))
+    :custom
+    (completion-styles '(orderless basic))
+    (completion-category-defaults nil)
+    (completion-category-overrides '((file (styles partial-completion)))))
 #+end_src
 ** consult
 #+begin_src emacs-lisp
@@ -2554,6 +2563,8 @@ See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for 
 autocompletion replacement!
 #+begin_src emacs-lisp
   (use-package corfu
+    :init
+    (global-corfu-mode)
     :config
     (unless (display-graphic-p)
       (when (require 'corfu-terminal nil :noerror)
@@ -2564,14 +2575,32 @@ autocompletion replacement!
     (customize-set-variable 'corfu-auto t)         ; Enable auto completion
     (customize-set-variable 'corfu-auto-prefix 2)  ; Complete with less prefix keys
 
-    (global-corfu-mode 1)
     (when (require 'corfu-popupinfo nil :noerror)
 
       (corfu-popupinfo-mode 1)
       (eldoc-add-command #'corfu-insert)
       (keymap-set corfu-map "M-p" #'corfu-popupinfo-scroll-down)
       (keymap-set corfu-map "M-n" #'corfu-popupinfo-scroll-up)
-      (keymap-set corfu-map "M-d" #'corfu-popupinfo-toggle)))
+      (keymap-set corfu-map "M-d" #'corfu-popupinfo-toggle))
+    :custom
+    (text-mode-ispell-word-completion nil))
+#+end_src
+** dabbrev
+:PROPERTIES:
+:CREATED:  [2024-10-14 Mon 22:51]
+:END:
+#+begin_src emacs-lisp
+  ;; Use Dabbrev with Corfu!
+  (use-package dabbrev
+    ;; Swap M-/ and C-M-/
+    :bind (("M-/" . dabbrev-completion)
+           ("C-M-/" . dabbrev-expand))
+    :config
+    (add-to-list 'dabbrev-ignored-buffer-regexps "\\` ")
+    ;; Since 29.1, use `dabbrev-ignored-buffer-regexps' on older.
+    (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
+    (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
+    (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
 #+end_src
 ** cape
 :PROPERTIES:
@@ -2580,11 +2609,14 @@ autocompletion replacement!
 completion at point
 #+begin_src emacs-lisp
   (use-package cape
-    :config
+    :bind ("M-+" . cape-prefix-map)
+    :init
     ;; Add useful defaults completion sources from cape
-    (add-to-list 'completion-at-point-functions #'cape-file)
-    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-
+    (add-hook 'completion-at-point-functions #'cape-dabbrev)
+    (add-hook 'completion-at-point-functions #'cape-dict)
+    (add-hook 'completion-at-point-functions #'cape-file)
+    (add-hook 'completion-at-point-functions #'cape-history)
+    :config
     ;; Silence the pcomplete capf, no errors or messages!
     ;; Important for corfu
     (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
@@ -2602,6 +2634,7 @@ completion at point
       (corfu-mode))
     (add-hook 'eshell-mode-hook #'crafted-completion-corfu-eshell))
 #+end_src
+
 * system
 ** vterm
 #+begin_src emacs-lisp
@@ -2732,7 +2765,7 @@ install it with pacman ~mu~
     (require 'mu4e)  ;; somehow this is needed, because otherwise calling org-store-link doesn't work
     (require 'mu4e-org)
     ;; Use Ivy for mu4e completions (maildir folders, etc)
-    (setq mu4e-completing-read-function #'ivy-completing-read)
+    ; (setq mu4e-completing-read-function #'ivy-completing-read)
 
     ;; send email using smtp
     ;; see https://www.djcbsoftware.nl/code/mu/mu4e/Gmail-configuration.html#Settings
@@ -2896,16 +2929,16 @@ install it with pacman ~mu~
     )
 #+end_src
 
-** SOME COMMENT mu4e-thread-folding
+** COMMENT mu4e-thread-folding
 :LOGBOOK:
 - State "SOME"       from              [2021-09-26 Sun 13:14]
 :END:
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (use-package mu4e-thread-folding
     :quelpa (mu4e-thread-folding :fetcher github :repo "rougier/mu4e-thread-folding"))
 #+end_src
 ** COMMENT mu4e-alert
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (use-package mu4e-alert
     :after mu4e
     :custom
@@ -3091,24 +3124,35 @@ Put spaces around operators such as +, -, etc.
 : 15
 
 *** flycheck
+:LOGBOOK:
+- Note taken on [2024-10-08 Tue 11:44] \\
+  this makes larger org-mode files very very slow
+:END:
 #+begin_src emacs-lisp
   (use-package flycheck
-    :init (global-flycheck-mode))
+    ;; :init (global-flycheck-mode)
+  )
 #+end_src
 
 #+RESULTS:
 
 ** julia
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (use-package julia-mode) ;; for syntax highlighting
-  (require 'julia-repl)
-  ;; (use-package julia-repl-mode ;; for fancy REPL
-  ;;   :hook (julia-mode . julia-repl-mode)
-  ;;   :config
-  ;; (setq julia-repl-switches "--threads 4")
-  (julia-repl-set-terminal-backend 'vterm)
-  (add-hook 'julia-mode-hook 'julia-repl-mode)
+  (use-package julia-repl ;; for fancy REPL
+    :after vterm
+    :hook
+    (julia-mode . julia-repl-mode)
+    (julia-repl . #'julia-repl-use-emacsclient)
+    ;; (add-hook 'julia-mode-hook 'julia-repl-mode)
+    :config
+    (setq julia-repl-switches "--threads 4")
+    (setq vterm-kill-buffer-on-exit nil)
+    ;; after julia-repl but before using it
+    (julia-repl-set-terminal-backend 'vterm))
+#+end_src
 
+#+begin_src emacs-lisp
   (use-package org-contrib
     :init
     (require 'ob-julia)
@@ -3124,6 +3168,9 @@ Put spaces around operators such as +, -, etc.
     ;;         "--banner=no"))
     )
 #+end_src
+
+#+RESULTS:
+: ob-julia
 
 ** stan
 https://mc-stan.org/
@@ -3169,7 +3216,7 @@ org-mode babel intergation for stan
 this has now migrated away from org-contrib to https://git.kyleam.com/ob-stan/ so if I want to get this to work I should probably figure out a straight recipe for it.
 
 I've evaluated this once to install it, but straight was interfering with my regular setup.
-#+begin_src emacs-lisp :eval never :tangle no
+#+begin_src emacs-lisp :eval never
   (use-package ob-stan
     :straight (ob-stan
                :type git
