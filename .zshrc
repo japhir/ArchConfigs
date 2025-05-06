@@ -28,7 +28,7 @@ source /usr/share/fzf/completion.zsh
 
 # User configuration
 typeset -U path PATH
-path=(~/.cargo/bin ~/.local/bin ~/bin $path)
+path=(~/.cargo/bin ~/.local/bin ~/bin ~/SurfDrive/Postdoc1/prj/2024-10-28_HNBody/hnbody-1.0.10-linux-x86_64/bin $path)
 export PATH
 
 # You may need to manually set your language environment
@@ -45,6 +45,7 @@ fi
 export ALTERNATE_EDITOR=""
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
+export JULIA_NUM_THREADS=auto
 
 alias R='R --quiet --no-save --no-restore'
 alias o='xdg-open'
@@ -57,10 +58,13 @@ alias pacsize="expac -H M '%m\t%n' | sort -h"
 alias killorphans="sudo pacman -Rnsc $(pacman -Qtdq)"
 alias pi="pacman -Qq | fzf --preview 'pacman -Qil {}' --layout=reverse --bind 'enter:execute(pacman -Qil {} | less)'"
 
+alias ssh="TERM=xterm-256color ssh"
+alias der="ssh -Y derecho"
+
 # oxidize
-#alias ls="exa --icons -a --group-directories-first"
-alias cat="bat"
-alias cd="z"
+alias ls="eza --icons -a --group-directories-first"
+# alias cat="bat"
+# alias cd="z"
 alias zz="z -"
 alias weather='curl "wttr.in/Utrecht?format=v2"'
 alias fetch="fastfetch"
