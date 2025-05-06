@@ -172,6 +172,7 @@ bindsym $mod+o exec libreoffice                                   # office
 bindsym $mod+s exec $music                                        # music
 bindsym $mod+m exec $editor                                       # eMacs
 bindsym $mod+c exec emacsclient -e '(make-capture-frame)'         # Capture from anywhere
+bindsym $mod+r exec foot R --quiet --no-save --no-restore         # quick calculator
 
 # add the webcam screen for video recording
 bindsym $mod+Shift+w exec mpv --no-osc --demuxer-lavf-format=video4linux2 --demuxer-lavf-o-set=input_format=mjpeg av://v4l2:/dev/video0 || notify-send "failed to start webcam"

@@ -9,7 +9,7 @@ set $right l
 set $lang 'us'
 set $term foot
 set $browser MOZ_ENABLE_WAYLAND=1 firefox
-set $filemanager nautilus
+set $filemanager thunar
 # set $music spotify
 set $music foot ncspot
 set $editor emacsclient -c -n -e '(switch-to-buffer nil)'
