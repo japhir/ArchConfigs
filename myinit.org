@@ -44,7 +44,10 @@ https://emacs.stackexchange.com/questions/598/how-do-i-prevent-extremely-long-li
   (global-so-long-mode 1)
   ;; (setq-default bidi-display-reordering nil)  ;; officially unsupported
 #+end_src
-
+** native compilation
+#+begin_src emacs-lisp
+  (setq native-compile-prune-cache t)
+#+end_src
 * COMMENT log startup time
 stolen from [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org#startup-performance][David Wilson's config]]
 #+begin_src emacs-lisp
@@ -1171,6 +1174,7 @@ Filter tasks by context (sorted by todo state)
           ("p" . "People")
           ("pm" "Martin" tags-todo "Martin")
           ("pr" "Richard" tags-todo "Richard")
+          ("ps" "Sharon" tags-todo "Sharon")
           ("pl" "Line" tags-todo "Line")
           ("pa" "Anne" tags-todo "Anne")
           ("pf" "FEST" tags-todo "FEST")
@@ -1273,6 +1277,7 @@ customize capture templates
                    ("Family" . ?F)
                    ("Martin" . ?M)
                    ("Richard" . ?R)
+                   ("Sharon" . ?S)
                    ("Line" . ?L)
                    ("Inigo" . ?I)
                    ("Niels" . ?N)))
@@ -1360,7 +1365,7 @@ org-export ignore headlines with ~:ignore:~ tag
 :CREATED:  [2023-06-05 Mon 13:46]
 :END:
 #+begin_src emacs-lisp
-  ;; (customize-set-variable 'org-cite-global-bibliography '("/home/japhir/SurfDrive/bibliography/references.bib"))
+  (customize-set-variable 'org-cite-global-bibliography '("/home/japhir/SurfDrive/bibliography/references.bib"))
   (setq org-cite-csl-styles-dir "~/Zotero/styles")
   ;; (setq org-cite-csl--fallback-style-file "/home/japhir/Zotero/styles/paleoceanography.csl") ; doesn't have a bibliography style!
   (setq org-cite-csl--fallback-style-file "/home/japhir/Zotero/styles/apa.csl")
@@ -1803,6 +1808,39 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
     )
 #+end_src
 
+*** citar
+:PROPERTIES:
+:CREATED:  [2024-10-25 Fri 10:51]
+:END:
+#+begin_src emacs-lisp
+  (use-package citar
+    :bind
+    (:map org-mode-map :package org ("C-c b" . #'org-cite-insert))
+    :hook
+    (LaTeX-mode . citar-capf-setup)
+    (org-mode . citar-capf-setup)
+    :custom
+    (org-cite-insert-processor 'citar)
+    (org-cite-follow-processor 'citar)
+    (org-cite-activate-processor 'citar)
+    (citar-bibliography org-cite-global-bibliography))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package citar-embark
+    :after citar embark
+    :no-require
+    :config
+    (citar-embark-mode)
+    ;;(citar-at-point-function 'embark-act)
+    )
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package citar-org-roam
+    :after (citar org-roam)
+    :config (citar-org-roam-mode))
+#+end_src
 *** open zotero pdf at point
 from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-mendeley-jabref-and-zotero-users][the manual]]
 #+begin_src emacs-lisp
@@ -2010,6 +2048,7 @@ https://github.com/fuxialexander/org-pdftools
                org-roam-dailies-tomorrow
                org-roam-dailies-yesterday)
     :bind (("C-c n f" . org-roam-node-find)
+  	 ("C-c n n" . org-roam-dailies-goto-today)
            ("C-c n d" . org-roam-dailies-capture-today)
            :map org-roam-mode-map
            ("<mouse-1>" . org-roam-visit-thing)
@@ -2923,6 +2962,11 @@ install it with pacman ~mu~
                    :query "maildir:/hawaii/Inbox OR maildir:/solismail/inbox OR maildir:/gmail/Inbox"
                          :key ?i))
     (add-to-list 'mu4e-bookmarks
+                 '(:name "Flagged"
+  		       ;;  or maildir:/solismail/Inbox or maildir:/solismail/Archive or maildir:'solismail/Important Backlog'
+                   :query "flag:flagged"
+                   :key ?f))
+    (add-to-list 'mu4e-bookmarks
                  '(:name "All sent mail"
                    :query "from:ikocken@hawaii.edu OR from:iljakocken@gmail.com OR from:i.j.kocken@uu.nl"
                    :key ?s))
@@ -3087,33 +3131,29 @@ Put spaces around operators such as +, -, etc.
     (electric-operator-add-rules-for-mode 'stan-mode
                                           (cons "," ", ")
                                           (cons "~" " ~ "))
-
-    (electric-operator-add-rules-for-mode 'ess-r-mode
-                                          (cons ".+" " . + ")
+    ;; (electric-operator-add-rules-for-mode 'ess-r-mode
+                                          ;; (cons ".+" " . + ")
                                           ;; these should never have spacing around them
-                                          (cons ":" ":") ;; for ranges, should not add space
-                                          (cons "::" "::") ;; to call a function from a package
-                                          (cons ":::" ":::") ;; to call an internal function from a package
-                                          (cons ":=" " := ") ;; walrus operator
-                                          (cons "? " "?")
-                                          (cons "){" ") {")
-                                          (cons "}else{" "} else {")
-                                          (cons "for(" "for (")
-                                          (cons "if(" "if (")
-                                          (cons "while(" "while (")
-                                          (cons "{{" " {{ ") ;; curly-curly tidyverse
-                                          (cons "}}" " }} ")
-                                          (cons "!!" " !!")
-                                          (cons "!!!" " !!!")
-                                          (cons "^" "^") ;;
-                                          (cons "|>" " |> ") ;; r 4.0 built-in pipe
-                                          )
+                                          ;; (cons ":" ":") ;; for ranges, should not add space
+                                          ;; (cons "::" "::") ;; to call a function from a package
+                                          ;; (cons ":::" ":::") ;; to call an internal function from a package
+                                          ;; (cons ":=" " := ") ;; walrus operator
+                                          ;; (cons "? " "?")
+                                          ;; (cons "){" ") {")
+                                          ;; (cons "}else{" "} else {")
+                                          ;; (cons "for(" "for (")
+                                          ;; (cons "if(" "if (")
+                                          ;; (cons "while(" "while (")
+                                          ;; (cons "{{" " {{ ") ;; curly-curly tidyverse
+                                          ;; (cons "}}" " }} ")
+                                          ;; (cons "!!" " !!")
+                                          ;; (cons "!!!" " !!!")
+                                          ;; (cons "^" "^") ;;
+                                          ;; (cons "|>" " |> ") ;; r 4.0 built-in pipe
+                                          ;; )
     :custom
     (electric-operator-R-named-argument-style 'spaced))
 #+end_src
-
-#+RESULTS:
-| electric-operator-mode | electric-layout-mode |
 
 *** compilation window height
 #+begin_src emacs-lisp
@@ -3300,19 +3340,36 @@ https://github.com/kawabata/ox-pandoc
 
 ** LaTeX (AUCTeX, RefTeX)
 for working with \LaTeX
+** COMMENT using AUCTeX from AUR
 #+begin_src emacs-lisp
-  ;(load "auctex.el" nil t t)
-  ;(load "preview-latex.el" nil t t)
-  (use-package tex
-    :load-path "/usr/share/emacs/site-lisp/auctex/"
+  ;; recommended way to activate AUCTeX and preview-latex
+  (add-to-list 'load-path "/usr/share/emacs/site-lisp/")
+  (load "auctex.el" nil t t)
+  (load "preview-latex.el" nil t t)
+#+end_src
+
+** using
+override circular dependency in auctex
+#+begin_src emacs-lisp
+  (with-eval-after-load 'tex-site
+    (defun ConTeXt-mode ()
+      "Major mode for editing ConTeXt files."
+      (interactive)
+      (context-mode)))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package auctex
+    ;; :load-path "/usr/share/emacs/site-lisp/auctex/"
     :hook
     (LaTeX-mode . turn-on-reftex)
     ;; (LaTeX-mode . turn-on-auto-fill) ;; I actually don't like this!
     (LaTeX-mode . prettify-symbols-mode)
     (LaTeX-mode . visual-fill-column-mode)
 
-    (LaTeX-mode . menu-bar--display-line-numbers-mode-relative)
+    (LaTeX-mode . display-line-numbers-mode)
     :init
+    (setq display-line-numbers-type 'relative)
     (setq TeX-auto-save t)
     (setq TeX-parse-self t)
     (setq-default TeX-master nil)
@@ -3408,7 +3465,7 @@ https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
   ;;   :hook (ess-r-mode-hook . tree-sitter-ess-r-mode-activate))
   (setq major-mode-remap-alist
    '((bash-mode . bash-ts-mode)
-     (c-mode . rust-c-mode)
+     (c-mode . c-ts-mode)
      (python-mode . python-ts-mode)
      (rust-mode . rust-ts-mode)))
 
