@@ -7,9 +7,12 @@ I use:
   - [org-mode](https://orgmode.org/) mode that I use for GTD, writing, literate programming
   - [evil-org-mode](https://github.com/Somelauw/evil-org-mode) to use vim keybindings in org-mode
   - [org-roam](https://www.orgroam.com/) connected note-taking following the zettelkasten method
+  - [magit](https://magit.vc/) the best git porcelain
   - [ess](https://ess.r-project.org/) data analysis in R
   - [modus-themes](https://gitlab.com/protesilaos/modus-themes/) beautiful light and dark theme
-- [sway](https://swaywm.org/) window manager
+  - [mu4e](https://www.djcbsoftware.nl/code/mu/) read my email from emacs
+- [hyprland](https://hyprland.org/) window manager
+  (I recently switched from [sway](https://swaywm.org/), config still available)
   - [wofi](https://hg.sr.ht/~scoopta/wofi) for launching programs that I don't have a keybinding for
   - [nwg-panel](https://github.com/nwg-piotr/nwg-panel) for workspaces, bar, and other nice widgets
   - [swaync](https://github.com/ErikReider/SwayNotificationCenter) for notifications
@@ -17,8 +20,8 @@ I use:
 - [foot](https://codeberg.org/dnkl/foot) terminal emulator
  - [zsh](https://grml.org/zsh/) bash alternative
  - [fzf](https://github.com/junegunn/fzf) fuzzy file finder, this makes terminal's <kbd>ctrl</kbd>+<kbd>r</kbd> so nice!
+ - [zoxide](https://github.com/ajeetdsouza/zoxide) fast directory navigation
 - [firefox](https://firefox.org/) browser
-  - [tridactyl](https://github.com/tridactyl/tridactyl) vim keybindings in firefox (I've moved around a lot between extensions...)
   - [org-capture](https://github.com/sprig/org-capture-extension) capture websites into emacs org-mode
 
 Personal scripts are in /bin and user services in /services.

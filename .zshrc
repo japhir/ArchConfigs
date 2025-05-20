@@ -131,6 +131,7 @@ PROMPT=$PROMPT'%{$(vterm_prompt_end)%}'
 # moved to end of file so that above config is available within sway maybe?
 # start sway if on tty1
 if [ "$(tty)" = "/dev/tty1" ]; then
-    sway
+    #sway
+    hyprland
     exit 0
 fi
