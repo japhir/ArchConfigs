@@ -14,9 +14,11 @@ I use:
 - [hyprland](https://hyprland.org/) window manager
   (I recently switched from [sway](https://swaywm.org/), config still available)
   - [wofi](https://hg.sr.ht/~scoopta/wofi) for launching programs that I don't have a keybinding for
-  - [nwg-panel](https://github.com/nwg-piotr/nwg-panel) for workspaces, bar, and other nice widgets
-  - [swaync](https://github.com/ErikReider/SwayNotificationCenter) for notifications
-  - [wlsunset](https://sr.ht/~kennylevinsen/wlsunset/) to change display brightness/colour in the evening
+  <!-- - [nwg-panel](https://github.com/nwg-piotr/nwg-panel) for workspaces, bar, and other nice widgets -->
+  - [ashell](https://github.com/MalpenZibo/ashell) bar
+  - [swaync](https://github.com/ErikReider/SwayNotificationCenter) notification centre
+  - [swayosd](https://github.com/ErikReider/SwayOSD) show volume/brightness notifications
+  <!-- - [wlsunset](https://sr.ht/~kennylevinsen/wlsunset/) to change display brightness/colour in the evening -->
 - [foot](https://codeberg.org/dnkl/foot) terminal emulator
  - [zsh](https://grml.org/zsh/) bash alternative
  - [fzf](https://github.com/junegunn/fzf) fuzzy file finder, this makes terminal's <kbd>ctrl</kbd>+<kbd>r</kbd> so nice!
@@ -24,7 +26,8 @@ I use:
 - [firefox](https://firefox.org/) browser
   - [org-capture](https://github.com/sprig/org-capture-extension) capture websites into emacs org-mode
 
-Personal scripts are in /bin and user services in /services.
+Personal scripts are in `/bin`, and user services in `/services`.
+Customized desktop files to launch applications are stored in `/desktop`.
 
 If you want to use (some) of my configs, I recommend that you proceed with caution and use only the bits that you like!
 
