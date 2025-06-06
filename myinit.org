@@ -2685,19 +2685,6 @@ completion at point
   (use-package systemd
     :defer t)
 #+end_src
-** dired-single
-:PROPERTIES:
-:CREATED:  [2025-05-28 Wed 09:59]
-:END:
-:LOGBOOK:
-- Note taken on [2025-05-28 Wed 09:59] \\
-  seems to have disappeared from archive? Installed via straight instead
-:END:
-#+begin_src emacs-lisp :tangle no
-  (straight-use-package
-   '(dired-single :type git :host github :repo "emacsattic/dired-single"))
-#+end_src
-
 ** dired
 #+begin_src emacs-lisp
   (use-package dired
@@ -2706,9 +2693,13 @@ completion at point
     :bind (("C-x C-j" . dired-jump))
     :custom ((dired-listing-switches "-agho --group-directories-first --time-style=iso"))
     :config
+    (put 'dired-find-alternate-file 'disabled nil)
+    (defun my-dired-up-directory ()
+      (interactive)
+      (find-alternate-file ".."))
     (evil-collection-define-key 'normal 'dired-mode-map
-      "h" 'dired-single-up-directory
-      "l" 'dired-single-buffer))
+      "h" #'my-dired-up-directory
+      "l" #'dired-find-alternate-file))
 
   (use-package dired-open
     :config
