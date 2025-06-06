@@ -22,9 +22,11 @@ function zvm_config() {
 
 # plugins/extensions
 source /usr/share/zsh/plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+zvm_after_init_commands+=('source <(fzf --zsh)')
 # make sure fzf comes after vi-mode
-source /usr/share/fzf/key-bindings.zsh
-source /usr/share/fzf/completion.zsh
+eval "$(zoxide init zsh)"
+# my new custom prompt
+eval "$(starship init zsh)"
 
 # User configuration
 typeset -U path PATH
@@ -45,7 +47,6 @@ fi
 export ALTERNATE_EDITOR=""
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
-export JULIA_NUM_THREADS=auto
 
 alias R='R --quiet --no-save --no-restore'
 alias o='xdg-open'
@@ -70,9 +71,6 @@ alias weather='curl "wttr.in/Utrecht?format=v2"'
 alias fetch="fastfetch"
 alias neofetch="fastfetch"
 
-eval "$(zoxide init zsh)"
-# my new custom prompt
-eval "$(starship init zsh)"
 
 # countdown in seconds
 # useful to countdown block_distractions
