@@ -34,9 +34,21 @@ If you want to use (some) of my configs, I recommend that you proceed with cauti
 Simply git clone in where you want and symlink the files to their proper destination.
 I'm slowly moving things around so that in the future I'll be able to just git clone this directory to my `~/.config` without any symlinking.
 
-For individual entries type: `ln -s {target-filename} {symbolic filename}`, for example for i3: `ln -s i3config ~/.config/i3/config`
+For individual entries type: `ln -s {target-filename} {symbolic filename}`.
+For example for hyprland:
+```bash
+# new conf directory
+mkdir ~/.config/hypr
+# link only hyprland config
+ln -s hypr/hyprland.conf ~/.config/hypr/hyprland.conf
+# link all configs
+ln -s hypr/* ~/.config/hypr/
+```
 
-For all the executables, make a directory (e.g. `~/bin`), add it to your `PATH`, then symlink with `ln -s /path/to/ArchConfigs/bin/* ~/bin`.
+For all the executables,
+make a directory (e.g. `mkdir ~/bin`),
+add it to your `PATH` (update `~/.zshrc`),
+then symlink the binaries with `ln -s /path/to/ArchConfigs/bin/* ~/bin`.
 Possibly, you'll have to `chmod +x filename` to make the files executable.
 
 Kind regards,
