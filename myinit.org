@@ -858,7 +858,7 @@ evil keybindings for magit
     ; :after (magit evil)
     :hook
     (git-commit-mode . evil-insert-state)
-    (magit-mode . turn-off-evil-snipe-override-mode)
+    ;; (magit-mode . turn-off-evil-snipe-override-mode)
     :config
     (evil-set-initial-state 'magit-log-edit-mode 'insert))
 #+end_src
@@ -2685,10 +2685,21 @@ completion at point
   (use-package systemd
     :defer t)
 #+end_src
+** dired-single
+:PROPERTIES:
+:CREATED:  [2025-05-28 Wed 09:59]
+:END:
+:LOGBOOK:
+- Note taken on [2025-05-28 Wed 09:59] \\
+  seems to have disappeared from archive? Installed via straight instead
+:END:
+#+begin_src emacs-lisp :tangle no
+  (straight-use-package
+   '(dired-single :type git :host github :repo "emacsattic/dired-single"))
+#+end_src
+
 ** dired
 #+begin_src emacs-lisp
-  (use-package dired-single)
-
   (use-package dired
     :ensure nil
     :commands (dired dired-jump)
@@ -3214,7 +3225,12 @@ Put spaces around operators such as +, -, etc.
     (julia-repl . #'julia-repl-use-emacsclient)
     ;; (add-hook 'julia-mode-hook 'julia-repl-mode)
     :config
-    (setq julia-repl-switches "--threads 4")
+    (add-to-list 'display-buffer-alist
+     '("\\*julia"
+       display-buffer-in-side-window
+       (inhibit-same-window . t)
+       (side . right)))
+    ;(setq julia-repl-switches "--threads 4")
     (setq vterm-kill-buffer-on-exit nil)
     ;; after julia-repl but before using it
     (julia-repl-set-terminal-backend 'vterm))

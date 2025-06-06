@@ -172,24 +172,34 @@ alert = ".*notification"
 [[CustomModule]]
 name = "FuzzyClock"
 command = ""
-icon = "🕓"
-listen_cmd = 'echo {\"text\": \"$(fuzzy_clock)\", \"alt\": \"$(date +%R)\"}'
-icons.'(11:4[56789])|(11:5.)|(12:[01].)|(12:1[01234])' = "🕛"
-icons.'(12:1[56789])|(12:[234]).|(12:4[0-4])' = "🕧"
-icons.'(12:4[56789])|(12:5.)|(13:[01].)|(13:1[01234])' = "🕐"
-icons.'(13:1[56789])|(13:[234]).|(13:4[0-4])' = "🕜"
-# 🕑 # 2
-# 🕝 # 2:30
-# 🕒 # 3
-# 🕞 # 3:30
-# 🕓 # 4
-# 🕟 # 4:30
-# 🕔 # 5
-# 🕠 # 5:30
-# 🕕 # 6
-# 🕡 # 6:30
-# 🕖 # 7
-# 🕢 # 7:30
+icon = "🕰️"
+listen_cmd = "fuzzy_update.sh"
+# Full hours
+icons.'.*twelve$'         = "🕛"
+icons.'.*one$'            = "🕐"
+icons.'.*two$'            = "🕑"
+icons.'.*three$'          = "🕒"
+icons.'.*four$'           = "🕓"
+icons.'.*five$'           = "🕔"
+icons.'.*six$'            = "🕕"
+icons.'.*seven$'          = "🕖"
+icons.'.*eight$'          = "🕗"
+icons.'.*nine$'           = "🕘"
+icons.'.*ten$'            = "🕙"
+icons.'.*eleven$'         = "🕚"
+# Half past
+icons.'.*half past twelve' = "🕧"
+icons.'.*half past one'    = "🕜"
+icons.'.*half past two'    = "🕝"
+icons.'.*half past three'  = "🕞"
+icons.'.*half past four'   = "🕟"
+icons.'.*half past five'   = "🕠"
+icons.'.*half past six'    = "🕡"
+icons.'.*half past seven'  = "🕢"
+icons.'.*half past eight'  = "🕣"
+icons.'.*half past nine'   = "🕤"
+icons.'.*half past ten'    = "🕥"
+icons.'.*half past eleven' = "🕦"
 
 # Settings module configuration
 [settings]
