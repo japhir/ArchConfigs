@@ -26,7 +26,7 @@ I use:
 - [firefox](https://firefox.org/) browser
   - [org-capture](https://github.com/sprig/org-capture-extension) capture websites into emacs org-mode
 
-Personal scripts are in `/bin`, and user services in `/services`.
+Personal scripts are in `/bin`, and user services in `/systemd/user/`.
 Customized desktop files to launch applications are stored in `/desktop`.
 
 If you want to use (some) of my configs, I recommend that you proceed with caution and use only the bits that you like!
