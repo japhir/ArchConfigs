@@ -88,7 +88,7 @@ Host imap.gmail.com
 User ikocken@hawaii.edu
 PassCmd "cat ~/.hawaiipass"
 AuthMechs LOGIN
-SSLType IMAPS
+TLSType IMAPS
 CertificateFile /etc/ssl/certs/ca-certificates.crt
 Pipelinedepth 50
 Timeout 60
@@ -168,7 +168,7 @@ Host imap.gmail.com
 User iljakocken@gmail.com
 PassCmd "cat ~/.gmailpass"
 AuthMechs LOGIN
-SSLType IMAPS
+TLSType IMAPS
 CertificateFile /etc/ssl/certs/ca-certificates.crt
 Pipelinedepth 50
 Timeout 60
