@@ -52,7 +52,8 @@ alias R='R --quiet --no-save --no-restore'
 alias o='xdg-open'
 alias e="emacsclient -t"
 alias en="emacsclient -nw"
-alias pb='curl -F c=@- https://ptpb.pw\?u\=1' # neat pastebin
+#alias pb='curl -F c=@- https://ptpb.pw\?u\=1' # neat pastebin
+alias pb="curl --data-binary @- https://paste.rs" # pastebin
 alias pg="cd ~/SurfDrive/PhD/programming"
 alias prj="cd ~/SurfDrive/Postdoc1/prj"
 alias pacsize="expac -H M '%m\t%n' | sort -h"
@@ -139,6 +140,6 @@ function y() {
 # start sway if on tty1
 if [ "$(tty)" = "/dev/tty1" ]; then
     #sway
-    hyprland
-    exit 0
+    #hyprland
+    exec /home/japhir/.local/bin/start-hyprland-session
 fi
