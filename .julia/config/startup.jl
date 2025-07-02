@@ -15,6 +15,7 @@ end
 
 if haskey(ENV, "INSIDE_EMACS")
     ENV["JULIA_EDITOR"] = "emacsclient"
+    ENV["DISPLAY"] = ":0"
 else
     # only use OhMyREPL when not inside emacs
     # I want emacs to handle syntax highlighting and parentheses etc.
