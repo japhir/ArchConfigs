@@ -33,7 +33,11 @@ CLOSED: [2023-07-13 Thu 11:16] SCHEDULED: <2023-07-12 Wed>
 #+end_src
 
 whoops I had not disabled the lowest codeblock that sets the threshold to something.
-** make long lines faster
+** COMMENT make long lines faster
+:LOGBOOK:
+- Note taken on [2025-06-17 Tue 11:01] \\
+  rnkr on #emacs told me these are not needed for left-to-right text and I probably don't have lines over 10k chars long
+:END:
 I like to write my org-mode scientific papers such that each line has one sentence.
 This allows me to make more meaningful git commits per line.
 Often, these lines are quite long, however, and this makes emacs very slow.
@@ -41,7 +45,7 @@ https://emacs.stackexchange.com/questions/598/how-do-i-prevent-extremely-long-li
 #+begin_src emacs-lisp
   (setq-default bidi-paragraph-direction 'left-to-right)
   (setq-default bidi-inhibit-bpa t)
-  (global-so-long-mode 1)
+  ;; (global-so-long-mode 1)
   ;; (setq-default bidi-display-reordering nil)  ;; officially unsupported
 #+end_src
 ** native compilation
@@ -342,7 +346,11 @@ https://github.com/iqbalansari/emacs-emojify
     (use-package emojify
       :hook (mu4e-mode . emojify-mode))
 #+end_src
-** pulse
+** COMMENT pulse
+:LOGBOOK:
+- Note taken on [2025-06-17 Tue 11:03] \\
+  doesn't seem to work anyway
+:END:
 Highlight the current line when changing focus. It's like beacon-mode but native!
 from https://karthinks.com/software/batteries-included-with-emacs/
 #+begin_src emacs-lisp
@@ -365,6 +373,17 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
     ;; (visual-fill-column-width 115) ;; instead prefer fill-column-width
     (split-window-preferred-function 'visual-fill-column-split-window-sensibly)
     (visual-fill-column-center-text t))
+#+end_src
+** display-buffers default
+:PROPERTIES:
+:CREATED:  [2025-06-17 Tue 13:36]
+:END:
+#+begin_src emacs-lisp
+  (add-to-list 'display-buffer-alist
+   '("\\*\\(julia\\|R:.*\\)\\*"
+     (display-buffer-reuse-window display-buffer-in-side-window)
+     (side . right)
+     (window-width . 0.5)))
 #+end_src
 ** define new org-todo faces
 *** org-todo-next
@@ -981,7 +1000,7 @@ basic latex settings
 ** theming
 #+begin_src emacs-lisp
   (org-tags-column -65)
-  (org-startup-indented t)
+  ;; (org-startup-indented t)
   (org-startup-folded 'content)
   (org-agenda-block-separator "")
   (org-fontify-emphasized-text t)
@@ -1506,9 +1525,17 @@ see e.g. https://emojipedia.org/calendar/ for emoji!
 #+begin_src emacs-lisp
   (use-package org-modern
     :after org
-    :config (global-org-modern-mode 1))
+    :hook
+    (org-mode . org-modern-mode)
+    (org-agenda-finalize . org-modern-agenda))
 #+end_src
-
+** org-modern-indent
+:PROPERTIES:
+:CREATED:  [2025-06-25 Wed 14:42]
+:END:
+#+begin_src emacs-lisp
+  (use-package org-modern-indent)
+#+end_src
 ** ob-async
 allow asyncronous code block evaluation https://github.com/astahlman/ob-async
 #+begin_src emacs-lisp
@@ -1839,7 +1866,7 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
 #+begin_src emacs-lisp
   (use-package citar-org-roam
     :after (citar org-roam)
-    :config (citar-org-roam-mode))
+    :hook (org-mode . citar-org-roam-mode))
 #+end_src
 *** open zotero pdf at point
 from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-mendeley-jabref-and-zotero-users][the manual]]
@@ -2109,6 +2136,7 @@ https://github.com/fuxialexander/org-pdftools
                    (direction . right)
                    ;; (window-width . 0.33)
                    (window-height . fit-window-to-buffer)))
+    ;; (setq org-roam-db-update-on-save t)
     (org-roam-db-autosync-mode)
     (require 'org-roam-protocol))
 #+end_src
@@ -2309,7 +2337,7 @@ Since the org module lazy loads org-protocol (waits until an org URL is detected
 :END:
 this is actually really cool but I rarely use it!
 https://github.com/org-roam/org-roam-ui
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package org-roam-ui
       :after org-roam
       ;; :hook
@@ -3214,13 +3242,13 @@ Put spaces around operators such as +, -, etc.
     :hook
     (julia-mode . julia-repl-mode)
     (julia-repl . #'julia-repl-use-emacsclient)
-    ;; (add-hook 'julia-mode-hook 'julia-repl-mode)
     :config
-    (add-to-list 'display-buffer-alist
-     '("\\*julia"
-       display-buffer-in-side-window
-       (inhibit-same-window . t)
-       (side . right)))
+    ;; (add-to-list 'display-buffer-alist
+    ;;  '("\\*julia\\*"
+    ;;    (display-buffer-reuse-window display-buffer-in-side-window)
+    ;;    (side . right)
+    ;;    (window-width . 0.5)
+    ;;    (slot . 1)))
     ;(setq julia-repl-switches "--threads 4")
     (setq vterm-kill-buffer-on-exit nil)
     ;; after julia-repl but before using it
@@ -3488,7 +3516,7 @@ https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
   (use-package tree-sitter-langs)
 
   (require 'treesit)
-  (global-tree-sitter-mode)
+  ;; (global-tree-sitter-mode)
   (add-hook 'ess-r-mode-hook #'tree-sitter-hl-mode)
   (add-hook 'c-mode-hook #'tree-sitter-hl-mode)
   (add-hook 'rust-mode-hook #'tree-sitter-hl-mode)
