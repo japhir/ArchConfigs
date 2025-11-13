@@ -147,8 +147,6 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
     "Lists of Movies etc.")
   (defvar org-cal-file "~/org/calendars/gcal.org"
     "Google Calendar")
-  (setq my/org-roam-files
-        (directory-files "~/SurfDrive/bibliography/notes/daily" t "org$"))
 #+end_src
 * interface
 ** turn off UI elements and small tweaks
@@ -169,7 +167,7 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
   ;; backspace deletes one character instead of one column
   (global-set-key (kbd "DEL") 'backward-delete-char)
   ;; remove trailing whitespace before save
-  (add-hook 'before-save-hook 'delete-trailing-whitespace)
+  ;; (add-hook 'before-save-hook 'delete-trailing-whitespace)
   ;; prefer utf-8
   (prefer-coding-system 'utf-8-unix)
 
@@ -310,10 +308,10 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
   (use-package circadian
     :custom
     ;; current location on earth for auto toggle between light and dark theme
-    (calendar-latitude 52.08) ;; Utrecht
-    (calendar-longitude 5.11)
-    ;; (calendar-latitude 21.25) ;; Honolulu
-    ;; (calendar-longitude -157.8)
+    ;; (calendar-latitude 52.08) ;; Utrecht
+    ;; (calendar-longitude 5.11)
+    (calendar-latitude 21.30) ;; Honolulu
+    (calendar-longitude -157.8)
     ;; (calendar-latitude 40.5) ;; New York
     ;; (calendar-longitude -74.5)
     (circadian-themes '((:sunrise . modus-operandi)
@@ -813,6 +811,16 @@ vim emulator
     :config
     (evil-mode 1))
 #+end_src
+** evil-numbers
+:PROPERTIES:
+:CREATED:  [2025-09-04 Thu 13:35]
+:END:
+#+begin_src emacs-lisp
+  (use-package evil-numbers
+    :config
+    (evil-define-key '(normal visual) 'global (kbd "C-c +") 'evil-numbers/inc-at-pt)
+    (evil-define-key '(normal visual) 'global (kbd "C-c -") 'evil-numbers/dec-at-pt))
+#+end_src
 ** evil-collection
 #+begin_src emacs-lisp
   (use-package evil-collection
@@ -1000,7 +1008,7 @@ basic latex settings
 ** theming
 #+begin_src emacs-lisp
   (org-tags-column -65)
-  ;; (org-startup-indented t)
+  (org-startup-indented t)
   (org-startup-folded 'content)
   (org-agenda-block-separator "")
   (org-fontify-emphasized-text t)
@@ -1071,8 +1079,7 @@ all the org-files in my org-directory
 #+begin_src emacs-lisp
   ;(setq org-directory "~/org/") ;; changed org-roam capture
   (org-agenda-files (append
-                     (directory-files-recursively "~/org" "\\.org$")
-                     my/org-roam-files))
+                     (directory-files-recursively "~/org" "\\.org$")))
 #+end_src
 *** refile targets
 swyper makes refiling amazing!
@@ -1339,7 +1346,7 @@ customize capture templates
      (latex . t)
      (R . t)
      (julia . t)
-     ;; (julia-vterm . t)
+     (julia-vterm . t)
      ))
 #+end_src
 *** org-export odt
@@ -1395,7 +1402,7 @@ org-export ignore headlines with ~:ignore:~ tag
   ;; (setq org-cite-biblatex-options bibstyle=authoryear-comp)
   (add-to-list 'load-path "/usr/bin/vendor_perl/")
 #+end_src
-*** latejx class =ijkarticle=
+*** latex class =ijkarticle=
 #+begin_src emacs-lisp
   (add-to-list 'org-latex-classes
          '("ijkarticle"
@@ -1529,12 +1536,17 @@ see e.g. https://emojipedia.org/calendar/ for emoji!
     (org-mode . org-modern-mode)
     (org-agenda-finalize . org-modern-agenda))
 #+end_src
-** org-modern-indent
+** COMMENT org-modern-indent
 :PROPERTIES:
 :CREATED:  [2025-06-25 Wed 14:42]
 :END:
 #+begin_src emacs-lisp
-  (use-package org-modern-indent)
+  (use-package org-modern-indent
+    ;; :load-path "~/code/emacs/org-modern-indent/"
+    ; or
+    :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent")
+    :config ; add late to hook
+    (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
 #+end_src
 ** ob-async
 allow asyncronous code block evaluation https://github.com/astahlman/ob-async
@@ -2064,35 +2076,25 @@ https://github.com/fuxialexander/org-pdftools
 
 #+begin_src emacs-lisp
   (use-package org-roam
-    :demand ; do not defer
-    :commands (org-roam-buffer-toggle-display
-               org-roam-find-file
-               org-roam-graph
-               org-roam-insert
-               org-roam-switch-to-buffer
-               org-roam-dailies-date
-               org-roam-dailies-today
-               org-roam-dailies-tomorrow
-               org-roam-dailies-yesterday)
-    :bind (("C-c n f" . org-roam-node-find)
+    ;; :demand ; do not defer
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+  	 ("C-c n f" . org-roam-node-find)
+           ("C-c n g" . org-roam-graph)
+           ("C-c n i" . org-roam-node-insert)
   	 ("C-c n n" . org-roam-dailies-goto-today)
            ("C-c n d" . org-roam-dailies-capture-today)
-           :map org-roam-mode-map
-           ("<mouse-1>" . org-roam-visit-thing)
            :map org-mode-map
-           (("C-c n l" . org-roam-buffer-toggle)
-            ("C-c n g" . org-roam-graph)
-            ("C-c n i" . org-roam-node-insert)
-            :map evil-normal-state-map ;; is there an evil map within org-mode?
+  	 (:map evil-normal-state-map ;; is there an evil map within org-mode?
             ("g[" . org-roam-dailies-goto-previous-note)
             ("g]" . org-roam-dailies-goto-next-note)))
     :custom
     ;; the file-truename part makes it follow symbolic links!
-    (org-roam-directory (file-truename "~/SurfDrive/bibliography/notes/"))
+    (org-roam-directory (file-truename "~/org/notes/"))
     (org-roam-dailies-directory "daily/")
-    (org-id-link-to-org-use-id 'create-if-interactive)
+    (org-roam-db-location "~/org/org-roam.db")
+    ;; (org-id-link-to-org-use-id 'create-if-interactive)
     ;; (org-roam-completion-everywhere t) ;; this was a bit excessive
-    (org-roam-verbose nil) ; https://youtu.be/fn4jIlFwuLU
+    ;; (org-roam-verbose t)
     (org-roam-buffer-no-delete-other-windows t) ; make org-roam buffer sticky
     (org-roam-capture-templates
      '(("d" "default" plain
@@ -2136,7 +2138,9 @@ https://github.com/fuxialexander/org-pdftools
                    (direction . right)
                    ;; (window-width . 0.33)
                    (window-height . fit-window-to-buffer)))
-    ;; (setq org-roam-db-update-on-save t)
+    ;; If you're using a vertical completion framework, you might want a more informative completion interface
+    (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+    (setq org-roam-db-update-on-save t)
     (org-roam-db-autosync-mode)
     (require 'org-roam-protocol))
 #+end_src

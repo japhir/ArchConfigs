@@ -15,6 +15,7 @@ bindkey -v
 # End of lines configured by zsh-newuser-install
 
 # manual changes
+source /usr/share/nvm/init-nvm.sh
 # overwrite beam in insert, I like it blocky everywhere
 function zvm_config() {
     ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BLOCK
@@ -140,6 +141,5 @@ function y() {
 # start sway if on tty1
 if [ "$(tty)" = "/dev/tty1" ]; then
     #sway
-    #hyprland
-    exec /home/japhir/.local/bin/start-hyprland-session
+    hyprland
 fi

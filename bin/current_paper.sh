@@ -7,5 +7,5 @@ do
 done
 
 /usr/bin/emacsclient -n -c \
-		     -e '(switch-to-buffer nil)' \
+		     -e '(open-inbox-file)' \
 		     --frame-parameters '((name . "editor"))'

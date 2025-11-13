@@ -39,7 +39,8 @@ app_launcher_cmd = "wofi --show drun --allow-images --allow-markup"
 # optional, the following is the default configuration
 [modules]
 # The modules that will be displayed on the left side of the status bar
-left = [ "AppLauncher", "Workspaces", "WindowTitle" ]
+left = [ # "AppLauncher",
+"Workspaces", "WindowTitle" ]
 # The modules that will be displayed in the center of the status bar
 center = [ "FuzzyClock" ]
 # MediaPlayer?

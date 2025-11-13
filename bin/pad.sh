@@ -7,5 +7,5 @@ do
 done
 
 /usr/bin/emacsclient -n -c \
- "~/org/clumpednotes.org" \
- --frame-parameters '((name . "TODO"))'
+		     "~/org/clumpednotes.org" \
+		     --frame-parameters '((name . "TODO"))'
