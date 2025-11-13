@@ -55,8 +55,6 @@ alias e="emacsclient -t"
 alias en="emacsclient -nw"
 #alias pb='curl -F c=@- https://ptpb.pw\?u\=1' # neat pastebin
 alias pb="curl --data-binary @- https://paste.rs" # pastebin
-alias pg="cd ~/SurfDrive/PhD/programming"
-alias prj="cd ~/SurfDrive/Postdoc1/prj"
 alias pacsize="expac -H M '%m\t%n' | sort -h"
 alias killorphans="sudo pacman -Rnsc $(pacman -Qtdq)"
 alias pi="pacman -Qq | fzf --preview 'pacman -Qil {}' --layout=reverse --bind 'enter:execute(pacman -Qil {} | less)'"
@@ -73,7 +71,6 @@ alias weather='curl "wttr.in/Utrecht?format=v2"'
 alias fetch="fastfetch"
 alias neofetch="fastfetch"
 
-
 # countdown in seconds
 # useful to countdown block_distractions
 function countdown(){
@@ -84,7 +81,7 @@ function countdown(){
    done
 }
 
-# the remainder is vterm stuff for emacs!
+# vterm stuff for emacs!
 # https://github.com/akermu/emacs-libvterm/blob/master/etc/emacs-vterm-zsh.sh
 vterm_printf(){
     if [ -n "$TMUX" ]; then
@@ -128,6 +125,7 @@ vterm_prompt_end() {
 setopt PROMPT_SUBST
 PROMPT=$PROMPT'%{$(vterm_prompt_end)%}'
 
+
 # open yazi with y, then cd to final directory before quit
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
@@ -137,8 +135,7 @@ function y() {
 	rm -f -- "$tmp"
 }
 
-# moved to end of file so that above config is available within sway maybe?
-# start sway if on tty1
+# start wm if on tty1
 if [ "$(tty)" = "/dev/tty1" ]; then
     #sway
     hyprland
