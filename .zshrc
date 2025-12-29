@@ -138,5 +138,6 @@ function y() {
 # start wm if on tty1
 if [ "$(tty)" = "/dev/tty1" ]; then
     #sway
-    hyprland
+    # hyprland
+    start-hyprland
 fi

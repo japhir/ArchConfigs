@@ -308,10 +308,10 @@ from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www
   (use-package circadian
     :custom
     ;; current location on earth for auto toggle between light and dark theme
-    ;; (calendar-latitude 52.08) ;; Utrecht
-    ;; (calendar-longitude 5.11)
-    (calendar-latitude 21.30) ;; Honolulu
-    (calendar-longitude -157.8)
+    (calendar-latitude 52.08) ;; Utrecht
+    (calendar-longitude 5.11)
+    ;; (calendar-latitude 21.30) ;; Honolulu
+    ;; (calendar-longitude -157.8)
     ;; (calendar-latitude 40.5) ;; New York
     ;; (calendar-longitude -74.5)
     (circadian-themes '((:sunrise . modus-operandi)
@@ -2091,7 +2091,7 @@ https://github.com/fuxialexander/org-pdftools
     ;; the file-truename part makes it follow symbolic links!
     (org-roam-directory (file-truename "~/org/notes/"))
     (org-roam-dailies-directory "daily/")
-    (org-roam-db-location "~/org/org-roam.db")
+    (org-roam-db-location "~/org-roam.db")
     ;; (org-id-link-to-org-use-id 'create-if-interactive)
     ;; (org-roam-completion-everywhere t) ;; this was a bit excessive
     ;; (org-roam-verbose t)
@@ -2656,6 +2656,7 @@ autocompletion replacement!
     :custom
     (text-mode-ispell-word-completion nil))
 #+end_src
+
 ** dabbrev
 :PROPERTIES:
 :CREATED:  [2024-10-14 Mon 22:51]
