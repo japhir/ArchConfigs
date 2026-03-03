@@ -7,5 +7,5 @@ do
 done
 
 /usr/bin/emacsclient -n -c \
-		     "~/org/clumpednotes.org" \
+		     -e '(open-work-file)' \
 		     --frame-parameters '((name . "TODO"))'
