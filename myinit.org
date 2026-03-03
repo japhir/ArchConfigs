@@ -1876,7 +1876,8 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
 #+begin_src emacs-lisp
   (use-package citar-org-roam
     :after (citar org-roam)
-    :hook (org-mode . citar-org-roam-mode))
+    :config
+    (citar-org-roam-mode 1))
 #+end_src
 *** open zotero pdf at point
 from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-mendeley-jabref-and-zotero-users][the manual]]
@@ -2136,9 +2137,9 @@ https://github.com/fuxialexander/org-pdftools
                    (direction . right)
                    ;; (window-width . 0.33)
                    (window-height . fit-window-to-buffer)))
+
     ;; If you're using a vertical completion framework, you might want a more informative completion interface
     (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-    (setq org-roam-db-update-on-save t)
     (org-roam-db-autosync-mode)
     (require 'org-roam-protocol))
 #+end_src
