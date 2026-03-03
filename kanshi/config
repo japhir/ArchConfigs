@@ -35,8 +35,8 @@ profile work {
     # output eDP-1 mode 1920x1080@60.020Hz position 2560,360
     # Signe's big screen goes to the top
     # output "HP Inc. HP E273q 6CM9300JV4" mode 2560x1440@59.951Hz position 0,0
-    output $MAIN_1 enable
-    # monitor in the corner
+    output $MAIN_1 enable position 0,1080
+    # monitor in the 3.82 corner
     output "Acer Technologies Acer V236HL LYWEE0054200" mode 1920x1080@60.000Hz position 0,0
 }
 
