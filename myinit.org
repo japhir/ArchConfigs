@@ -19,65 +19,11 @@ is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
 - State "SOME"       from "NEXT"       [2024-09-20 Fri 18:43]
 :END:
 
-** DONE COMMENT report gc-cons threshold behaviour to maintainers
-CLOSED: [2023-07-13 Thu 11:16] SCHEDULED: <2023-07-12 Wed>
-#+begin_src emacs-lisp
-  (require 'emacs-gc-stats)
-  ;; Optionally reset Emacs GC settings to default values (recommended)
-  (setq emacs-gc-stats-gc-defaults 'emacs-defaults)
-  ;; Optionally set reminder to upload the stats after 3 weeks.
-  (setq emacs-gc-stats-remind t) ; can also be a number of days
-  ;; Optionally disable logging the command names
-  ;; (setq emacs-gc-stats-inhibit-command-name-logging t)
-  (emacs-gc-stats-mode +1)
-#+end_src
-
-whoops I had not disabled the lowest codeblock that sets the threshold to something.
-** COMMENT make long lines faster
-:LOGBOOK:
-- Note taken on [2025-06-17 Tue 11:01] \\
-  rnkr on #emacs told me these are not needed for left-to-right text and I probably don't have lines over 10k chars long
-:END:
-I like to write my org-mode scientific papers such that each line has one sentence.
-This allows me to make more meaningful git commits per line.
-Often, these lines are quite long, however, and this makes emacs very slow.
-https://emacs.stackexchange.com/questions/598/how-do-i-prevent-extremely-long-lines-making-emacs-slow
-#+begin_src emacs-lisp
-  (setq-default bidi-paragraph-direction 'left-to-right)
-  (setq-default bidi-inhibit-bpa t)
-  ;; (global-so-long-mode 1)
-  ;; (setq-default bidi-display-reordering nil)  ;; officially unsupported
-#+end_src
 ** native compilation
 #+begin_src emacs-lisp
   (setq native-compile-prune-cache t)
 #+end_src
-* COMMENT log startup time
-stolen from [[https://github.com/daviwil/dotfiles/blob/master/Emacs.org#startup-performance][David Wilson's config]]
-#+begin_src emacs-lisp
-  ;; Profile emacs startup
-  (add-hook 'emacs-startup-hook
-            (lambda ()
-              (message "*** Emacs loaded in %s with %d garbage collections."
-                       (format "%.2f seconds"
-                               (float-time
-                                (time-subtract after-init-time before-init-time)))
-                       gcs-done)))
-#+end_src
 * package archive
-** COMMENT setup package archive in init.el
-this is handled in [[file:~/.emacs.d/init.el]]
-#+begin_src emacs-lisp
-  (let ((file-name-handler-alist nil))
-    (require 'package)
-    (setq package-enable-at-startup nil)
-    (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-    (package-initialize)
-    (org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org"))
-    (setq custom-file "~/.emacs.d/emacs-custom.el")
-    (load custom-file))
-  (put 'erase-buffer 'disabled nil)
-#+end_src
 ** use-package
 Use-package is an amazing resource to clean up my init file and have it play
 nice on both my desktop and laptop.
@@ -86,42 +32,6 @@ nice on both my desktop and laptop.
   (setq use-package-verbose t)
   (use-package delight)  ; to omit lines from the mode-line
 #+end_src
-** COMMENT quelpa
-#+begin_src emacs-lisp
-  (quelpa
-   '(quelpa-use-package
-     :fetcher git
-     :url "https://github.com/quelpa/quelpa-use-package.git"))
-  (require 'quelpa-use-package)
-#+end_src
-** COMMENT straight.el
-#+begin_src emacs-lisp
-  (defvar bootstrap-version)
-  (let ((bootstrap-file
-         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-        (bootstrap-version 5))
-    (unless (file-exists-p bootstrap-file)
-      (with-current-buffer
-          (url-retrieve-synchronously
-           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-           'silent 'inhibit-cookies)
-        (goto-char (point-max))
-        (eval-print-last-sexp)))
-    (load bootstrap-file nil 'nomessage))
-#+end_src
-
-** COMMENT automatic package updates
-from the [[https://github.com/daviwil/emacs-from-scratch/blob/master/Emacs.org#automatic-package-updates][emacs from scratch]] series
-#+begin_src emacs-lisp
-  (use-package auto-package-update
-    :custom
-    (auto-package-update-interval 7)
-    (auto-package-update-prompt-before-update t)
-    (auto-package-update-hide-results t)
-    :config
-    (auto-package-update-at-time "09:00"))
-#+end_src
-
 * dirvar
 define dirvars 'org-in-file', 'org-gtd-file', etc.
 #+begin_src emacs-lisp
@@ -207,40 +117,10 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
   ;; Remember and restore the last cursor location of opened files
   (save-place-mode 1)
 #+end_src
-** COMMENT frames-only-mode
-let my window manager handle screen creation
-#+begin_src emacs-lisp
-  (use-package frames-only-mode
-    :custom (frames-only-mode nil))
-#+end_src
-** COMMENT default-text-scale
-use C-M-= and C-M-- to increase/decrease font size globally.
-#+begin_src emacs-lisp
-  (use-package default-text-scale
-    :custom (default-text-scale-mode t))
-#+end_src
-commented out because the C-x + C-x - are fine...
 ** play nice with parentheses
 #+begin_src emacs-lisp
   (electric-pair-mode 1) ; auto-insert matching bracket
   (show-paren-mode 1)    ; turn on paren match highlighting
-#+end_src
-*** COMMENT smartparens
-https://github.com/Fuco1/smartparens
-insert matching parentheses and jump across them
-
-it's been pretty slow and annoying for pasting stuff in R live repls
-#+begin_src emacs-lisp
-  (use-package smartparens
-    :hook ((prog-mode markdown-mode org-mode inferior-ess-mode inferior-ess-r-mode) . turn-on-smartparens-strict-mode)
-    :config (show-smartparens-global-mode t))
-#+end_src
-*** COMMENT evil-smartparens
-https://github.com/expez/evil-smartparens
-#+begin_src emacs-lisp
-  (use-package evil-smartparens
-    :after evil
-    :hook (smartparens-enabled . evil-smartparens-mode))
 #+end_src
 * change appearance
 ** line spacing, underline, visual line
@@ -256,13 +136,6 @@ matching parenthesis are highlighted with rainbow colours.
     :hook ((prog-mode LaTeX-mode) . rainbow-delimiters-mode))
 #+end_src
 ** set the theme
-*** COMMENT clean up previous theme
-from this [[https://explog.in/dot/emacs/config.html][config]] from [[https://www.reddit.com/r/emacs/comments/4mzynd/what_emacs_theme_are_you_currently_using/d43c5cw][reddit]]
-#+begin_src emacs-lisp
-  (defadvice load-theme (before clear-previous-themes activate)
-    "Clear existing theme settings instead of layering them"
-    (mapc #'disable-theme custom-enabled-themes))
-#+end_src
 *** prot's modus themes
 #+begin_src emacs-lisp
   (use-package modus-themes
@@ -318,22 +191,6 @@ https://github.com/iqbalansari/emacs-emojify
 #+begin_src emacs-lisp
     (use-package emojify
       :hook (mu4e-mode . emojify-mode))
-#+end_src
-** COMMENT pulse
-:LOGBOOK:
-- Note taken on [2025-06-17 Tue 11:03] \\
-  doesn't seem to work anyway
-:END:
-Highlight the current line when changing focus. It's like beacon-mode but native!
-from https://karthinks.com/software/batteries-included-with-emacs/
-#+begin_src emacs-lisp
-  (defun pulse-line (&rest _)
-        "Pulse the current line."
-        (pulse-momentary-highlight-one-line (point)))
-
-  (dolist (command '(scroll-up-command scroll-down-command
-                     recenter-top-bottom other-window))
-    (advice-add command :after #'pulse-line))
 #+end_src
 ** visual-fill-column-mode
 This allows me to write nicely on a widescreen monitor in a single buffer.
@@ -475,97 +332,6 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
     "Face used for todo keywords that indicate CANC items."
     :group 'org-faces)
 #+end_src
-** COMMENT svg-tag-mode
-#+begin_src emacs-lisp
-  (require 'svg-tag-mode)
-
-  (defconst date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}")
-  (defconst time-re "[0-9]\\{2\\}:[0-9]\\{2\\}")
-  (defconst day-re "[A-Za-z]\\{3\\}")
-
-  (defun svg-progress-percent (value)
-    (svg-image (svg-lib-concat
-                (svg-lib-progress-bar (/ (string-to-number value) 100.0)
-                                      nil :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
-                (svg-lib-tag (concat value "%")
-                             nil :stroke 0 :margin 0)) :ascent 'center))
-
-  (defun svg-progress-count (value)
-    (let* ((seq (mapcar #'string-to-number (split-string value "/")))
-           (count (float (car seq)))
-           (total (float (cadr seq))))
-      (svg-image (svg-lib-concat
-                  (svg-lib-progress-bar (/ count total) nil
-                                        :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
-                  (svg-lib-tag value nil
-                               :stroke 0 :margin 0)) :ascent 'center)))
-
-  (setq svg-tag-tags
-        `(
-          ;; Org tags
-          (":\\([@A-Za-z0-9]+\\)" . ((lambda (tag) (svg-tag-make tag))))
-          (":\\([@A-Za-z0-9]+[ \-]\\)" . ((lambda (tag) tag)))
-
-          ;; Task priority
-          ("\\[#[A-Z]\\]" . ( (lambda (tag)
-                                (svg-tag-make tag :face 'org-priority
-                                              :beg 2 :end -1 :margin 0))))
-
-          ;; Progress
-          ("\\(\\[[0-9]\\{1,3\\}%\\]\\)" . ((lambda (tag)
-                                              (svg-progress-percent (substring tag 1 -2)))))
-          ("\\(\\[[0-9]+/[0-9]+\\]\\)" . ((lambda (tag)
-                                            (svg-progress-count (substring tag 1 -1)))))
-
-          ;; TODO states
-          ("NEXT" . ((lambda (tag)
-                       (svg-tag-make "NEXT" :face todo-next :margin 0))))
-          ("WAIT" . ((lambda (tag)
-                       (svg-tag-make "WAIT" :face 'org-todo-waiting :margin 0))))
-          ("TICK" . ((lambda (tag)
-                       (svg-tag-make "TICK" :face 'org-todo-tick :margin 0))))
-          ("SOME" . ((lambda (tag)
-                       (svg-tag-make "SOME" :face 'org-todo-someday :margin 0))))
-          ("CANC" . ((lambda (tag)
-                       (svg-tag-make "CANC" :face 'org-done-cancelled :margin 0))))
-          ("DONE" . ((lambda (tag)
-                       (svg-tag-make "DONE" :face 'org-done-done :margin 0))))
-
-          ;; Citation of the form [cite:&Knuth:1984]
-          ("\\(\\[cite:&[A-Za-z]+:\\)" . ((lambda (tag)
-                                            (svg-tag-make tag
-                                                          :inverse t
-                                                          :beg 7 :end -1
-                                                          :crop-right t))))
-          ("\\[cite:&[A-Za-z]+:\\([0-9]+\\]\\)" . ((lambda (tag)
-                                                     (svg-tag-make tag
-                                                                   :end -1
-                                                                   :crop-left t))))
-
-
-          ;; Active date (without day name, with or without time)
-          (,(format "\\(<%s %s>\\)" date-re day-re) .
-           ((lambda (tag)
-              (svg-tag-make tag :beg 1 :end -1 :margin 0))))
-          (,(format "\\(<%s *%s *\\)%s>" date-re day-re time-re) .
-           ((lambda (tag)
-              (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0))))
-          (,(format "<%s *%s *\\(%s>\\)" date-re day-re time-re) .
-           ((lambda (tag)
-              (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0))))
-
-          ;; Inactive date  (without day name, with or without time)
-          (,(format "\\(\\[%s *%s *\\]\\)" date-re day-re) .
-           ((lambda (tag)
-              (svg-tag-make tag :beg 1 :end -1 :margin 0 :face 'org-date))))
-          (,(format "\\(\\[%s *%s *\\)%s\\]" date-re day-re time-re) .
-           ((lambda (tag)
-              (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :face 'org-date))))
-          (,(format "\\[%s *%s *\\(%s\\]\\)" date-re day-re time-re) .
-           ((lambda (tag)
-              (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0 :face 'org-date))))))
-#+end_src
-
 * version control
 ** diff-hl
 Highlight diffs of current version-controlled buffer in the margin. Quite cool!
@@ -625,11 +391,6 @@ Insert demos after describe function https://github.com/xuchunyang/elisp-demos
 #+begin_src emacs-lisp
   (global-set-key (kbd "<f5>") 'revert-buffer)
 #+end_src
-** COMMENT fetch calendar
-#+begin_src emacs-lisp
-  (defun fetch-calendar ()
-    (when (internet-up-p) (org-gcal-fetch)))
-#+end_src
 ** org-agenda recent open loops
 #+begin_src emacs-lisp
   (defun my-org-agenda-recent-open-loops ()
@@ -639,38 +400,6 @@ Insert demos after describe function https://github.com/xuchunyang/elisp-demos
       (fetch-calendar)
       (org-agenda-list nil (org-read-date nil nil "-2d") 4)
       (goto-char (point-min))))
-#+end_src
-** COMMENT edit heading in indirect buffer
-[[https://www.reddit.com/r/orgmode/comments/fuvdqv/org_notetaking_workflow_with_orgroam/fmhl3ml?utm_source=share&utm_medium=web2x][taken from this reddit thread by alphapapa]]
-I haven't used this at all.
-#+begin_src emacs-lisp
-  (defun ap/org-tree-to-indirect-buffer (&optional arg)
-    "Create indirect buffer and narrow it to current subtree.
-  The buffer is named after the subtree heading, with the filename
-  appended.  If a buffer by that name already exists, it is
-  selected instead of creating a new buffer."
-    (interactive "P")
-    (let* ((new-buffer-p)
-           (pos (point))
-           (buffer-name (let* ((heading (org-get-heading t t))
-                               (level (org-outline-level))
-                               (face (intern (concat "outline-" (number-to-string level))))
-                               (heading-string (propertize (org-link-display-format heading)
-                                                           'face face)))
-                          (concat heading-string "::" (buffer-name))))
-           (new-buffer (or (get-buffer buffer-name)
-                           (prog1 (condition-case nil
-                                      (make-indirect-buffer (current-buffer) buffer-name 'clone)
-                                    (error (make-indirect-buffer (current-buffer) buffer-name)))
-                             (setq new-buffer-p t)))))
-      (switch-to-buffer new-buffer)
-      (when new-buffer-p
-        ;; I don't understand why setting the point again is necessary, but it is.
-        (goto-char pos)
-        (rename-buffer buffer-name)
-        (org-narrow-to-subtree))))
-
-  (advice-add 'org-tree-to-indirect-buffer :override 'ap/org-tree-to-indirect-buffer)
 #+end_src
 ** get-labels in current buffer
 from [[https://kitchingroup.cheme.cmu.edu/blog/2014/03/08/Using-yasnippet-to-get-completion-in-ref-links/][JKitchin's blog]]
@@ -718,16 +447,6 @@ Sources:
     (if (equal "capture" (frame-parameter nil 'name))
         (delete-frame)))
 #+end_src
-** COMMENT play bell sound when task is marked as done
-from [[https://stackoverflow.com/questions/15345614/how-to-get-emacs-org-mode-to-play-sound-file-on-done-state][this stackoverflow post]]
-#+begin_src emacs-lisp
-  (add-hook 'org-after-todo-state-change-hook 'my-org-after-todo-state-change)
-  (defun my-org-after-todo-state-change ()
-    (when (or (string-equal org-state "DONE")
-              (string-equal org-state "CANC"))
-      (org-clock-out-if-current)
-      (play-sound-file "~/bell.aif")))
-#+end_src
 ** org-babel ANSI colours
 https://emacs.stackexchange.com/questions/44664/apply-ansi-color-escape-sequences-for-org-babel-results
 This will apply the ANSI colour escape codes to source block outputs.
@@ -774,13 +493,6 @@ from https://chainsawriot.com/postmannheim/2022/12/16/aoe16.html
 #+end_src
 * evil
 Evil allows me to use vi(m) keybindings in emacs.
-** COMMENT undo-tree
-this shouldn't be needed with emacs 28 or later
-#+begin_src emacs-lisp
-  (use-package undo-tree
-    :config
-    (global-undo-tree-mode))
-#+end_src
 ** evil
 vim emulator
 #+begin_src emacs-lisp
@@ -930,23 +642,6 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
 #+begin_src emacs-lisp
   :custom
 #+end_src
-** COMMENT org-entities-user
-These are nice shorthands for commands I use often. In org-source they look
-nice, and they export to both \LaTeX and =html= correctly. Note that
-unfortunately, special entity names cannot contain numerics, so =\d18O= is not
-possible.
-#+begin_src emacs-lisp
-  (org-entities-user
-   '(("celsius" "\\(^{\\circ}\\)C" nil "&deg;C" "°C" "°C" "℃")
-     ("minus" "\\-" t "&minus;" "-" "-" "−")  ;; defaults to =\\minus= in LaTeX, which doesn't work.
-     ("permil" "\\textperthousand{}" nil "&permil;" "per thousand" "per thousand" "‰")  ;; exactly the same as in org-entities
-     ("us" "\\," nil "&nbsp;" " " " " " ")
-     ("appr" "\\sim" t "&tilde;" "~" "~" "~")
-     ;; for gps-coordinates
-     ("degree" "^{\\circ}" t "&deg;" "°" "°" "°")
-     ("arcminute" "^{'}" t "&prime;" "'" "′" "′")
-     ("arcsecond" "^{''}" t "&Prime;" "\"" "″" "″")))
-#+end_src
 ** basics
 #+begin_src emacs-lisp
   (org-ctrl-k-protect-subtree t)
@@ -1006,33 +701,6 @@ basic latex settings
      ("\\.pdf.xoj\\'" . "xournal %s")))
 #+end_src
 
-** COMMENT org-yt
-use it to display youtube image previews and other online image previews
-https://emacs.stackexchange.com/questions/42281/org-mode-is-it-possible-to-display-online-images
-#+begin_src emacs-lisp
-  (use-package org-yt
-    :straight (org-yt :type git :host github :repo "TobiasZawada/org-yt")
-    :config
-    (defun org-image-link (protocol link _description)
-      "Interpret LINK as base64-encoded image data."
-      (cl-assert (string-match "\\`img" protocol) nil
-                 "Expected protocol type starting with img")
-      (let ((buf (url-retrieve-synchronously (concat (substring protocol 3) ":" link))))
-        (cl-assert buf nil
-                   "Download of image \"%s\" failed." link)
-        (with-current-buffer buf
-          (goto-char (point-min))
-          (re-search-forward "\r?\n\r?\n")
-          (buffer-substring-no-properties (point) (point-max)))))
-
-    (org-link-set-parameters
-     "imghttp"
-     :image-data-fun #'org-image-link)
-
-    (org-link-set-parameters
-     "imghttps"
-     :image-data-fun #'org-image-link))
-#+end_src
 ** GTD stuff
 *** org-agenda
 #+begin_src emacs-lisp
@@ -1292,11 +960,6 @@ customize capture templates
 #+begin_src emacs-lisp
   :config
 #+end_src
-*** COMMENT quick-capture
-#+begin_src emacs-lisp
-  (define-key global-map (kbd "C-c h")
-  (lambda () (interactive) (org-capture nil "x")))
-#+end_src
 *** effort estimates
 #+begin_src emacs-lisp
   (add-to-list 'org-global-properties
@@ -1464,43 +1127,6 @@ https://gist.github.com/jethrokuan/d6f80caaec7f49dedffac7c4fe41d132
 #+begin_src emacs-lisp
   )
 #+end_src
-** COMMENT display PROPERTIES in agenda
-#+begin_src emacs-lisp
-  (use-package org-agenda-property
-    :custom
-    (org-agenda-property-list '("DELEGATED_TO"))
-    (org-agenda-property-position 'next-line))
-#+end_src
-** COMMENT org-superstar-mode
-https://github.com/integral-dw/org-superstar-mode
-
-Here are some symbol options for my various todo-states
-inbox: 📨📥
-NEXT: ☐⏭
-DONE: ☑🗹✅
-TICK: →🗓📅📆
-WAIT: ☕📨…
-SOME: ☁⛅⛈🌤🌧🌥🌪⛱☼
-CANC: ❌☒✗⮽🗳🗵🗷✘╳❌ ❎🗑
-
-see e.g. https://emojipedia.org/calendar/ for emoji!
-
-#+begin_src emacs-lisp
-  (use-package org-superstar
-    :hook
-    (org-mode . (lambda () (org-superstar-mode 1)))
-    :custom
-    (org-superstar-headline-bullets-list
-     '("◉" "●" "○" "⬡" "◆" "►" "▸"))
-    ;; (org-superstar-todo-bullet-alist '(("NEXT" " ⏭ " ?⏭)
-    ;;                                    ("TICK" " 🗓" ?🗓)
-    ;;                                    ("WAIT" " 📨" ?📨)
-    ;;                                    ("SOME" " ☁" ?☁)
-    ;;                                    ("DONE" " ☑" ?☑)
-    ;;                                    ("CANC" " 🗑" ?🗑)))
-    ;;(org-superstar-special-todo-items t)
-    )
-#+end_src
 ** org-modern
 #+begin_src emacs-lisp
   (use-package org-modern
@@ -1508,18 +1134,6 @@ see e.g. https://emojipedia.org/calendar/ for emoji!
     :hook
     (org-mode . org-modern-mode)
     (org-agenda-finalize . org-modern-agenda))
-#+end_src
-** COMMENT org-modern-indent
-:PROPERTIES:
-:CREATED:  [2025-06-25 Wed 14:42]
-:END:
-#+begin_src emacs-lisp
-  (use-package org-modern-indent
-    ;; :load-path "~/code/emacs/org-modern-indent/"
-    ; or
-    :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent")
-    :config ; add late to hook
-    (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
 #+end_src
 ** ob-async
 allow asyncronous code block evaluation https://github.com/astahlman/ob-async
@@ -1546,19 +1160,6 @@ got the function from this [[https://github.com/marcinkoziej/org-pomodoro/issues
             (org-pomodoro))))
     )
 #+end_src
-** COMMENT org-hyperscheduler
-not sure if I like it enough yet, but looks promising!
-https://github.com/dmitrym0/org-hyperscheduler
-#+begin_src emacs-lisp
-  (use-package org-hyperscheduler
-    :straight
-    (org-hyperscheduler
-     :repo "dmitrym0/org-hyperscheduler"
-     :host github
-     :branch "main"
-     :type git
-     :files ("*")))
-#+end_src
 ** org-pdftools
 used to be org-pdfview
 #+begin_src emacs-lisp
@@ -1567,37 +1168,6 @@ used to be org-pdfview
     :hook (org-mode . org-pdftools-setup-link))
 #+end_src
 
-** COMMENT view inline pdfs?
-doesn't work :(
-#+begin_src emacs-lisp
-  (add-to-list 'image-type-file-name-regexps '("\\.pdf\\'" . imagemagick))
-  (add-to-list 'image-file-name-extensions "pdf")
-  (setq imagemagick-types-inhibit (remove 'PDF imagemagick-types-inhibit))
-  (setq org-image-actual-width (list 800))
-#+end_src
-** COMMENT org-beamer
-#+begin_src emacs-lisp
-  (use-package ox-latex
-    :after org
-    :ensure nil
-    :config
-    (add-to-list 'org-latex-classes
-                 '("beamer"
-                   "\\documentclass\[presentation\]\{beamer\}"
-                   ("\\section\{%s\}" . "\\section*\{%s\}")
-                   ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
-                   ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}"))))
-#+end_src
-** COMMENT org-fragtog
-auto-toggle latex fragments
-#+begin_src emacs-lisp
-  (use-package org-fragtog
-    :after org
-    :hook (org-mode . org-fragtog-mode)
-    :custom
-    ;; (org-startup-with-latex-preview t)
-    (org-format-latex-options (plist-put org-format-latex-options :scale 2.5)))
-#+end_src
 ** org-appear
 dive into links/formatted entries
 https://github.com/awth13/org-appear
@@ -1611,39 +1181,6 @@ https://github.com/awth13/org-appear
     (org-appear-autosubmarkers t)
     (org-appear-delay 1))
 #+end_src
-** COMMENT deft
-:LOGBOOK:
-- Note taken on [2020-07-15 Wed 16:09] \\
-  added it based on [[file:~/SurfDrive/bibliography/notes//20200715160129-an_orgmode_note_workflow.org][An Orgmode Note Workflow]]
-:END:
-#+begin_src emacs-lisp :eval never
-  (use-package deft
-    :after org
-    :bind
-    ("C-c n d" . deft)
-    :custom
-    (deft-recursive t)
-    (deft-use-filter-string-for-filename t)
-    (deft-default-extension "org")
-    (deft-directory org-roam-directory))
-#+end_src
-
-** COMMENT pdf preview in org
-#+begin_src emacs-lisp :eval never
-  ; (add-to-list 'image-type-file-name-regexps '("\\.pdf\\'" . imagemagick))
-  ; (add-to-list 'image-file-name-extensions "pdf")
-  ; (setq imagemagick-types-inhibit (remove 'PDF imagemagick-types-inhibit)
-  ;       org-image-actual-width t)
-#+end_src
-
-** COMMENT org-clock-reminder
-#+begin_src emacs-lisp
-  (use-package org-clock-reminder
-    :config
-    (setq org-clock-reminder-interval 600)
-    (setq org-clock-reminder-remind-inactivity 't)
-    (org-clock-reminder-activate))
-#+end_src
 * presenting
 ** org-tree-slide-mode
 #+begin_src emacs-lisp
@@ -1653,14 +1190,6 @@ https://github.com/awth13/org-appear
 #+end_src
 
 * writing
-** COMMENT spell-fu
-#+begin_src emacs-lisp
-  (use-package spell-fu
-    :hook (org-mode . (lambda()
-                        (setq spell-fu-faces-exclude
-                              '(org-meta-line org-link org-code))
-                        (spell-fu-mode))))
-#+end_src
 ** easy symbol insertion
 By default C-x 8 o = ° and C-x 8 m = µ. So:
 #+begin_src emacs-lisp
@@ -1671,35 +1200,11 @@ By default C-x 8 o = ° and C-x 8 m = µ. So:
 #+end_src
 I also use compose-key, mapped to right alt with some custom settings for
 <ralt> g d, resulting in δ, for example.
-** COMMENT all-the-icons
-https://github.com/domtronn/all-the-icons.el
-#+begin_src emacs-lisp
-  (use-package all-the-icons)
-#+end_src
-*** COMMENT all-the-icons-ivy
-#+begin_src emacs-lisp
-  (use-package all-the-icons-ivy
-    :after (ivy all-the-icons)
-    :config
-    (all-the-icons-ivy-setup))
-#+end_src
-*** all-the-icons-dired
-#+begin_src emacs-lisp
-  (use-package all-the-icons-dired
-    :after (dired all-the-icons)
-    :hook (dired-mode . all-the-icons-dired-mode))
-#+end_src
 ** nerd-icons
 #+begin_src emacs-lisp
   (use-package nerd-icons)
   (use-package nerd-icons-dired
     :hook (dired-mode . nerd-icons-dired-mode))
-#+end_src
-** COMMENT emojify-mode
-#+begin_src emacs-lisp
-  (use-package emojify
-    :custom (emojify-emoji-styles 'unicode)
-    :hook ((mu4e-mode mu4e-view-mode mu4e-compse-mode org-mode) . emojify-mode))
 #+end_src
 ** yasnippet
 usefull snippets for me: org-mode (fig_, )
@@ -1744,57 +1249,6 @@ Note that I've stopped using ivy, however.
         bibtex-align-at-equal-sign t)
   (setq bibtex-dialect 'biblatex)
 #+end_src
-
-*** COMMENT bibtex/ivy-bibtex
-:LOGBOOK:
-- Note taken on [2024-05-20 Mon 09:13] \\
-  ~tmalsburg~ commented that I can disable auto reloading with bibtex-completion-watch-bibliography
-- Note taken on [2024-02-01 Thu 11:07] \\
-  this is what makes the package reload my bibtex entries every now and then, causing my whole emacs session to hang
-:END:
-reference manager I use it in conjunction with zotero, which generates the
-.bib files, and org-ref, to insert citations in org files.
-
-#+begin_src emacs-lisp
-  (use-package ivy-bibtex
-    :after ivy
-    :init
-    (setq bibtex-completion-bibliography
-          '("~/SurfDrive/bibliography/references.bib"
-            "~/Documents/References/PhD.bib")
-          bibtex-completion-library-path '("~/SurfDrive/bibliography/")
-          bibtex-completion-notes-path "~/SurfDrive/bibliography/notes/"
-          bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
-
-          bibtex-completion-additional-search-fields '(keywords)
-          bibtex-completion-display-formats
-          '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
-            (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
-            (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
-            (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
-            (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
-          bibtex-completion-pdf-open-function
-          (lambda (fpath)
-            (call-process "open" nil 0 nil fpath))))
-#+end_src
-
-#+RESULTS:
-
-*** COMMENT automatically generating bibtex keys
-#+begin_src emacs-lisp
-  (use-package bibtex
-    :custom
-    (bibtex-autokey-year-length 4)
-    (bibtex-autokey-name-year-separator "-" )
-    (bibtex-autokey-year-title-separator "-")
-    (bibtex-autokey-titlewords 0)
-    (bibtex-autokey-titlewords-stretch 0)
-    (bibtex-autokey-titleword-length 0)
-    ;; org-ref-bibtex-hydra-key-binding (kbd "")
-    )
-#+end_src
-
-#+RESULTS:
 
 *** org-ref itself
 https://github.com/jkitchin/org-ref/blob/master/org-ref.org
@@ -1883,37 +1337,6 @@ from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-me
 #+RESULTS:
 : my/org-ref-open-pdf-at-point
 
-*** COMMENT citeproc
-#+begin_src emacs-lisp
-  (use-package citeproc)
-  (use-package citeproc-org)
-#+end_src
-
-* COMMENT navigation
-** COMMENT beginend
-#+begin_src emacs-lisp
-  (use-package beginend
-    :init
-    (beginend-global-mode))
-#+end_src
-
-** COMMENT evil-easymotion
-Link evil forward commands etc. to avy jump previews so you can jump down 10
-lines if you forgot to press 10j. https://github.com/PythonNut/evil-easymotion/
-#+begin_src emacs-lisp
-  (use-package evil-easymotion
-    :config
-    (evilem-default-keybindings "SPC"))
-#+end_src
-** COMMENT evil-snipe
-https://github.com/hlissner/evil-snipe
-#+begin_src emacs-lisp
-  (use-package evil-snipe
-    :delight evil-snipe-mode
-    :config
-    (evil-snipe-mode 1)
-    (evil-snipe-override-mode 1))
-#+end_src
 * note-taking
 ** pdf-tools
 #+begin_src emacs-lisp
@@ -1929,14 +1352,6 @@ https://github.com/hlissner/evil-snipe
     ;; swiper doesn't play nice with pdf-tools, so I disable it.
     ;(:map pdf-view-mode-map ("C-s" . isearch-forward))
    )
-#+end_src
-** COMMENT org-xournalpp
-#+begin_src emacs-lisp
-  (use-package org-xournalpp
-    :ensure t
-    :quelpa (org-xournalpp :fetcher gitlab :repo "vherrmann/org-xournalpp" :files ("*.el" "resources"))
-    :config
-    (add-hook 'org-mode-hook 'org-xournalpp-mode))
 #+end_src
 ** org-noter
 https://github.com/weirdNox/org-noter
@@ -1994,61 +1409,6 @@ https://github.com/weirdNox/org-noter
     (with-eval-after-load 'pdf-annot
       (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 #+end_src
-*** COMMENT org-noter-insert-precice-note-dwim---stolen from zaeph
-https://github.com/zaeph/.emacs.d/blob/master/init.el#L4420
-#+begin_src emacs-lisp
-    (defun zp/org-noter-insert-precise-note-dwim (force-mouse)
-      "Insert note associated with a specific location.
-  If in nov-mode, use point rather than the mouse to target the
-  position."
-      (interactive "P")
-      (if (and (derived-mode-p 'nov-mode)
-               (not force-mouse))
-          (let ((pos (if (region-active-p)
-                         (min (region-beginning) (point))
-                       (point))))
-            (org-noter-pdftools-insert-note pos))
-        (org-noter-pdftools-insert-precise-note)))
-#+end_src
-** COMMENT org-noter-pdftools
-I have switched to using Zotero's PDF reader directly...
-
-https://github.com/fuxialexander/org-pdftools
-#+begin_src emacs-lisp
-  (use-package org-noter-pdftools
-    :after org-noter
-    :config
-    ;; Add a function to ensure precise note is inserted
-    (defun org-noter-pdftools-insert-precise-note (&optional toggle-no-questions)
-      (interactive "P")
-      (org-noter--with-valid-session
-       (let ((org-noter-insert-note-no-questions (if toggle-no-questions
-                                                     (not org-noter-insert-note-no-questions)
-                                                   org-noter-insert-note-no-questions))
-             (org-pdftools-use-isearch-link t)
-             (org-pdftools-use-freestyle-annot 'org-pdftools-use-freepointer-annot))
-         (org-noter-insert-note (org-noter--get-precise-info)))))
-
-    ;; fix https://github.com/weirdNox/org-noter/pull/93/commits/f8349ae7575e599f375de1be6be2d0d5de4e6cbf
-    (defun org-noter-set-start-location (&optional arg)
-      "When opening a session with this document, go to the current location.
-  With a prefix ARG, remove start location."
-      (interactive "P")
-      (org-noter--with-valid-session
-       (let ((inhibit-read-only t)
-             (ast (org-noter--parse-root))
-             (location (org-noter--doc-approx-location (when (called-interactively-p 'any) 'interactive))))
-         (with-current-buffer (org-noter--session-notes-buffer session)
-           (org-with-wide-buffer
-            (goto-char (org-element-property :begin ast))
-            (if arg
-                (org-entry-delete nil org-noter-property-note-location)
-              (org-entry-put nil org-noter-property-note-location
-                             (org-noter--pretty-print-location location))))))))
-    (with-eval-after-load 'pdf-annot
-      (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
-#+end_src
-
 ** org-roam
 [[https://org-roam.readthedocs.io/en/latest/installation/][docs here]]
 [[file:~/SurfDrive/bibliography/notes//20200427230825-how_to_take_smart_notes.org][How to Take Smart Notes]]
@@ -2122,51 +1482,6 @@ https://github.com/fuxialexander/org-pdftools
     (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
     (org-roam-db-autosync-mode)
     (require 'org-roam-protocol))
-#+end_src
-
-** COMMENT org-roam-bibtex
-#+begin_src emacs-lisp
-  (use-package org-roam-bibtex
-    :config
-    (org-roam-bibtex-mode))
-#+end_src
-
-** COMMENT org-transclusion
-:PROPERTIES:
-:CREATED:  [2023-06-03 Sat 07:49]
-:END:
-#+begin_src emacs-lisp
-  (use-package org-transclusion)
-  (define-key org-mode-map (kbd "<f12>") #'org-transclusion-add)
-  (define-key org-mode-map (kbd "C-n t") #'org-transclusion-mode)
-#+end_src
-** COMMENT bibtex-completion
-seems like this is what both [[https://github.com/jethrokuan/dots/blob/master/.doom.d/config.el#L454][jethro]] and [[https://github.com/zaeph/.emacs.d/blob/8243cd8c74775387e011de679f041ca8e3cff41a/init.el#L3865][zaeph]] seem to be using since org-roam v2 update
-#+begin_src emacs-lisp
-  (use-package bibtex-completion
-    :disabled
-    :config
-    (setq bibtex-completion-notes-path "~/SurfDrive/bibliography/notes/"
-          bibtex-completion-bibliography "~/SurfDrive/bibliography/references.bib"
-          bibtex-completion-pdf-field "file"
-          bibtex-completion-notes-template-multiple-files
-          (concat
-           ":PROPERTIES:"
-           ":ROAM_REFS: cite:${=key=}\n"
-           ":END:"
-           "#+title: ${=key=}: ${title}\n"
-           "* TODO Notes\n"
-           ":PROPERTIES:\n"
-           ":Custom_ID: ${=key=}\n"
-           ":NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n"
-           ":AUTHOR: ${author-abbrev}\n"
-           ":JOURNAL: ${journaltitle}\n"
-           ":DATE: ${date}\n"
-           ":YEAR: ${year}\n"
-           ":DOI: ${doi}\n"
-           ":URL: ${url}\n"
-           ":END:\n\n"
-           )))
 #+end_src
 
 ** org-roam-create-note-from-headline
@@ -2278,221 +1593,6 @@ https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
       (zp/org-set-time-file-property "LAST_MODIFIED")))
 #+end_src
 
-** COMMENT org-roam-bibtex
-#+begin_src emacs-lisp
-  (use-package org-roam-bibtex
-    :after org-roam
-    :bind (:map org-mode-map
-                (("C-c n a" . orb-note-actions)))
-    :custom
-    ;(orb-note-actions-interface 'ivy)
-    (orb-preformat-keywords
-     '("citekey" "title" "url" "author-or-editor" "journal" "keywords" "file"))
-    (orb-process-file-keyword t)
-    (orb-file-field-extensions '("pdf")))
-#+end_src
-
-** COMMENT org-roam-protocol
-this bit errors out if I use-package it.
-
-Since the org module lazy loads org-protocol (waits until an org URL is detected), we can safely chain `org-roam-protocol' to it.
-#+begin_src emacs-lisp
-  (require 'org-roam-protocol
-      :after org-protocol)
-#+end_src
-
-** SOME COMMENT org-roam-ui
-:LOGBOOK:
-- State "SOME"       from              [2024-09-20 Fri 18:32]
-:END:
-this is actually really cool but I rarely use it!
-https://github.com/org-roam/org-roam-ui
-#+begin_src emacs-lisp :tangle no
-  (use-package org-roam-ui
-      :after org-roam
-      ;; :hook
-      ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-      ;;         a hookable mode anymore, you're advised to pick something yourself
-      ;;         if you don't care about startup time, use
-      ;; :hook (after-init . org-roam-ui-mode)
-      :config
-      (setq org-roam-ui-sync-theme t
-            org-roam-ui-follow t
-            org-roam-ui-update-on-save t
-            org-roam-ui-open-on-start t))
-#+end_src
-
-** COMMENT ora-roam-todo
-from [[https://github.com/abo-abo/oremacs/blob/github/modes/ora-org-roam.el#L106][abo-abo's oremacs config]]
-#+begin_src emacs-lisp
-  (defun ora-roam-todo ()
-    "An ad-hoc agenda for `org-roam'."
-    (interactive)
-    (let* ((win (next-window))
-           (buf (current-buffer))
-           (bname "*roam-todo*")
-           (b (get-buffer bname)))
-      (if b
-          (progn
-            (switch-to-buffer b)
-            (ivy-occur-revert-buffer))
-        (setq b (get-buffer-create bname))
-        (switch-to-buffer b)
-        (ora-roam-occur)
-        (setq ivy-occur-last (make-ivy-state
-                              :action #'counsel-git-grep-action
-                              :buffer buf
-                              :caller 'ora-roam-todo
-                              :directory default-directory
-                              :re-builder #'ivy--regex-plus
-                              :text ivy-text
-                              :window win)))))
-
-  (ivy-configure 'ora-roam-todo
-    :occur #'ora-roam-occur
-    :parent 'counsel-rg)
-
-  (defun ora-roam-occur (&optional _cands)
-    (unless (eq major-mode 'ivy-occur-grep-mode)
-      (ivy-occur-grep-mode))
-    (setq default-directory org-roam-directory)
-    ;; (setq-local counsel-ag-command
-    ;;             '("rg" "--no-heading" "--line-number" "--sortr" "modified" "--color" "never" "-s" "%s"))
-    (setq-local counsel-ag-command '("ug" "--colour=never" "--sort=rused" "--binary-files=without-match" "%s"))
-    (ivy-set-text "^\\*+  (TODO|NEXT|WAIT|TICK)")
-    (let ((cands (counsel--split-string
-                  (counsel--call
-                   (cl-subst ivy-regex "%s" counsel-ag-command :test #'equal))))
-          (today (format-time-string "%Y_%m_%d")))
-      (setq cands
-            (cl-remove-if
-             (lambda (s)
-               (and (string-match ":\\([0-9]+_[0-9]+_[0-9]+\\):" s)
-                    (string< today (match-string 1 s))))
-             cands))
-      (swiper--occur-insert-lines (mapcar #'counsel--normalize-grep-match cands))))
-#+end_src
-
-#+RESULTS:
-: ora-roam-occur
-
-* COMMENT playing videos
-** COMMENT emms for playing youtube videos etc.
-#+begin_src emacs-lisp
-  (use-package emms
-    :defer t
-    :config
-    (require 'emms-setup)
-    (emms-all)
-    (default-players))
-#+end_src
-** COMMENT org-media-note
-#+begin_src emacs-lisp
-  (use-package quelpa-use-package)
-  (use-package pretty-hydra)
-  (use-package org-media-note
-    :quelpa (org-media-note :fetcher github :repo "yuchen-lea/org-media-note")
-    :ensure nil
-    :hook (org-mode . org-media-note-mode)
-    :bind (("C-c v" . org-media-note-hydra/body))  ;; Main entrance
-    :custom
-    (org-media-note-screenshot-image-dir "~/SurfDrive/bibliography/notes/imgs/"))
-#+end_src
-
-** COMMENT mpv
-play videos from orgmode!
-#+begin_src emacs-lisp
-  (use-package mpv
-    :hook
-    (org-open-at-point-functions . mpv-seek-to-position-at-point)
-    :config
-    (org-add-link-type "mpv" #'mpv-play)
-    (defun org-mpv-complete-link (&optional arg)
-      (replace-regexp-in-string
-       "file:" "mpv:"
-       (org-file-complete-link arg)
-       t t)))
-#+end_src
-it's not working so far
-
-* COMMENT swiper / ivy
-very nice search replacement
-#+begin_src emacs-lisp
-  (use-package swiper
-    :init (ivy-mode 1)
-    :delight ivy-mode
-    :config
-    (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
-    :custom
-    (ivy-use-virtual-buffers t)
-    (ivy-count-format "(%d/%d) ")
-    :bind
-    ("\C-s" . swiper)
-    ("C-c C-r" . ivy-resume)
-    ("C-c v" . ivy-push-view)
-    ("C-c V" . ivy-pop-view))
-#+end_src
-** COMMENT counsel
-#+begin_src emacs-lisp
-  (use-package counsel
-    :init (counsel-mode 1)
-    :delight counsel-mode
-    :bind
-    ("C-x l" . counsel-locate)
-    ;; ("C-c g" . counsel-git)
-    ;; ("M-x" . counsel-M-x)
-    ("C-c s" . counsel-rg))
-#+end_src
-** COMMENT link-hint
-#+begin_src emacs-lisp
-  (use-package link-hint
-    :ensure t
-    :defer t
-    :bind ((:map evil-normal-state-map ("SPC f" . link-hint-open-link))))
-;;(:map mu4e-view-mode-map ("f" . link-hint-open-link))
-#+end_src
-
-* COMMENT load systemcrafters completion config
-:PROPERTIES:
-:CREATED:  [2023-04-11 Tue 09:17]
-:END:
-It's been recently updated to become even more customizable <3
-https://github.com/SystemCrafters/crafted-emacs/blob/craftedv2alpha/README-new.org
-
-now switched to beta
-https://github.com/SystemCrafters/crafted-emacs/blob/craftedv2beta/README.org
-
--> disable
-[[file:~/ArchConfigs/myinit.org::*swiper / ivy][swiper / ivy]]
-[[file:~/ArchConfigs/myinit.org::*bibtex/ivy-bibtex][bibtex/ivy-bibtex]]
-org-ref-ivy, a line in [[file:~/ArchConfigs/myinit.org::*org-ref itself][org-ref itself]]
-[[file:~/ArchConfigs/myinit.org::*all-the-icons-ivy][all-the-icons-ivy]]
-
-#+begin_src emacs-lisp
-  (load "~/crafted-emacs/modules/crafted-init-config")
-
-  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-  (when (and custom-file
-             (file-exists-p custom-file))
-    (load custom-file nil :nomessage))
-
-  (require 'crafted-completion-packages)  ; must come first to install
-                                          ; the packages
-
-  (package-install-selected-packages :noconfirm) ; install the packages
-                                          ; from the bundle
-                                          ; mentioned above.
-
-  ;; (require 'crafted-defaults-config) ; I don't like winner-mode and some of the keybindings in here
-  (require 'crafted-startup-config)
-  (require 'crafted-completion-config)
-
-  (keymap-global-set "C-c s" 'consult-ripgrep)
-  ;; I thought this one was set already but it's not working for me
-  (keymap-global-set "C-s" 'consult-line)
-  ;; (keymap-set vertico-map "M-RET" 'vertico-quit-insert)
-#+end_src
-
 * extend default completion packages
 :PROPERTIES:
 :CREATED:  [2024-02-24 Sat 15:27]
@@ -2557,41 +1657,6 @@ it also likes savehist-mode, which I already had enabled.
             ("e" . wgrep-change-to-wgrep-mode)
             ("C-x C-q" . wgrep-change-to-wgrep-mode)
             ("C-c C-c" . wgrep-finish-edit)))
-#+end_src
-** COMMENT company
-:LOGBOOK:
-- Note taken on [2024-02-29 Thu 16:33] \\
-  switched away from company to corfu + cape
-:END:
-See https://iqss.github.io/IQSS.emacs/init.html#auto-complete_configuration for where I got it from.
-#+begin_src emacs-lisp
-  (use-package company
-    :init (global-company-mode)
-    :delight company-mode
-    :config
-    ;; company-require-match nil
-          ;; company-async-timeout 6
-          ;; company-idle-delay 0.25 ;; default 0.5,
-          ;; company-minimum-prefix-length 2 ;; default 3
-          ;; completion-ignore-case t
-          ;; company-global-modes '(not term-mode))
-    (require 'company-capf)
-    (require 'company-files)
-    (require 'company-math)
-    (delete-dups (push 'company-math-symbols-unicode company-backends))
-    (delete-dups (push 'company-capf company-backends))
-    (delete-dups (push 'company-files company-backends))
-    (setq tab-always-indent 'complete)
-    :bind
-    (:map company-active-map
-          ("C-n" . company-select-next)
-          ("C-p" . company-select-previous)
-          ("<tab>" . company-complete-common)
-          ("<backtab>" . company-select-previous))
-    (:map company-mode-map
-          ([remap indent-for-tab-command] . company-indent-or-complete-common)
-          ("C-M-i" . company-complete)
-          ("C-M-S-i" . counsel-company)))
 #+end_src
 ** corfu
 :PROPERTIES:
@@ -2742,52 +1807,6 @@ From https://tvraman.github.io/emacspeak/blog/augment-emacs-with-zoxide.html
 #+begin_src emacs-lisp
   ;; (global-set-key (kbd "C-; j") #'dired-zoxide)
   (define-key evil-normal-state-map (kbd "gz") #'dired-zoxide)
-#+end_src
-** COMMENT dirvish
-:PROPERTIES:
-:CREATED:  [2021-12-28 Tue 16:10]
-:END:
-https://github.com/alexluigit/dirvish
-#+begin_src emacs-lisp
-  (use-package dirvish
-    :bind (:map dirvish-mode-map
-                ("l" . dirvish-find-file)
-                ("h" . dirvish-up-directory)))
-#+end_src
-** COMMENT zel
-https://github.com/emacsattic/zel
-find recent files ranked by frequency of use, just like z in the shell
-#+begin_src emacs-lisp
-  (use-package zel
-    :ensure t
-    :demand t
-    :bind (("C-x C-r" . zel-find-file-frecent))
-    :config (zel-install))
-#+end_src
-** emacs-pkgbuild-mode
-Install it with Pacman
-#+begin_src bash :results none :exports code :eval never
-sudo pacman -S emacs-pkgbuild-mode
-#+end_src
-
-Then load it into emacs when opening a PKGBUILD file
-#+begin_src emacs-lisp
-  (use-package pkgbuild-mode
-     :ensure nil
-     :defer t
-     :load-path "/usr/share/emacs/site-lisp/"
-     :mode "/PKGBUILD$")
-#+end_src
-** COMMENT calendar
-perhaps change keybindings a little: [[https://github.com/emacs-evil/evil-collection/issues/211][evil-collection issue]]
-#+begin_src emacs-lisp
-  (use-package calfw)
-  (use-package calfw-org
-    :custom
-    (cfw:display-calendar-holidays nil)
-    (calendar-week-start 1)
-    :bind
-    ("C-c o" . cfw:open-org-calendar))
 #+end_src
 * email
 ** smtp
@@ -3005,45 +2024,7 @@ install it with pacman ~mu~
     )
 #+end_src
 
-** COMMENT mu4e-thread-folding
-:LOGBOOK:
-- State "SOME"       from              [2021-09-26 Sun 13:14]
-:END:
-#+begin_src emacs-lisp
-  (use-package mu4e-thread-folding
-    :quelpa (mu4e-thread-folding :fetcher github :repo "rougier/mu4e-thread-folding"))
-#+end_src
-** COMMENT mu4e-alert
-#+begin_src emacs-lisp
-  (use-package mu4e-alert
-    :after mu4e
-    :custom
-    (mu4e-alert-interesting-mail-query
-     (concat "flag:unread AND maildir:/inbox"
-             ;; " AND NOT maildir:\"/news\""
-             ))
-    :config
-    (mu4e-alert-set-default-style 'libnotify)
-    :hook (after-init . mu4e-alert-enable-notifications))
-#+end_src
 * science packages
-** COMMENT eval-in-repl
-from: https://iqss.github.io/IQSS.emacs/init.html#general_repl_(comint)_config
-use other programming languages in interactive environment, similar to how ESS does it
-#+begin_src emacs-lisp
-  (use-package eval-in-repl
-    :hook (comint-mode . (lambda() (setq truncate-lines 1)))
-    :custom
-    (comint-process-echoes t
-      eir-repl-placement 'below)
-    (comint-scroll-to-bottom-on-input t)
-    (comint-scroll-to-bottom-on-output t)
-    (comint-move-point-for-output t))
-#+end_src
-
-#+RESULTS:
-| lambda | nil | (setq truncate-lines 1) |
-
 ** ess
 https://ess.r-project.org/
 emacs speaks statistics, work with R etc.
@@ -3135,16 +2116,6 @@ emacs speaks statistics, work with R etc.
 #+RESULTS:
 : japhir/insert-r-pipe
 
-*** COMMENT ess-view
-[[https://github.com/GioBo/ess-view][GioBo/ess-view: A small package to view dataframes within spreadsheet softwares]]
-allows you to quickly look at dataframes in a spreadsheet software (in my case LibreOffice)
-#+begin_src emacs-lisp
-  (use-package ess-view
-    :after ess)
-#+end_src
-
-#+RESULTS:
-
 *** electric-spacing operator
 Put spaces around operators such as +, -, etc.
 #+begin_src emacs-lisp
@@ -3186,19 +2157,6 @@ Put spaces around operators such as +, -, etc.
 #+RESULTS:
 : 15
 
-*** COMMENT flycheck
-:LOGBOOK:
-- Note taken on [2024-10-08 Tue 11:44] \\
-  this makes larger org-mode files very very slow
-:END:
-#+begin_src emacs-lisp
-  (use-package flycheck
-    ;; :init (global-flycheck-mode)
-  )
-#+end_src
-
-#+RESULTS:
-
 ** julia
 #+begin_src emacs-lisp
   (use-package julia-mode) ;; for syntax highlighting
@@ -3230,26 +2188,6 @@ Put spaces around operators such as +, -, etc.
     (defalias 'org-babel-variable-assignments:julia 'org-babel-variable-assignments:julia-vterm)
     )
 #+end_src
-
-#+begin_src emacs-lisp :tangle no
-  (use-package org-contrib
-    :init
-    (require 'ob-julia)
-    :commands org-babel-execute:julia
-    :config
-    ;; (setq org-babel-julia-command-arguments
-    ;;       `("--sysimage"
-    ;;         ,(when-let ((img "~/.local/lib/julia.so")
-    ;;                     (exists? (file-exists-p img)))
-    ;;            (expand-file-name img))
-    ;;         "--threads"
-    ;;         ,(number-to-string (- (doom-system-cpus) 2))
-    ;;         "--banner=no"))
-    )
-#+end_src
-
-#+RESULTS:
-: ob-julia
 
 ** stan
 https://mc-stan.org/
@@ -3289,25 +2227,6 @@ check out this worg entry on working inline with stan models! https://orgmode.or
 #+RESULTS:
 : t
 
-** COMMENT ob-stan
-org-mode babel intergation for stan
-
-this has now migrated away from org-contrib to https://git.kyleam.com/ob-stan/ so if I want to get this to work I should probably figure out a straight recipe for it.
-
-I've evaluated this once to install it, but straight was interfering with my regular setup.
-#+begin_src emacs-lisp :eval never
-  (use-package ob-stan
-    :straight (ob-stan
-               :type git
-               :host nil
-               :repo "https://git.kyleam.com/ob-stan"))
-#+end_src
-
-So for now we just load it manually with:
-#+begin_src emacs-lisp
-  (load "~/.emacs.d/straight/repos/ob-stan/ob-stan.el")
-#+end_src
-
 ** markdown-mode
 markdown mode for writing
 #+begin_src emacs-lisp
@@ -3326,33 +2245,6 @@ for working with .Rmd files etc.
 
 #+RESULTS:
 
-** COMMENT matlab
-if I'm ever required to work in non-open-source
-#+begin_src emacs-lisp
-  (use-package matlab
-    :ensure nil
-    :init (autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
-    :mode ("\\.m\\'" . matlab-mode)
-    :interpreter "matlab"
-    :custom
-    (matlab-indent-function t)
-    (matlab-indent-function "matlab"))
-#+end_src
-
-#+RESULTS:
-: ((matlab . matlab) (r . ess-r-mode) (Rscript . ess-r-mode) (ruby1.8 . ruby-mode) (ruby1.9 . ruby-mode) (jruby . ruby-mode) (rbx . ruby-mode) (ruby . ruby-mode) (python[0-9.]* . python-mode) (rhino . js-mode) (gjs . js-mode) (nodejs . js-mode) (node . js-mode) (gawk . awk-mode) (nawk . awk-mode) (mawk . awk-mode) (awk . awk-mode) (pike . pike-mode) (\(mini\)?perl5? . perl-mode) (wishx? . tcl-mode) (tcl\(sh\)? . tcl-mode) (expect . tcl-mode) (octave . octave-mode) (scm . scheme-mode) ([acjkwz]sh . sh-mode) (r?bash2? . sh-mode) (dash . sh-mode) (mksh . sh-mode) (\(dt\|pd\|w\)ksh . sh-mode) (es . sh-mode) (i?tcsh . sh-mode) (oash . sh-mode) (rc . sh-mode) (rpm . sh-mode) (sh5? . sh-mode) (tail . text-mode) (more . text-mode) (less . text-mode) (pg . text-mode) (make . makefile-gmake-mode) (guile . scheme-mode) (clisp . lisp-mode) (emacs . emacs-lisp-mode))
-
-** COMMENT pandoc-mode
-exporting markdown
-#+begin_src emacs-lisp
-  (use-package pandoc-mode
-    :defer t
-    :hook markdown-mode)
-#+end_src
-
-#+RESULTS:
-| pandoc-mode |
-
 ** mermaid
 #+begin_src emacs-lisp
   (use-package ob-mermaid
@@ -3362,31 +2254,8 @@ exporting markdown
 
 #+RESULTS:
 
-** COMMENT org-pandoc
-https://github.com/kawabata/ox-pandoc
-#+begin_src emacs-lisp
-  (use-package ox-pandoc
-    :after org
-    :custom
-    (org-pandoc-options '((bibliography
-          . "/home/japhir/Documents/References/PhD.bib"))
-          ;; org-pandoc-options-for-docx '((reference-docx
-          ;; . "/home/japhir/SurfDrive/PhD/chapters/wordtemplate.docx"))
-          ))
-#+end_src
-
-#+RESULTS:
-
 ** LaTeX (AUCTeX, RefTeX)
 for working with \LaTeX
-** COMMENT using AUCTeX from AUR
-#+begin_src emacs-lisp
-  ;; recommended way to activate AUCTeX and preview-latex
-  (add-to-list 'load-path "/usr/share/emacs/site-lisp/")
-  (load "auctex.el" nil t t)
-  (load "preview-latex.el" nil t t)
-#+end_src
-
 ** using
 override circular dependency in auctex
 #+begin_src emacs-lisp
@@ -3414,65 +2283,6 @@ override circular dependency in auctex
     (setq-default TeX-master nil)
     (setq reftex-plug-into-AUCTeX t))
 #+end_src
-
-** COMMENT hl-todo
-hmm it does overwrite my nice highlighting of NEXT
-#+begin_src emacs-lisp
-  (use-package hl-todo
-    :bind (:map hl-todo-mode-map
-                ("C-c k" . hl-todo-previous)
-                ("C-c j" . hl-todo-next))
-    :hook ((LaTeX ess ess-r org) . hl-todo-mode))
-#+end_src
-
-#+RESULTS:
-
-** COMMENT helm-bibtex
-#+begin_src emacs-lisp
-  (setq
-   bibtex-completion-notes-path "/home/japhir/SurfDrive/bibliography/notes/"
-   ;; bibtex-completion-bibliography "/home/japhir/SurfDrive/bibliography/references.bib" ; defined elsewhere
-   ;; bibtex-completion-pdf-field "file"
-   bibtex-completion-notes-template-multiple-files
-   (concat
-   "#+title: ${title}\n"
-   "#+created: %u\n"
-   "#+last_modified: %U\n"
-   "#+roam_key: cite:${=key=}\n\n\n"
-   "* TODO Notes\n"
-   ":PROPERTIES:\n"
-   ":Custom_ID: ${=key=}\n"
-   ":NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n"
-   ":AUTHOR: ${author-abbrev}\n"
-   ":JOURNAL: ${journaltitle}\n"
-   ":DATE: ${date}\n"
-   ":YEAR: ${year}\n"
-   ":DOI: ${doi}\n"
-   ":URL: ${url}\n"
-   ":END:\n\n"))
-#+end_src
-
-#+RESULTS:
-#+begin_example
-,#+title: ${title}
-,#+created: %u
-,#+last_modified: %U
-,#+roam_key: cite:${=key=}
-
-
-,* TODO Notes
-:PROPERTIES:
-:Custom_ID: ${=key=}
-:NOTER_DOCUMENT: %(orb-process-file-field "${=key=}")
-:AUTHOR: ${author-abbrev}
-:JOURNAL: ${journaltitle}
-:DATE: ${date}
-:YEAR: ${year}
-:DOI: ${doi}
-:URL: ${url}
-:END:
-
-#+end_example
 
 * secret directories
 These are all the settings that require secret directories, such as my org
