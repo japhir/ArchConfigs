@@ -733,7 +733,6 @@ swyper makes refiling amazing!
                                    (org-lists-file :maxlevel . 2)
                                    (org-someday-file :maxlevel . 2)
                                    (org-work-file :maxlevel . 6)
-                                   ;; (my/org-roam-files :maxlevel . 1) ;; comment out since org-roam-refile
                                    )))
   (org-outline-path-complete-in-steps nil)   ;; Refile in a single go
   (org-refile-use-outline-path 'file)            ;; Show full paths for refiling
@@ -1494,10 +1493,30 @@ https://org-roam.discourse.group/t/creating-an-org-roam-note-from-an-existing-he
       (org-cut-subtree)
       (org-roam-node-find nil title)
       (org-paste-subtree)))
-
-
 #+end_src
 
+** org-roam refile to today
+:PROPERTIES:
+:CREATED:  [2026-03-03 Tue 21:42]
+:END:
+#+begin_src emacs-lisp
+  (defun my/org-refile-to-today-toplevel ()
+      "Refile the current heading to the top level of today's daily note."
+      (interactive)
+      (let* ((today (format-time-string "%Y-%m-%d"))
+             (daily-file (expand-file-name
+                          (concat today ".org")
+                          (expand-file-name
+                           org-roam-dailies-directory
+                           org-roam-directory))))
+        (unless (file-exists-p daily-file)
+          (org-roam-dailies-capture-today t))
+        (org-refile nil nil
+                    (list today daily-file nil 1))))
+
+   (with-eval-after-load 'org
+    (define-key org-mode-map (kbd "C-c n r") #'my/org-refile-to-today-toplevel))
+#+end_src
 ** zaeph's CREATED and LAST_MODIFIED properties
 https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
 #+begin_src emacs-lisp
