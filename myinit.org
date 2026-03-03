@@ -82,13 +82,9 @@ this is handled in [[file:~/.emacs.d/init.el]]
 Use-package is an amazing resource to clean up my init file and have it play
 nice on both my desktop and laptop.
 #+begin_src emacs-lisp
-  (eval-when-compile
-    (require 'use-package))
   (setq use-package-always-ensure t)
   (setq use-package-verbose t)
-  (use-package diminish)  ; to abbreviate lines from the mode-line
   (use-package delight)  ; to omit lines from the mode-line
-  (use-package bind-key)  ; for easy keybindings
 #+end_src
 ** COMMENT quelpa
 #+begin_src emacs-lisp
@@ -135,7 +131,7 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
     "Personal TODO's")
   (defvar org-tickler-file "~/org/tickler.org"
     "Tickler")
-  (defvar org-clumped-file "~/org/clumpednotes.org"
+  (defvar org-work-file "~/org/work.org"
     "Work TODO's")
   (defvar org-notes-file "~/org/notes.org"
     "General Notes and Protocols")
@@ -178,17 +174,16 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
   (global-auto-revert-mode 1)
   (setq global-auto-revert-non-file-buffers t)
 
-  (defalias 'yes-or-no-p 'y-or-n-p)
+  (setq use-short-answers t)
   (setq use-dialog-box nil) ; do not use graphical ui dialog boxes but use echo area (esp. for org-pomodoro)
 
   ;; always follow symlinks w/o asking
-  (require 'vc-hooks)
   (setq vc-follow-symlinks t)
 #+end_src
 ** auto-save
 #+begin_src emacs-lisp
   (setq auto-save-default t  ;; let's try autosave for a while
-        backup-inhibited t
+        make-backup-files nil
         confirm-nonexistent-file-or-buffer nil
         create-lockfiles nil)
 #+end_src
@@ -248,10 +243,11 @@ https://github.com/expez/evil-smartparens
     :hook (smartparens-enabled . evil-smartparens-mode))
 #+end_src
 * change appearance
-** line spacing, underline
+** line spacing, underline, visual line
 #+begin_src emacs-lisp
   (setq-default line-spacing 0)
   (setq x-underline-at-descent-line t)
+  (setq global-visual-line-mode t)
 #+end_src
 ** rainbow-delimiters
 matching parenthesis are highlighted with rainbow colours.
@@ -366,7 +362,6 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
   (use-package visual-fill-column
     :hook (org-mode . visual-fill-column-mode)
     :custom
-    (global-visual-line-mode t)
     ;; (global-visual-fill-column-mode t)
     ;; (visual-fill-column-width 115) ;; instead prefer fill-column-width
     (split-window-preferred-function 'visual-fill-column-split-window-sensibly)
@@ -378,10 +373,19 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
 :END:
 #+begin_src emacs-lisp
   (add-to-list 'display-buffer-alist
-   '("\\*\\(julia\\|R:.*\\)\\*"
+   '("\\*julia\\*"
      (display-buffer-reuse-window display-buffer-in-side-window)
      (side . right)
      (window-width . 0.5)))
+
+  (add-to-list 'display-buffer-alist
+               '(("\\*R:"
+                  display-buffer-in-side-window
+                  (inhibit-same-window . t)
+                  (side . right)
+                  ;; (slot . 2)
+                  ;; (window-width . 0.5)
+                  )))
 #+end_src
 ** define new org-todo faces
 *** org-todo-next
@@ -590,7 +594,6 @@ Highlight diffs of current version-controlled buffer in the margin. Quite cool!
   (use-package diff-hl
     :init
     (global-diff-hl-mode)
-    (setq diff-hl-gutter-mode t)
     (diff-hl-flydiff-mode +1)
     :hook (magit-post-refresh . diff-hl-magit-post-refresh))
 #+end_src
@@ -599,7 +602,11 @@ git porcelain, essential!
 #+begin_src emacs-lisp
   (use-package magit
     :commands magit-status
+    :hook
+    (git-commit-mode . evil-insert-state)
+    ;; (magit-mode . turn-off-evil-snipe-override-mode)
     :config
+    (evil-set-initial-state 'magit-log-edit-mode 'insert)
     (customize-set-variable 'magit-diff-refine-hunk t)
     ;; :after with-editor
     )
@@ -627,16 +634,19 @@ Insert demos after describe function https://github.com/xuchunyang/elisp-demos
     (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
 #+end_src
 ** which-key
+:LOGBOOK:
+- Note taken on [2026-03-03 Tue 19:17] \\
+  now built-in!
+:END:
 #+begin_src emacs-lisp
-  (use-package which-key
-    :config (which-key-mode))
+  (which-key-mode)
 #+end_src
 * custom functions/keyboard shortcuts
 ** revert buffer
 #+begin_src emacs-lisp
   (global-set-key (kbd "<f5>") 'revert-buffer)
 #+end_src
-** fetch calendar
+** COMMENT fetch calendar
 #+begin_src emacs-lisp
   (defun fetch-calendar ()
     (when (internet-up-p) (org-gcal-fetch)))
@@ -649,7 +659,7 @@ Insert demos after describe function https://github.com/xuchunyang/elisp-demos
           (org-agenda-use-time-grid nil))
       (fetch-calendar)
       (org-agenda-list nil (org-read-date nil nil "-2d") 4)
-      (beginend-org-agenda-mode-goto-beginning)))
+      (goto-char (point-min))))
 #+end_src
 ** COMMENT edit heading in indirect buffer
 [[https://www.reddit.com/r/orgmode/comments/fuvdqv/org_notetaking_workflow_with_orgroam/fmhl3ml?utm_source=share&utm_medium=web2x][taken from this reddit thread by alphapapa]]
@@ -874,21 +884,6 @@ this uses gc <word>
     :config
     (evil-commentary-mode))
 #+end_src
-** evil-magit
-:LOGBOOK:
-- Note taken on [2024-10-20 Sun 20:18] \\
-  no longer works, changed evil-magit to magit so my config can live on?
-:END:
-evil keybindings for magit
-#+begin_src emacs-lisp
-  (use-package magit
-    ; :after (magit evil)
-    :hook
-    (git-commit-mode . evil-insert-state)
-    ;; (magit-mode . turn-off-evil-snipe-override-mode)
-    :config
-    (evil-set-initial-state 'magit-log-edit-mode 'insert))
-#+end_src
 * short-doc
 No idea why but suddently I've been getting issues about the function =define-short-documentation-group= not existing. This may fix it?
 #+begin_src emacs-lisp
@@ -907,10 +902,10 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
     "Open the inbox file."
     (interactive)
     (find-file org-in-file))
-  (defun open-clumped-file ()
-     "Open the clumped file."
+  (defun open-work-file ()
+     "Open the work file."
      (interactive)
-     (find-file org-clumped-file))
+     (find-file org-work-file))
   #+end_src
 ** setup
 #+begin_src emacs-lisp
@@ -931,7 +926,7 @@ org-in-file and org-gtd-file are defined in emacsdirs.el (private file).
    ("C-c c" . org-capture)
    ("C-c g" . open-gtd-file)
    ("C-c i" . open-inbox-file)
-   ("C-c t" . open-clumped-file)
+   ("C-c w" . open-work-file)
    ("C-c !" . org-time-stamp-inactive))
 #+end_src
 ** hook
@@ -1090,7 +1085,7 @@ swyper makes refiling amazing!
                                    (org-notes-file :maxlevel . 2)
                                    (org-lists-file :maxlevel . 2)
                                    (org-someday-file :maxlevel . 2)
-                                   (org-clumped-file :maxlevel . 6)
+                                   (org-work-file :maxlevel . 6)
                                    ;; (my/org-roam-files :maxlevel . 1) ;; comment out since org-roam-refile
                                    )))
   (org-outline-path-complete-in-steps nil)   ;; Refile in a single go
@@ -1208,8 +1203,8 @@ Filter tasks by context (sorted by todo state)
 #+end_src
 *** stuck projects
 #+begin_src emacs-lisp
-  (org-tags-exclude-from-inheritance '("prj")
-   org-stuck-projects '("+prj/-CANC-SOME-DONE"
+  (org-tags-exclude-from-inheritance '("prj"))
+  (org-stuck-projects '("+prj/-CANC-SOME-DONE"
                         ("NEXT" "WAIT" "TICK") ()))  ;;  "SOME"
   (org-hierarchical-todo-statistics nil) ;; look for not-done tasks recursively
   ;; (org-provide-todo-statistics '(("NEXT", "TICK") ("CANC", "SOME", "DONE", "WAIT")))
@@ -1477,20 +1472,19 @@ https://gist.github.com/jethrokuan/d6f80caaec7f49dedffac7c4fe41d132
   (require 'org-protocol)
 #+end_src
 
+** org-num settings
+#+begin_src emacs-lisp
+  (with-eval-after-load 'org-num
+    (setq 
+     org-num-skip-unnumbered t
+     org-num-skip-commented t
+     org-num-skip-tags '("ignore" "nolatex" "noexport")))
+#+end_src
+
 ** close use-package org
 #+begin_src emacs-lisp
   )
 #+end_src
-** org-num settings
-#+begin_src emacs-lisp
-  (customize-set-variable 'org-num-skip-unnumbered t)
-  (customize-set-variable 'org-num-skip-commented t)
-  (customize-set-variable 'org-num-skip-tags '("ignore" "nolatex" "noexport"))
-#+end_src
-
-#+RESULTS:
-| ignore | nolatex | noexport |
-
 ** COMMENT display PROPERTIES in agenda
 #+begin_src emacs-lisp
   (use-package org-agenda-property
@@ -1698,11 +1692,10 @@ By default C-x 8 o = ° and C-x 8 m = µ. So:
 #+end_src
 I also use compose-key, mapped to right alt with some custom settings for
 <ralt> g d, resulting in δ, for example.
-** all-the-icons
+** COMMENT all-the-icons
 https://github.com/domtronn/all-the-icons.el
 #+begin_src emacs-lisp
   (use-package all-the-icons)
-  (setq inhibit-compacting-font-caches t)
 #+end_src
 *** COMMENT all-the-icons-ivy
 #+begin_src emacs-lisp
@@ -1716,6 +1709,11 @@ https://github.com/domtronn/all-the-icons.el
   (use-package all-the-icons-dired
     :after (dired all-the-icons)
     :hook (dired-mode . all-the-icons-dired-mode))
+#+end_src
+** nerd-icons
+#+begin_src emacs-lisp
+  (use-package nerd-icons)
+  (use-package nerd-icons-dired)
 #+end_src
 ** COMMENT emojify-mode
 #+begin_src emacs-lisp
@@ -2691,11 +2689,12 @@ completion at point
     :config
     ;; Silence the pcomplete capf, no errors or messages!
     ;; Important for corfu
-    (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
+    ;; (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
 
     ;; Ensure that pcomplete does not write to the buffer
     ;; and behaves as a pure `completion-at-point-function'.
-    (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify)
+    ;; (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify)
+    ; this is obsolete now!
 
     ;; No auto-completion or completion-on-quit in eshell
     (defun crafted-completion-corfu-eshell ()
@@ -2724,15 +2723,17 @@ completion at point
     :ensure nil
     :commands (dired dired-jump)
     :bind (("C-x C-j" . dired-jump))
-    :custom ((dired-listing-switches "-agho --group-directories-first --time-style=iso"))
+    :custom
+    (dired-listing-switches "-agho --group-directories-first --time-style=iso")
+    (dired-kill-when-opening-new-dired-buffer t)
     :config
-    (put 'dired-find-alternate-file 'disabled nil)
+    (put 'dired-find-alternate-file 'disabled t)
     (defun my-dired-up-directory ()
       (interactive)
       (find-alternate-file ".."))
     (evil-collection-define-key 'normal 'dired-mode-map
       "h" #'my-dired-up-directory
-      "l" #'dired-find-alternate-file))
+      "l" #'dired-open-file))
 
   (use-package dired-open
     :config
@@ -3122,15 +3123,6 @@ emacs speaks statistics, work with R etc.
                (string= lang "stan")
                (string= lang "sh")
                (string= lang "latex"))))
-    (setq ess-use-ido nil) ; disable ido, so that vertico etc. are used
-    (add-to-list 'display-buffer-alist
-                 '(("\\*R:"
-                    display-buffer-in-side-window
-                    (inhibit-same-window . t)
-                    (side . right)
-                    ;; (slot . 2)
-                    ;; (window-width . 0.5)
-                    )))
     :custom
     ;; display-buffer-alist
           ;; '(("*R Dired*"
@@ -3242,25 +3234,36 @@ Put spaces around operators such as +, -, etc.
 ** julia
 #+begin_src emacs-lisp
   (use-package julia-mode) ;; for syntax highlighting
-  (use-package julia-repl ;; for fancy REPL
-    :after vterm
-    :hook
-    (julia-mode . julia-repl-mode)
-    (julia-repl . #'julia-repl-use-emacsclient)
-    :config
-    ;; (add-to-list 'display-buffer-alist
-    ;;  '("\\*julia\\*"
-    ;;    (display-buffer-reuse-window display-buffer-in-side-window)
-    ;;    (side . right)
-    ;;    (window-width . 0.5)
-    ;;    (slot . 1)))
-    ;(setq julia-repl-switches "--threads 4")
-    (setq vterm-kill-buffer-on-exit nil)
-    ;; after julia-repl but before using it
-    (julia-repl-set-terminal-backend 'vterm))
+  ;; (use-package julia-repl ;; for fancy REPL
+  ;;   :after vterm
+  ;;   :hook
+  ;;   (julia-mode . julia-repl-mode)
+  ;;   (julia-repl . #'julia-repl-use-emacsclient)
+  ;;   :config
+  ;;   ;; (add-to-list 'display-buffer-alist
+  ;;   ;;  '("\\*julia\\*"
+  ;;   ;;    (display-buffer-reuse-window display-buffer-in-side-window)
+  ;;   ;;    (side . right)
+  ;;   ;;    (window-width . 0.5)
+  ;;   ;;    (slot . 1)))
+  ;;   ;(setq julia-repl-switches "--threads 4")
+  ;;   (setq vterm-kill-buffer-on-exit nil)
+  ;;   ;; after julia-repl but before using it
+  ;;   (julia-repl-set-terminal-backend 'vterm))
+  (use-package julia-vterm
+    :hook (julia-mode . julia-vterm-mode))
+
 #+end_src
 
 #+begin_src emacs-lisp
+  (use-package ob-julia-vterm
+    :config
+    (defalias 'org-babel-execute:julia 'org-babel-execute:julia-vterm)
+    (defalias 'org-babel-variable-assignments:julia 'org-babel-variable-assignments:julia-vterm)
+    )
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
   (use-package org-contrib
     :init
     (require 'ob-julia)
@@ -3516,63 +3519,33 @@ syntax above.
 :PROPERTIES:
 :CREATED:  [2022-09-27 Tue 16:46]
 :END:
-https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
+Emacs 29+ ships treesit built-in. Grammars are compiled native libraries that must be installed once with ~M-x treesit-install-language-grammar~, or via the helper function below.
 #+begin_src emacs-lisp
-  (use-package tree-sitter-langs)
+  (setq treesit-language-source-alist
+        '((bash   "https://github.com/tree-sitter/tree-sitter-bash")
+          (c      "https://github.com/tree-sitter/tree-sitter-c")
+          (python "https://github.com/tree-sitter/tree-sitter-python")
+          (rust   "https://github.com/tree-sitter/tree-sitter-rust")))
 
-  (require 'treesit)
-  ;; (global-tree-sitter-mode)
-  (add-hook 'ess-r-mode-hook #'tree-sitter-hl-mode)
-  (add-hook 'c-mode-hook #'tree-sitter-hl-mode)
-  (add-hook 'rust-mode-hook #'tree-sitter-hl-mode)
-  ;; (add-hook 'ess-r-mode-hook #'tree-sitter-indent-mode)
-  (customize-set-variable 'treesit-font-lock-level 4)
-  ;; (use-package tree-sitter-indent)
-  ;; (use-package tree-sitter-ispell)
-  ;; (use-package tree-sitter-ess-r
-  ;;   :hook (ess-r-mode-hook . tree-sitter-ess-r-mode-activate))
+  (defun my/treesit-install-all-grammars ()
+    "Install every grammar listed in `treesit-language-source-alist'."
+    (interactive)
+    (mapc (lambda (lang)
+            (unless (treesit-language-available-p (car lang))
+              (treesit-install-language-grammar (car lang))))
+          treesit-language-source-alist))
+
+  ;; Transparently redirect old major modes to their ts-mode equivalents.
+  ;; This means existing hooks on e.g. python-mode still fire correctly.
   (setq major-mode-remap-alist
-   '((bash-mode . bash-ts-mode)
-     (c-mode . c-ts-mode)
-     (python-mode . python-ts-mode)
-     (rust-mode . rust-ts-mode)))
+        '((bash-mode   . bash-ts-mode)
+          (c-mode      . c-ts-mode)
+          (python-mode . python-ts-mode)
+          (rust-mode   . rust-ts-mode)))
 
-  (use-package evil-textobj-tree-sitter
-    ;; copied from https://github.com/meain/evil-textobj-tree-sitter README
-    :config
-    ;; bind `function.outer`(entire function block) to `f` for use in things like `vaf`, `yaf`
-    (define-key evil-outer-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.outer"))
-    ;; bind `function.inner`(function block without name and args) to `f` for use in things like `vif`, `yif`
-    (define-key evil-inner-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.inner"))
-    ;; You can also bind multiple items and we will match the first one we can find
-    (define-key evil-outer-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj ("conditional.outer" "loop.outer")))
-    ;; The first arguemnt to `evil-textobj-tree-sitter-get-textobj' will be the capture group to use
-    ;; and the second arg will be an alist mapping major-mode to the corresponding query to use.
-    (define-key evil-outer-text-objects-map "m" (evil-textobj-tree-sitter-get-textobj "import"
-                                                  '((python-mode . [(import_statement) @import])
-                                                    (c-mode . [(preproc_include) @import]))))
-    ;; Goto start of next function
-    (define-key evil-normal-state-map (kbd "]f") (lambda ()
-                                                   (interactive)
-                                                   (evil-textobj-tree-sitter-goto-textobj "function.outer")))
-    ;; Goto start of previous function
-    (define-key evil-normal-state-map (kbd "[f") (lambda ()
-                                                   (interactive)
-                                                   (evil-textobj-tree-sitter-goto-textobj "function.outer" t)))
-    ;; Goto end of next function
-    (define-key evil-normal-state-map (kbd "]F") (lambda ()
-                                                   (interactive)
-                                                   (evil-textobj-tree-sitter-goto-textobj "function.outer" nil t)))
-    ;; Goto end of previous function
-    (define-key evil-normal-state-map (kbd "[F") (lambda ()
-                                                   (interactive)
-                                                   (evil-textobj-tree-sitter-goto-textobj "function.outer" t t)))
-    )
+  ;; Level 4 enables all available highlighting; default is 3.
+  (setq treesit-font-lock-level 4)
 #+end_src
-
-#+RESULTS:
-: t
-
 * reset gc-cons-threshold
 #+begin_src emacs-lisp
   (setq gc-cons-threshold 16777216
