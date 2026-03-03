@@ -1,0 +1,52 @@
+// DMS Window Rules - Managed by DankMaterialShell
+// Do not edit manually - changes may be overwritten
+window-rule {
+    match app-id=r#"^org\.gnome\."#
+    draw-border-with-background false
+    geometry-corner-radius 12
+    clip-to-geometry true
+}
+
+window-rule {
+    match app-id=r#"^org\.wezfurlong\.wezterm$"#
+    match app-id="Alacritty"
+    match app-id="zen"
+    match app-id="com.mitchellh.ghostty"
+    match app-id="kitty"
+    draw-border-with-background false
+    opacity 0.9
+}
+
+window-rule {
+    match is-active=false
+    opacity 0.9
+}
+
+window-rule {
+    geometry-corner-radius 12
+    clip-to-geometry true
+}
+
+// Open DMS windows as floating by default
+window-rule {
+    match app-id=r#"org.quickshell$"#
+    open-floating true
+}
+
+// @id=wr_1772032505879910010 @name=emacs
+window-rule {
+    match app-id="^emacs$"
+    open-maximized-to-edges true
+}
+
+// @id=wr_1772034779309332181 @name=firefox
+window-rule {
+    match app-id="^firefox$"
+    open-maximized-to-edges true
+}
+
+// @id=wr_1772035799850145926 @name=thunar
+window-rule {
+    match app-id="^thunar$" title="^Rename"
+    open-floating true
+}
