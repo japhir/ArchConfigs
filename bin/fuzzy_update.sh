@@ -1,7 +1,7 @@
 #!/bin/bash
 
 while true; do
-	fuzzy_time=$(fuzzy_clock)
+	fuzzy_time=$(bash-fuzzy-clock)
 	current_time=$(date +%R)
 
 	hour=${current_time:0:2}
