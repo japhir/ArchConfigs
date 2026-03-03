@@ -1514,8 +1514,41 @@ https://org-roam.discourse.group/t/creating-an-org-roam-note-from-an-existing-he
         (org-refile nil nil
                     (list today daily-file nil 1))))
 
-   (with-eval-after-load 'org
-    (define-key org-mode-map (kbd "C-c n r") #'my/org-refile-to-today-toplevel))
+#+end_src
+** refile to daily based on CREATED property
+#+begin_src emacs-lisp
+    (defun my/org-refile-to-created-date ()
+      "Refile the current heading to the end of the daily note matching
+  its CREATED property.  Creates the daily note if it doesn't exist."
+      (interactive)
+      (let* ((created (org-entry-get (point) "CREATED"))
+             (_ (unless created
+                  (user-error "No CREATED property found on this heading")))
+             (date (if (string-match
+                        "\\[\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\)"
+                        created)
+                       (match-string 1 created)
+                     (user-error "Could not parse date from CREATED: %s" created)))
+             (daily-file (expand-file-name
+                          (concat date ".org")
+                          (expand-file-name
+                           org-roam-dailies-directory
+                           org-roam-directory))))
+        (unless (file-exists-p daily-file)
+          (with-temp-file daily-file
+            (insert (format "#+title: %s\n#+created: [%s]\n#+last_modified:\n"
+                            date date)))
+          (org-roam-db-update-file daily-file))
+        (let ((end-pos (with-current-buffer (find-file-noselect daily-file)
+                         (point-max))))
+          (org-refile nil nil (list date daily-file nil end-pos)))
+        (message "Refiled to daily note for %s" date)))
+#+end_src
+** set up keybinds
+#+begin_src emacs-lisp
+  (with-eval-after-load 'org
+    (define-key org-mode-map (kbd "C-c n r") #'my/org-refile-to-today-toplevel)
+    (define-key org-mode-map (kbd "C-c n R") #'my/org-refile-to-created-date))
 #+end_src
 ** zaeph's CREATED and LAST_MODIFIED properties
 https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
