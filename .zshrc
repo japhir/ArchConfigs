@@ -71,6 +71,9 @@ alias weather='curl "wttr.in/Utrecht?format=v2"'
 alias fetch="fastfetch"
 alias neofetch="fastfetch"
 
+# fix ghostty Ctrl+[
+bindkey '^[[91;5u' vi-cmd-mode
+
 # countdown in seconds
 # useful to countdown block_distractions
 function countdown(){
@@ -139,5 +142,6 @@ function y() {
 if [ "$(tty)" = "/dev/tty1" ]; then
     #sway
     # hyprland
-    start-hyprland
+    # start-hyprland
+    niri-session
 fi
