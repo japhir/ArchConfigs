@@ -345,6 +345,8 @@ Highlight diffs of current version-controlled buffer in the margin. Quite cool!
 ** magit
 git porcelain, essential!
 #+begin_src emacs-lisp
+  (use-package transient
+    :ensure (:host github :repo "magit/transient"))
   (use-package magit
     :commands magit-status
     :hook
@@ -470,8 +472,16 @@ I still prefer this option because I have colours during my session/in the ESS p
 ** internet up
 #+begin_src emacs-lisp
   (defun internet-up-p (&optional host)
-    (= 0 (call-process "ping" nil nil nil "-c" "1" "-W" "1"
+    (= 0 (call-process "ping" nil nil nil "-c" "1"
+                       ;; -W is seconds on Linux, milliseconds on macOS
+                       (if (eq system-type 'darwin) "-W" "-W") "1"
                        (if host host "www.google.com"))))
+#+end_src
+
+** firefox as default browser
+#+begin_src emacs-lisp
+  (when (eq system-type 'darwin)
+    (setq browse-url-browser-function 'browse-url-default-macosx-browser))
 #+end_src
 
 ** allow editing text fields in firefox
@@ -686,12 +696,12 @@ basic latex settings
 #+begin_src emacs-lisp
   (org-file-apps
    '((auto-mode . emacs)
-     ("\\.x?html?\\'" . "xdg-open %s")
+     ("\\.x?html?\\'" . "open %s")
      ("\\.pdf\\'" . (lambda (file link)
                       (org-pdftools-open link)))
-     ("\\.mp4\\'" . "xdg-open %s")
-     ("\\.webm\\'" . "xdg-open %s")
-     ("\\.mkv\\'" . "xdg-open %s")
+     ("\\.mp4\\'" . "open %s")
+     ("\\.webm\\'" . "open %s")
+     ("\\.mkv\\'" . "open %s")
      ("\\.pdf.xoj\\'" . "xournal %s")))
 #+end_src
 
@@ -1222,12 +1232,14 @@ usefull snippets for me: org-mode (fig_, )
 ** ispell: spell-checking
 #+begin_src emacs-lisp
   (use-package ispell
+    :ensure nil
     :config
     (setq ispell-dictionary "british-ize-w_accents"))
 #+end_src
 ** flyspell
 #+begin_src emacs-lisp
   (use-package flyspell
+    :ensure nil
     :hook (;(org-mode . flyspell-mode)
            (prog-mode . flyspell-prog-mode))
     :config
@@ -1300,6 +1312,7 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
 
 #+begin_src emacs-lisp
   (use-package citar-embark
+    :ensure nil
     :after citar embark
     :no-require
     :config
@@ -1749,6 +1762,7 @@ autocompletion replacement!
 #+begin_src emacs-lisp
   ;; Use Dabbrev with Corfu!
   (use-package dabbrev
+    :ensure nil
     ;; Swap M-/ and C-M-/
     :bind (("M-/" . dabbrev-completion)
            ("C-M-/" . dabbrev-expand))
@@ -1860,7 +1874,8 @@ From https://tvraman.github.io/emacspeak/blog/augment-emacs-with-zoxide.html
 
 #+begin_src emacs-lisp
   ;; (global-set-key (kbd "C-; j") #'dired-zoxide)
-  (define-key evil-normal-state-map (kbd "gz") #'dired-zoxide)
+  (with-eval-after-load 'evil
+    (define-key evil-normal-state-map (kbd "gz") #'dired-zoxide))
 #+end_src
 * email
 ** smtp
