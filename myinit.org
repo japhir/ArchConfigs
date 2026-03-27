@@ -1767,6 +1767,17 @@ autocompletion replacement!
       (keymap-set corfu-map "M-p" #'corfu-popupinfo-scroll-down)
       (keymap-set corfu-map "M-n" #'corfu-popupinfo-scroll-up)
       (keymap-set corfu-map "M-d" #'corfu-popupinfo-toggle))
+    (defvar my-corfu-reclaim-focus nil)
+    (add-hook 'completion-in-region-mode-hook
+      (lambda ()
+        (unless completion-in-region-mode
+          (setq my-corfu-reclaim-focus t))))
+    (add-function :after after-focus-change-function
+      (lambda ()
+        (when my-corfu-reclaim-focus
+          (setq my-corfu-reclaim-focus nil)
+          (unless (seq-some #'frame-focus-state (frame-list))
+            (call-process "open" nil nil nil "-a" "Emacs")))))
     :custom
     (text-mode-ispell-word-completion nil))
 #+end_src

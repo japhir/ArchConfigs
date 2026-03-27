@@ -1,0 +1,172 @@
+# syntax=toml
+#
+# Example configuration for Paneru.
+#
+[options]
+# Enables focus follows mouse. Enabled by default, set to false to disable.
+# focus_follows_mouse = true
+
+# Array of widths used by the `window_resize` action to cycle between.
+# Defaults to 25%, 33%, 50%, 66% and 75%.
+preset_column_widths = [ 0.25, 0.33, 0.50, 0.66, 0.75 ]
+
+# How many fingers to use for moving windows left and right.
+# Make sure that it doesn't clash with OS setting for workspace switching.
+# Values lower than 3 will be ignored.
+# Remove the line to disable the gesture feature.
+# Apple touchpads support gestures with more than five fingers (!),
+# but it is probably not that useful to use two hands :)
+swipe_gesture_fingers = 4
+
+# Which direction should windows move with a swipe gesture.
+# "Natural" => Swipe fingers to the right, windows move to the right.
+# "Reversed" => Swipe fingers to the right, windows move to the left.
+# Default: "Natural"
+# swipe_gesture_direction = "Natural"
+
+# Swiping keeps sliding windows until the first or last window.
+# Set to false to clamp so edge windows stay on-screen. Enabled by default.
+# continuous_swipe = true
+
+# Animation speed in 1/10th of display resolution per second.
+# E.g. a value of 20 means: move at a speed of two display sizes per second.
+# To disable animations, leave this unset or set to a very large value.
+# default 50
+animation_speed = 30
+
+
+# Automatically center the focused window when switching focus with keyboard,
+# i.e. 'window_focus_west' or 'window_focus_east'.
+# auto_center = false
+
+# Height of off-screen window slivers as a ratio (0.0–1.0) of the display
+# height. Lower values hide the window's corner radius at screen edges.
+# Default: 1.0 (full height, no inset).
+# sliver_height = 1.0
+
+# Width of off-screen window slivers in pixels. Controls how much of an
+# off-screen window peeks from the screen edge.
+# Default: 5 pixels.
+# sliver_width = 5
+
+# Padding applied at screen edges (in pixels). Independent from the
+# between-window gaps set by per-window horizontal/vertical_padding.
+# Default: 0 on all sides.
+# padding_top = 0
+# padding_bottom = 0
+# padding_left = 0
+# padding_right = 0
+
+# Override the system-reported menubar height (in pixels).
+# Useful when auto-hiding the menubar or when the detected value is wrong.
+# When unset, the height reported by macOS is used.
+# menubar_height = 25
+
+# draw a border around the active window
+#border_active_window = false
+#border_color = "#89b4fa"
+# too buggy
+
+[bindings]
+# Moves the focus between windows. If there are no windows when moving up or
+# down, will swtich focus to the display above or below.
+window_focus_west = ["cmd - h", "cmd - leftarrow"]
+window_focus_east = ["cmd - l", "cmd - rightarrow"]
+window_focus_north = ["cmd - k", "cmd - uparrow"]
+window_focus_south = ["cmd - j", "cmd - downarrow"]
+
+# Swaps windows in chosen direction. If there are no windows to swap, will
+# move the window to a display above or below.
+window_swap_west = "cmd + shift - h"
+window_swap_east = "cmd + shift - l"
+window_swap_north = "cmd + shift - k"
+window_swap_south = "cmd + shift - j"
+
+# Jump to the left-most or right-most windows.
+#window_focus_first = "cmd + shift - h"
+#window_focus_last = "cmd + shift - l"
+
+# Move the current window into the left-most or right-most positions.
+#window_swap_first = "alt + shift - h"
+#window_swap_last = "alt + shift - l"
+
+# Centers the current window on screen.
+window_center = "cmd + shift - c"
+
+# Cycles between the window sizes defined in the `preset_column_widths` option.
+window_resize = "cmd - r"
+
+# Cycles backwards through `preset_column_widths`.
+window_shrink = "cmd + shift - y"
+window_grow = "cmd + shift - o"
+
+# Toggle full width for the current focused window.
+window_fullwidth = "cmd + shift - f"
+
+# Toggles the window for management. If unmanaged, the window will be "floating".
+window_manage = "cmd + shift - space"
+
+# Stacks and unstacks a window into the left column. Each window gets a 1/N of the height.
+window_stack = "cmd - ["
+window_unstack = "cmd - ]"
+
+# Moves currently focused window to the next display.
+window_nextdisplay = "cmd + shift - l"
+
+# Moves the mouse pointer to the next display.
+mouse_nextdisplay = "shift + alt - l"
+
+# Size stacked windows in the column to equal heights.
+#window_equalize = "cmd + shift - e"
+
+# Quits the window manager.
+quit = "ctrl + alt - q"
+
+# Window properties, matched by a RegExp title string.
+[windows]
+
+[windows.pip]
+# Title RegExp pattern is required.
+title = "Picture.*(in)?.*[Pp]icture"
+# Do not manage this window, e.g. it will be floating.
+floating = true
+
+[windows.neovide]
+# Matches an editor by title and always inserts its window at index 1,
+# a specific initial width (as a ratio of display width),
+# and let some bindings pass through.
+# Note: bundle_id is optional. Some apps (e.g. plain binaries) do not
+# report one, so matching by title alone is often more reliable.
+title = "Neovide.*"
+index = 1
+width = 0.5
+bindings_passthrough = ["ctrl-h", "ctrl-l"]
+
+[windows.popup]
+# Matches a popup and silently appends it at the end.
+title = "Unimportant popup window"
+dont_focus = true
+index = 100
+
+
+[windows.passwords]
+# Floating window placed on a grid. The format is "cols:rows:x:y:w:h".
+# This divides the display into a 6x6 grid and places the window at cell (1,1)
+# spanning 4 columns and 4 rows — roughly centered covering 2/3 of the display.
+title = "Passwords.*"
+floating = true
+grid = "6:6:1:1:4:4"
+
+[windows.firefox]
+title = "Firefox.*"
+bindings_passthrough = ["cmd-l"]
+
+[windows.all]
+# Matches all windows and adds a few pixels of spacing to their borders.
+# Note: horizontal_padding and vertical_padding create gaps on all sides of
+# each window. At screen edges, the gap is cancelled out so padding only
+# appears between windows. Use the [options] padding_* settings above to
+# control screen edge margins independently.
+title = ".*"
+horizontal_padding = 4
+vertical_padding = 2
