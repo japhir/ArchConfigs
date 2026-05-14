@@ -6,7 +6,7 @@ binds {
 
     // === Application Launchers ===
     Mod+Return hotkey-overlay-title="Open Terminal" { spawn "ghostty"; }
-    Mod+D hotkey-overlay-title="Application Launcher" {
+    Mod+D repeat=false hotkey-overlay-title="Application Launcher" {
         spawn "dms" "ipc" "call" "spotlight" "toggle";
    }
     Mod+V hotkey-overlay-title="Clipboard Manager" {
@@ -60,6 +60,11 @@ binds {
         spawn "dms" "ipc" "call" "processlist" "focusOrToggle";
     }
 
+    Mod+Shift+R hotkey-overlay-title="Reload Niri" {
+        spawn "dms" "restart";
+    }
+    // load-config-file;
+
     // === Audio Controls ===
     XF86AudioRaiseVolume allow-when-locked=true {
         spawn "dms" "ipc" "call" "audio" "increment" "3";
@@ -103,6 +108,7 @@ binds {
     // === Window Management ===
     Mod+Shift+Q repeat=false { close-window; }
     Mod+F { maximize-column; }
+    Mod+Ctrl+F { maximize-window-to-edges; }
     Mod+Shift+F { fullscreen-window; }
     Mod+Shift+Space { toggle-window-floating; }
     Mod+Space { switch-focus-between-floating-and-tiling; }
@@ -137,7 +143,7 @@ binds {
 
     // === Monitor Navigation ===
     Mod+Ctrl+Left  { focus-monitor-left; }
-    //Mod+Ctrl+Down  { focus-monitor-down; }
+    // Mod+Ctrl+Down  { focus-monitor-down; }
     //Mod+Ctrl+Up    { focus-monitor-up; }
     Mod+Ctrl+Right { focus-monitor-right; }
     Mod+Ctrl+H     { focus-monitor-left; }
@@ -192,24 +198,24 @@ binds {
     Mod+Ctrl+Shift+WheelScrollDown { move-column-right; }
     Mod+Ctrl+Shift+WheelScrollUp   { move-column-left; }
 
-    // === Numbered Workspaces ===
-    Mod+1 { focus-workspace 1; }
-    Mod+2 { focus-workspace 2; }
-    Mod+3 { focus-workspace 3; }
-    Mod+4 { focus-workspace 4; }
-    Mod+5 { focus-workspace 5; }
-    Mod+6 { focus-workspace 6; }
+    // === Named Workspaces ===
+    Mod+1 { focus-workspace "terminal"; }
+    Mod+2 { focus-workspace "browser"; }
+    Mod+3 { focus-workspace "emacs"; }
+    Mod+4 { focus-workspace "docs"; }
+    Mod+5 { focus-workspace "chat"; }
+    Mod+6 { focus-workspace "design"; }
     Mod+7 { focus-workspace 7; }
     Mod+8 { focus-workspace 8; }
     Mod+9 { focus-workspace 9; }
 
-    // === Move to Numbered Workspaces ===
-    Mod+Shift+1 { move-column-to-workspace 1; }
-    Mod+Shift+2 { move-column-to-workspace 2; }
-    Mod+Shift+3 { move-column-to-workspace 3; }
-    Mod+Shift+4 { move-column-to-workspace 4; }
-    Mod+Shift+5 { move-column-to-workspace 5; }
-    Mod+Shift+6 { move-column-to-workspace 6; }
+    // === Move to Named Workspaces ===
+    Mod+Shift+1 { move-column-to-workspace "terminal"; }
+    Mod+Shift+2 { move-column-to-workspace "browser"; }
+    Mod+Shift+3 { move-column-to-workspace "emacs"; }
+    Mod+Shift+4 { move-column-to-workspace "docs"; }
+    Mod+Shift+5 { move-column-to-workspace "chat"; }
+    Mod+Shift+6 { move-column-to-workspace "design"; }
     Mod+Shift+7 { move-column-to-workspace 7; }
     Mod+Shift+8 { move-column-to-workspace 8; }
     Mod+Shift+9 { move-column-to-workspace 9; }
@@ -221,9 +227,9 @@ binds {
 
     // === Sizing & Layout ===
     Mod+R { switch-preset-column-width; }
-    Mod+Shift+R { switch-preset-window-height; }
+    // Mod+Shift+R { switch-preset-window-height; }
     Mod+Ctrl+R { reset-window-height; }
-    Mod+Ctrl+F { expand-column-to-available-width; }
+    // Mod+Ctrl+F { expand-column-to-available-width; }
     Mod+C { center-column; }
     Mod+Ctrl+C { center-visible-columns; }
 

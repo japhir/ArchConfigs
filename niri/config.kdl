@@ -301,6 +301,25 @@ recent-windows {
     }
 }
 
+workspace "terminal" {
+        open-on-output "eDP-1"
+}
+workspace "browser" {
+        open-on-output "DP-1"
+}
+workspace "emacs" {
+        open-on-output "DP-1"
+}
+workspace "docs" {
+        open-on-output "DP-1"
+}
+workspace "chat" {
+        open-on-output "eDP-1"
+}
+workspace "design" {
+        open-on-output "DP-1"
+}
+
 // Include dms files
 include "dms/colors.kdl"
 include "dms/layout.kdl"
