@@ -193,6 +193,7 @@ environment {
   ELECTRON_OZONE_PLATFORM_HINT "auto"
   QT_QPA_PLATFORMTHEME "gtk3"
   QT_QPA_PLATFORMTHEME_QT6 "gtk3"
+  MOZ_ENABLE_WAYLAND "1"
 }
 hotkey-overlay {
     skip-at-startup

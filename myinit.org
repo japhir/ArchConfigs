@@ -474,12 +474,6 @@ I still prefer this option because I have colours during my session/in the ESS p
                        (if host host "www.google.com"))))
 #+end_src
 
-** firefox as default browser
-#+begin_src emacs-lisp
-  (setq browse-url-generic-program (executable-find "firefox")
-        browse-url-browser-function 'browse-url-generic)
-#+end_src
-
 ** allow editing text fields in firefox
 from https://chainsawriot.com/postmannheim/2022/12/16/aoe16.html
 #+begin_src emacs-lisp
@@ -1132,7 +1126,15 @@ https://gist.github.com/jethrokuan/d6f80caaec7f49dedffac7c4fe41d132
     :after org
     :hook
     (org-mode . org-modern-mode)
-    (org-agenda-finalize . org-modern-agenda))
+    (org-agenda-finalize . org-modern-agenda)
+    :custom
+    (org-modern-table nil))
+#+end_src
+** valign for tables
+#+begin_src emacs-lisp
+  (use-package valign
+    :hook (org-mode . valign-mode)
+    :custom (valign-fancy-bar t))
 #+end_src
 ** ob-async
 allow asyncronous code block evaluation https://github.com/astahlman/ob-async
@@ -2345,16 +2347,22 @@ syntax above.
   (load "~/.emacs.d/secretdirs.el" t)
 #+end_src
 
-* NEXT tree-sitter
+* tree-sitter
 :PROPERTIES:
 :CREATED:  [2022-09-27 Tue 16:46]
 :END:
+:LOGBOOK:
+- Note taken on [2026-03-03 Tue 21:49] \\
+  finally updated this so it works with builtin setup
+:END:
 Emacs 29+ ships treesit built-in. Grammars are compiled native libraries that must be installed once with ~M-x treesit-install-language-grammar~, or via the helper function below.
+
 #+begin_src emacs-lisp
   (setq treesit-language-source-alist
         '((bash   "https://github.com/tree-sitter/tree-sitter-bash")
           (c      "https://github.com/tree-sitter/tree-sitter-c")
           (python "https://github.com/tree-sitter/tree-sitter-python")
+          (kdl "https://github.com/tree-sitter-grammars/tree-sitter-kdl")
           (rust   "https://github.com/tree-sitter/tree-sitter-rust")))
 
   (defun my/treesit-install-all-grammars ()
