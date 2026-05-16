@@ -1,37 +1,76 @@
-* daily review of %U
-** close out today
-- [ ] clear physical desktop / inbox / notebook %i
-- [ ] clear Downloads folder / Screenshots(?)
+* daily review of %U [/]
+a short end-of-day pass — ~15–20 min. same two phases as the weekly review
+(get clear, get current) so the GTD shape becomes muscle memory. the weekly
+does the deep work; the daily keeps the system trusted in between.
+
+** get clear [/]
+all open loops out of your head and inboxes, into the system.
+
+*** NEXT collect — head, desk, screen
+desk / notebook %i, Downloads + Screenshots, anything from today not yet
+captured. just capture — don't process yet.
 #+begin_src emacs-lisp
   (dired "~/Downloads")
-  (image-dired "~/Downloads")
 #+end_src
-- [ ] collect calendar open loops (+- 2 days) -> reschedule appointments/tasks or unschedule them
 #+begin_src emacs-lisp
-(my-org-agenda-recent-open-loops)
+  (org-timer-set-timer 2)
 #+end_src
-- [ ] clear email inboxes---capture with either C-S-l (org-capture) or Super+c
+
+*** NEXT process every inbox with the decision tree [/]
+one pass, every inbox. for each item ask: is it actionable?
+- no  → trash, or SOME (someday), or reference (org-roam)
+- yes → what is the next action? <2 min: do it now. else delegate → WAIT,
+  or defer → SCHEDULE. more than one action → make it a :prj: with an outcome.
+(full tree: [[file:weekly_review.org]])
+- [ ] inbox.org + mobin.org
+- [ ] email — hawaii, solis, gmail
+- [ ] Teams / other message streams
+- [ ] stray TODO headings in org-roam dailies → refile out
+#+begin_src emacs-lisp
+  (org-agenda nil "i")
+#+end_src
 #+begin_src emacs-lisp
   (progn
     (browse-url "https://mail.google.com/mail/u/0")
     (browse-url "https://outlook.office.com/mail/inbox"))
 #+end_src
-- [ ] process streams (Teams, [[https://www.twitter.com][Twitter]]) as inboxes -- record tasks, read it later, file notes
-- [ ] capture any remaining open loops as tasks
-- [ ] schedule + refile tasks in [[file:inbox.org][Inbox]] -> [[file:todo.org][Personal]], or [[file:clumpednotes.org][Work]]
-- [ ] look through each Project or Area and order actions by importance or critical path
-** plan tomorrow
-- [ ] look through Project + Area, focus on top 2--3 actions
-  - [ ] what is the one thing I could do tomorrow such that by doing it, everything else will be easier or unnecessary?
-  - [ ] decide/schedule actions for tomorrow
 #+begin_src emacs-lisp
-  (find-file "~/org/clumpednotes.org")
-  (org-sparse-tree)
+  (mu4e)
 #+end_src
-- [ ] schedule today's tasks (immersive morning -> process afternoon, deep -> shallow)
 #+begin_src emacs-lisp
-  (progn
-    (org-agenda nil "a")
-    (org-agenda-day-view))
+  (org-timer-set-timer 8)
 #+end_src
-- [ ] clock out
+
+** get current [/]
+make the agenda one you can trust tomorrow morning.
+
+*** NEXT close today — done, clock, recent calendar
+mark finished items DONE and clock out. review the last ~2 days of calendar
+and the Overdue block: each stale date gets done, rescheduled, or unscheduled.
+#+begin_src emacs-lisp
+  (my-org-agenda-recent-open-loops)
+#+end_src
+#+begin_src emacs-lisp
+  (org-agenda nil "A")
+#+end_src
+#+begin_src emacs-lisp
+  (org-timer-set-timer 3)
+#+end_src
+
+*** NEXT every active project has a next action
+the core GTD check. the stuck-projects view lists every :prj: with no
+NEXT/WAIT/TICK — give each a concrete, physical next action. a project
+sitting on a date is not yet a doable thing.
+#+begin_src emacs-lisp
+  (org-agenda nil "#")
+#+end_src
+#+begin_src emacs-lisp
+  (org-timer-set-timer 3)
+#+end_src
+
+*** NEXT pick tomorrow's ONE thing
+of tomorrow's actions: what one thing, done, makes the rest easier or
+unnecessary? mark it, plus 1–2 backups. tomorrow morning needs no deciding.
+#+begin_src emacs-lisp
+  (org-timer-set-timer 1)
+#+end_src

@@ -867,6 +867,8 @@ customize capture templates
        "* %?\nEntered on %U\n %i\n %a")
       ("r" "Weekly Review" entry (file "~/org/log.org")
        (file "~/org/weekly_review.org") :clock-in t :clock-keep t :jump-to-captured t)
+      ("d" "Daily Review" entry (file "~/org/log.org")
+       (file "~/org/daily_review.org") :clock-in t :clock-keep t :jump-to-captured t)
       ("p" "Protocol" entry (file org-in-file)
        "* %:description%? :@web:\n[[%:link][%:description]]\n#+begin_quote\n%:initial\n#+end_quote\n" :add-created t)
       ("L" "Protocol Link" entry (file org-in-file)
