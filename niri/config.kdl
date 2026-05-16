@@ -306,19 +306,19 @@ workspace "terminal" {
         open-on-output "eDP-1"
 }
 workspace "browser" {
-        open-on-output "DP-1"
+        open-on-output "LG Electronics W2261 0x0002CF35"
 }
 workspace "emacs" {
-        open-on-output "DP-1"
+        open-on-output "LG Electronics W2261 0x0002CF35"
 }
 workspace "docs" {
-        open-on-output "DP-1"
+        open-on-output "LG Electronics W2261 0x0002CF35"
 }
 workspace "chat" {
         open-on-output "eDP-1"
 }
 workspace "design" {
-        open-on-output "DP-1"
+        open-on-output "LG Electronics W2261 0x0002CF35"
 }
 
 // Include dms files
