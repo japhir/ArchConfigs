@@ -1,0 +1,162 @@
+* weekly review of %U [0/0]
+optionally, follow along with the [[https://gettingthingsdone.com/2015/07/podcast-07-guided-gtd-weekly-review/][audio guide]]
+** get clear weekly review [0/4]
+10--15 minutes max! the main focus should be the get current part!
+*** NEXT physical collection: collect all the paper in my surroundings and inbox it
+#+begin_src emacs-lisp
+  (org-timer-set-timer 2)
+#+end_src
+*** NEXT mental collection
+#+begin_src emacs-lisp
+  (org-timer-set-timer 5)
+#+end_src
+*** NEXT process the "stuff" in your inbox [0/10]
+only spend a certain amount of time, if you don't make it estimate how
+long it'll take you --> schedule that in your calendar. OR split up into two:
+get clear (this part) and get current.
+#+begin_src emacs-lisp
+  (org-timer-set-timer 6)
+#+end_src
+what is it? is it actionable?
+   no
+     → trash → dd
+     → tickler → change status to ~TICK~, C-c C-s SCHEDULE
+     → someday/maybe → change status to ~SOME~, refile to project or [[file:someday.org]]
+     → reference -> org-roam-refile to today's daily note
+   yes → what's the next action? <2m? do it now
+   *delegate*? -> email/ask someone, then change status to ~WAIT~
+   *defer*? -> C-c C-s SCHEDULE for some future date
+   if it's a *next action*:
+    → rephrase headline: verb, no reference to "it/this"
+    → t n on heading to change status to ~NEXT~
+    → C-c C-w refile
+   if it's a *project*:
+     → what's the desired outcome?
+     → add ~[/]~ to beginning of line and C-c C-c on it to make it track the tasks
+     → C-c C-c j on heading to add :prj: tag
+     → C-c C-x p set CATEGORY property (for nice agenda)
+     → if desired: C-c l to org-store-link, which adds an org-ID making it an org-roam node
+- [ ] inbox [[file:inbox.org]]
+- [ ] mobile inbox [[file:mobin.org]]
+#+begin_src emacs-lisp
+  (org-agenda nil "i")
+#+end_src
+- [ ] hawaii mail → C-m ; h
+- [ ] solismail      → C-m ; s
+- [ ] gmail            [[https://mail.google.com]]
+- [ ] github          [[https://github.com]]
+- [ ] teams           → launch teams-for-linux
+- [ ] Zotero new articles?  → Mod+4, sort by recently added
+- [ ] tabs in ff     → Mod+2
+- [ ] tabs on android
+**** how much time would you need to process IN to 0? schedule!
+2:00 hours?
+go into [[https://calendar.google.com][calendar]], find that time to finish processing
+
+*** NEXT mental collection: empty head, uncaptured projects/ideas etc.
+** get current weekly review [0/8]
+*** NEXT go over all NEXT items and make sure they are actually physical next actions
+#+begin_src emacs-lisp
+  (org-timer-set-timer 5)
+#+end_src
+by context?
+
+when you're doing work, you only want to see "these are the options I want to see". Are they actually NEXT? Do they have a verb?
+
+C-c a n
+#+begin_src emacs-lisp
+  (org-agenda nil "n")
+#+end_src
+
+*** NEXT go back into previous calendar data!
+#+begin_src emacs-lisp
+  (org-timer-set-timer 2)
+#+end_src
+
+~2 weeks or so. See if there are no loose threads!
+
+look at upcoming events --> capture. Is enough time for organizing? Do I need to block out time?
+#+begin_src emacs-lisp
+  (progn
+    (org-agenda nil "a")
+    (org-agenda-earlier 2))
+#+end_src
+cycle to the previous, current and next weeks with ~]~.
+#+begin_src emacs-lisp
+  (my-org-agenda-recent-open-loops)
+#+end_src
+*** NEXT review upcoming calendar
+#+begin_src emacs-lisp
+  (org-timer-set-timer 2)
+#+end_src
+
+Are you leaving enough space in your calendar for doing-time and for clearing-up time? Do you need to block out time?
+
+*** NEXT check that all TICK's have scheduled times  :@schedule: :@computer:
+#+begin_src emacs-lisp
+  (org-todo-list 3)
+#+end_src
+*** NEXT review waiting for list, as often as needed
+#+begin_src emacs-lisp
+  (org-timer-set-timer 2)
+#+end_src
+
+#+begin_src emacs-lisp
+  (org-agenda nil "w")
+#+end_src
+*** NEXT review project list/larger outcome lists
+#+begin_src emacs-lisp
+  (org-timer-set-timer 6)
+#+end_src
+
+bumping up to a higher level. No project planning, just schedule time to get projects unstuck etc. one by one, >1 NEXT per item, planning?
+
+stuck projects
+#+begin_src emacs-lisp
+  (org-agenda nil "#")
+#+end_src
+
+go over project list and make sure they all have verbs/intended outcomes
+#+begin_src emacs-lisp
+  (org-agenda nil "j")
+#+end_src
+sometimes just do a project review!
+*** NEXT review relevant checklists. travel, garden-fall etc.
+#+begin_src emacs-lisp
+  (org-timer-set-timer 1)
+#+end_src
+
+Trigger for NEXT actions. also see [[file:life.org]] areas of focus
+#+begin_src emacs-lisp
+  (progn
+    (find-file-other-window "~/org/life.org")
+    (find-file-other-window "~/org/triggerlist2.org"))
+#+end_src
+
+*** NEXT go over raw GTD files to check if perhaps some things are not labelled as projects
+C-c C-o on these lines
+[[file:todo.org]]
+[[file:clumpednotes.org]]
+or C-c C-c here
+#+begin_src emacs-lisp
+  (progn
+    (find-file-other-window "~/org/todo.org")
+    (find-file-other-window "~/org/clumpednotes.org"))
+#+end_src
+
+** get creative weekly review [0/3]
+*** NEXT review someday/maybe lists
+#+begin_src emacs-lisp
+  (org-timer-set-timer 1)
+#+end_src
+
+#+begin_src emacs-lisp
+  (progn
+    (org-todo-list 4)
+    (find-file-other-window "~/org/someday.org"))
+#+end_src
+*** NEXT be creative: think about what now opens up now that you're clear
+#+begin_src emacs-lisp
+  (org-timer-set-timer 1)
+#+end_src
+*** NEXT schedule a timeslot for the next weekly review

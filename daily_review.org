@@ -1,0 +1,37 @@
+* daily review of %U
+** close out today
+- [ ] clear physical desktop / inbox / notebook %i
+- [ ] clear Downloads folder / Screenshots(?)
+#+begin_src emacs-lisp
+  (dired "~/Downloads")
+  (image-dired "~/Downloads")
+#+end_src
+- [ ] collect calendar open loops (+- 2 days) -> reschedule appointments/tasks or unschedule them
+#+begin_src emacs-lisp
+(my-org-agenda-recent-open-loops)
+#+end_src
+- [ ] clear email inboxes---capture with either C-S-l (org-capture) or Super+c
+#+begin_src emacs-lisp
+  (progn
+    (browse-url "https://mail.google.com/mail/u/0")
+    (browse-url "https://outlook.office.com/mail/inbox"))
+#+end_src
+- [ ] process streams (Teams, [[https://www.twitter.com][Twitter]]) as inboxes -- record tasks, read it later, file notes
+- [ ] capture any remaining open loops as tasks
+- [ ] schedule + refile tasks in [[file:inbox.org][Inbox]] -> [[file:todo.org][Personal]], or [[file:clumpednotes.org][Work]]
+- [ ] look through each Project or Area and order actions by importance or critical path
+** plan tomorrow
+- [ ] look through Project + Area, focus on top 2--3 actions
+  - [ ] what is the one thing I could do tomorrow such that by doing it, everything else will be easier or unnecessary?
+  - [ ] decide/schedule actions for tomorrow
+#+begin_src emacs-lisp
+  (find-file "~/org/clumpednotes.org")
+  (org-sparse-tree)
+#+end_src
+- [ ] schedule today's tasks (immersive morning -> process afternoon, deep -> shallow)
+#+begin_src emacs-lisp
+  (progn
+    (org-agenda nil "a")
+    (org-agenda-day-view))
+#+end_src
+- [ ] clock out
