@@ -7,3 +7,5 @@ Laptop/workspace9.json
 calendarlinks.org
 \#*\#
 .\#*
+*.DS_Store
+.agent-shell/
