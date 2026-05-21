@@ -60,6 +60,10 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
   (setq inhibit-splash-screen t)
   ;; (setq initial-major-mode 'org-mode)
   (setq large-file-warning-threshold 100000000) ;; change to ~100 MB
+  ;; let tiling WMs (AeroSpace, niri) fill column exactly instead of
+  ;; snapping frame size to a multiple of char height
+  (setq frame-resize-pixelwise t
+        window-resize-pixelwise t)
   (scroll-bar-mode -1)   ; turn off the scroll bar
   (tool-bar-mode -1)     ; turn off the tool bar
   (if (not (eq system-type 'darwin))	; on macos we do want a menu-bar
