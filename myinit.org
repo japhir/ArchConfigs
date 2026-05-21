@@ -2235,7 +2235,10 @@ emacs speaks statistics, work with R etc.
             (ess-R-fl-keyword:operators . t)
             (ess-R-fl-keyword:delimiters)
             (ess-R-fl-keyword:=)
-            (ess-R-fl-keyword:F&T)))))
+            (ess-R-fl-keyword:F&T))))
+    :config
+    (when (eq system-type 'darwin)
+      (setq inferior-R-program-name "/Library/Frameworks/R.framework/Resources/bin/R")))
 #+end_src
 
 #+RESULTS:
