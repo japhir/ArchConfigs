@@ -55,3 +55,7 @@
 (when (file-exists-p custom-file)
   (load custom-file))
 (put 'erase-buffer 'disabled nil)
+
+(require 'server)
+(unless (server-running-p)
+  (server-start))
