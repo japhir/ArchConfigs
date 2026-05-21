@@ -1196,6 +1196,10 @@ https://github.com/awth13/org-appear
     (org-appear-autosubmarkers t)
     (org-appear-delay 1))
 #+end_src
+** org-present
+#+begin_src emacs-lisp
+  (use-package org-present)
+#+end_src
 * presenting
 ** org-tree-slide-mode
 #+begin_src emacs-lisp
@@ -1352,7 +1356,14 @@ from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-me
 
 #+RESULTS:
 : my/org-ref-open-pdf-at-point
-
+** org-fragtog
+#+begin_src emacs-lisp
+  (use-package org-fragtog
+    :ensure t
+    :hook (org-mode . org-fragtog-mode)
+    :config
+    (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5)))
+#+end_src
 * note-taking
 ** pdf-tools
 #+begin_src emacs-lisp
@@ -1885,6 +1896,42 @@ From https://tvraman.github.io/emacspeak/blog/augment-emacs-with-zoxide.html
   ;; (global-set-key (kbd "C-; j") #'dired-zoxide)
   (with-eval-after-load 'evil
     (define-key evil-normal-state-map (kbd "gz") #'dired-zoxide))
+#+end_src
+
+** setting PATH
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :ensure t
+    :config
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize)))
+#+end_src
+
+* AI agents
+:PROPERTIES:
+:CREATED:  [2026-03-18 Wed 10:16]
+:END:
+** agent-shell
+#+begin_src emacs-lisp
+  (use-package agent-shell
+      :ensure t
+      :ensure-system-package
+      ;; Add agent installation configs here
+      ((claude . "brew install claude-code")
+       (claude-agent-acp . "npm install -g @zed-industries/claude-agent-acp"))
+      :config
+      (setq agent-shell-preferred-agent-config (agent-shell-anthropic-make-claude-code-config))
+      (setq agent-shell-anthropic-authentication
+  	  (agent-shell-anthropic-make-authentication :login t))
+      ;; Evil state-specific RET behavior: insert mode = newline, normal mode = send
+      (evil-define-key 'insert agent-shell-mode-map (kbd "RET") #'newline)
+      (evil-define-key 'normal agent-shell-mode-map (kbd "RET") #'comint-send-input)
+
+      ;; Configure *agent-shell-diff* buffers to start in Emacs state
+      (add-hook 'diff-mode-hook
+  	      (lambda ()
+  		(when (string-match-p "\\*agent-shell-diff\\*" (buffer-name))
+  		  (evil-emacs-state)))))
 #+end_src
 * email
 ** smtp
