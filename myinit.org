@@ -62,7 +62,8 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
   (setq large-file-warning-threshold 100000000) ;; change to ~100 MB
   (scroll-bar-mode -1)   ; turn off the scroll bar
   (tool-bar-mode -1)     ; turn off the tool bar
-  (menu-bar-mode -1)     ; turn off the menu
+  (if (not (eq system-type 'darwin))	; on macos we do want a menu-bar
+      (menu-bar-mode -1))     ; turn off the menu
   (setq visible-bell 1)  ; turn off beeps, make them flash!
   (global-hl-line-mode t)
   ;; typing
@@ -154,17 +155,19 @@ matching parenthesis are highlighted with rainbow colours.
 *** circadian: dark theme at night, light theme during the day
 #+begin_src emacs-lisp
   (use-package circadian
-    :custom
-    ;; current location on earth for auto toggle between light and dark theme
-    (calendar-latitude 52.08) ;; Utrecht
-    (calendar-longitude 5.11)
-    ;; (calendar-latitude 21.30) ;; Honolulu
-    ;; (calendar-longitude -157.8)
-    ;; (calendar-latitude 40.5) ;; New York
-    ;; (calendar-longitude -74.5)
-    (circadian-themes '((:sunrise . modus-operandi)
-                        (:sunset  . modus-vivendi)))
     :config
+    (require 'solar)
+    (setq calendar-latitude 52.08             ;; Utrecht
+          calendar-longitude 5.11
+          calendar-time-zone 60               ;; CET (UTC+1)
+          calendar-standard-time-zone-name "CET"
+          calendar-daylight-time-zone-name "CEST"
+          ;; (calendar-latitude 21.30) ;; Honolulu
+          ;; (calendar-longitude -157.8)
+          ;; (calendar-latitude 40.5) ;; New York
+          ;; (calendar-longitude -74.5)
+          circadian-themes '((:sunrise . modus-operandi)
+                             (:sunset  . modus-vivendi)))
     (circadian-setup))
 #+end_src
 ** set variable font
@@ -243,7 +246,6 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
       "Face for NEXT TODO keyword"
       :group 'org-faces)
 #+end_src
-
 *** org-todo-waiting
 #+begin_src emacs-lisp
   (defface org-todo-waiting
@@ -986,7 +988,6 @@ customize capture templates
      (latex . t)
      (R . t)
      (julia . t)
-     (julia-vterm . t)
      ))
 #+end_src
 *** org-export odt
@@ -1138,7 +1139,14 @@ https://gist.github.com/jethrokuan/d6f80caaec7f49dedffac7c4fe41d132
     (org-mode . org-modern-mode)
     (org-agenda-finalize . org-modern-agenda)
     :custom
-    (org-modern-table nil))
+    (org-modern-table nil)
+    :config
+    (setq org-modern-fold-stars
+          '(("▶" . "▼")
+            ("▷" . "▽")
+            ("⏵" . "⏷")
+            ("▹" . "▿")
+            ("▸" . "▾"))))
 #+end_src
 ** valign for tables
 #+begin_src emacs-lisp
@@ -1171,14 +1179,6 @@ got the function from this [[https://github.com/marcinkoziej/org-pomodoro/issues
             (org-pomodoro))))
     )
 #+end_src
-** org-pdftools
-used to be org-pdfview
-#+begin_src emacs-lisp
-  (use-package org-pdftools
-    :after (org pdf-tools)
-    :hook (org-mode . org-pdftools-setup-link))
-#+end_src
-
 ** org-appear
 dive into links/formatted entries
 https://github.com/awth13/org-appear
@@ -1312,9 +1312,7 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
 
 #+begin_src emacs-lisp
   (use-package citar-embark
-    :ensure nil
     :after citar embark
-    :no-require
     :config
     (citar-embark-mode)
     ;;(citar-at-point-function 'embark-act)
@@ -1356,11 +1354,9 @@ from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-me
 #+begin_src emacs-lisp
   (use-package pdf-tools
     :magic ("%PDF" . pdf-view-mode)
-    :load-path "/usr/share/emacs/site-lisp/pdf-tools"
-    :init
+    :config
     (pdf-tools-install)
     :custom
-    ;(pdf-loader-install)
     (pdf-view-display-size 'fit-width)
     :bind
     ;; swiper doesn't play nice with pdf-tools, so I disable it.
@@ -1733,20 +1729,25 @@ autocompletion replacement!
 #+begin_src emacs-lisp
   (use-package corfu
     :init
+    (setq corfu-frame-parameters
+          '((no-accept-focus . t)
+            (no-focus-on-map . t)
+            (focusable . nil)
+            (no-other-frame . t)
+            (child-frame-border-width . 0)))
     (global-corfu-mode)
     :config
     (unless (display-graphic-p)
-      (when (require 'corfu-terminal nil :noerror)
+      (use-package corfu-terminal
+        :config
         (corfu-terminal-mode +1)))
-
     ;; Setup corfu for popup like completion
     (customize-set-variable 'corfu-cycle t)        ; Allows cycling through candidates
     (customize-set-variable 'corfu-auto t)         ; Enable auto completion
-    (customize-set-variable 'corfu-auto-prefix 2)  ; Complete with less prefix keys
-
+    (customize-set-variable 'corfu-auto-prefix 4)  ; Complete with less prefix keys
     (when (require 'corfu-popupinfo nil :noerror)
-
       (corfu-popupinfo-mode 1)
+      (setq corfu-popupinfo-delay '(0.5 . 0.2))
       (eldoc-add-command #'corfu-insert)
       (keymap-set corfu-map "M-p" #'corfu-popupinfo-scroll-down)
       (keymap-set corfu-map "M-n" #'corfu-popupinfo-scroll-up)
@@ -1828,13 +1829,16 @@ completion at point
     (dired-listing-switches "-agho --group-directories-first --time-style=iso")
     (dired-kill-when-opening-new-dired-buffer t)
     :config
+    (when (eq system-type 'darwin)
+      (setq insert-directory-program "gls"))
     (put 'dired-find-alternate-file 'disabled t)
     (defun my-dired-up-directory ()
       (interactive)
       (find-alternate-file ".."))
-    (evil-collection-define-key 'normal 'dired-mode-map
-      "h" #'my-dired-up-directory
-      "l" #'dired-open-file))
+    (with-eval-after-load 'evil-collection
+      (evil-collection-define-key 'normal 'dired-mode-map
+        "h" #'my-dired-up-directory
+        "l" #'dired-open-file)))
 
   (use-package dired-open
     :config
@@ -1845,8 +1849,9 @@ completion at point
   (use-package dired-hide-dotfiles
     :hook (dired-mode . dired-hide-dotfiles-mode)
     :config
-    (evil-collection-define-key 'normal 'dired-mode-map
-      "H" 'dired-hide-dotfiles-mode))
+    (with-eval-after-load 'evil-collection
+      (evil-collection-define-key 'normal 'dired-mode-map
+        "H" 'dired-hide-dotfiles-mode)))
     #+end_src
 
 ** zoxide dired
@@ -2309,7 +2314,7 @@ for working with .Rmd files etc.
 #+begin_src emacs-lisp
   (use-package polymode :defer t)
   (use-package poly-markdown :defer t)
-  (use-package poly-R)
+  (use-package poly-R :defer t)
 #+end_src
 
 #+RESULTS:
