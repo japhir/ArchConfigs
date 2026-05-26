@@ -24,6 +24,14 @@ is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
   (setq native-compile-prune-cache t)
 #+end_src
 * package archive
+** compat
+Emacs 30.x ships compat 30.x built-in. Many packages (orderless, magit, etc.)
+require compat >= 31. Install from source to shadow the built-in.
+#+begin_src emacs-lisp
+  (elpaca (compat :host github :repo "emacs-compat/compat" :inherit nil))
+  (elpaca-wait)
+#+end_src
+
 ** use-package
 Use-package is an amazing resource to clean up my init file and have it play
 nice on both my desktop and laptop.
@@ -204,6 +212,7 @@ https://github.com/iqbalansari/emacs-emojify
 This allows me to write nicely on a widescreen monitor in a single buffer.
 #+begin_src emacs-lisp
   (use-package visual-fill-column
+    :ensure (:host github :repo "joostkremers/visual-fill-column" :inherit nil)
     :hook (org-mode . visual-fill-column-mode)
     :custom
     ;; (global-visual-fill-column-mode t)
@@ -353,7 +362,7 @@ Highlight diffs of current version-controlled buffer in the margin. Quite cool!
 git porcelain, essential!
 #+begin_src emacs-lisp
   (use-package transient
-    :ensure (:host github :repo "magit/transient"))
+    :ensure (:type git :host github :repo "magit/transient" :inherit nil))
   (use-package magit
     :commands magit-status
     :hook
@@ -1761,6 +1770,7 @@ autocompletion replacement!
     :config
     (unless (display-graphic-p)
       (use-package corfu-terminal
+        :ensure nil
         :config
         (corfu-terminal-mode +1)))
     ;; Setup corfu for popup like completion
