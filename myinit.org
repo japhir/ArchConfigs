@@ -60,9 +60,14 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
   (setq inhibit-splash-screen t)
   ;; (setq initial-major-mode 'org-mode)
   (setq large-file-warning-threshold 100000000) ;; change to ~100 MB
+  ;; let tiling WMs (AeroSpace, niri) fill column exactly instead of
+  ;; snapping frame size to a multiple of char height
+  (setq frame-resize-pixelwise t
+        window-resize-pixelwise t)
   (scroll-bar-mode -1)   ; turn off the scroll bar
   (tool-bar-mode -1)     ; turn off the tool bar
-  (menu-bar-mode -1)     ; turn off the menu
+  (if (not (eq system-type 'darwin))	; on macos we do want a menu-bar
+      (menu-bar-mode -1))     ; turn off the menu
   (setq visible-bell 1)  ; turn off beeps, make them flash!
   (global-hl-line-mode t)
   ;; typing
@@ -154,17 +159,19 @@ matching parenthesis are highlighted with rainbow colours.
 *** circadian: dark theme at night, light theme during the day
 #+begin_src emacs-lisp
   (use-package circadian
-    :custom
-    ;; current location on earth for auto toggle between light and dark theme
-    (calendar-latitude 52.08) ;; Utrecht
-    (calendar-longitude 5.11)
-    ;; (calendar-latitude 21.30) ;; Honolulu
-    ;; (calendar-longitude -157.8)
-    ;; (calendar-latitude 40.5) ;; New York
-    ;; (calendar-longitude -74.5)
-    (circadian-themes '((:sunrise . modus-operandi)
-                        (:sunset  . modus-vivendi)))
     :config
+    (require 'solar)
+    (setq calendar-latitude 52.08             ;; Utrecht
+          calendar-longitude 5.11
+          calendar-time-zone 60               ;; CET (UTC+1)
+          calendar-standard-time-zone-name "CET"
+          calendar-daylight-time-zone-name "CEST"
+          ;; (calendar-latitude 21.30) ;; Honolulu
+          ;; (calendar-longitude -157.8)
+          ;; (calendar-latitude 40.5) ;; New York
+          ;; (calendar-longitude -74.5)
+          circadian-themes '((:sunrise . modus-operandi)
+                             (:sunset  . modus-vivendi)))
     (circadian-setup))
 #+end_src
 ** set variable font
@@ -243,7 +250,6 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
       "Face for NEXT TODO keyword"
       :group 'org-faces)
 #+end_src
-
 *** org-todo-waiting
 #+begin_src emacs-lisp
   (defface org-todo-waiting
@@ -345,6 +351,8 @@ Highlight diffs of current version-controlled buffer in the margin. Quite cool!
 ** magit
 git porcelain, essential!
 #+begin_src emacs-lisp
+  (use-package transient
+    :ensure (:host github :repo "magit/transient"))
   (use-package magit
     :commands magit-status
     :hook
@@ -470,8 +478,16 @@ I still prefer this option because I have colours during my session/in the ESS p
 ** internet up
 #+begin_src emacs-lisp
   (defun internet-up-p (&optional host)
-    (= 0 (call-process "ping" nil nil nil "-c" "1" "-W" "1"
+    (= 0 (call-process "ping" nil nil nil "-c" "1"
+                       ;; -W is seconds on Linux, milliseconds on macOS
+                       (if (eq system-type 'darwin) "-W" "-W") "1"
                        (if host host "www.google.com"))))
+#+end_src
+
+** firefox as default browser
+#+begin_src emacs-lisp
+  (when (eq system-type 'darwin)
+    (setq browse-url-browser-function 'browse-url-default-macosx-browser))
 #+end_src
 
 ** allow editing text fields in firefox
@@ -686,12 +702,12 @@ basic latex settings
 #+begin_src emacs-lisp
   (org-file-apps
    '((auto-mode . emacs)
-     ("\\.x?html?\\'" . "xdg-open %s")
+     ("\\.x?html?\\'" . "open %s")
      ("\\.pdf\\'" . (lambda (file link)
                       (org-pdftools-open link)))
-     ("\\.mp4\\'" . "xdg-open %s")
-     ("\\.webm\\'" . "xdg-open %s")
-     ("\\.mkv\\'" . "xdg-open %s")
+     ("\\.mp4\\'" . "open %s")
+     ("\\.webm\\'" . "open %s")
+     ("\\.mkv\\'" . "open %s")
      ("\\.pdf.xoj\\'" . "xournal %s")))
 #+end_src
 
@@ -978,7 +994,6 @@ customize capture templates
      (latex . t)
      (R . t)
      (julia . t)
-     (julia-vterm . t)
      ))
 #+end_src
 *** org-export odt
@@ -1130,7 +1145,14 @@ https://gist.github.com/jethrokuan/d6f80caaec7f49dedffac7c4fe41d132
     (org-mode . org-modern-mode)
     (org-agenda-finalize . org-modern-agenda)
     :custom
-    (org-modern-table nil))
+    (org-modern-table nil)
+    :config
+    (setq org-modern-fold-stars
+          '(("▶" . "▼")
+            ("▷" . "▽")
+            ("⏵" . "⏷")
+            ("▹" . "▿")
+            ("▸" . "▾"))))
 #+end_src
 ** valign for tables
 #+begin_src emacs-lisp
@@ -1163,14 +1185,6 @@ got the function from this [[https://github.com/marcinkoziej/org-pomodoro/issues
             (org-pomodoro))))
     )
 #+end_src
-** org-pdftools
-used to be org-pdfview
-#+begin_src emacs-lisp
-  (use-package org-pdftools
-    :after (org pdf-tools)
-    :hook (org-mode . org-pdftools-setup-link))
-#+end_src
-
 ** org-appear
 dive into links/formatted entries
 https://github.com/awth13/org-appear
@@ -1183,6 +1197,10 @@ https://github.com/awth13/org-appear
     (org-appear-autolinks t)
     (org-appear-autosubmarkers t)
     (org-appear-delay 1))
+#+end_src
+** org-present
+#+begin_src emacs-lisp
+  (use-package org-present)
 #+end_src
 * presenting
 ** org-tree-slide-mode
@@ -1224,12 +1242,14 @@ usefull snippets for me: org-mode (fig_, )
 ** ispell: spell-checking
 #+begin_src emacs-lisp
   (use-package ispell
+    :ensure nil
     :config
     (setq ispell-dictionary "british-ize-w_accents"))
 #+end_src
 ** flyspell
 #+begin_src emacs-lisp
   (use-package flyspell
+    :ensure nil
     :hook (;(org-mode . flyspell-mode)
            (prog-mode . flyspell-prog-mode))
     :config
@@ -1303,7 +1323,6 @@ https://github.com/jkitchin/org-ref/blob/master/org-ref.org
 #+begin_src emacs-lisp
   (use-package citar-embark
     :after citar embark
-    :no-require
     :config
     (citar-embark-mode)
     ;;(citar-at-point-function 'embark-act)
@@ -1339,17 +1358,22 @@ from [[https://github.com/jkitchin/org-ref/blob/master/org-ref.org#a-note-for-me
 
 #+RESULTS:
 : my/org-ref-open-pdf-at-point
-
+** org-fragtog
+#+begin_src emacs-lisp
+  (use-package org-fragtog
+    :ensure t
+    :hook (org-mode . org-fragtog-mode)
+    :config
+    (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5)))
+#+end_src
 * note-taking
 ** pdf-tools
 #+begin_src emacs-lisp
   (use-package pdf-tools
     :magic ("%PDF" . pdf-view-mode)
-    :load-path "/usr/share/emacs/site-lisp/pdf-tools"
-    :init
+    :config
     (pdf-tools-install)
     :custom
-    ;(pdf-loader-install)
     (pdf-view-display-size 'fit-width)
     :bind
     ;; swiper doesn't play nice with pdf-tools, so I disable it.
@@ -1722,20 +1746,25 @@ autocompletion replacement!
 #+begin_src emacs-lisp
   (use-package corfu
     :init
+    (setq corfu-frame-parameters
+          '((no-accept-focus . t)
+            (no-focus-on-map . t)
+            (focusable . nil)
+            (no-other-frame . t)
+            (child-frame-border-width . 0)))
     (global-corfu-mode)
     :config
     (unless (display-graphic-p)
-      (when (require 'corfu-terminal nil :noerror)
+      (use-package corfu-terminal
+        :config
         (corfu-terminal-mode +1)))
-
     ;; Setup corfu for popup like completion
     (customize-set-variable 'corfu-cycle t)        ; Allows cycling through candidates
     (customize-set-variable 'corfu-auto t)         ; Enable auto completion
-    (customize-set-variable 'corfu-auto-prefix 2)  ; Complete with less prefix keys
-
+    (customize-set-variable 'corfu-auto-prefix 4)  ; Complete with less prefix keys
     (when (require 'corfu-popupinfo nil :noerror)
-
       (corfu-popupinfo-mode 1)
+      (setq corfu-popupinfo-delay '(0.5 . 0.2))
       (eldoc-add-command #'corfu-insert)
       (keymap-set corfu-map "M-p" #'corfu-popupinfo-scroll-down)
       (keymap-set corfu-map "M-n" #'corfu-popupinfo-scroll-up)
@@ -1751,6 +1780,7 @@ autocompletion replacement!
 #+begin_src emacs-lisp
   ;; Use Dabbrev with Corfu!
   (use-package dabbrev
+    :ensure nil
     ;; Swap M-/ and C-M-/
     :bind (("M-/" . dabbrev-completion)
            ("C-M-/" . dabbrev-expand))
@@ -1816,13 +1846,16 @@ completion at point
     (dired-listing-switches "-agho --group-directories-first --time-style=iso")
     (dired-kill-when-opening-new-dired-buffer t)
     :config
+    (when (eq system-type 'darwin)
+      (setq insert-directory-program "gls"))
     (put 'dired-find-alternate-file 'disabled t)
     (defun my-dired-up-directory ()
       (interactive)
       (find-alternate-file ".."))
-    (evil-collection-define-key 'normal 'dired-mode-map
-      "h" #'my-dired-up-directory
-      "l" #'dired-open-file))
+    (with-eval-after-load 'evil-collection
+      (evil-collection-define-key 'normal 'dired-mode-map
+        "h" #'my-dired-up-directory
+        "l" #'dired-open-file)))
 
   (use-package dired-open
     :config
@@ -1833,8 +1866,9 @@ completion at point
   (use-package dired-hide-dotfiles
     :hook (dired-mode . dired-hide-dotfiles-mode)
     :config
-    (evil-collection-define-key 'normal 'dired-mode-map
-      "H" 'dired-hide-dotfiles-mode))
+    (with-eval-after-load 'evil-collection
+      (evil-collection-define-key 'normal 'dired-mode-map
+        "H" 'dired-hide-dotfiles-mode)))
     #+end_src
 
 ** zoxide dired
@@ -1862,7 +1896,44 @@ From https://tvraman.github.io/emacspeak/blog/augment-emacs-with-zoxide.html
 
 #+begin_src emacs-lisp
   ;; (global-set-key (kbd "C-; j") #'dired-zoxide)
-  (define-key evil-normal-state-map (kbd "gz") #'dired-zoxide)
+  (with-eval-after-load 'evil
+    (define-key evil-normal-state-map (kbd "gz") #'dired-zoxide))
+#+end_src
+
+** setting PATH
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :ensure t
+    :config
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize)))
+#+end_src
+
+* AI agents
+:PROPERTIES:
+:CREATED:  [2026-03-18 Wed 10:16]
+:END:
+** agent-shell
+#+begin_src emacs-lisp
+  (use-package agent-shell
+      :ensure t
+      :ensure-system-package
+      ;; Add agent installation configs here
+      ((claude . "brew install claude-code")
+       (claude-agent-acp . "npm install -g @zed-industries/claude-agent-acp"))
+      :config
+      (setq agent-shell-preferred-agent-config (agent-shell-anthropic-make-claude-code-config))
+      (setq agent-shell-anthropic-authentication
+  	  (agent-shell-anthropic-make-authentication :login t))
+      ;; Evil state-specific RET behavior: insert mode = newline, normal mode = send
+      (evil-define-key 'insert agent-shell-mode-map (kbd "RET") #'newline)
+      (evil-define-key 'normal agent-shell-mode-map (kbd "RET") #'comint-send-input)
+
+      ;; Configure *agent-shell-diff* buffers to start in Emacs state
+      (add-hook 'diff-mode-hook
+  	      (lambda ()
+  		(when (string-match-p "\\*agent-shell-diff\\*" (buffer-name))
+  		  (evil-emacs-state)))))
 #+end_src
 * email
 ** smtp
@@ -2166,7 +2237,10 @@ emacs speaks statistics, work with R etc.
             (ess-R-fl-keyword:operators . t)
             (ess-R-fl-keyword:delimiters)
             (ess-R-fl-keyword:=)
-            (ess-R-fl-keyword:F&T)))))
+            (ess-R-fl-keyword:F&T))))
+    :config
+    (when (eq system-type 'darwin)
+      (setq inferior-R-program-name "/Library/Frameworks/R.framework/Resources/bin/R")))
 #+end_src
 
 #+RESULTS:
@@ -2296,7 +2370,7 @@ for working with .Rmd files etc.
 #+begin_src emacs-lisp
   (use-package polymode :defer t)
   (use-package poly-markdown :defer t)
-  (use-package poly-R)
+  (use-package poly-R :defer t)
 #+end_src
 
 #+RESULTS:
