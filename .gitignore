@@ -1,5 +1,7 @@
 Laptop/init.el
 emacsdirs.el
+myinit.el
+auto/
 Laptop/emacsdirs.el
 *~
 *_archive
