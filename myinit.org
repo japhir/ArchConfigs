@@ -148,6 +148,7 @@ matching parenthesis are highlighted with rainbow colours.
     (modus-themes-italic-constructs t)
     (modus-themes-bold-constructs t)
     (modus-themes-mixed-fonts t)
+    (modus-themes-variable-pitch-ui t)
     (modus-themes-headings
      '((1 . (variable-pitch 1.3))
        (2 . (variable-pitch 1.1))
@@ -1236,7 +1237,11 @@ usefull snippets for me: org-mode (fig_, )
     :delight yas-mode
     :config
     (require 'warnings)
+    (add-to-list 'warning-suppress-types '(use-package))
+    (add-to-list 'warning-suppress-types '(comp))
     (add-to-list 'warning-suppress-types '(yasnippet backquote-change))
+    (add-to-list 'warning-suppress-log-types '(comp))
+    (add-to-list 'warning-suppress-log-types '(yasnippet backquote-change))
     (setq yas-indent-line t))
 #+end_src
 ** ispell: spell-checking
@@ -1825,6 +1830,22 @@ completion at point
     (add-hook 'eshell-mode-hook #'crafted-completion-corfu-eshell))
 #+end_src
 
+** eglot
+#+begin_src emacs-lisp
+  (use-package eglot
+    :ensure nil
+    :custom
+    (eglot-autoshutdown t))
+#+end_src
+
+** xref
+#+begin_src emacs-lisp
+  (use-package xref
+    :ensure nil
+    :custom
+    (xref-show-definitions-function #'xref-show-definitions-completing-read))
+#+end_src
+
 * system
 ** vterm
 #+begin_src emacs-lisp
@@ -2360,7 +2381,11 @@ check out this worg entry on working inline with stan models! https://orgmode.or
 ** markdown-mode
 markdown mode for writing
 #+begin_src emacs-lisp
-  (use-package markdown-mode :defer t)
+  (use-package markdown-mode
+    :defer t
+    :custom
+    (markdown-enable-html t)
+    (markdown-enable-math t))
 #+end_src
 
 #+RESULTS:
@@ -2411,7 +2436,16 @@ override circular dependency in auctex
     (setq TeX-auto-save t)
     (setq TeX-parse-self t)
     (setq-default TeX-master nil)
-    (setq reftex-plug-into-AUCTeX t))
+    (setq reftex-plug-into-AUCTeX t)
+    (setq LaTeX-electric-left-right-brace t)
+    (setq TeX-electric-math '("$" . "$"))
+    (setq TeX-electric-sub-and-superscript t))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package auctex-latexmk
+    :custom
+    (auctex-latexmk-inherit-TeX-PDF-mode t))
 #+end_src
 
 * secret directories
