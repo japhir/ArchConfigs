@@ -3,18 +3,18 @@
 output "DP-1" {
     mode "1920x1080@59.934"
     scale 1
-    position x=0 y=0
+    position x=0 y=1080
 }
 
-output "HDMI-A-2" {
-    mode "1920x1080@59.934"
-    scale 1
-    position x=960 y=0
+output "Samsung Electric Company SAMSUNG 0x01000000" {
+    mode "3840x2160@30.000"
+    scale 2
+    position x=2880 y=0
 }
 
-output "eDP-1" {
+output "LG Display 0x0521 Unknown" {
     mode "1920x1080@60.020"
     scale 1
-    position x=2880 y=0
+    position x=2880 y=1080
 }
 
