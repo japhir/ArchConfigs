@@ -9,3 +9,4 @@ calendarlinks.org
 .\#*
 *.DS_Store
 .agent-shell/
+.pi/agent/sessions/*

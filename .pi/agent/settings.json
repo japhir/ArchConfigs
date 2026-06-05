@@ -1,0 +1,13 @@
+{
+  "lastChangelogVersion": "0.78.1",
+  "defaultProvider": "ollama",
+  "defaultModel": "qwen3.6:35b-mlx",
+  "defaultThinkingLevel": "medium",
+  "enableInstallTelemetry": true,
+  "compaction": {
+    "enabled": false
+  },
+  "terminal": {
+    "showTerminalProgress": true
+  }
+}
