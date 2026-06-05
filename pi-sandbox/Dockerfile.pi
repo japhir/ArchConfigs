@@ -26,7 +26,7 @@ RUN npm install -g @earendil-works/pi-coding-agent @mermaid-js/mermaid-cli && \
     rm -rf /root/.npm/_cacache
 
 # wrap raw mmdc binary so agent doesn't need flags
-RUN echo '{"args": ["--no-sandbox", "--disable-setuid-sandbox"]}' > /etc/mermaid-puppeteer.json
+RUN echo '{"executablePath": "/usr/bin/chromium", "args": ["--no-sandbox", "--disable-setuid-sandbox"]}' > /etc/mermaid-puppeteer.json
 RUN mv /usr/local/bin/mmdc /usr/local/bin/mmdc-raw && \
     echo '#!/bin/bash\n/usr/local/bin/mmdc-raw -p /etc/mermaid-puppeteer.json "$@"' > /usr/local/bin/mmdc && \
     chmod +x /usr/local/bin/mmdc
