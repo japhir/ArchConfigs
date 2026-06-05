@@ -1,0 +1,20 @@
+{
+  "providers": {
+    "ollama": {
+      "baseUrl": "http://host.docker.internal:11434/v1",
+      "api": "openai-completions",
+      "apiKey": "ollama",
+      "compat": {
+	"supportsDeveloperRole": false,
+	"supportsReasoningEffort": false
+      },
+      "models": [
+        { "id": "gemma4:31b" },
+        { "id": "gemma4:26b" },
+        { "id": "gemma4:e2b" },
+        { "id": "qwen3.6:35b-mlx" },
+        { "id": "qwen3.6:27b" }
+      ]
+    }
+  }
+}

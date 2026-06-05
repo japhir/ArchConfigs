@@ -1,0 +1,40 @@
+FROM node:22-bookworm-slim
+
+# Install curl (needed for uv) and ca-certificates, aggressively clean apt caches
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl gpg ca-certificates ripgrep fd-find postgresql-client git vim less procps \
+    w3m chromium && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+
+# Install gh
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list && \
+    apt-get update && apt-get install -y gh && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+
+RUN ln -s /usr/bin/fdfind /usr/local/bin/fd
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# force Puppeteer to use system chromium instead of downloading
+ENV CHROME_BIN=/usr/bin/chromium
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
+# install harnass and diagram engine
+RUN npm install -g @earendil-works/pi-coding-agent @mermaid-js/mermaid-cli && \
+    npm cache clean --force && \
+    rm -rf /root/.npm/_cacache
+
+# wrap raw mmdc binary so agent doesn't need flags
+RUN echo '{"args": ["--no-sandbox", "--disable-setuid-sandbox"]}' > /etc/mermaid-puppeteer.json
+RUN mv /usr/local/bin/mmdc /usr/local/bin/mmdc-raw && \
+    echo '#!/bin/bash\n/usr/local/bin/mmdc-raw -p /etc/mermaid-puppeteer.json "$@"' > /usr/local/bin/mmdc && \
+    chmod +x /usr/local/bin/mmdc
+
+# Create a generic, writable home directory for our non-root host user
+RUN mkdir -p /home/sandbox && chmod 777 /home/sandbox
+ENV HOME=/home/sandbox
+ENV UV_CACHE_DIR=/home/sandbox/.cache/uv
+ENV NPM_CACHE_DIR=/home/sandbox/.npm
+WORKDIR /workspace
+ENTRYPOINT ["pi"]

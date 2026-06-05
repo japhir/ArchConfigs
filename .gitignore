@@ -21,3 +21,4 @@ handoff-build-html-review.md
 # third-party / company-specific, never shared
 agents/skills/graphify/
 agents/skills/synced/
+.pi/agent/sessions/*
