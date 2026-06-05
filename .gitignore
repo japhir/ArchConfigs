@@ -48,3 +48,6 @@ agents/.skill-lock.json
 eetsysteem.el
 eetsysteem-tests.el
 myinit-tests.el
+
+.pi/agent/sessions/*
+.pi/agent/auth.json

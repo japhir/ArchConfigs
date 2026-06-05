@@ -1,0 +1,44 @@
+#!/bin/bash
+
+PI_DIR="${HOME}/.pi/agent"
+SKILLS_DIR="${HOME}/.agents/skills"
+
+mkdir -p "$PI_DIR"
+mkdir -p "$SKILLS_DIR"
+
+# =====================================================================
+# DEEP DEFENSIVE GUARD: Git Repository Isolation
+# =====================================================================
+# 1. Trace the script back to its real home (resolving any macOS symlinks)
+TARGET_FILE="${BASH_SOURCE[0]}"
+while [ -h "$TARGET_FILE" ]; do
+    TARGET_FILE=$(readlink "$TARGET_FILE")
+done
+SCRIPT_REAL_DIR=$(cd "$(dirname "$TARGET_FILE")" && pwd)
+
+# 2. Locate the Git root of the script's real home, and your current location
+SCRIPT_GIT_ROOT=$(cd "$SCRIPT_REAL_DIR" && git rev-parse --show-toplevel 2>/dev/null)
+CURRENT_GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+
+# 3. Evaluate safety boundaries
+WORKSPACE_MODE="rw"
+if [ -n "$SCRIPT_GIT_ROOT" ] && [ "$SCRIPT_GIT_ROOT" = "$CURRENT_GIT_ROOT" ]; then
+    echo "⚠️  Security Warning: Launching from inside the configuration Git repository."
+    echo "   Forcing Read-Only (:ro) workspace to protect scripts and dotfiles."
+    WORKSPACE_MODE="ro"
+fi
+# =====================================================================
+
+docker run -it --rm \
+  --user "$(id -u):$(id -g)" \
+  --network bridge \
+  --cap-drop=ALL \
+  --security-opt no-new-privileges:true \
+  -v "${PWD}":"/workspace":${WORKSPACE_MODE} \
+  -v "${PI_DIR}":"/home/sandbox/.pi/agent":rw \
+  -v "${SKILLS_DIR}":"/home/sandbox/.agents/skills":ro \
+  -e OLLAMA_HOST="host.docker.internal:11434" \
+  -e ANTHROPIC_API_KEY \
+  -e OPENAI_API_KEY \
+  -e UV_PROJECT_ENVIRONMENT="/workspace/.venv-docker" \
+  local/pi-sandbox "$@"
