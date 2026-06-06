@@ -1,0 +1,38 @@
+#+title: 0001 — Add TODO parked state; subtree is the default project model
+
+* Status
+accepted
+
+* Decision
+
+Add a plain =TODO= keyword to the front of the sequence, giving
+=TODO(t) NEXT(n) WAIT(w!/!) TICK(k) SOME(s!/!) | DONE(d) CANC(c)=. =TODO= takes
+the =t= fast-select key (matching org's default and Rougier); =TICK= moves from
+=t= to =k= (ti**c**K) to free it. A project's actions are modelled as a
+subtree of headings by default: actions waiting their turn are =TODO= (parked,
+invisible to the =n= list), and exactly one is promoted to =NEXT=. Trivial
+projects may still use a plain =[ ]= checkbox checklist on the project heading
+instead. A =:prj:= with no =NEXT=/=WAIT=/=TICK= is stuck.
+
+* Why
+
+Previously the keyword set had no parked state, so a future project action had
+to be either =NEXT= (which inflated the Next-Actions list until it was no
+longer a true list of /next/ actions) or keyword-less (invisible, free to rot).
+Projects were modelled inconsistently — some checklist, some subtree — with no
+rule and no review check. =TODO= gives subtree actions a real home that is both
+visible inside the project and excluded from =n=, mirroring the canonical GTD /
+Rougier =TODO= → =NEXT= promotion.
+
+* Consequences
+
+- =org-stuck-projects= keeps its trigger set =("NEXT" "WAIT" "TICK")= — it must
+  *not* include =TODO=, so a project carrying only =TODO= children correctly
+  reads as stuck (it has no defined next action).
+- The "exactly one =NEXT= per project" invariant is review discipline for now;
+  a custom agenda to flag projects with zero or multiple =NEXT= can come later.
+- Muscle memory and existing =~/org= data change: a one-time pass may be wanted
+  to convert stray keyword-less project actions to =TODO=.
+- =TICK='s fast-select key moves =t= → =k=. During the transition the old =t=
+  reflex now sets =TODO=, not =TICK= — watch for mis-marked ticklers until the
+  new key is habitual.

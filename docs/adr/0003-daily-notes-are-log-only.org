@@ -1,0 +1,30 @@
+#+title: 0003 — org-roam daily notes are log-only; tasks get swept out
+
+* Status
+accepted
+
+* Decision
+
+An org-roam daily note (=notes/daily/=) is a log/journal surface only. It is
+not a task bucket. Any TODO-state heading that ends up under =notes/daily/= is
+a leak, to be caught by a "stray tasks" agenda command (every TODO-state
+heading under =notes/daily/=) run during the daily and weekly review and
+refiled out to its real home (=todo.org= / =work.org= / project). The existing
+=my/org-refile-to-today= / =my/org-refile-to-created-date= functions are for
+parking *log entries* on a date, not for storing live actions.
+
+* Why
+
+GTD requires every bucket to have exactly one defined meaning. The daily note
+was doubling as journal and an accidental task surface (=C-c n d= captures
+=* %?= with no keyword), so tasks typed there were invisible to the =n= / =j=
+views and could rot. Declaring dailies log-only — and adding the sweep that was
+the missing half of the refile-into-daily machinery — closes the loop without
+turning dailies into a second inbox to process.
+
+* Consequences
+
+- A "stray tasks under notes/daily/" agenda command is needed and must be added
+  as an explicit step in both the daily and weekly review.
+- Captures into a daily should stay keyword-less (log entries); a task belongs
+  in the inbox, not a daily.

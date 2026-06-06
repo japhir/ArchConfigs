@@ -1,0 +1,77 @@
+#+title: GTD Workflow — as built
+#+created: [2026-06-06 Sat]
+#+last_modified:
+
+As-built snapshot of the GTD workflow implemented in the org-mode section of
+=myinit.org=. Companion to [[file:CONTEXT.org][CONTEXT.org]] (the glossary) and [[file:docs/adr/][docs/adr/]] (the
+decisions behind the shape). Reference doc — lives in the ArchConfigs repo,
+deliberately /not/ under =~/org= (not an agenda file).
+
+This file describes what is /live/ today. Decisions that are agreed but not yet
+implemented are marked → ADR and listed under "Decided, pending implementation".
+
+* The five phases
+
+** Capture
+- =C-c c= → org-capture; every template lands in =inbox.org=, =CREATED= auto-set
+- Mobile (Orgzly) → =mobin.org=
+- Web → org-protocol templates =p= / =L= into =inbox.org=
+- =C-c n d= → org-roam daily note — log/journal only, never a task bucket (ADR 0003)
+- =C-c c j= → journal datetree
+- =inbox.org= + =mobin.org= carry =#+filetags: inbox= → =i= agenda catches both
+
+** Clarify
+- Decision tree lives in =weekly_review.org=, run during the weekly review
+- Actionable? <2 min do now; delegate→=WAIT=; defer→tickler; project→ =:prj:=
+- Non-actionable: trash / =TICK= / =SOME= / reference→org-roam
+
+** Organize
+- TODO states: =TODO → NEXT → WAIT → TICK → SOME | DONE CANC= (ADR 0001)
+  - =TODO= = parked project action; =NEXT= = the one actionable now (exactly one per project)
+- Projects: =:prj:= heading + =[/]= cookie; identified by tag + outline path (ADR 0002)
+- Areas of Responsibility: =life.org= headings; carried on items via =:CATEGORY:= (ADR 0002)
+- Contexts: =@=-tags — place / tool / energy / with-whom (=@agenda= + person); see CONTEXT.org
+- =SCHEDULED= = tickler ("resurface on this date") only; =DEADLINE= + =gcal.org= = hard landscape (ADR 0004)
+- Files: =todo.org= (personal), =work.org= (work), =someday.org=, =lists.org=,
+  =journal.org=, =life.org= (areas); reference → org-roam notes
+- Refile: =C-c C-w=; =C-c n r= / =C-c n R= refile a heading into a daily note (as a log entry)
+
+** Reflect
+- *Weekly review* (capture template =r= → =weekly_review.org=, clocked): get
+  clear / get current / get creative. CANONICAL — mirrors the David Allen
+  podcast steps exactly. ⚠️ FROZEN: do not edit =weekly_review.org=.
+- *Daily pass* (capture template =d= → =daily_review.org=): the mid-week
+  engine — empty =inbox.org= + =mobin.org=, sweep stray tasks out of
+  =notes/daily/=, pick the day's =NEXT=s. Light; never duplicates the weekly.
+- Agendas: =A= block, =n= next, =w= waiting, =j= projects, =I= important, =#= stuck, =a= areas
+
+** Engage
+- Context agendas =g*=, energy =E*=, people =p*=, =W= work / =P= personal
+- org-pomodoro (=C-c p=) for focus blocks
+
+* Constraints (do not "fix")
+
+- =weekly_review.org= is frozen — its steps follow David Allen's published
+  process deliberately. Do not consolidate it with the daily pass or
+  "streamline" its steps.
+
+* Decided, pending implementation
+
+These are agreed (see ADRs) but not yet in =myinit.org= / =~/org=:
+
+- Update =org-todo-keywords= to
+  =TODO(t) NEXT(n) WAIT(w!/!) TICK(k) SOME(s!/!) | DONE(d) CANC(c)= + faces
+  (=TICK= key =t=→=k=); one-time pass to convert stray keyword-less project
+  actions to =TODO= (ADR 0001)
+- Areas: wire =life.org= as =org-areas-file=; area completion read from its
+  headings; stamp =:CATEGORY:= at clarify (org-gtd style); add =a= "Areas"
+  agenda with a neglected-area check (area with no active =:prj:=); migrate
+  existing CATEGORY=project-name values (ADR 0002)
+- Daily-note sweep: =a= "stray tasks under notes/daily/" agenda; add the sweep
+  step to the daily pass (ADR 0003)
+- Demote action-type =@=-tags (=@write @program @read @research @createplot
+  @schedule=) + drop their =g*= agendas; keep =@agenda=; decide later whether
+  per-=:PersonName:= tags stay
+- Daily pass: actually start using =d=; fix the stale =clumpednotes.org= →
+  =work.org= link inside =daily_review.org=
+- Config drift: see the backlog filed into the personal GTD system

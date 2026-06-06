@@ -1,0 +1,106 @@
+#+title: GTD Context — Glossary
+#+created: [2026-06-06 Sat]
+#+last_modified:
+
+Canonical language for the org-mode GTD system implemented in =myinit.org=.
+Glossary only — no implementation detail. For the as-built workflow see
+[[file:gtd-workflow.org][gtd-workflow.org]]; for the decisions behind it see [[file:docs/adr/][docs/adr/]].
+
+* Language
+
+** Actions & states
+
+*** Next Action
+The single, concrete, physically-doable action that moves a project forward
+right now. Keyword =NEXT=. A project has exactly one.
+/Avoid/: task, todo (for this meaning).
+
+*** Parked Action
+A captured project action that is real but not yet the next one to do —
+waiting its turn behind the current Next Action. Keyword =TODO=. Invisible to
+the =n= (Next Actions) list by design; surfaced only inside its project.
+/Avoid/: backlog item, later.
+
+*** Waiting
+An action handed off or blocked, pending something external (a person, a
+reply, a delivery). Keyword =WAIT=.
+/Avoid/: blocked, pending, delegated (as a state name).
+
+*** Tickler
+A distinct parked state for an item to revisit later, keyword =TICK=. It is not
+=NEXT= and never appears in the Next-Actions (=n=) list. =SCHEDULED= is the
+orthogonal mechanism giving it a resurface date. The tickler is a behaviour
+(=TICK= [+ =SCHEDULED=]), not a file.
+/Avoid/: reminder, snooze, deferred next action.
+
+*** Hard Landscape
+The day's genuinely date-bound commitments — only what /must/ happen on a
+specific date. Carried by =DEADLINE= and timed events in =gcal.org=, never by a
+wished-for =SCHEDULED=. =SCHEDULED= means "resurface on this date" (tickler),
+not "do around now".
+/Avoid/: calendar (overloaded), schedule.
+
+*** Someday/Maybe
+Something not committed to — no decision to act has been made. Keyword =SOME=.
+/Avoid/: backlog, wishlist, later.
+
+** Structure
+
+*** Project
+Any outcome that needs more than one action. Marked with the =:prj:= tag
+(not inherited) on a heading carrying =[/]=; identified by that tag plus its
+outline path. Its actions live either as a checkbox checklist (trivial
+projects) or as =TODO=/=NEXT= subtree headings (default). A project with no
+=NEXT=/=WAIT=/=TICK= is /stuck/.
+/Avoid/: epic, goal (a goal is a higher horizon, not a project).
+
+*** Area of Responsibility
+An ongoing sphere of life with a maintenance standard, never "done" — health,
+finances, research, relationships, home. Areas /generate/ projects; the review
+walks them to surface new commitments. Each lives as a top-level heading in
+=life.org= (the review artifact and the area vocabulary), and is stamped on
+projects/actions via the =:CATEGORY:= property (one area per item, inherited
+down the subtree, shown in the agenda column). An area with no active =:prj:=
+is /neglected/.
+/Avoid/: context (a constraint on acting, not a sphere of life), category
+(=CATEGORY= is the mechanism that carries the area, not a synonym for it),
+project.
+
+*** Context
+A constraint on /where/, /with what/, /with whom/, or /at what energy/ an
+action can be performed — never a description of the /kind/ of work. It answers
+"can I even do this here, now?". Four flavours:
+- place: =@home=, =@office=, =@lab=, =@errands=, =@klusje=
+- tool: =@computer=, =@phone=, =@bank=, =@email=, =@teams=
+- energy: =@focus=, =@braindead=
+- with-whom: =@agenda= + a person tag (see /Agenda list/)
+Kind-of-work tags (=@write=, =@program=, =@read=, =@research=, =@createplot=,
+=@schedule=) are /not/ contexts — they overlap each other and =@computer= and
+are demoted.
+/Avoid/: label, category, area (a horizon, not a context), action-type tag.
+
+*** Agenda list
+The GTD list of things to raise with a specific person or at a specific
+meeting. Carried by =@agenda= + a =:PersonName:= tag. A with-whom context: you
+can only act on it when you are with that person. (Whether the per-person tags
+stay is an open question.)
+/Avoid/: meeting notes, to-discuss pile.
+
+*** Inbox
+Unprocessed captured stuff with no decided meaning yet. Lives in =inbox.org=
+(desktop/web) and =mobin.org= (mobile); both carry =#+filetags: inbox=.
+/Avoid/: todo list, queue.
+
+*** Stuck Project
+A =:prj:= with no actionable forward state (=NEXT=/=WAIT=/=TICK=). The weekly
+review must give every stuck project a Next Action or park/cancel it.
+
+*** Daily Note
+An org-roam note under =notes/daily/= — a log/journal surface only, never a
+task bucket. A TODO-state heading found there is a /stray task/ to be swept
+out to its real home during review.
+/Avoid/: journal (reserved: see below), inbox, capture surface.
+
+*** Stray Task
+A TODO-state heading that has leaked into a daily note. The review sweeps these
+out; they should never live in =notes/daily/=.

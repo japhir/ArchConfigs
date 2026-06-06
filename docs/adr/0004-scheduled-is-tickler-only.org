@@ -1,0 +1,33 @@
+#+title: 0004 — SCHEDULED means "resurface on this date" only; calendar is the hard landscape
+
+* Status
+accepted
+
+* Decision
+
+=SCHEDULED= carries exactly one meaning: hide this item until the given date,
+then resurface it (a tickler date). It never means "I'd like to work on this
+around now." The hard landscape — things that genuinely must happen on a
+specific date — is carried only by =DEADLINE= and timed events in =gcal.org=.
+This is why =org-agenda-todo-ignore-scheduled= is =t=: scheduled-but-not-yet-due
+items are deliberately kept out of the next-actions lists until their date.
+
+* Why
+
+Soft scheduling ("do around now") breeds a pile of overdue items that the
+agenda nags about, which erodes trust in the system — the cardinal GTD failure.
+Reserving =SCHEDULED= for the tickler keeps the calendar a trustworthy hard
+landscape and the next-actions lists honest.
+
+=TICK= and =NEXT= + =SCHEDULED= are *not* equivalent: the =n= view filters on
+the =NEXT= keyword, so a =TICK= item never appears there regardless of any
+date, whereas =NEXT= is the active "do this now" state. =TICK= is a distinct
+parked state (review-this-later); =SCHEDULED= is the orthogonal mechanism that
+sets *when* something resurfaces.
+
+* Consequences
+
+- Items you "want to do soon" stay =NEXT= (chosen during review/engage), not
+  =SCHEDULED= to a wished date.
+- =org-agenda-todo-ignore-scheduled t= must stay; flipping it would reintroduce
+  scheduled items into the todo lists and break the convention.

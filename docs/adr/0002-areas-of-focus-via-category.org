@@ -1,0 +1,49 @@
+#+title: 0002 — Areas of Responsibility carried by the CATEGORY property
+
+* Status
+accepted
+
+* Decision
+
+Add Areas of Responsibility as the GTD horizon above projects. Areas live as
+top-level keyword-less headings in =life.org=, which is both the review
+artifact and the source of the area vocabulary. An area is stamped on a project
+(and pushed down to its child actions) using the built-in =:CATEGORY:= property
+— the org-gtd.el convention =(org-entry-put (point) "CATEGORY" area)= — exactly
+one area per item. =life.org= is wired as =org-areas-file= and reviewed via a
+new =a= "Areas" agenda that flags any area with no active =:prj:= (a neglected
+area). Goals / vision / purpose (higher horizons) are deferred to =SOME=.
+
+* Why
+
+The system covered only runway (=NEXT=) and projects (=:prj:=); without an
+areas layer the review cannot ask "is any area being neglected?" or "does this
+project serve an area?". =CATEGORY= is chosen as the carrier because it is a
+built-in special property that inherits down the subtree, renders in the agenda
+prefix column, and is filterable in the agenda — so area doubles as the visible
+grouping label and the per-area / clock-by-area views come for free, with one
+area structurally enforced. The completion list is derived from =life.org=
+headings rather than a separate =org-gtd-areas-of-focus= defcustom, keeping a
+single source of truth.
+
+* Considered options
+
+- *=:area_x:= tag, keep CATEGORY = project name.* Rejected: would need custom
+  faces/filters for what =CATEGORY= gives natively, and allows accidental
+  multi-area. Kept project-name in the agenda column but at the cost of a
+  second bespoke taxonomy.
+- *Tag, multiple areas allowed.* Rejected: blurs the neglect/balance and
+  clock-by-area math (a project double-counts across areas).
+
+* Consequences
+
+- =CATEGORY= no longer holds the project name; projects are identified by the
+  =:prj:= tag plus their outline path. The agenda category column now shows the
+  area.
+- A one-time migration over =~/org= is needed: stamp =CATEGORY= = area on
+  existing projects and clear old project-name CATEGORY values.
+- Area completion is dynamic (read from =life.org=); adding an area = adding a
+  heading there, no config change.
+- Loose actions (not under a project) may carry a =CATEGORY= area when it is
+  obvious, but it is not required — an unstamped item simply inherits the file
+  default.
