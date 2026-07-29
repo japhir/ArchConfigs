@@ -6,7 +6,7 @@
 #   - macos-focus-mode CLI (https://github.com/arodik/macos-focus-mode),
 #     which wraps the "macos-focus-mode" Shortcut.
 
-MEETING=$(/opt/homebrew/bin/icalbuddy eventsNow)
+MEETING=$(/opt/homebrew/bin/icalbuddy -ea -ic "ilja.kocken@fwdfaster.ai" eventsNow)
 
 if [ -n "$MEETING" ]; then
     /opt/homebrew/bin/macos-focus-mode enable --silent
