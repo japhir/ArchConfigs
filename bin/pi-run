@@ -2,9 +2,12 @@
 
 PI_DIR="${HOME}/.pi/agent"
 SKILLS_DIR="${HOME}/.agents/skills"
+PI_TMP_DIR="/private/tmp/pi"
 
 mkdir -p "$PI_DIR"
 mkdir -p "$SKILLS_DIR"
+mkdir -p "$PI_TMP_DIR"
+chmod 1777 "$PI_TMP_DIR"
 
 # 1. parse security override flag
 ARGS=()
@@ -45,9 +48,11 @@ docker run -it --rm \
   --network bridge \
   --cap-drop=ALL \
   --security-opt no-new-privileges:true \
+  --shm-size=1gb \
   -v "${PWD}":"/workspace":${WORKSPACE_MODE} \
   -v "${PI_DIR}":"/home/sandbox/.pi/agent":rw \
   -v "${SKILLS_DIR}":"/home/sandbox/.agents/skills":ro \
+  -v "${PI_TMP_DIR}":"/tmp":rw \
   -e OLLAMA_HOST="host.docker.internal:11434" \
   -e ANTHROPIC_API_KEY \
   -e OPENAI_API_KEY \
