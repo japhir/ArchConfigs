@@ -10,3 +10,6 @@ calendarlinks.org
 *.DS_Store
 .agent-shell/
 .pi/agent/sessions/*
+graphify-out/
+architecture-review.html
+handoff-build-html-review.md
