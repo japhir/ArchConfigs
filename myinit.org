@@ -32,6 +32,81 @@ nice on both my desktop and laptop.
   (setq use-package-verbose t)
   (use-package delight)  ; to omit lines from the mode-line
 #+end_src
+* system
+** vterm
+#+begin_src emacs-lisp
+  (use-package vterm)
+  ;; (define-key vterm-mode-map (kbd "C-c C-l") #'vterm-clear)
+#+end_src
+** systemd
+#+begin_src emacs-lisp
+  (use-package systemd
+    :defer t)
+#+end_src
+** dired
+#+begin_src emacs-lisp
+  (use-package dired
+    :ensure nil
+    :commands (dired dired-jump)
+    :bind (("C-x C-j" . dired-jump))
+    :custom
+    (dired-listing-switches "-agho --group-directories-first --time-style=iso")
+    (dired-kill-when-opening-new-dired-buffer t)
+    :config
+    (when (eq system-type 'darwin)
+      (setq insert-directory-program "gls"))
+    (put 'dired-find-alternate-file 'disabled t)
+    (defun my-dired-up-directory ()
+      (interactive)
+      (find-alternate-file ".."))
+    (with-eval-after-load 'evil-collection
+      (evil-collection-define-key 'normal 'dired-mode-map
+        "h" #'my-dired-up-directory
+        "l" #'dired-open-file)))
+
+  (use-package dired-open
+    :config
+    (setq dired-open-extensions '(("png" . "imv")
+                                  ("mkv" . "mpv")
+                                  ("mp4" . "mpv"))))
+
+  (use-package dired-hide-dotfiles
+    :hook (dired-mode . dired-hide-dotfiles-mode)
+    :config
+    (with-eval-after-load 'evil-collection
+      (evil-collection-define-key 'normal 'dired-mode-map
+        "H" 'dired-hide-dotfiles-mode)))
+    #+end_src
+
+** zoxide dired
+:PROPERTIES:
+:CREATED:  [2025-05-28 Wed 09:22]
+:END:
+From https://tvraman.github.io/emacspeak/blog/augment-emacs-with-zoxide.html
+#+begin_src emacs-lisp
+  (defun dired-zoxide (q)
+    "Query zoxide  and launch dired.
+  Shell Utility zoxide --- implemented in Rust --- lets you jump to
+  directories that are used often.
+  This command does for Emacs, what zoxide does at the  shell."
+    (interactive "sZoxide:")
+    (if-let
+        ((zoxide (executable-find "zoxide"))
+         (target
+          (with-temp-buffer
+            (if (= 0 (call-process zoxide nil t nil "query" q))
+                (string-trim (buffer-string))))))
+        (funcall-interactively #'dired  target)
+      (unless zoxide (error "Install zoxide"))
+      (unless target (error "No Match"))))
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; (global-set-key (kbd "C-; j") #'dired-zoxide)
+  (with-eval-after-load 'evil
+    (define-key evil-normal-state-map (kbd "gz") #'dired-zoxide))
+#+end_src
+
 * dirvar
 define dirvars 'org-in-file', 'org-gtd-file', etc.
 #+begin_src emacs-lisp
@@ -727,11 +802,11 @@ basic latex settings
   (org-agenda-include-all-todo nil)
 #+end_src
 *** agenda files
-all the org-files in my org-directory
+all the org-files in my org-directory. Rebuilt dynamically before every
+agenda build (see "dynamic agenda files" under :config), so files created
+after init — e.g. new dailies — are always included.
 #+begin_src emacs-lisp
   ;(setq org-directory "~/org/") ;; changed org-roam capture
-  (org-agenda-files (append
-                     (directory-files-recursively "~/org" "\\.org$")))
 #+end_src
 *** refile targets
 swyper makes refiling amazing!
@@ -830,7 +905,6 @@ Filter tasks by context (sorted by todo state)
           ("gk" "Klusjes/Craft" tags-todo "@klusje")
           ("go" "Office" tags-todo "@office")
           ("ge" "Errands" tags-todo "@errands")
-          ("gl" "Laboratory" tags-todo "@lab")
           ;; ("gt" "Travel" tags-todo "@travel")
           ("gt" "Teams" tags-todo "@teams")
           ("gc" "Computer" tags-todo "@computer")
@@ -841,21 +915,19 @@ Filter tasks by context (sorted by todo state)
           ("gp" "Program" tags-todo "@program")
           ("gC" "Create/Plot" tags-todo "@createplot")
           ("gr" "Read" tags-todo "@read")
-          ("gg" "Research" tags-todo "@research")
-          ("gs" "Schedule" tags-todo "@schedule")
+          ("gg" "Research" tags-todo "research")
+          ("gs" "Software" tags-todo "software")
           ("ga" "Agenda" tags-todo "@agenda")
           ("E" . "Energy")
           ("Ef" "Focus" tags-todo "@focus")
           ("Ed" "Braindead" tags-todo "@braindead")
-          ("D" "DataSteward" tags-todo "DataSteward")
           ("p" . "People")
-          ("pm" "Martin" tags-todo "Martin")
-          ("pr" "Richard" tags-todo "Richard")
-          ("ps" "Sharon" tags-todo "Sharon")
           ("pl" "Line" tags-todo "Line")
           ("pa" "Anne" tags-todo "Anne")
-          ("pf" "FEST" tags-todo "FEST")
-          ("pi" "Inigo" tags-todo "Inigo")))
+          ("pr" "Rens" tags-todo "Rens")
+          ("pk" "Renske" tags-todo "Renske")
+          ("pj" "Jonathan" tags-todo "Jonathan")
+          ("pf" "Frans" tags-todo "Frans")))
 #+end_src
 *** stuck projects
 #+begin_src emacs-lisp
@@ -893,7 +965,7 @@ customize capture templates
 *** TODO states
 #+begin_src emacs-lisp
   (org-todo-keywords
-   '((sequence "NEXT(n)" "WAIT(w!/!)" "TICK(t)" "SOME(s!/!)" "|"
+   '((sequence "TODO(t)" "NEXT(n)" "WAIT(w!/!)" "TICK(k)" "SOME(s!/!)" "|"
                "DONE(d)" "CANC(c)")))
   #+end_src
 
@@ -922,11 +994,17 @@ customize capture templates
 #+begin_src emacs-lisp
   (org-fast-tag-selection-single-key t)
   (org-tag-alist '(("prj" . ?j)
+                   ;; WBSO / export tags (see ~/org/wbso-export.org and the
+                   ;; Note Workflow v2 spec, D6/D9/D23/D24)
+                   ("software" . ?s)   ;; claimable R&D work (Emdesk :R:)
+                   ("research" . ?g)   ;; claimable R&D work (Emdesk :R:)
+                   ("meeting" . ?M)    ;; context-only in export, no effort claim
+                   ("fail" . ?x)       ;; failed experiment — WBSO gold
+                   ("private" . ?v)    ;; never exported
                    (:startgroup . nil)
                    ("@home" . ?h)
                    ("@office" . ?o)
                    ("@errands" . ?e)
-                   ("@lab" . ?l)
                    (:endgroup . nil)
                    ("@computer" . ?c)  ;; general in case I can't decide
                    ("@klusje" . ?k)    ;; crafts, things that require my toolbox
@@ -938,7 +1016,6 @@ customize capture templates
                    ("@program" . ?p)
                    ("@createplot" . ?C)
                    ("@read" . ?r)
-                   ("@research" . ?g)
                    ("@schedule" . ?s)
                    ("@agenda" . ?a)    ;; things to discuss
                    ;; ("@admin" . ??) ;; do I want admin? which key should it use?
@@ -949,15 +1026,13 @@ customize capture templates
                    (:startgroup . nil)
                    ("Work" . ?W) ("Personal" . ?P)
                    (:endgroup . nil)
-                   ;; ("DataSteward" . ?D)
                    ;; tags to accompany the @agenda context
                    ("Family" . ?F)
-                   ("Martin" . ?M)
-                   ("Richard" . ?R)
-                   ("Sharon" . ?S)
                    ("Line" . ?L)
-                   ("Inigo" . ?I)
-                   ("Niels" . ?N)))
+                   ("Rens" . ?R)
+                   ("Renske" . ?K)
+                   ("Jonathan" . ?J)
+                   ("Frans" . ?N)))
 #+end_src
 *** org src blocks
 #+begin_src emacs-lisp
@@ -968,6 +1043,21 @@ customize capture templates
 ** config start
 #+begin_src emacs-lisp
   :config
+#+end_src
+*** dynamic agenda files
+Rescan ~/org before every agenda build so newly created files (dailies!)
+show up without restarting or re-running init. Lockfiles (.#foo.org) are
+dangling symlinks that would break the agenda, so they're filtered out.
+#+begin_src emacs-lisp
+  (defun my/org-agenda-files-refresh (&rest _)
+    "Rebuild variable `org-agenda-files' from the contents of ~/org."
+    (setq org-agenda-files
+          (seq-remove (lambda (f)
+                        (string-prefix-p ".#" (file-name-nondirectory f)))
+                      (directory-files-recursively "~/org" "\\.org$"))))
+  (my/org-agenda-files-refresh)
+  (advice-add 'org-agenda :before #'my/org-agenda-files-refresh)
+  (advice-add 'org-todo-list :before #'my/org-agenda-files-refresh)
 #+end_src
 *** effort estimates
 #+begin_src emacs-lisp
@@ -1671,6 +1761,49 @@ https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
       (zp/org-set-time-file-property "LAST_MODIFIED")))
 #+end_src
 
+** vulpea (work laptop only)
+:PROPERTIES:
+:CREATED:  [2026-07-09 Thu]
+:END:
+[[https://github.com/d12frosted/vulpea][vulpea]] v2 (2.5.0+, the July-2026 standalone rewrite): own SQLite DB,
+async indexing, runs *side by side* with org-roam over the same files
+(D15). Used by [[file:~/org/wbso-export.org][wbso-export.org]] to resolve project-node titles → IDs and
+to find unlinked plaintext mentions. org-roam above is untouched.
+
+Machine-scoped to this work mac (=system-type 'darwin=) per D21; the
+personal Arch machine keeps its inbox/todo/work GTD for now. To migrate
+later, lift the =when= guard (see the spec's D21 migration steps).
+
+Notes:
+- =vulpea-buffer-alias-property= points at =ROAM_ALIASES= so vulpea reads
+  the same aliases org-roam wrote (D14; load-bearing for unlinked-mention
+  detection of old title spellings).
+- vulpea keeps its DB in =user-emacs-directory= — *separate* from
+  =~/org-roam.db=, so the two databases never collide.
+- =rg= (ripgrep) is required for unlinked mentions; =fswatch= is optional
+  (external-change detection). Without =fswatch= vulpea polls, which is
+  fine here.
+#+begin_src emacs-lisp
+  (when (eq system-type 'darwin)
+    ;; Point vulpea at the notes dir and the org-roam alias property BEFORE it
+    ;; loads, so its defaults compute correctly.
+    (setq vulpea-db-sync-directories (list (file-truename "~/org/notes/")))
+    (setq vulpea-buffer-alias-property "ROAM_ALIASES") ; D14
+    (use-package vulpea
+      :ensure (vulpea :host github :repo "d12frosted/vulpea"
+                      :ref "v2.5.0"
+                      :files (:defaults))
+      :defer t
+      :commands (vulpea-find vulpea-insert vulpea-db-sync-full-scan)
+      :init
+      (setq vulpea-db-location
+            (expand-file-name "vulpea/vulpea.db" user-emacs-directory))
+      :config
+      ;; background reindex + external-change detection (D15). On first run
+      ;; this scans ~/org/notes/ in the background to build the DB.
+      (vulpea-db-autosync-mode +1)))
+#+end_src
+
 * extend default completion packages
 :PROPERTIES:
 :CREATED:  [2024-02-24 Sat 15:27]
@@ -1821,90 +1954,6 @@ completion at point
                   corfu-auto nil)
       (corfu-mode))
     (add-hook 'eshell-mode-hook #'crafted-completion-corfu-eshell))
-#+end_src
-
-* system
-** vterm
-#+begin_src emacs-lisp
-  (use-package vterm)
-  ;; (define-key vterm-mode-map (kbd "C-c C-l") #'vterm-clear)
-#+end_src
-** systemd
-#+begin_src emacs-lisp
-  (use-package systemd
-    :defer t)
-#+end_src
-** dired
-#+begin_src emacs-lisp
-  (use-package dired
-    :ensure nil
-    :commands (dired dired-jump)
-    :bind (("C-x C-j" . dired-jump))
-    :custom
-    (dired-listing-switches "-agho --group-directories-first --time-style=iso")
-    (dired-kill-when-opening-new-dired-buffer t)
-    :config
-    (when (eq system-type 'darwin)
-      (setq insert-directory-program "gls"))
-    (put 'dired-find-alternate-file 'disabled t)
-    (defun my-dired-up-directory ()
-      (interactive)
-      (find-alternate-file ".."))
-    (with-eval-after-load 'evil-collection
-      (evil-collection-define-key 'normal 'dired-mode-map
-        "h" #'my-dired-up-directory
-        "l" #'dired-open-file)))
-
-  (use-package dired-open
-    :config
-    (setq dired-open-extensions '(("png" . "imv")
-                                  ("mkv" . "mpv")
-                                  ("mp4" . "mpv"))))
-
-  (use-package dired-hide-dotfiles
-    :hook (dired-mode . dired-hide-dotfiles-mode)
-    :config
-    (with-eval-after-load 'evil-collection
-      (evil-collection-define-key 'normal 'dired-mode-map
-        "H" 'dired-hide-dotfiles-mode)))
-    #+end_src
-
-** zoxide dired
-:PROPERTIES:
-:CREATED:  [2025-05-28 Wed 09:22]
-:END:
-From https://tvraman.github.io/emacspeak/blog/augment-emacs-with-zoxide.html
-#+begin_src emacs-lisp
-  (defun dired-zoxide (q)
-    "Query zoxide  and launch dired.
-  Shell Utility zoxide --- implemented in Rust --- lets you jump to
-  directories that are used often.
-  This command does for Emacs, what zoxide does at the  shell."
-    (interactive "sZoxide:")
-    (if-let
-        ((zoxide (executable-find "zoxide"))
-         (target
-          (with-temp-buffer
-            (if (= 0 (call-process zoxide nil t nil "query" q))
-                (string-trim (buffer-string))))))
-        (funcall-interactively #'dired  target)
-      (unless zoxide (error "Install zoxide"))
-      (unless target (error "No Match"))))
-#+end_src
-
-#+begin_src emacs-lisp
-  ;; (global-set-key (kbd "C-; j") #'dired-zoxide)
-  (with-eval-after-load 'evil
-    (define-key evil-normal-state-map (kbd "gz") #'dired-zoxide))
-#+end_src
-
-** setting PATH
-#+begin_src emacs-lisp
-  (use-package exec-path-from-shell
-    :ensure t
-    :config
-    (when (memq window-system '(mac ns x))
-      (exec-path-from-shell-initialize)))
 #+end_src
 
 * AI agents
