@@ -1,0 +1,189 @@
+#+title: Replace oauth2ms with mutt_oauth2.py for mbsync + O365 XOAUTH2
+#+author: notes for Claude / future-self
+#+date: 2026-06-06
+
+* Purpose
+Prompt + research record for migrating the Microsoft Office365 (solismail,
+=i.j.kocken@uu.nl=) mbsync OAuth2 token fetcher away from the dead =oauth2ms=
+library to the maintained =mutt_oauth2.py=.
+
+Do *not* execute yet. This file is the spec. When ready, feed the "Prompt to
+execute" section to an agent (or follow it by hand).
+
+* Background / why this exists
+- Email synced locally with isync/mbsync, read in Emacs mu4e.
+- Gmail accounts (LOGIN auth) fine. The O365 work account uses XOAUTH2 and
+  broke.
+- Two bugs were already fixed in a prior session:
+  1. =/etc/hosts= had a typo =126.0.0.1 localhost= (should be =127.0.0.1=),
+     so the oauth2ms local redirect HTTP server could not bind
+     (=OSError: [Errno 99] Cannot assign requested address=). FIXED.
+  2. The cached refresh token in
+     =~/.local/share/oauth2ms/credentials.bin= had expired (last write
+     2025-06-24, MS refresh tokens die after ~90d). Re-auth fixed it.
+- =mbsync -a= now runs clean. This migration is *preventive*: oauth2ms upstream
+  is unmaintained (~5-6 yrs, last meaningful commit 2020) and fragile (local
+  redirect HTTP server, latent crash in =fetch_token_from_cache= when
+  =acquire_token_silent= returns None).
+
+* Current working setup (the thing being replaced)
+- mbsync config: =~/.mbsyncrc=, IMAPAccount =solismail=.
+  - =Host outlook.office365.com=
+  - =User i.j.kocken@uu.nl=
+  - =AuthMechs XOAUTH2=
+  - =PassCmd /home/japhir/bin/oauth2ms=  (symlink ->
+    =~/Documents/oauth2ms/oauth2ms=)
+- Token fetcher: =oauth2ms= (python, =/usr/bin/python3= shebang, system
+  =msal=/=gnupg=/=pyxdg=).
+  - config:      =~/.config/oauth2ms/config.json=
+  - token cache: =~/.local/share/oauth2ms/credentials.bin= (plaintext JSON;
+    =-e= gpg encryption NOT used)
+- Azure app registration values currently in use (reusable). Real values live
+  in =~/.config/oauth2ms/config.json= (NOT in this repo) — read them from there
+  at execution time. Placeholders below to keep secrets out of git:
+  - tenant_id: =<TENANT_ID>=
+  - client_id: =<CLIENT_ID>=
+  - client_secret: =<CLIENT_SECRET>= (the only true secret; keep it only in
+    config.json, never commit)
+  - scopes: =https://outlook.office.com/IMAP.AccessAsUser.All=,
+            =https://outlook.office.com/SMTP.Send=
+- SASL XOAUTH2 *mechanism* plugin (what actually lets mbsync speak XOAUTH2):
+  =cyrus-sasl-xoauth2-git= (AUR) — INSTALLED, actively maintained, KEEP.
+  Files at =/usr/lib/sasl2/libxoauth2.so=.
+
+* Research basis (2026-06, web search)
+** Candidates considered
+- *mutt_oauth2.py* — token fetcher shipped with the mutt project. Maintained.
+  Supports devicecode and authcode flows. Stores token encrypted via a
+  user-supplied decryption/encryption pipe (gpg / pass / keychain). Drop-in
+  =PassCmd= replacement; rest of stack unchanged.
+- *sasl-xoauth2 (tarickb)* — a SASL plugin that refreshes tokens *internally*;
+  removes the need for any token script and also covers sending
+  (msmtp/postfix). More moving parts; replaces the cyrus-sasl-xoauth2 plugin
+  (conflict); reported O365 refresh quirks (issue #89), HVE needs
+  refresh_window >= 600.
+- *oauth2ms* — current. Dead upstream. Reject.
+
+** Packaging reality on Arch (checked with pacman/paru)
+- No XOAUTH2 SASL plugin in official repos at all (mainline =cyrus-sasl= ships
+  gssapi/ldap/sql only). The XOAUTH2 *mechanism* is inherently AUR /
+  build-from-source whichever route is taken.
+- =mutt= and =neomutt= ARE in official =extra= repo. =extra/mutt= ships
+  =/usr/share/doc/mutt/samples/mutt_oauth2.py= (+ =.README=). So Option A's
+  token fetcher comes from an official-repo package.
+- =sasl-xoauth2-git= is AUR-only (new dep); =cyrus-sasl-xoauth2-git= AUR-only
+  (already installed).
+
+** Decision: Option A (mutt_oauth2.py)
+Rationale:
+- Net-new AUR packages = 0. Reuses the already-installed, *maintained*
+  cyrus-sasl-xoauth2 plugin (the only genuinely dead component is the fetcher,
+  which this replaces).
+- Token fetcher sourced from official =extra/mutt=.
+- devicecode flow needs no local redirect HTTP server -> the =/etc/hosts= /
+  port-bind class of failure cannot recur.
+- Smallest, lowest-risk change: swap one =PassCmd=.
+Pick Option B only if/when sending-side auth (msmtp/postfix) should be unified
+under the same token manager.
+
+** Sources
+- Ben Swift, "The great 2025 email yak-shave: O365 + mbsync + mu + neomutt +
+  msmtp" — https://benswift.me/blog/2025/09/12/the-great-2025-email-yak-shave-o365-mbsync-mu-neomutt-msmtp/
+- sasl-xoauth2 (tarickb) README —
+  https://github.com/tarickb/sasl-xoauth2/blob/master/README.md
+- sasl-xoauth2 O365 token-refresh issue #89 —
+  https://github.com/tarickb/sasl-xoauth2/issues/89
+- Arch forum, "OAuth 2 for Office365 with isync/msmtp" —
+  https://bbs.archlinux.org/viewtopic.php?id=262954
+- mutt_oauth2.py + README shipped at
+  =/usr/share/doc/mutt/samples/mutt_oauth2.py{,.README}= (extra/mutt)
+
+* Prompt to execute
+#+begin_quote
+Migrate the solismail (i.j.kocken@uu.nl, Office365) mbsync token fetcher from
+oauth2ms to mutt_oauth2.py. Keep the cyrus-sasl-xoauth2 SASL plugin and the
+mbsync XOAUTH2 mechanism as-is. Do not touch the gmail/hawaii accounts. Verify
+done when `mbsync -a` runs clean using the new fetcher.
+
+Steps:
+
+1. Ensure the script is available. Prefer the official package:
+   - If `mutt` is not installed: `pacman -S mutt` (official extra repo), OR
+     just copy the standalone script — both fine.
+   - Copy the sample out of the doc dir so pacman upgrades don't surprise us:
+     `mkdir -p ~/bin && cp /usr/share/doc/mutt/samples/mutt_oauth2.py ~/bin/mutt_oauth2.py && chmod +x ~/bin/mutt_oauth2.py`
+   - Read `/usr/share/doc/mutt/samples/mutt_oauth2.py.README` first; the
+     script's registration constants and CLI may differ by version.
+
+2. Configure the registration in the script. Open `~/bin/mutt_oauth2.py` and
+   set the Microsoft/registration block. Two sub-options:
+   a. Reuse the existing Azure app (preferred, already consented). Read all
+      three values from ~/.config/oauth2ms/config.json (do not hardcode here):
+      - tenant: <TENANT_ID> (config.json "tenant_id")
+      - client_id: <CLIENT_ID> (config.json "client_id")
+      - client_secret: <CLIENT_SECRET> (config.json "client_secret")
+      - registration name "microsoft" with authflow. Prefer `devicecode`
+        (no local redirect server). If the app registration does not permit
+        device code / public-client flows, fall back to `authcode` (localhost
+        redirect) — that app already had a localhost redirect registered.
+      - scopes must include offline_access plus
+        https://outlook.office.com/IMAP.AccessAsUser.All and
+        https://outlook.office.com/SMTP.Send
+   b. Or use the script's built-in Thunderbird/mutt client_id with devicecode
+      if reusing the UU app is troublesome.
+
+3. Choose token storage. Use gpg encryption (the user has gpg; oauth2ms had a
+   gpg path too). Pick a token file path, e.g.
+   `~/.local/share/mutt_oauth2/solismail.token`, and a gpg recipient (the
+   user's own key/email). mutt_oauth2.py takes `--encryption-pipe` /
+   `--decryption-pipe` args wrapping `gpg --encrypt -r <key>` and
+   `gpg --decrypt`. Confirm exact flag names from the README for the installed
+   version before wiring.
+
+4. First-time authorize (INTERACTIVE — the user must complete the browser /
+   device-code login as i.j.kocken@uu.nl). Run the script with
+   `--authorize` (plus the encryption-pipe args). Do not attempt to complete
+   the Microsoft login non-interactively; hand the command to the user to run
+   with the `!` prefix so output lands in the session. Success = token file
+   written.
+
+5. Update ~/.mbsyncrc, IMAPAccount solismail only. Replace
+     PassCmd /home/japhir/bin/oauth2ms
+   with a call that prints the access token, e.g.
+     PassCmd "~/bin/mutt_oauth2.py ~/.local/share/mutt_oauth2/solismail.token --decryption-pipe 'gpg --decrypt'"
+   (adjust to the README's exact invocation; mbsync expects the raw bearer
+   token on stdout, which the cyrus-sasl-xoauth2 plugin then encodes — same
+   contract oauth2ms satisfied). Leave AuthMechs XOAUTH2 unchanged.
+
+6. Test: `mbsync solismail` then `mbsync -a`. Both must exit 0 with no auth
+   errors. Confirm a token *refresh* works by deleting nothing but running a
+   second time after the access token's short lifetime if practical (the
+   refresh token in the token file should auto-renew).
+
+7. Cleanup ONLY after success is confirmed:
+   - Remove the oauth2ms PassCmd symlink target usage (leave the clone for
+     now, or remove `~/bin/oauth2ms` symlink).
+   - Optionally `paru -Rns oauth2ms-git` (redundant AUR pkg) and delete the
+     stray uv-init files in ~/Documents/oauth2ms (main.py, pyproject.toml,
+     .python-version, 0-byte README.md, .venv) if the clone is abandoned.
+   - Keep ~/.config/oauth2ms/config.json until the new flow is proven (it
+     holds the client_secret being reused).
+
+Constraints / gotchas:
+- Never edit myinit.el (generated); not relevant here anyway.
+- The browser/device-code login is interactive — cannot be done by the agent.
+- Do not modify gmail or hawaii IMAPAccount blocks.
+- mbsync needs the raw access token on stdout from PassCmd, NOT an
+  xoauth2-base64 blob (the SASL plugin does the SASL encoding). Match the
+  oauth2ms behaviour (it printed the plain token; PassCmd had no
+  --encode-xoauth2).
+#+end_quote
+
+* Open questions to resolve at execution time
+- Exact CLI flags of the *installed* mutt_oauth2.py version (authorize flag,
+  pipe flag names) — read the README, versions drift.
+- Does the UU Azure app registration allow device-code / public-client flow?
+  If not, use authcode (localhost redirect already registered) — and note the
+  /etc/hosts fix means localhost now binds correctly.
+- Whether to also migrate the *sending* path (msmtp) to the same token; out of
+  scope here (that's the argument for Option B later).
