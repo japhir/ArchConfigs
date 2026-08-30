@@ -28,7 +28,7 @@ is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
 Emacs 30.x ships compat 30.x built-in. Many packages (orderless, magit, etc.)
 require compat >= 31. Install from source to shadow the built-in.
 #+begin_src emacs-lisp
-  (elpaca (compat :host github :repo "emacs-compat/compat" :inherit nil))
+  (elpaca (compat :type git :host github :repo "emacs-compat/compat" :inherit nil))
   (elpaca-wait)
 #+end_src
 
@@ -212,7 +212,7 @@ https://github.com/iqbalansari/emacs-emojify
 This allows me to write nicely on a widescreen monitor in a single buffer.
 #+begin_src emacs-lisp
   (use-package visual-fill-column
-    :ensure (:host github :repo "joostkremers/visual-fill-column" :inherit nil)
+    :ensure (:type git :host github :repo "joostkremers/visual-fill-column" :inherit nil)
     :hook (org-mode . visual-fill-column-mode)
     :custom
     ;; (global-visual-fill-column-mode t)
@@ -1768,10 +1768,10 @@ autocompletion replacement!
             (child-frame-border-width . 0)))
     (global-corfu-mode)
     :config
+    ;; corfu-terminal is deliberately not installed (:ensure nil), and a daemon's
+    ;; initial frame is non-graphic, so require it defensively rather than failing init.
     (unless (display-graphic-p)
-      (use-package corfu-terminal
-        :ensure nil
-        :config
+      (when (require 'corfu-terminal nil :noerror)
         (corfu-terminal-mode +1)))
     ;; Setup corfu for popup like completion
     (customize-set-variable 'corfu-cycle t)        ; Allows cycling through candidates
@@ -1859,7 +1859,11 @@ completion at point
 * system
 ** vterm
 #+begin_src emacs-lisp
-  (use-package vterm)
+  (use-package vterm
+    :custom
+    ;; build vterm-module.so non-interactively; otherwise a batch byte-compile
+    ;; that requires vterm hangs forever on the "build it? (y/n)" prompt
+    (vterm-always-compile-module t))
   ;; (define-key vterm-mode-map (kbd "C-c C-l") #'vterm-clear)
 #+end_src
 ** systemd
@@ -2203,7 +2207,14 @@ emacs speaks statistics, work with R etc.
 #+begin_src emacs-lisp
   (use-package ess
     ;; :load-path "/usr/share/emacs/site-lisp/ess"
-    :init (require 'ess-site)  ;; seems like this is needed to load the minor modes as well keybindings don't work without it
+    :init
+    ;; upstream moved ess-jags-d.el to lisp/obsolete/, which elpaca links into a
+    ;; subdirectory that is not on load-path -- but ess-site.el still requires it.
+    (when-let* ((lib (locate-library "ess-mode"))
+                (dir (expand-file-name "lisp/obsolete" (file-name-directory lib)))
+                ((file-directory-p dir)))
+      (add-to-list 'load-path dir))
+    (require 'ess-site)  ;; seems like this is needed to load the minor modes as well keybindings don't work without it
     :hook (
            ((ess-r-mode inferior-ess-r-mode) . electric-layout-mode)
            ;; (ess-r-post-run . (lambda ()
