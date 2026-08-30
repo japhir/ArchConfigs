@@ -1,0 +1,2 @@
+#!/usr/bin/sh
+git diff `git log --oneline --diff-filter=A -- "$1" | awk '{print $1}'` HEAD "$1"
