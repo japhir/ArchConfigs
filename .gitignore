@@ -11,3 +11,6 @@ calendarlinks.org
 .\#*
 *.DS_Store
 .agent-shell/
+
+# editor/tooling backups
+*.bak
