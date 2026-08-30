@@ -119,7 +119,7 @@ vterm_cmd() {
 # See, http://tldp.org/HOWTO/Xterm-Title-4.html, for the meaning of the various
 # symbols.
 autoload -U add-zsh-hook
-add-zsh-hook -Uz chpwd (){ print -Pn "\e]2;%m:%2~\a" }
+add-zsh-hook -Uz chpwd (){ [[ -t 1 ]] && print -Pn "\e]2;%m:%2~\a" }
 
 # communicate prompt location to vterm
 vterm_prompt_end() {
