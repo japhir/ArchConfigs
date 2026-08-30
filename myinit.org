@@ -905,7 +905,7 @@ customize capture templates
 *** TODO states
 #+begin_src emacs-lisp
   (org-todo-keywords
-   '((sequence "NEXT(n)" "WAIT(w!/!)" "TICK(t)" "SOME(s!/!)" "|"
+   '((sequence "TODO(t)" "NEXT(n)" "WAIT(w!/!)" "TICK(k)" "SOME(s!/!)" "|"
                "DONE(d)" "CANC(c)")))
   #+end_src
 
