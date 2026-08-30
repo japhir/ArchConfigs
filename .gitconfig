@@ -33,8 +33,3 @@
 	repo = /home/japhir/SurfDrive/Postdoc1/prj/2023-04-18_guide_to_astronomical_solutions
 	repo = /home/japhir/SurfDrive/Postdoc1/prj/2023-06-03_bayesian_snvec/
 
-[filter "remove-pass"]
-	clean = "sed -e 's/^password=.*/#password=TODO/'"
-
-[filter "remove-email"]
-	clean = "sed -e ^User .*/User #TODO yourmail@yourhost.com/'"
