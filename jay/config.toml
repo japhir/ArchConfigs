@@ -1,0 +1,115 @@
+# The keymap that is used for shortcuts and also sent to clients.
+
+keymap = """
+    xkb_keymap {
+        xkb_keycodes { include "evdev+aliases(qwerty)" };
+	xkb_types    { include "complete" };
+	xkb_compat   { include "complete" };
+	xkb_symbols  { include "pc+us+inet(evdev)+ctrl(nocaps)+compose(ralt)" }; };
+    """ 
+    # xkb_keycodes { include "evdev+aliases(qwerty)" };
+    # xkb_types    { include "complete"              };
+    # xkb_compat   { include "complete"              };
+    # xkb_symbols  { include "pc+us+inet(evdev)"     };
+
+# An action that will be executed when the GPU has been initialized.
+on-graphics-initialized = [
+    { type = "exec", exec = "swayosd-server" },
+    { type = "exec", exec = "wl-tray-bridge" },
+]
+
+# Shortcuts that are processed by the compositor.
+# The left hand side should be a key, possibly prefixed with modifiers.
+# The right hand side should be an action.
+[shortcuts]
+# The focus-X actions move the keyboard focus to next window on the X.
+logo-h = "focus-left"
+logo-j = "focus-down"
+logo-k = "focus-up"
+logo-l = "focus-right"
+
+# The move-X actions move window that has the keyboard focus to the X.
+logo-shift-h = "move-left"
+logo-shift-j = "move-down"
+logo-shift-k = "move-up"
+logo-shift-l = "move-right"
+
+# The split-X action places the currently focused window in a container
+# and sets the split direction of the container to X.
+# logo-h = "split-horizontal"
+logo-v = "split-vertical"
+
+# The toggle-split action changes the split direction of the current
+# container.
+logo-e = "toggle-split"
+# The toggle-mono action changes whether the current container shows
+# a single window or all windows next to each other.
+logo-w = "toggle-mono"
+# The toggle-fullscreen action toggles the current window between
+# windowed and fullscreen.
+logo-f = "toggle-fullscreen"
+
+# The focus-parent action moves the keyboard focus to the parrent of
+# the currently focused window.
+logo-p = "focus-parent"
+# The close action requests the currently focused window to close.
+logo-shift-q = "close"
+# The toggle-floating action changes the currently focused window between
+# floating and tiled.
+logo-shift-space = "toggle-floating"
+
+# All actions above are so-called simple actions that are identified by
+# a string. More complex actions take parameters and are written as a table.
+# For example, the exec action spawns an application and has the exec field
+# that describes how to spawn the application.
+# Logo-Return = { type = "exec", exec = "notify-send logo-return" }
+logo-Return = { type = "exec", exec = "foot" }
+logo-shift-t = { type = "exec", exec = "foot" }
+logo-d = { type = "exec", exec = "sh -lc 'wofi --show drun --allow-images --allow-markup'" }
+# The quit action terminates the compositor.
+logo-shift-e = "quit"
+# The reload-config-toml action reloads the TOML configuration file.
+logo-shift-r = "reload-config-toml"
+
+# The switch-to-vt action switches to a different virtual terminal.
+ctrl-alt-F1 = { type = "switch-to-vt", num = 1 }
+ctrl-alt-F2 = { type = "switch-to-vt", num = 2 }
+ctrl-alt-F3 = { type = "switch-to-vt", num = 3 }
+ctrl-alt-F4 = { type = "switch-to-vt", num = 4 }
+ctrl-alt-F5 = { type = "switch-to-vt", num = 5 }
+ctrl-alt-F6 = { type = "switch-to-vt", num = 6 }
+ctrl-alt-F7 = { type = "switch-to-vt", num = 7 }
+ctrl-alt-F8 = { type = "switch-to-vt", num = 8 }
+ctrl-alt-F9 = { type = "switch-to-vt", num = 9 }
+ctrl-alt-F10 = { type = "switch-to-vt", num = 10 }
+ctrl-alt-F11 = { type = "switch-to-vt", num = 11 }
+ctrl-alt-F12 = { type = "switch-to-vt", num = 12 }
+
+# The show-workspace action switches to a workspace. If the workspace is not
+# currently being used, it is created on the output that contains the pointer.
+logo-1 = { type = "show-workspace", name = "1" }
+logo-2 = { type = "show-workspace", name = "2" }
+logo-3 = { type = "show-workspace", name = "3" }
+logo-4 = { type = "show-workspace", name = "4" }
+logo-5 = { type = "show-workspace", name = "5" }
+logo-6 = { type = "show-workspace", name = "6" }
+logo-7 = { type = "show-workspace", name = "7" }
+logo-8 = { type = "show-workspace", name = "8" }
+logo-9 = { type = "show-workspace", name = "9" }
+# super-F10 = { type = "show-workspace", name = "10" }
+# super-F11 = { type = "show-workspace", name = "11" }
+# super-F12 = { type = "show-workspace", name = "12" }
+
+# The move-to-workspace action moves the currently focused window to a workspace.
+logo-shift-1 = { type = "move-to-workspace", name = "1" }
+logo-shift-2 = { type = "move-to-workspace", name = "2" }
+logo-shift-3 = { type = "move-to-workspace", name = "3" }
+logo-shift-4 = { type = "move-to-workspace", name = "4" }
+logo-shift-5 = { type = "move-to-workspace", name = "5" }
+logo-shift-6 = { type = "move-to-workspace", name = "6" }
+logo-shift-7 = { type = "move-to-workspace", name = "7" }
+logo-shift-8 = { type = "move-to-workspace", name = "8" }
+logo-shift-9 = { type = "move-to-workspace", name = "9" }
+# super-shift-F10 = { type = "move-to-workspace", name = "10" }
+# super-shift-F11 = { type = "move-to-workspace", name = "11" }
+# super-shift-F12 = { type = "move-to-workspace", name = "12" }

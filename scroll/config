@@ -1,0 +1,431 @@
+# -*- mode: conf -*-
+# vim: ft=swayconfig
+# Read `man 5 scroll` for a complete reference.
+
+# The file we include below is created and will be overwritten by nwg-shell-config GUI!
+include ~/.config/sway/variables
+include ~/.config/sway/mediakeys
+include ~/.config/sway/inputs
+include ~/.config/sway/outputs
+include ~/.config/sway/autostart
+include ~/.config/sway/workspaces
+include ~/.config/sway/software_workspaces
+include ~/.config/sway/for_window
+# i've tweaked them manually.
+
+# overwrite variables
+set $launcher wofi --show drun --allow-images --allow-markup scrollmsg exec --
+
+# load urxvt customisations moved them over to ~/.Xdefaults, which should be loaded automatically
+exec /usr/bin/xrdb /home/jahir/.Xresources
+# load environment variables
+exec sh ~/.profile
+seat seat0 xcursor_theme Yaru 24
+
+# load urxvt customisations moved them over to ~/.Xdefaults, which should be loaded automatically
+exec /usr/bin/xrdb /home/jahir/.Xresources
+# load environment variables
+exec sh ~/.profile
+seat seat0 xcursor_theme Yaru 24
+
+exec_always import-gsettings \
+    gtk-theme:gtk-theme-name \
+    icon-theme:gtk-icon-theme-name \
+    cursor-theme:gtk-cursor-theme-name
+
+# Your preferred application launcher
+# Note: it is recommended that you pass the final command to sway
+# set $menu dmenu_path | rofi -dmenu | xargs swaymsg exec --
+set $menu wofi --show drun --allow-images --allow-markup swaymsg exec --
+# --color=/home/japhir/.cache/wal/colors-rofi-dark.rasi
+
+exec swayidle -w \
+         timeout 300 'swaylock -f -c 000000' \
+         timeout 600 'scrollmsg "output * power off"' resume 'scrollmsg "output * power on"' \
+         before-sleep 'swaylock -f -c 000000'
+# This will lock your screen after 300 seconds of inactivity, then turn off
+# your displays after another 300 seconds, and turn your screens back on when
+# resumed. It will also lock your screen before your computer goes to sleep.
+
+
+### Windows defaults
+default_border pixel 2
+gaps inner 4
+gaps outer 20
+client.focused #15439e #000000 #e0e0e0 #2e9ef4 #15439e
+client.focused_inactive #595959 #000000 #e0e0e0 #2e9ef4 #595959
+client.unfocused #595959 #000000 #e0e0e0 #2e9ef4 #595959
+
+# Idle inhibit for fullscreen windows
+for_window [all] inhibit_idle fullscreen
+
+# Layout settings
+layout_default_width 0.5
+layout_default_height 1.0
+layout_widths [0.33333333 0.5 0.666666667 1.0]
+layout_heights [0.33333333 0.5 0.666666667 1.0]
+
+fullscreen_movefocus true
+
+# Animations
+animations {
+    enabled yes
+    default yes 300 var 3 [ 0.215 0.61 0.355 1 ]
+    window_open yes 300 var 3 [ 0 0 1 1 ]
+    window_move yes 300 var 3 [ 0.215 0.61 0.355 1 ] off 0.05 6 [0 0.6 0.4 0 1 0 0.4 -0.6 1 -0.6]
+    window_size yes 300 var 3 [ -0.35 0 0 0.5 ]
+}
+
+### Key bindings
+#
+# Basics:
+#
+    # Start a terminal
+    bindsym $mod+Return exec $term
+
+    # Kill focused window
+    bindsym $mod+Backspace kill
+    bindsym $mod+Shift+Backspace kill unfocused
+    bindsym $mod+Ctrl+Backspace kill all
+
+    # Start your launcher
+    bindsym $mod+d exec $menu
+
+
+    # Drag floating windows by holding down $mod and left mouse button.
+    # Resize them with right mouse button + $mod.
+    # Despite the name, also works for non-floating windows.
+    # Change normal to inverse to use left mouse button for resizing and right
+    # mouse button for dragging.
+    floating_modifier $mod normal
+
+    # Reload the configuration file
+    bindsym $mod+Shift+c reload
+
+    # Exit scroll (logs you out of your Wayland session)
+    bindsym $mod+Shift+e exec $exit
+    # TODO
+    # scrollnag -t warning -m 'You pressed the exit shortcut. Do you really want to exit scroll? This will end your Wayland session.' -B 'Yes, exit scroll' 'scrollmsg exit'
+
+
+    # Layout mode
+    bindsym $mod+bracketleft set_mode h
+    bindsym $mod+bracketright set_mode v
+#
+# Moving around:
+#
+    # Move your focus around
+    bindsym $mod+$left focus left
+    bindsym $mod+$down focus down
+    bindsym $mod+$up focus up
+    bindsym $mod+$right focus right
+    bindsym $mod+home focus beginning
+    bindsym $mod+end focus end
+    # Move the focused window with the same, but add Shift
+    bindsym $mod+Shift+$left move left
+    bindsym $mod+Shift+$down move down
+    bindsym $mod+Shift+$up move up
+    bindsym $mod+Shift+$right move right
+    bindsym $mod+Shift+home move beginning
+    bindsym $mod+Shift+end move end
+    # nomode
+    bindsym $mod+Alt+$left move left nomode
+    bindsym $mod+Alt+$down move down nomode
+    bindsym $mod+Alt+$up move up nomode
+    bindsym $mod+Alt+$right move right nomode
+    bindsym $mod+Alt+home move beginning nomode
+    bindsym $mod+Alt+end move end nomode
+
+    # Focus other monitors
+    bindsym $mod+Ctrl+$left focus output left
+    bindsym $mod+Ctrl+$down focus output down
+    bindsym $mod+Ctrl+$up focus output up
+    bindsym $mod+Ctrl+$right focus output right
+#
+# Workspaces:
+#
+    # Note: workspaces can have any name you want, not just numbers.
+    # We just use 1-10 as the default.
+    bindsym $mod+Ctrl+1 move workspace to output left
+    bindsym $mod+Ctrl+2 move workspace to output right
+
+# Scaling
+    # Workspace
+    bindsym $mod+Shift+comma scale_workspace incr -0.05
+    bindsym --whole-window $mod+Shift+button4 scale_workspace incr -0.05
+    bindsym $mod+Shift+period scale_workspace incr 0.05
+    bindsym --whole-window $mod+Shift+button5 scale_workspace incr 0.05
+    bindsym $mod+Shift+Ctrl+period scale_workspace reset
+
+    # Overview
+    bindsym --no-repeat $mod+tab scale_workspace overview
+    bindsym --whole-window button8 scale_workspace overview
+
+    # Jump
+    # jump_labels_color #9e1530FF
+    # jump_labels_background #15309eFF
+    # jump_labels_scale 0.9
+    # jump_labels_keys asdf
+    bindsym --no-repeat $mod+slash jump
+    bindsym --no-repeat $mod+Shift+slash jump container
+    bindsym --no-repeat $mod+Ctrl+slash jump workspaces
+    bindsym --no-repeat $mod+Alt+slash jump floating
+
+    # Content
+    bindsym $mod+comma scale_content incr -0.05
+    bindsym --whole-window $mod+button4 scale_content incr -0.05
+    bindsym $mod+period scale_content incr 0.05
+    bindsym --whole-window $mod+button5 scale_content incr 0.05
+    bindsym $mod+Ctrl+period scale_content reset
+
+#
+# Layout stuff:
+#
+    # Make the current focus fullscreen
+    bindsym $mod+f fullscreen
+    bindsym $mod+Ctrl+f fullscreen global
+    bindsym $mod+Alt+f fullscreen_application toggle
+    bindsym $mod+Ctrl+Alt+f fullscreen_application reset
+
+    # Toggle the current focus between tiling and floating mode
+    bindsym $mod+y focus mode_toggle
+    # Toggle layout type (h<->v)
+    bindsym $mod+Shift+y layout_transpose
+
+    # Float a window
+    bindsym $mod+Shift+f floating toggle
+
+    # Toggle sticky
+    bindsym $mod+Shift+Ctrl+a sticky toggle
+    # Toggle pin
+    bindsym --no-repeat $mod+a pin beginning
+    bindsym --no-repeat $mod+Shift+a pin end
+
+    # Selection
+    bindsym --no-repeat $mod+Insert selection toggle
+    bindsym --no-repeat $mod+Ctrl+Insert selection reset
+    bindsym --no-repeat $mod+Shift+Insert selection move
+    bindsym --no-repeat $mod+Ctrl+Shift+Insert selection workspace
+    bindsym --no-repeat $mod+Alt+Insert selection to_trail
+
+    # Marks
+    # bindsym $mod+m exec scroll-mark-toggle.sh
+    # bindsym $mod+Shift+m exec scroll-mark-remove.sh
+    # bindsym $mod+apostrophe exec scroll-mark-switch.sh
+
+#
+# Scratchpad:
+#
+    # Scroll has a "scratchpad", which is a bag of holding for windows.
+    # You can send windows there and get them back later.
+
+    # Move the currently focused window to the scratchpad
+    bindsym $mod+Shift+z move scratchpad
+
+    # Show the next scratchpad window or hide the focused scratchpad window.
+    # If there are multiple scratchpad windows, this command cycles through them.
+    bindsym $mod+z scratchpad show
+    bindsym --no-repeat $mod+Alt+z scratchpad jump
+
+    bindsym $mod+Ctrl+z workspace back_and_forth
+
+#
+# Mode modifiers
+#
+mode "modifiers" {
+    bindsym $right set_mode after; mode default
+    bindsym $left set_mode before; mode default
+    bindsym home set_mode beginning; mode default
+    bindsym end set_mode end; mode default
+    bindsym $up set_mode focus; mode default
+    bindsym $down set_mode nofocus; mode default
+    bindsym h set_mode center_horiz; mode default
+    bindsym Shift+h set_mode nocenter_horiz; mode default
+    bindsym v set_mode center_vert; mode default
+    bindsym Shift+v set_mode nocenter_vert; mode default
+    bindsym r set_mode reorder_auto; mode default
+    bindsym Shift+r set_mode noreorder_auto; mode default
+
+    # Return to default mode
+    bindsym Escape mode "default"
+}
+bindsym $mod+backslash mode "modifiers"
+
+#
+# Resizing containers:
+#
+bindsym $mod+minus cycle_size h prev
+bindsym $mod+equal cycle_size h next
+bindsym $mod+Shift+minus cycle_size v prev
+bindsym $mod+Shift+equal cycle_size v next
+
+mode "setsizeh" {
+    bindsym 1 set_size h 0.125; mode default
+    bindsym 2 set_size h 0.1666666667; mode default
+    bindsym 3 set_size h 0.25; mode default
+    bindsym 4 set_size h 0.333333333; mode default
+    bindsym 5 set_size h 0.375; mode default
+    bindsym 6 set_size h 0.5; mode default
+    bindsym 7 set_size h 0.625; mode default
+    bindsym 8 set_size h 0.6666666667; mode default
+    bindsym 9 set_size h 0.75; mode default
+    bindsym 0 set_size h 0.833333333; mode default
+    bindsym minus set_size h 0.875; mode default
+    bindsym equal set_size h 1.0; mode default
+
+    # Return to default mode
+    bindsym Escape mode "default"
+}
+bindsym $mod+b mode "setsizeh"
+
+mode "setsizev" {
+    bindsym 1 set_size v 0.125; mode default
+    bindsym 2 set_size v 0.1666666667; mode default
+    bindsym 3 set_size v 0.25; mode default
+    bindsym 4 set_size v 0.333333333; mode default
+    bindsym 5 set_size v 0.375; mode default
+    bindsym 6 set_size v 0.5; mode default
+    bindsym 7 set_size v 0.625; mode default
+    bindsym 8 set_size v 0.6666666667; mode default
+    bindsym 9 set_size v 0.75; mode default
+    bindsym 0 set_size v 0.833333333; mode default
+    bindsym minus set_size v 0.875; mode default
+    bindsym equal set_size v 1.0; mode default
+
+    # Return to default mode
+    bindsym Escape mode "default"
+}
+bindsym $mod+Shift+b mode "setsizev"
+
+mode "resize" {
+    # left will shrink the containers width
+    # right will grow the containers width
+    # up will shrink the containers height
+    # down will grow the containers height
+    bindsym $left resize shrink width 100px
+    bindsym $down resize grow height 100px
+    bindsym $up resize shrink height 100px
+    bindsym $right resize grow width 100px
+
+    # Return to default mode
+    bindsym Escape mode "default"
+}
+bindsym $mod+Shift+r mode "resize"
+
+mode "align" {
+    bindsym c align center; mode default
+    bindsym m align middle; mode default
+    bindsym r align reset; mode default
+    bindsym $left align left; mode default
+    bindsym $right align right; mode default
+    bindsym $up align up; mode default
+    bindsym $down align down; mode default
+    bindsym Escape mode "default"
+}
+bindsym $mod+c mode "align"
+
+mode "fit_size" {
+    bindsym w fit_size h visible proportional; mode default
+    bindsym Shift+w fit_size v visible proportional; mode default
+    bindsym Ctrl+w fit_size h visible equal; mode default
+    bindsym Ctrl+Shift+w fit_size v visible equal; mode default
+
+    bindsym $right fit_size h toend proportional; mode default
+    bindsym Shift+$right fit_size v toend proportional; mode default
+    bindsym Ctrl+$right fit_size h toend equal; mode default
+    bindsym Ctrl+Shift+$right fit_size v toend equal; mode default
+
+    bindsym $left fit_size h tobeg proportional; mode default
+    bindsym Shift+$left fit_size v tobeg proportional; mode default
+    bindsym Ctrl+$left fit_size h tobeg equal; mode default
+    bindsym Ctrl+Shift+$left fit_size v tobeg equal; mode default
+
+    bindsym $up fit_size h active proportional; mode default
+    bindsym Shift+$up fit_size v active proportional; mode default
+    #bindsym Ctrl+$up fit_size h active equal; mode default
+    #bindsym Ctrl+Shift+$up fit_size v active equal; mode default
+
+    bindsym $down fit_size h all proportional; mode default
+    bindsym Shift+$down fit_size v all proportional; mode default
+    bindsym Ctrl+$down fit_size h all equal; mode default
+    bindsym Ctrl+Shift+$down fit_size v all equal; mode default
+}
+bindsym $mod+w mode "fit_size"
+
+mode "trailmark" {
+    bindsym bracketright trailmark next
+    bindsym bracketleft trailmark prev
+    bindsym semicolon trailmark toggle; mode default
+    bindsym Escape mode "default"
+}
+bindsym $mod+semicolon mode "trailmark"
+
+mode "trail" {
+    bindsym bracketright trail next
+    bindsym bracketleft trail prev
+    bindsym semicolon trail new; mode default
+    bindsym d trail delete; mode default
+    bindsym c trail clear; mode default
+    bindsym insert trail to_selection; mode default
+    bindsym Escape mode "default"
+}
+bindsym $mod+Shift+semicolon mode "trail"
+
+#
+# Utilities:
+#
+    # Special keys to adjust volume via PulseAudio
+    bindsym --locked XF86AudioMute exec pactl set-sink-mute \@DEFAULT_SINK@ toggle
+    bindsym --locked XF86AudioLowerVolume exec pactl set-sink-volume \@DEFAULT_SINK@ -5%
+    bindsym --locked XF86AudioRaiseVolume exec pactl set-sink-volume \@DEFAULT_SINK@ +5%
+    bindsym --locked XF86AudioMicMute exec pactl set-source-mute \@DEFAULT_SOURCE@ toggle
+
+    # Special keys to control media via playerctl
+    bindsym --locked XF86AudioPlay exec playerctl play-pause
+    bindsym --locked XF86AudioPause exec playerctl play-pause
+    bindsym --locked XF86AudioPrev exec playerctl previous
+    bindsym --locked XF86AudioNext exec playerctl next
+    bindsym --locked XF86AudioStop exec playerctl stop
+
+    # Special keys to adjust brightness via brightnessctl
+    bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
+    bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
+
+    # Special key to take a screenshot with grim
+    bindsym Print exec grim
+
+
+focus_wrapping no
+
+bindgesture swipe:4:right workspace next
+bindgesture swipe:4:left workspace prev
+
+bindgesture swipe:4:up scale_workspace overview
+
+#
+# Workspace rules:
+#
+# Opens a terminal when creating workspace 6
+# workspace 6 exec kitty
+
+
+#
+# Status Bar:
+#
+# Read `man 5 scroll-bar` for more information about this section.
+bar {
+    position top
+
+    # When the status_command prints a new line to stdout, scrollbar updates.
+    # The default just shows the current date and time.
+    status_command while date +'%Y-%m-%d %X'; do sleep 1; done
+
+    colors {
+        statusline #ffffff
+        background #323232
+        inactive_workspace #32323200 #32323200 #5c5c5c
+        scroller #2F343AFF #055E20FF #FFFFFFFF
+    }
+}
+#
+# include /etc/scroll/config.d/*
