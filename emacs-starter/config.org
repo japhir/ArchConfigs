@@ -53,6 +53,10 @@ the three paths here.
 
 On Windows =USERPROFILE= is =C:\Users\<name>=. On Linux it is unset and =HOME=
 is used, which is what makes this file testable on Ilja's machine.
+
+The folder and inbox names below are literal, not derived from the names
+above: fewer moving parts. Reusing this file for another household is a
+search-and-replace, described in the README.
 #+begin_src emacs-lisp
   (defvar my/sync-root
     (expand-file-name "Nextcloud" (or (getenv "USERPROFILE") (getenv "HOME")))
@@ -162,11 +166,14 @@ you typed before.
 
 ** one Emacs
 Starting Emacs a second time (from the Start menu, or by opening a file)
-talks to the running one instead of opening a second window.
+talks to the running one instead of opening a second window. On Windows this
+can fail with "directory is unsafe" when the =server= folder is owned by the
+wrong account; that is not worth a broken startup, so the failure is
+swallowed and the README has the fix.
 #+begin_src emacs-lisp
   (require 'server)
   (unless (server-running-p)
-    (server-start))
+    (ignore-errors (server-start)))
 #+end_src
 
 ** where Customize saves
@@ -286,15 +293,13 @@ file; =Enter= jumps there. =C-x b= lists open buffers and recent files together.
 
 * org-mode
 ** the basics
-Org is built in. Long lines wrap at the window edge. Files open showing their
-headings and first-level content. Done tasks get a timestamp, and state
+Org is built in. Files open showing their headings and first-level content. Done tasks get a timestamp, and state
 changes go in a =LOGBOOK= drawer so the heading stays clean.
 #+begin_src emacs-lisp
   (use-package org
     :ensure nil
     :bind (("C-c c" . org-capture)
            ("C-c a" . org-agenda))
-    :hook (org-mode . visual-line-mode)
     :custom
     (org-startup-folded 'content)
     (org-log-done 'time)
@@ -379,9 +384,33 @@ shows them.
 - =C-c d=: my day. Today's scheduled items and deadlines (and habits), then
   every =NEXT=, then every =WAIT=.
 - =C-c a A=: the same, including my partner's tasks.
-- =C-c a n= / =C-c a w=: just the =NEXT= or =WAIT= lists.
+
+Two deliberate choices. First, a =NEXT= that carries a =SCHEDULED= date stays
+out of the "Next actions" block until that date; it shows up under "Today"
+when due. Scheduling means "resurface on this day", and a list that nags
+about things you have already given a date to is a list you stop trusting
+(the same rule as Ilja's config, ADR 0004 in the repo). Second, only folders
+that actually exist are agenda files, and the list is recomputed before every
+agenda call. So before the sync client has created a folder, or if a name in
+"where our files live" is wrong, the agenda still opens, with a warning at
+startup saying which folder is missing, instead of failing on every command.
 #+begin_src emacs-lisp
-  (setq org-agenda-files (list my/shared-dir my/personal-dir))
+  (defun my/existing-org-dirs ()
+    "The shared and personal folders that exist on disk right now."
+    (seq-filter #'file-directory-p (list my/shared-dir my/personal-dir)))
+
+  (defun my/refresh-agenda-files (&rest _)
+    "Point the agenda at the folders that exist. Runs before every agenda."
+    (setq org-agenda-files (my/existing-org-dirs)))
+
+  (my/refresh-agenda-files)
+  (advice-add 'org-agenda :before #'my/refresh-agenda-files)
+
+  (dolist (dir (list my/shared-dir my/personal-dir))
+    (unless (file-directory-p dir)
+      (display-warning 'emacs-starter
+                       (format "Org folder not found: %s. Check \"where our files live\" in config.org, or wait for the sync client." dir))))
+
   (setq org-agenda-span 'day)
   (setq org-deadline-warning-days 14)
   (setq org-agenda-todo-ignore-scheduled t)
@@ -407,9 +436,7 @@ shows them.
 
   (setq org-agenda-custom-commands
         `(("d" "My day" ,(my/agenda-blocks 'my/agenda-skip-partner-only))
-          ("A" "Everyone's day" ,(my/agenda-blocks nil))
-          ("n" "Next actions" todo "NEXT")
-          ("w" "Waiting for" todo "WAIT")))
+          ("A" "Everyone's day" ,(my/agenda-blocks nil))))
 
   (defun my/agenda-day ()
     "Show my day."
@@ -446,8 +473,14 @@ Org files are plain text: stars for headings, =*bold*= with literal
 asterisks, =- [ ]= for a checkbox. The pretty layer draws them nicer: bullets
 instead of stars, tags and todo keywords as pills, checkboxes as boxes,
 emphasis markers hidden until the cursor is on them (that is what
-=org-appear= does), prose in a proportional font. =C-c v= switches the whole
-layer off and on in every org buffer, so the raw text is one key away.
+=org-appear= does), prose in a proportional font, long lines wrapped at the
+window edge. =C-c v= switches the whole layer off and on in every org buffer,
+so the raw text is one key away.
+
+The variables are set before the modes are switched on because =org-appear=
+reads =org-hide-emphasis-markers= at the moment it is enabled to decide what
+to reveal. The =fboundp= checks keep org buffers usable if a package failed
+to install on the first, networked start.
 #+begin_src emacs-lisp
   (use-package org-modern
     :after org
@@ -470,12 +503,13 @@ layer off and on in every org buffer, so the raw text is one key away.
   (defun my/apply-pretty ()
     "Turn the pretty layer on or off in the current org buffer, following `my/pretty'."
     (let ((on (if my/pretty 1 -1)))
-      (org-indent-mode on)
-      (org-modern-mode on)
-      (org-appear-mode on)
-      (variable-pitch-mode on)
       (setq-local org-hide-emphasis-markers my/pretty)
       (setq-local org-pretty-entities my/pretty)
+      (org-indent-mode on)
+      (variable-pitch-mode on)
+      (visual-line-mode on)
+      (when (fboundp 'org-modern-mode) (org-modern-mode on))
+      (when (fboundp 'org-appear-mode) (org-appear-mode on))
       (org-restart-font-lock)))
 
   (defun my/toggle-pretty ()
@@ -541,11 +575,16 @@ my/show-welcome=, which is the same thing done through the settings interface.
   (global-set-key (kbd "C-c h") #'my/open-welcome)
 
   (defun my/initial-buffer ()
-    "What to show at startup: the lessons, or my day."
-    (if my/show-welcome
-        (find-file-noselect my/welcome-file)
-      (progn (org-agenda nil "d")
-             (get-buffer org-agenda-buffer-name))))
+    "What to show at startup: the lessons, or my day.
+  If the agenda cannot be built, show the lessons anyway rather than an error."
+    (or (unless my/show-welcome
+          (condition-case err
+              (progn (org-agenda nil "d")
+                     (get-buffer org-agenda-buffer-name))
+            (error (message "Could not open the agenda at startup: %s"
+                            (error-message-string err))
+                   nil)))
+        (find-file-noselect my/welcome-file)))
 
   (setq initial-buffer-choice #'my/initial-buffer)
 #+end_src

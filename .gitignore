@@ -18,3 +18,16 @@ calendarlinks.org
 # originals stashed by bin/disk-maintenance-setup before it writes /etc;
 # machine-local state used by --revert, and derivable from pacman.conf anyway
 .disk-maintenance-backup/
+
+# emacs-starter: generated when config.org is tangled or Emacs is run from it
+emacs-starter/config.el
+emacs-starter/custom.el
+emacs-starter/local/
+emacs-starter/elpa/
+emacs-starter/server/
+emacs-starter/eln-cache/
+emacs-starter/auto-save-list/
+emacs-starter/transient/
+emacs-starter/recentf
+emacs-starter/history
+emacs-starter/places

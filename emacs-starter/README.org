@@ -31,10 +31,34 @@ Windows is the target; it also loads on Linux for testing.
    =C-c d= opens an agenda listing tasks from both folders.
 6. Print =cheatsheet.html= from a browser.
 
+Keys are documented in =cheatsheet.org=; the tables in =config.org= (top) and
+=welcome.org= repeat it. A rebind is an edit in all three, then the export
+below.
+
 Regenerate the HTML after editing the cheatsheet:
 #+begin_src sh
   emacs --batch cheatsheet.org -f org-html-export-to-html
 #+end_src
+
+* If something fails on first start
+
+- "The directory ~/.emacs.d/server is unsafe": the =server= folder under
+  =.emacs.d= is owned by another account (typically after copying as
+  administrator). Right-click it, Properties, Security, Advanced, change the
+  owner to her user. Until then Emacs still starts; only the
+  second-instance-reuses-the-first behaviour is off.
+- A warning "Org folder not found": a name under "where our files live" in
+  =config.org= does not match a folder under =Nextcloud=, or the sync client
+  has not created it yet. The agenda works with whatever folders exist.
+
+* Reusing this for another household
+
+Names are literal in =config.org=, on purpose. Search and replace, in this
+order: =inbox-iljline.org= (shared inbox file), =iljline= (shared folder),
+then the two names in the "who is who" block, =line= and =ilja=, and the
+personal folder name =line= under "where our files live". The =DONE-<NAME>=
+keywords, tags and =CREATED_BY= follow from the two variables. Then set the
+same keyword set in every other client that edits the shared files.
 
 * Optional: Dutch spell checking
 
