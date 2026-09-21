@@ -14,3 +14,7 @@ calendarlinks.org
 
 # editor/tooling backups
 *.bak
+
+# originals stashed by bin/disk-maintenance-setup before it writes /etc;
+# machine-local state used by --revert, and derivable from pacman.conf anyway
+.disk-maintenance-backup/
