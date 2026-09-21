@@ -24,6 +24,8 @@ The Emacs config source of truth is `myinit.org` (org-babel literate config at r
 
 The files under `emacs/` (`early-init.el`, `custom-modules/`) were a temporary experiment to integrate `crafted-emacs`. They are not the canonical source.
 
+`emacs-starter/` is a separate, standalone Emacs config for the shared org todo system (target: a Windows machine; phones run orgzly-revived and beorg). It shares nothing with `myinit.org`; its literate file is `config.org`. Setup steps and design notes are in its `README.org`.
+
 ## Systemd user services
 
 In `systemd/user/`, symlinked to `~/.config/systemd/user/`:

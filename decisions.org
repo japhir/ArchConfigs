@@ -112,3 +112,40 @@ Excluded from automatic pruning, deliberately:
   is a periodic glance rather than a thing to remember.
 - Automatic runs will therefore always reclaim less than a manual sweep. That is
   the intent.
+
+* emacs-starter is a standalone config, not a module of myinit.org
+:PROPERTIES:
+:CREATED:  [2026-09-21 Mon]
+:STATUS:   accepted
+:END:
+
+=emacs-starter/= is Line's Emacs configuration for the shared org todo system,
+targeting Windows. It duplicates the org-mode settings it needs (todo keywords,
+logging, org-modern) rather than sharing them with =myinit.org=, and it uses
+package.el with use-package rather than elpaca.
+
+** Why duplicate rather than modularise
+
+Sharing would have meant splitting =myinit.org= into modules first — a cleanup
+attempted more than once and never finished (see the GTD implementation plan).
+Making her config depend on that refactor would have blocked a working setup
+on an open-ended one. The duplicated part is small and is derived from two
+name variables, so the drift risk is a handful of lines. When =myinit.org= is
+modularised, this config is the candidate first consumer of the extracted
+org module.
+
+** Why package.el rather than elpaca
+
+Elpaca needs git on PATH and builds packages from source; on a Windows machine
+with nobody to debug a failed build, that is a startup failure with no
+recovery path. package.el needs only the network, and everything the config
+uses is on GNU ELPA or MELPA. The cost is being a release behind on occasion,
+which for this use is nothing.
+
+** Consequences
+
+- Keyword and tag changes to the shared system must be made in both configs
+  (plus orgzly-revived and beorg), per ADR 0005.
+- The literate file is =config.org=, not =init.org=, because
+  =org-babel-load-file= tangles to a =.el= of the same name and =init.el= is
+  the bootstrap.
