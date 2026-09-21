@@ -1,0 +1,11 @@
+[Unit]
+Description=Weekly prune of user caches and expired trash
+
+[Timer]
+OnCalendar=weekly
+Persistent=true
+RandomizedDelaySec=1h
+Unit=disk-maintenance.service
+
+[Install]
+WantedBy=timers.target

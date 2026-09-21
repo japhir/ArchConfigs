@@ -1,0 +1,154 @@
+#!/usr/bin/env bash
+# Deploy (or undo) the disk-maintenance setup described in
+# docs/disk-maintenance.org and decisions.org.
+#
+#   sudo disk-maintenance-setup           install / re-apply (idempotent)
+#   sudo disk-maintenance-setup --check    report drift, change nothing
+#   sudo disk-maintenance-setup --revert   put everything back
+#
+# Files under /etc are COPIED from the repo, not symlinked, unlike the rest of
+# this repo's deployment model. /etc must keep working when /home is not
+# mounted, and the repo lives on /home. --check exists to catch the drift that
+# copying invites (the tracked pacman.conf had silently gone ~3 years stale).
+#
+# Everything under ~ is symlinked, matching the repo convention.
+
+set -euo pipefail
+
+REPO="${REPO:-/home/japhir/ArchConfigs}"
+CACHE_DIR=/home/pacman-cache
+USER_NAME="${SUDO_USER:-japhir}"
+USER_HOME="$(getent passwd "$USER_NAME" | cut -d: -f6)"
+BACKUP="$REPO/.disk-maintenance-backup"
+
+# repo path -> /etc destination
+declare -A ETC_FILES=(
+    ["pacman.conf"]="/etc/pacman.conf"
+    ["pacman.d/hooks/paccache-clean.hook"]="/etc/pacman.d/hooks/paccache-clean.hook"
+    ["systemd/journald.conf.d/00-size-limit.conf"]="/etc/systemd/journald.conf.d/00-size-limit.conf"
+    ["systemd/paccache.service.d/cachedir.conf"]="/etc/systemd/system/paccache.service.d/cachedir.conf"
+)
+USER_UNITS=(disk-maintenance.service disk-maintenance.timer)
+SYSTEM_TIMERS=(paccache.timer fstrim.timer)
+
+mode=install
+case "${1:-}" in
+    --check)  mode=check ;;
+    --revert) mode=revert ;;
+    "")       mode=install ;;
+    *) echo "usage: $(basename "$0") [--check|--revert]" >&2; exit 2 ;;
+esac
+
+[[ $mode != check && $EUID -ne 0 ]] && { echo "needs root: sudo $0 $*" >&2; exit 1; }
+as_user() { sudo -u "$USER_NAME" XDG_RUNTIME_DIR="/run/user/$(id -u "$USER_NAME")" "$@"; }
+
+# ---------------------------------------------------------------- check
+if [[ $mode == check ]]; then
+    rc=0
+    echo "== /etc files (repo is source of truth) =="
+    for src in "${!ETC_FILES[@]}"; do
+        dst="${ETC_FILES[$src]}"
+        if [[ ! -e $dst ]]; then
+            echo "  MISSING   $dst"; rc=1
+        elif diff -q "$REPO/$src" "$dst" >/dev/null 2>&1; then
+            echo "  ok        $dst"
+        else
+            echo "  DRIFTED   $dst  (diff $REPO/$src $dst)"; rc=1
+        fi
+    done
+    echo "== timers =="
+    for t in "${SYSTEM_TIMERS[@]}"; do
+        printf '  %-24s %s\n' "$t" "$(systemctl is-enabled "$t" 2>&1)"
+    done
+    for t in disk-maintenance.timer; do
+        printf '  %-24s %s (user)\n' "$t" "$(as_user systemctl --user is-enabled "$t" 2>&1 || true)"
+    done
+    echo "== cache dir =="
+    if [[ -d $CACHE_DIR ]]; then
+        echo "  ok        $CACHE_DIR  $(stat -c '%U:%G %a' "$CACHE_DIR")  $(du -sh "$CACHE_DIR" 2>/dev/null | cut -f1)"
+    else
+        echo "  MISSING   $CACHE_DIR"; rc=1
+    fi
+    exit $rc
+fi
+
+# ---------------------------------------------------------------- revert
+if [[ $mode == revert ]]; then
+    echo "== disabling timers =="
+    for t in "${SYSTEM_TIMERS[@]}"; do systemctl disable --now "$t" 2>/dev/null || true; done
+    as_user systemctl --user disable --now disk-maintenance.timer 2>/dev/null || true
+
+    echo "== removing deployed files =="
+    for src in "${!ETC_FILES[@]}"; do
+        dst="${ETC_FILES[$src]}"
+        if [[ -f "$BACKUP/$(basename "$dst")" ]]; then
+            echo "  restoring original $dst"
+            install -Dm644 "$BACKUP/$(basename "$dst")" "$dst"
+        else
+            echo "  removing $dst"
+            rm -f "$dst"
+        fi
+    done
+    for u in "${USER_UNITS[@]}"; do rm -f "$USER_HOME/.config/systemd/user/$u"; done
+    rm -f "$USER_HOME/bin/disk-maintenance"
+
+    systemctl daemon-reload
+    systemctl restart systemd-journald
+    as_user systemctl --user daemon-reload
+
+    echo
+    echo "Reverted. The package cache at $CACHE_DIR was NOT deleted;"
+    echo "pacman is now back to /var/cache/pacman/pkg. Remove it with:"
+    echo "    sudo rm -rf $CACHE_DIR"
+    exit 0
+fi
+
+# ---------------------------------------------------------------- install
+echo "== package cache on /home =="
+# root:alpm 770 — pacman writes as root, but DownloadUser=alpm fetches as alpm,
+# so the download user needs write access. 770 keeps it off-limits to everyone
+# else, matching the default cache's posture.
+install -d -o root -g alpm -m 770 "$CACHE_DIR"
+echo "  $CACHE_DIR  $(stat -c '%U:%G %a' "$CACHE_DIR")"
+
+if [[ -d /var/cache/pacman/pkg ]] && compgen -G "/var/cache/pacman/pkg/*.pkg.tar*" >/dev/null; then
+    echo "  migrating existing cached packages off /"
+    mv -n /var/cache/pacman/pkg/*.pkg.tar* "$CACHE_DIR/" 2>/dev/null || true
+fi
+
+echo "== installing /etc files (backing up originals) =="
+mkdir -p "$BACKUP"
+for src in "${!ETC_FILES[@]}"; do
+    dst="${ETC_FILES[$src]}"
+    if [[ -f $dst && ! -f "$BACKUP/$(basename "$dst")" ]] \
+       && ! diff -q "$REPO/$src" "$dst" >/dev/null 2>&1; then
+        cp -a "$dst" "$BACKUP/$(basename "$dst")"
+        echo "  backed up $dst -> $BACKUP/"
+    fi
+    install -Dm644 "$REPO/$src" "$dst"
+    echo "  installed $dst"
+done
+
+echo "== user-level links =="
+install -d -o "$USER_NAME" -g "$USER_NAME" "$USER_HOME/bin" "$USER_HOME/.config/systemd/user"
+ln -sfn "$REPO/bin/disk-maintenance" "$USER_HOME/bin/disk-maintenance"
+for u in "${USER_UNITS[@]}"; do
+    ln -sfn "$REPO/systemd/user/$u" "$USER_HOME/.config/systemd/user/$u"
+done
+echo "  linked bin/disk-maintenance and ${#USER_UNITS[@]} user units"
+
+echo "== journal =="
+systemctl daemon-reload
+systemctl restart systemd-journald
+journalctl --vacuum-size=200M 2>&1 | tail -2
+
+echo "== timers =="
+for t in "${SYSTEM_TIMERS[@]}"; do
+    systemctl enable --now "$t" && echo "  enabled $t"
+done
+as_user systemctl --user daemon-reload
+as_user systemctl --user enable --now disk-maintenance.timer && echo "  enabled disk-maintenance.timer (user)"
+
+echo
+echo "Done. Verify the cache move with:  sudo pacman -Syw --noconfirm --cachedir $CACHE_DIR <somepkg>"
+df -h / /home

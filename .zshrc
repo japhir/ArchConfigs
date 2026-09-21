@@ -56,7 +56,11 @@ alias en="emacsclient -nw"
 #alias pb='curl -F c=@- https://ptpb.pw\?u\=1' # neat pastebin
 alias pb="curl --data-binary @- https://paste.rs" # pastebin
 alias pacsize="expac -H M '%m\t%n' | sort -h"
-alias killorphans="sudo pacman -Rnsc $(pacman -Qtdq)"
+# NOTE: single quotes are load-bearing. With double quotes the $(...) ran when
+# zsh started, so the alias froze whatever was orphaned at shell-open time and
+# went stale in long-lived terminals. Dropped -c (cascade) too: combined with a
+# stale list it could pull in packages that merely depend on the targets.
+alias killorphans='pacman -Qtdq >/dev/null 2>&1 && sudo pacman -Rns $(pacman -Qtdq) || echo "no orphans"'
 alias pi="pacman -Qq | fzf --preview 'pacman -Qil {}' --layout=reverse --bind 'enter:execute(pacman -Qil {} | less)'"
 
 alias ssh="TERM=xterm-256color ssh"

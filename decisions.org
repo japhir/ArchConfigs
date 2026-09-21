@@ -1,0 +1,114 @@
+#+title: System Decisions
+#+created: [2026-09-17 Thu]
+#+last_modified:
+
+Decisions about how this machine is set up and maintained — partitioning, package
+management, logging, scheduled maintenance. Each entry records /that/ a decision
+was made and /why/, so a future reader does not "fix" something that was
+deliberate.
+
+Scope note: GTD/org-mode decisions live in [[file:docs/adr/][docs/adr/]] and are numbered separately.
+This file is for the machine, not the workflow.
+
+A decision earns an entry here only when all three hold: it is hard to reverse,
+it is surprising without context, and it was a real trade-off with genuine
+alternatives. Everything else is just configuration — read the config.
+
+For the operational side of these decisions (what runs when, how to revert, what
+was reclaimed) see [[file:docs/disk-maintenance.org][docs/disk-maintenance.org]].
+
+* Pacman's package cache lives on /home, not /
+:PROPERTIES:
+:CREATED:  [2026-09-17 Thu]
+:STATUS:   accepted
+:END:
+
+=/= is a 20 GB partition (=nvme0n1p2=) and =/home= is 448 GB (=nvme0n1p4=). The
+default =CacheDir= of =/var/cache/pacman/pkg= puts every package download on the
+small partition, which with ~1400 packages installed meant a full =-Syu= regularly
+could not fit in the ~4 GB free on =/=. The standing workaround was to run
+=pacman -Sc= before every update, and sometimes to do partial upgrades. =CacheDir=
+now points at =/home/pacman-cache=, so downloads land on the partition with room.
+
+** Why not =~/.cache/pacman/pkg=
+
+That was the first choice and it does not work. =/home/japhir= is mode =700=, and
+=pacman.conf= sets =DownloadUser = alpm= (uid 973), which sandboxes downloads as
+an unprivileged user. =alpm= cannot traverse into the home directory, so the
+cache must sit somewhere it can reach. The alternatives were to loosen =700= on
+the home directory or to drop =DownloadUser=; both trade a real security property
+for convenience. =/home/pacman-cache= is root-owned, group =alpm=, mode =770= —
+on the big partition, reachable by the download user, and outside the private
+home directory.
+
+** Consequences
+
+- The cache is not available if =/home= fails to mount. Both partitions are on
+  the same NVMe device, so a scenario where =/= mounts and =/home= does not is
+  close to theoretical; in that case pacman re-downloads rather than breaking.
+- =/home/pacman-cache= is outside =~=, so it is not covered by any backup or sync
+  that targets the home directory. This is fine — it is a cache.
+- =paccache= must be pointed at the new directory explicitly (it defaults to the
+  pacman default path, not the configured =CacheDir=).
+
+* Disk maintenance is automatic and bounded, not manual and reactive
+:PROPERTIES:
+:CREATED:  [2026-09-17 Thu]
+:STATUS:   accepted
+:END:
+
+Every growth sink on this machine was previously unbounded and pruned by hand
+only once it hurt: the package cache until =/= filled, the journal until it hit
+the 10%-of-filesystem default (958 MB), =~/.cache= until it reached 35 GB, and
+the trash until it reached 12 GB. Each now has a ceiling enforced by a timer or
+hook, so disk pressure is a background condition rather than an event that
+interrupts an update.
+
+The mechanisms: =paccache.timer= plus a pacman =PostTransaction= hook for the
+package cache, =SystemMaxUse= for the journal, and a user timer running
+=bin/disk-maintenance= for the re-downloadable parts of =~/.cache= and for trash
+older than 30 days.
+
+** Why a hook /and/ a timer for the package cache
+
+They fail in different ways. The timer bounds the cache even if you never run
+pacman for a month; the hook bounds it at the moment of growth, which is what
+actually prevents a long =-Syu= from filling the disk midway. Neither alone
+covers both cases.
+
+** Consequences
+
+- Rollback via =pacman -U /path/to/cache/old-version= only reaches back two
+  package versions, because the cache is trimmed to =-rk2=. The Arch Linux
+  Archive remains the escape hatch for anything older.
+- Deleted files leave the trash automatically after 30 days, so the trash is no
+  longer an indefinite safety net.
+
+* Caches holding expensive or irreplaceable data are never pruned automatically
+:PROPERTIES:
+:CREATED:  [2026-09-17 Thu]
+:STATUS:   accepted
+:END:
+
+=~/.cache= is not uniformly disposable, so =bin/disk-maintenance= works from an
+explicit allowlist of re-downloadable caches rather than clearing =~/.cache=
+wholesale. The tempting one-liner (=rm -rf ~/.cache/*=) would have destroyed
+2.6 GB of =snvecR= astronomical solution data and a 1.4 GB =renv= package cache,
+both slow or awkward to reconstitute.
+
+Excluded from automatic pruning, deliberately:
+
+- =~/.cache/R/snvecR= — downloaded ZB17/ZB20/ZB23 orbital solutions; large,
+  external, and slow to refetch.
+- =~/.cache/R/renv= — shared package cache across R projects; restorable but a
+  long rebuild.
+- =~/.cache/mu= — the mu email index; regenerable from =~/Maildir= via =mu init
+  && mu index=, but not cheaply.
+
+** Consequences
+
+- The allowlist needs a new entry whenever a tool starts using a lot of cache.
+  =bin/disk-maintenance --report= exists to make the offenders visible, so this
+  is a periodic glance rather than a thing to remember.
+- Automatic runs will therefore always reclaim less than a manual sweep. That is
+  the intent.

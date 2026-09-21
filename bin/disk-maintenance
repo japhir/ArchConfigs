@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+# Bounded, non-interactive cleanup of re-downloadable user caches and old trash.
+#
+# Run by disk-maintenance.timer (weekly). Safe to run by hand at any time.
+#
+#   disk-maintenance --report    show what is using space; change nothing
+#   disk-maintenance --dry-run   show what would be removed; change nothing
+#   disk-maintenance             do it
+#
+# Design note: this works from an explicit allowlist rather than clearing
+# ~/.cache wholesale, because some caches under there are expensive or slow to
+# reconstitute (R/snvecR, R/renv, mu). See decisions.org.
+
+set -uo pipefail
+
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}"
+TRASH="${XDG_DATA_HOME:-$HOME/.local/share}/Trash"
+TRASH_MAX_AGE_DAYS=30
+
+# Caches that are safe to drop: everything here is re-downloaded or rebuilt
+# automatically on next use. Add new entries as tools start hogging space;
+# --report is how you notice.
+SAFE_CACHES=(
+    mozilla          # firefox http cache
+    quickshell       # DMS/quickshell shader+asset cache
+    yarn             # js package tarballs
+    spotify          # spotify client cache
+    tracker3         # desktop file index
+    ms-playwright    # downloaded browser binaries
+    thumbnails       # image thumbnails
+    chromium
+    google-chrome
+    zotero           # zotero's http cache, not the library in ~/Zotero
+    fontconfig       # per-user font cache; rebuilt on demand
+    pip              # python wheels, re-downloaded
+    go-build         # go build cache, rebuilt
+    sccache          # compiler cache, rebuilt
+    mesa_shader_cache # gpu shader cache, rebuilt on next run
+    gtk-4.0          # gtk icon/ui cache
+)
+
+# Caches under ~/.cache that we deliberately never touch automatically.
+PROTECTED=(
+    R/snvecR         # downloaded ZB17/ZB20/ZB23 orbital solutions
+    R/renv           # shared R package cache, slow to restore
+    mu               # mu email index, rebuilt via `mu init && mu index`
+    huggingface      # model weights; large and slow to re-download
+)
+
+mode=run
+case "${1:-}" in
+    --report)  mode=report ;;
+    --dry-run) mode=dry ;;
+    "")        mode=run ;;
+    *) echo "usage: $(basename "$0") [--report|--dry-run]" >&2; exit 2 ;;
+esac
+
+human() { du -sh "$1" 2>/dev/null | cut -f1; }
+avail() { df -h --output=avail "$1" 2>/dev/null | tail -1 | tr -d ' '; }
+
+echo "== disk-maintenance $(date -Iseconds) =="
+echo "free before:  / $(avail /)   /home $(avail /home)"
+
+if [[ $mode == report ]]; then
+    echo
+    echo "-- largest entries in $CACHE --"
+    du -sh "$CACHE"/* 2>/dev/null | sort -rh | head -20
+    echo
+    echo "-- trash --"
+    echo "  $(human "$TRASH/files") in $TRASH/files"
+    echo
+    echo "-- protected (never pruned automatically) --"
+    for p in "${PROTECTED[@]}"; do
+        [[ -e "$CACHE/$p" ]] && echo "  $(human "$CACHE/$p")  $CACHE/$p"
+    done
+    exit 0
+fi
+
+act() {
+    # act <description> <command...>
+    local desc="$1"; shift
+    if [[ $mode == dry ]]; then
+        echo "  would: $desc"
+    else
+        echo "  $desc"
+        "$@" >/dev/null 2>&1 || echo "    (failed, continuing)"
+    fi
+}
+
+echo
+echo "-- tool-managed caches --"
+if command -v uv >/dev/null; then
+    # `uv cache prune` removes only unused entries; it is uv's own GC, not rm -rf.
+    echo "  uv cache: $(human "$CACHE/uv")"
+    act "uv cache prune" uv cache prune
+fi
+if command -v paru >/dev/null; then
+    echo "  paru cache: $(human "$CACHE/paru")"
+    act "paru -Sc --noconfirm (AUR build + clone dirs)" paru -Sc --noconfirm
+fi
+
+echo
+echo "-- allowlisted caches --"
+for c in "${SAFE_CACHES[@]}"; do
+    d="$CACHE/$c"
+    [[ -d $d ]] || continue
+    echo "  $(human "$d")  $c"
+    act "rm -rf $d" rm -rf "$d"
+done
+
+echo
+echo "-- trash older than ${TRASH_MAX_AGE_DAYS}d --"
+if [[ -d "$TRASH/files" ]]; then
+    n=0
+    while IFS= read -r -d '' info; do
+        base="$(basename "$info" .trashinfo)"
+        target="$TRASH/files/$base"
+        [[ -e $target ]] || continue
+        n=$((n+1))
+        act "expire $base" rm -rf "$target" "$info"
+    done < <(find "$TRASH/info" -maxdepth 1 -name '*.trashinfo' \
+                  -mtime +"$TRASH_MAX_AGE_DAYS" -print0 2>/dev/null)
+    echo "  $n item(s) older than ${TRASH_MAX_AGE_DAYS}d"
+else
+    echo "  no trash directory"
+fi
+
+echo
+echo "free after:   / $(avail /)   /home $(avail /home)"

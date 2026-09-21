@@ -1,0 +1,163 @@
+#+title: Disk Maintenance — Runbook
+#+created: [2026-09-17 Thu]
+#+last_modified:
+
+Operational notes for the disk-space setup. The /why/ lives in [[file:../decisions.org][decisions.org]]; this
+file is the /what runs, what it touches, and how to undo it/.
+
+* Baseline [2026-09-17 Thu]
+
+What the machine looked like before any of this, so future-me can tell whether
+it worked.
+
+| Partition | Size | Used | Free | Note                          |
+|-----------+------+------+------+-------------------------------|
+| =/=       | 20G  | 15G  | 3.8G | the binding constraint        |
+| =/home=   | 448G | 409G | 16G  | slower burn, much more slack  |
+
+Largest sinks found:
+
+| Path                          | Size  | Disposition                    |
+|-------------------------------+-------+--------------------------------|
+| =~/SurfDrive=                 | 239G  | untouched — real data          |
+| =~/Pictures=                  | 36G   | untouched — real data          |
+| =~/.local/share/Trash=        | 12G   | expired, now 30-day policy     |
+| =~/.cache/uv=                 | 11G   | =uv cache prune=, now weekly   |
+| =~/.local/share/Steam=        | 7.2G  | untouched — your call          |
+| =~/.cache/ncspot=             | 4.7G  | capped at 1 GiB in config      |
+| =~/.cache/R=                  | 4.2G  | *protected*, see below         |
+| =~/.cache/paru=               | 3.1G  | =paru -Sc=, now weekly         |
+| =~/.cache/mozilla=            | 1.9G  | allowlisted, now weekly        |
+| =~/.cache/quickshell=         | 1.8G  | allowlisted, now weekly        |
+| =~/.cache/yarn=               | 1.5G  | allowlisted, now weekly        |
+| =~/.cache/mu=                 | 1017M | *protected* — email index      |
+| =~/sway.log=                  | 1.1G  | dated 2019; Sway is retired    |
+| journal (=/var/log/journal=)  | 958M  | capped at 200M                 |
+| =/var/cache/pkgfile=          | 299M  | left alone; =pkgfile= uses it  |
+
+* What is now in place
+
+** Package cache moved off =/=
+
+=CacheDir = /home/pacman-cache/= in =pacman.conf=. The directory is =root:alpm
+770= because =DownloadUser = alpm= fetches as an unprivileged user, and
+=/home/japhir= at mode =700= is unreachable to it. See [[file:../decisions.org][decisions.org]].
+
+Three places encode this path and must stay in sync:
+
+1. =pacman.conf= — =CacheDir=
+2. =pacman.d/hooks/paccache-clean.hook= — =paccache -c=
+3. =systemd/paccache.service.d/cachedir.conf= — =paccache -c= and =BindPaths=
+
+*** Trap: =paccache= ignores =CacheDir=
+
+=paccache= defaults to =/var/cache/pacman/pkg= no matter what =pacman.conf= says,
+so every invocation passes =-c= explicitly. Without it the timer runs green
+every week and cleans nothing.
+
+*** Trap: stock =paccache.service= cannot see =/home=
+
+It ships with =ProtectHome=yes=, which mounts =/home= empty for the unit. The
+drop-in switches to =ProtectHome=tmpfs= plus =BindPaths=/home/pacman-cache=,
+exposing only the cache and keeping the rest of the sandbox intact.
+
+** Cache trimmed on a timer /and/ on every transaction
+
+- =paccache.timer= (weekly, =-rk2=) — bounds the cache when you rarely update.
+- =pacman.d/hooks/paccache-clean.hook= (=PostTransaction=, =-rk2=) — bounds it at
+  the moment of growth, which is what stops a long =-Syu= filling the disk.
+
+=-k2= keeps the current package version plus one, so =pacman -U= rollback still
+works one step back. Older than that, use the [[https://archive.archlinux.org/][Arch Linux Archive]].
+
+** Journal capped
+
+=systemd/journald.conf.d/00-size-limit.conf= sets =SystemMaxUse=200M=,
+=SystemMaxFileSize=50M=, =MaxRetentionSec=1month=. Default is 10% of the
+filesystem, i.e. 2G on the 20G root.
+
+** Weekly user-cache prune
+
+=bin/disk-maintenance=, run by =systemd/user/disk-maintenance.timer=. Works from
+an *allowlist*, never =rm -rf ~/.cache=. Inspect before trusting:
+
+#+begin_src sh
+disk-maintenance --report     # what is big right now
+disk-maintenance --dry-run    # what a real run would delete
+#+end_src
+
+*** Protected — never pruned automatically
+
+| Path                | Why                                                |
+|---------------------+----------------------------------------------------|
+| =~/.cache/R/snvecR= | ZB17/ZB20/ZB23 orbital solutions; slow to refetch  |
+| =~/.cache/R/renv=   | shared R package cache; restorable but a long wait |
+| =~/.cache/mu=       | email index; =mu init && mu index= to rebuild      |
+
+If you ever /do/ want these gone, delete them by hand. They are listed in
+=PROTECTED= in the script purely as documentation — the script never reads that
+array when deciding what to remove.
+
+** =fstrim.timer= enabled
+
+Unrelated to space; it was simply off on an NVMe, which it should not be.
+
+** =killorphans= fixed
+
+Was =alias killorphans="sudo pacman -Rnsc $(pacman -Qtdq)"=. Double quotes made
+=$(...)= expand when zsh /started/, so the alias baked in whatever was orphaned
+at shell-open time and drifted from reality in long-lived terminals. Also
+dropped =-c= (cascade), which with a stale list could remove packages that merely
+depend on the targets. Now single-quoted and guarded against the empty case.
+
+* Deploying and undoing
+
+=bin/disk-maintenance-setup= is idempotent.
+
+#+begin_src sh
+sudo ~/ArchConfigs/bin/disk-maintenance-setup            # apply
+sudo ~/ArchConfigs/bin/disk-maintenance-setup --check    # report drift
+sudo ~/ArchConfigs/bin/disk-maintenance-setup --revert   # undo
+#+end_src
+
+** Why =/etc= files are copied, not symlinked
+
+The rest of this repo deploys by symlinking into =~=. The =/etc= files here are
+*copied* instead, because =/etc= has to keep working when =/home= is not mounted
+and this repo lives on =/home=. A dangling =/etc/pacman.conf= in a recovery
+session would mean no working package manager.
+
+The cost of copying is drift — exactly what had already happened, the tracked
+=pacman.conf= having gone stale enough to still list =[community]=, dropped
+upstream in 2023. =--check= diffs every deployed file against the repo, so run it
+if something feels off.
+
+** What =--revert= does and does not do
+
+Restores the original =/etc= files from =.disk-maintenance-backup/= (or deletes
+them if there was no original), disables all three timers, unlinks the user
+units, and restarts journald.
+
+It deliberately does *not* delete =/home/pacman-cache=, since that is real
+downloaded packages. Remove it yourself afterwards if you want the space:
+
+#+begin_src sh
+sudo rm -rf /home/pacman-cache
+#+end_src
+
+Reverting also does not un-cap ncspot (=ncspot/config.toml=), un-fix
+=killorphans= (=.zshrc=), or restore anything the one-time sweep deleted. Those
+are ordinary tracked edits — =git revert= or =git checkout= them.
+
+* Still on your plate
+
+Things deliberately left as judgment calls rather than automated:
+
+- =~/SurfDrive= (239G) — whether any of it can be selective-sync'd or archived
+  is a content question, not a maintenance one.
+- =~/.local/share/Steam= (7.2G) — uninstall games you are done with.
+- =~/Pictures= (36G) — worth a look for duplicates and originals already backed
+  up elsewhere.
+- =/= is 20G and =/usr= alone is 11G and growing. The setup here makes that
+  survivable, not fixed. Repartitioning is the permanent answer if this keeps
+  biting.

@@ -2,6 +2,10 @@ use_nerdfont=true
 notify=true
 library_tabs=["tracks","albums","artists","playlists","browse"]
 
+# Cap the downloaded-audio cache (MiB). Unset it grows without bound; it had
+# reached 4.7G in ~/.cache/ncspot. ncspot evicts oldest-first past this.
+audio_cache_size=1024
+
 [theme]
 #background = "black"
 primary = "light white"

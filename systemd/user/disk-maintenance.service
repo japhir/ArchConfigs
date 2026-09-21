@@ -1,0 +1,9 @@
+[Unit]
+Description=Prune re-downloadable user caches and expired trash
+
+[Service]
+Type=oneshot
+ExecStart=/home/japhir/bin/disk-maintenance
+# Cleanup must never compete with real work.
+Nice=19
+IOSchedulingClass=idle

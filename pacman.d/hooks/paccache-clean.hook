@@ -1,0 +1,20 @@
+# Trim the package cache at the moment it grows, so a long -Syu cannot fill the
+# disk halfway through. paccache.timer covers the "haven't updated in a month"
+# case; this covers the "this update is bigger than the free space" case.
+#
+# -k2 keeps the current version plus one, so `pacman -U` rollback still works
+# for the immediately previous version.
+#
+# NOTE: paccache defaults to /var/cache/pacman/pkg regardless of CacheDir, so
+# the path is passed explicitly. Keep in sync with CacheDir in pacman.conf.
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Operation = Remove
+Type = Package
+Target = *
+
+[Action]
+Description = Trimming pacman cache to the last 2 versions...
+When = PostTransaction
+Exec = /usr/bin/paccache -rk2 -c /home/pacman-cache
