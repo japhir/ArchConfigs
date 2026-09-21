@@ -35,6 +35,47 @@ Largest sinks found:
 | journal (=/var/log/journal=)  | 958M  | capped at 200M                 |
 | =/var/cache/pkgfile=          | 299M  | left alone; =pkgfile= uses it  |
 
+* After deployment [2026-09-21 Mon]
+
+Measured once =bin/disk-maintenance-setup= had run and the one-time sweep was
+done, so the baseline above has something to be compared against.
+
+| Metric        | Before | After | Note                                |
+|---------------+--------+-------+-------------------------------------|
+| =/= free      | 3.8G   | 4.1G  | journal cap; see caveat below       |
+| =/home= free  | 16G    | 43G   | trash, caches, ncspot, sway.log     |
+| journal       | 958M   | 31.9M | =MaxRetentionSec= did most of this  |
+| pacman cache  | on =/= | on =/home= | 20G partition -> 448G          |
+
+Timers verified enabled and scheduled: =paccache.timer=, =fstrim.timer=,
+=disk-maintenance.timer= (user), all weekly.
+
+The =paccache.service= drop-in was confirmed applied rather than merely present:
+
+#+begin_src sh
+systemctl show paccache.service -p ExecStart -p ProtectHome -p BindPaths
+#+end_src
+
+gives a single =ExecStart= of =paccache -rk2 -c /home/pacman-cache= (the
+=ExecStart== clearing worked and did not append), =ProtectHome=tmpfs=, and the
+=rbind= of the cache directory. Its first run reported "no candidate packages
+found for pruning", which is correct with one version cached — but note that is
+also what an invisible directory would report, so the =systemctl show= output is
+the real evidence, not the log line.
+
+That the =alpm= download user can actually write through pacman's sandbox was
+confirmed separately with =pacman -Syw hello=, which landed packages in
+=/home/pacman-cache=. Static config checks cannot prove this; if the sandbox ever
+changes, re-test this way.
+
+** Unexplained: ~600M on =/=
+
+=du= showed =/var= dropping ~900M when the journal was vacuumed, but =df= gained
+only ~290M of available space. Deleted-but-open files were the obvious suspect
+and =lsof +L1= showed no journal files, though it was run before the pacman test
+and not re-checked. Not load-bearing — the caps all work — but if =/= looks
+tighter than it should after a reboot, start here.
+
 * What is now in place
 
 ** Package cache moved off =/=
