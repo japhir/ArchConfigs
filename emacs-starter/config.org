@@ -1,0 +1,557 @@
+#+title: A starter Emacs for our shared org-mode todo system
+#+author: Ilja & Line
+
+This is a small, literate Emacs configuration for one person who uses Emacs
+mainly as the desktop client of a shared org-mode todo system. The phones run
+orgzly-revived and beorg; the files are synced through WebDAV by the Nextcloud
+desktop client. It is deliberately small: only what makes org-mode pleasant
+for that job, plus a friendly way to find files and commands.
+
+Every heading below explains one thing, then the code block does it. Emacs
+loads the code blocks in order on startup; the prose is for you.
+
+Keys you get from this file, all under the =C-c= prefix so they never clash
+with Emacs itself:
+
+| Key       | What it does                                        |
+|-----------+-----------------------------------------------------|
+| =C-c c=   | capture a new todo (=t= mine, =s= shared)           |
+| =C-c d=   | today's agenda: my day                              |
+| =C-c a=   | all agenda views                                    |
+| =C-c o=   | open one of our org files                           |
+| =C-c v=   | toggle the pretty layer to see the raw text         |
+| =C-c h=   | open the welcome / lessons file                     |
+| =C-s=     | search the current file (live list)                 |
+| =<f5>=    | switch between light and dark theme                 |
+
+* preamble
+The first line of the tangled file declares the modern Lisp dialect.
+#+begin_src emacs-lisp
+  ;;; config.el --- tangled from config.org  -*- lexical-binding: t -*-
+#+end_src
+
+* who is who
+Two names drive everything personal in this file: the todo keyword for "I
+finished this", the tag that assigns a task, the =CREATED_BY= property, and
+the agenda filter. Change these two strings and nothing else.
+#+begin_src emacs-lisp
+  (defvar my/me "line"
+    "My name, lowercase. Used as tag, in DONE-<NAME> and CREATED_BY.")
+  (defvar my/partner "ilja"
+    "My partner's name, lowercase. Same uses as `my/me'.")
+
+  (defun my/done-keyword (name)
+    "The todo keyword meaning NAME finished the task, e.g. DONE-LINE."
+    (concat "DONE-" (upcase name)))
+#+end_src
+
+* where our files live
+The Nextcloud client puts synced folders under one root. Two folders matter:
+the shared one, and my own. Both are plain local folders as far as Emacs is
+concerned; the sync client does the WebDAV work. If the folders move, change
+the three paths here.
+
+On Windows =USERPROFILE= is =C:\Users\<name>=. On Linux it is unset and =HOME=
+is used, which is what makes this file testable on Ilja's machine.
+#+begin_src emacs-lisp
+  (defvar my/sync-root
+    (expand-file-name "Nextcloud" (or (getenv "USERPROFILE") (getenv "HOME")))
+    "Folder the Nextcloud desktop client syncs into.")
+
+  (defvar my/shared-dir (expand-file-name "iljline" my/sync-root)
+    "Folder with the org files we both use.")
+  (defvar my/personal-dir (expand-file-name "line" my/sync-root)
+    "Folder with my own org files. Only my phone and this Emacs see it.")
+
+  (defvar my/shared-inbox (expand-file-name "inbox-iljline.org" my/shared-dir)
+    "Where shared captures land.")
+  (defvar my/personal-inbox (expand-file-name "inbox.org" my/personal-dir)
+    "Where my own captures land.")
+
+  (defvar my/local-dir (expand-file-name "local/" user-emacs-directory)
+    "Backups and autosaves go here, never into a synced folder.")
+  (make-directory my/local-dir t)
+
+  (defun my/org-files ()
+    "All .org files in the shared and personal folders."
+    (seq-mapcat (lambda (dir)
+                  (when (file-directory-p dir)
+                    (directory-files dir t "\\.org\\'")))
+                (list my/shared-dir my/personal-dir)))
+#+end_src
+
+* packages
+Emacs installs a handful of packages the first time it starts; this needs the
+internet and a few minutes. Afterwards they are on disk in =elpa/=. Everything
+built in to Emacs 30 (use-package, which-key, org itself) is
+marked =:ensure nil= so it is used from Emacs rather than downloaded. GNU ELPA
+is preferred over MELPA when a package is on both.
+#+begin_src emacs-lisp
+  (require 'package)
+  (setq package-archives
+        '(("gnu"    . "https://elpa.gnu.org/packages/")
+          ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+          ("melpa"  . "https://melpa.org/packages/")))
+  (setq package-archive-priorities '(("gnu" . 3) ("nongnu" . 2) ("melpa" . 1)))
+  (package-initialize)
+  (unless package-archive-contents
+    (package-refresh-contents))
+
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+#+end_src
+
+* sane defaults
+** the frame
+Menu bar stays: it is the best way to discover what Emacs can do when you
+don't yet know the name of a command. The tool bar and scroll bar go. The
+frame starts maximized.
+#+begin_src emacs-lisp
+  (menu-bar-mode 1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
+  (setq inhibit-startup-screen t)
+  (blink-cursor-mode 0)
+#+end_src
+
+** keys that surprise Windows users
+=C-z= minimizes the Emacs window ("suspend"), which on Windows looks like a
+crash. Unbound here. Typing while text is selected replaces the selection,
+like every other program. Yes/no questions accept =y= / =n=.
+#+begin_src emacs-lisp
+  (global-unset-key (kbd "C-z"))
+  (global-unset-key (kbd "C-x C-z"))
+  (delete-selection-mode 1)
+  (setq use-short-answers t)
+  (setq use-dialog-box nil)
+#+end_src
+
+** text encoding
+Unix line endings and UTF-8 everywhere, so files written here look identical
+on Linux and on the phones.
+#+begin_src emacs-lisp
+  (prefer-coding-system 'utf-8-unix)
+  (setq-default buffer-file-coding-system 'utf-8-unix)
+#+end_src
+
+** playing nice with the sync client
+Emacs normally leaves =.#file= lock files and =file~= backups next to the file
+it edits. On a synced folder those travel to the phones and confuse the apps.
+Lock files are off; backups and autosaves go to a local folder. When the sync
+client updates a file that is open here, the buffer reloads automatically.
+#+begin_src emacs-lisp
+  (setq create-lockfiles nil)
+  (setq backup-directory-alist `(("." . ,my/local-dir)))
+  (setq auto-save-file-name-transforms `((".*" ,my/local-dir t)))
+  (setq auto-save-default t)
+
+  (global-auto-revert-mode 1)
+  (setq auto-revert-verbose nil)
+#+end_src
+
+** remembering things between sessions
+Recent files show up in the buffer switcher; the minibuffer remembers what
+you typed before.
+#+begin_src emacs-lisp
+  (recentf-mode 1)
+  (setq recentf-max-saved-items 50)
+  (savehist-mode 1)
+  (save-place-mode 1)
+#+end_src
+
+** one Emacs
+Starting Emacs a second time (from the Start menu, or by opening a file)
+talks to the running one instead of opening a second window.
+#+begin_src emacs-lisp
+  (require 'server)
+  (unless (server-running-p)
+    (server-start))
+#+end_src
+
+** where Customize saves
+Anything saved through the menu bar's =Options= menu or =M-x customize= goes
+to =custom.el=, not into this file.
+#+begin_src emacs-lisp
+  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+#+end_src
+
+* looks
+** fonts
+Cascadia Code ships with Windows 11 and Windows Terminal; Consolas with every
+Windows. Segoe UI is the Windows interface font and works well for prose.
+Segoe UI Symbol fills in the arrows, bullets and checkboxes the pretty layer
+uses. The Linux names at the end are only for testing this file on Ilja's
+machine. Whichever is found first is used.
+#+begin_src emacs-lisp
+  (defun my/first-font (&rest families)
+    "Return the first of FAMILIES that is installed, or nil."
+    (seq-find (lambda (f) (find-font (font-spec :family f))) families))
+
+  (when (display-graphic-p)
+    (let ((mono  (my/first-font "Cascadia Code" "Consolas" "Noto Sans Mono" "DejaVu Sans Mono"))
+          (sans  (my/first-font "Segoe UI" "Noto Serif" "DejaVu Serif"))
+          (symbols (my/first-font "Segoe UI Symbol" "Noto Sans Symbols2" "DejaVu Sans")))
+      (when mono
+        (set-face-attribute 'default nil :family mono :height 120)
+        (set-face-attribute 'fixed-pitch nil :family mono))
+      (when sans
+        (set-face-attribute 'variable-pitch nil :family sans :height 1.05))
+      (when symbols
+        (set-fontset-font t 'symbol symbols nil 'append))))
+#+end_src
+
+** theme
+The Modus themes are designed for readability and come as a pair:
+=modus-operandi= (light) and =modus-vivendi= (dark). =<f5>= switches. Emacs
+ships the themes themselves, but the toggle and the heading options live in
+the =modus-themes= package, so that is installed. Headings
+get a slightly bigger proportional font when the pretty layer is on.
+#+begin_src emacs-lisp
+  (use-package modus-themes
+    :demand t
+    :bind ("<f5>" . modus-themes-toggle)
+    :custom
+    (modus-themes-to-toggle '(modus-operandi modus-vivendi))
+    (modus-themes-italic-constructs t)
+    (modus-themes-bold-constructs t)
+    (modus-themes-mixed-fonts t)
+    (modus-themes-headings
+     '((1 . (variable-pitch 1.3))
+       (2 . (variable-pitch 1.1))
+       (3 . (variable-pitch semibold))))
+    :config
+    (load-theme 'modus-operandi t))
+#+end_src
+
+** which-key: the keys you can press next
+Press =C-c= or =C-x= and pause: a panel lists what you can press next and what
+it does. This is how you learn the keys without memorising a list.
+#+begin_src emacs-lisp
+  (use-package which-key
+    :ensure nil
+    :custom
+    (which-key-idle-delay 0.6)
+    :config
+    (which-key-mode 1))
+#+end_src
+
+* finding things
+** vertico, orderless, marginalia
+Every place Emacs asks you to pick something (a file, a command, a buffer) now
+shows a vertical list you filter by typing. Words can come in any order:
+typing =agen tod= matches =org-agenda-todo=. The right-hand column explains
+each candidate.
+#+begin_src emacs-lisp
+  (use-package vertico
+    :init
+    (vertico-mode 1)
+    :custom
+    (vertico-cycle t))
+
+  (use-package orderless
+    :custom
+    (completion-styles '(orderless basic))
+    (completion-category-defaults nil)
+    (completion-category-overrides '((file (styles partial-completion)))))
+
+  (use-package marginalia
+    :init
+    (marginalia-mode 1))
+#+end_src
+
+** consult: search and switch
+=C-s= shows a live list of every line matching what you type, in the current
+file; =Enter= jumps there. =C-x b= lists open buffers and recent files together.
+#+begin_src emacs-lisp
+  (use-package consult
+    :bind (("C-s"   . consult-line)
+           ("C-x b" . consult-buffer)))
+#+end_src
+
+** open one of our org files
+=C-c o= lists just the org files in the shared and personal folders, by name.
+#+begin_src emacs-lisp
+  (defun my/open-org-file ()
+    "Pick one of our org files by name and open it."
+    (interactive)
+    (let* ((files (my/org-files))
+           (names (mapcar (lambda (f) (cons (file-relative-name f my/sync-root) f))
+                          files))
+           (choice (completing-read "Open org file: " names nil t)))
+      (find-file (cdr (assoc choice names)))))
+
+  (global-set-key (kbd "C-c o") #'my/open-org-file)
+#+end_src
+
+* org-mode
+** the basics
+Org is built in. Long lines wrap at the window edge. Files open showing their
+headings and first-level content. Done tasks get a timestamp, and state
+changes go in a =LOGBOOK= drawer so the heading stays clean.
+#+begin_src emacs-lisp
+  (use-package org
+    :ensure nil
+    :bind (("C-c c" . org-capture)
+           ("C-c a" . org-agenda))
+    :hook (org-mode . visual-line-mode)
+    :custom
+    (org-startup-folded 'content)
+    (org-log-done 'time)
+    (org-log-into-drawer t)
+    (org-tags-column -65)
+    (org-fontify-whole-heading-line t)
+    (org-fontify-quote-and-verse-blocks t)
+    (org-ellipsis "…")
+    (org-agenda-window-setup 'current-window)
+    (calendar-week-start-day 1))
+#+end_src
+
+** todo states
+The shared vocabulary, identical on both phones and both computers:
+
+| =TODO=   | to do, some day, not the next thing               |
+| =NEXT=   | the next concrete action                          |
+| =WAIT=   | waiting for someone else; logs when it started    |
+| =TICK=   | tickler: resurfaces on its =SCHEDULED= date       |
+| =SOME=   | someday / maybe; logs when it was parked          |
+| =DONE-X= | finished, by X. =d= is me, =D= is my partner      |
+| =DONE=   | finished, by whoever                              |
+| =CANC=   | cancelled                                         |
+
+The =!= in =WAIT(w!/!)= records a timestamp when a task enters and leaves
+that state. That answers "how long have I been waiting on this?" and "when did
+I park this?" months later.
+#+begin_src emacs-lisp
+  (setq org-todo-keywords
+        `((sequence "TODO(t)" "NEXT(n)" "WAIT(w!/!)" "TICK(k)" "SOME(s!/!)" "|"
+                    ,(format "%s(d)" (my/done-keyword my/me))
+                    ,(format "%s(D)" (my/done-keyword my/partner))
+                    "DONE(f)" "CANC(c)")))
+
+  (setq org-todo-keyword-faces
+        `(("NEXT" . (:inherit org-todo :foreground "white" :background "firebrick" :weight bold))
+          ("WAIT" . (:inherit org-todo :foreground "black" :background "gold" :weight bold))
+          ("TICK" . (:inherit org-todo :foreground "white" :background "slate blue" :weight bold))
+          ("SOME" . (:inherit org-todo :foreground "black" :background "light gray" :weight bold))
+          (,(my/done-keyword my/me) . org-done)
+          (,(my/done-keyword my/partner) . org-done)
+          ("CANC" . (:inherit org-done :strike-through t))))
+#+end_src
+
+** tags: whose task is this
+One tag per person; a task can carry only one of them. No tag means "either
+of us". =C-c C-q= on a heading opens the picker; the key is the first letter
+of the name. Context tags (where a task can be done) are ready to switch on
+once we have agreed on them.
+#+begin_src emacs-lisp
+  (setq org-tag-alist
+        `((:startgroup)
+          (,my/me      . ,(string-to-char my/me))
+          (,my/partner . ,(string-to-char my/partner))
+          (:endgroup)
+          ;; context tags, uncomment when agreed:
+          ;; ("@home"    . ?h)
+          ;; ("@errands" . ?e)
+          ;; ("@work"    . ?w)
+          ))
+  (setq org-fast-tag-selection-single-key t)
+#+end_src
+
+** capture: writing things down fast
+=C-c c= then =t= for my own inbox, =s= for the shared one. Both stamp when the
+task was written; the shared one also records who wrote it, because "who
+added this again?" is a useful question when a task has gone stale.
+#+begin_src emacs-lisp
+  (setq org-capture-templates
+        `(("t" "Todo (mine)" entry (file my/personal-inbox)
+           "* TODO %?\n:PROPERTIES:\n:CREATED:  %U\n:END:\n")
+          ("s" "Todo (shared)" entry (file my/shared-inbox)
+           ,(format "* TODO %%?\n:PROPERTIES:\n:CREATED:  %%U\n:CREATED_BY: %s\n:END:\n"
+                    my/me))))
+#+end_src
+
+** agenda: what is on today
+The agenda reads every org file in both folders. In the shared folder, tasks
+tagged only for my partner are hidden from my day view; the "everyone" view
+shows them.
+
+- =C-c d=: my day. Today's scheduled items and deadlines (and habits), then
+  every =NEXT=, then every =WAIT=.
+- =C-c a A=: the same, including my partner's tasks.
+- =C-c a n= / =C-c a w=: just the =NEXT= or =WAIT= lists.
+#+begin_src emacs-lisp
+  (setq org-agenda-files (list my/shared-dir my/personal-dir))
+  (setq org-agenda-span 'day)
+  (setq org-deadline-warning-days 14)
+  (setq org-agenda-todo-ignore-scheduled t)
+  (setq org-agenda-block-separator ?─)
+
+  (defun my/agenda-skip-partner-only ()
+    "Skip entries in the shared folder tagged for my partner and not for me."
+    (when (and buffer-file-name
+               (file-in-directory-p buffer-file-name my/shared-dir))
+      (let ((tags (org-get-tags)))
+        (when (and (member my/partner tags)
+                   (not (member my/me tags)))
+          (or (outline-next-heading) (point-max))))))
+
+  (defun my/agenda-blocks (skip)
+    "The three agenda blocks, with SKIP as the skip function."
+    `((agenda "" ((org-agenda-overriding-header "Today")
+                  (org-agenda-skip-function ',skip)))
+      (todo "NEXT" ((org-agenda-overriding-header "Next actions")
+                    (org-agenda-skip-function ',skip)))
+      (todo "WAIT" ((org-agenda-overriding-header "Waiting for")
+                    (org-agenda-skip-function ',skip)))))
+
+  (setq org-agenda-custom-commands
+        `(("d" "My day" ,(my/agenda-blocks 'my/agenda-skip-partner-only))
+          ("A" "Everyone's day" ,(my/agenda-blocks nil))
+          ("n" "Next actions" todo "NEXT")
+          ("w" "Waiting for" todo "WAIT")))
+
+  (defun my/agenda-day ()
+    "Show my day."
+    (interactive)
+    (org-agenda nil "d"))
+
+  (global-set-key (kbd "C-c d") #'my/agenda-day)
+#+end_src
+
+** habits
+Recurring tasks with =:STYLE: habit= show a consistency graph in the agenda,
+the feature we liked in organice.
+#+begin_src emacs-lisp
+  (use-package org-habit
+    :ensure nil
+    :after org
+    :custom
+    (org-habit-graph-column 50)
+    (org-habit-show-habits-only-for-today t))
+#+end_src
+
+** refile: moving a task to where it belongs
+=C-c C-w= on a heading asks where to move it. Any heading up to level 3 in any
+of our org files is a target; type part of the file or heading name.
+#+begin_src emacs-lisp
+  (setq org-refile-targets '((my/org-files :maxlevel . 3)))
+  (setq org-refile-use-outline-path 'file)
+  (setq org-outline-path-complete-in-steps nil)
+  (setq org-refile-allow-creating-parent-nodes 'confirm)
+#+end_src
+
+** the pretty layer
+Org files are plain text: stars for headings, =*bold*= with literal
+asterisks, =- [ ]= for a checkbox. The pretty layer draws them nicer: bullets
+instead of stars, tags and todo keywords as pills, checkboxes as boxes,
+emphasis markers hidden until the cursor is on them (that is what
+=org-appear= does), prose in a proportional font. =C-c v= switches the whole
+layer off and on in every org buffer, so the raw text is one key away.
+#+begin_src emacs-lisp
+  (use-package org-modern
+    :after org
+    :custom
+    (org-modern-table nil)
+    (org-modern-fold-stars
+     '(("▶" . "▼") ("▷" . "▽") ("⏵" . "⏷") ("▹" . "▿") ("▸" . "▾")))
+    :hook (org-agenda-finalize . org-modern-agenda))
+
+  (use-package org-appear
+    :after org
+    :custom
+    (org-appear-autoentities t)
+    (org-appear-autolinks t)
+    (org-appear-autosubmarkers t))
+
+  (defvar my/pretty t
+    "Whether the pretty layer is on in org buffers.")
+
+  (defun my/apply-pretty ()
+    "Turn the pretty layer on or off in the current org buffer, following `my/pretty'."
+    (let ((on (if my/pretty 1 -1)))
+      (org-indent-mode on)
+      (org-modern-mode on)
+      (org-appear-mode on)
+      (variable-pitch-mode on)
+      (setq-local org-hide-emphasis-markers my/pretty)
+      (setq-local org-pretty-entities my/pretty)
+      (org-restart-font-lock)))
+
+  (defun my/toggle-pretty ()
+    "Toggle the pretty layer in every org buffer."
+    (interactive)
+    (setq my/pretty (not my/pretty))
+    (dolist (buf (buffer-list))
+      (with-current-buffer buf
+        (when (derived-mode-p 'org-mode)
+          (my/apply-pretty))))
+    (message "Pretty layer %s" (if my/pretty "on" "off: this is the real text")))
+
+  (add-hook 'org-mode-hook #'my/apply-pretty)
+  (global-set-key (kbd "C-c v") #'my/toggle-pretty)
+#+end_src
+
+** spell checking (only if installed)
+Emacs uses the external program =hunspell= for spelling. If it is on the
+system, misspelled words in org files get a wavy underline; right-click for
+suggestions. Dutch is the default; =M-x ispell-change-dictionary= switches.
+Without =hunspell= and that dictionary this whole block does nothing. See the README for
+installing it.
+#+begin_src emacs-lisp
+  (defun my/hunspell-has-dictionary-p (dict)
+    "Whether hunspell is installed and can load DICT."
+    (and (executable-find "hunspell")
+         (zerop (call-process "hunspell" nil nil nil "-d" dict "-l"))))
+
+  (when (my/hunspell-has-dictionary-p "nl_NL")
+    (setq ispell-program-name "hunspell")
+    (setq ispell-dictionary "nl_NL")
+    (add-hook 'org-mode-hook #'flyspell-mode))
+#+end_src
+
+* the welcome file
+=welcome.org= next to this file is a short course: what a buffer is, what
+=C-= and =M-= mean, and the handful of org keys you need. It opens on every
+start until you turn it off; after that Emacs starts on today's agenda.
+=C-c h= opens it any time.
+
+Turn it off with =M-x my/welcome-done=, or through =M-x customize-variable
+my/show-welcome=, which is the same thing done through the settings interface.
+#+begin_src emacs-lisp
+  (defcustom my/show-welcome t
+    "Open welcome.org on startup. Set to nil once you know your way around."
+    :type 'boolean
+    :group 'org)
+
+  (defvar my/welcome-file (expand-file-name "welcome.org" user-emacs-directory)
+    "The lessons file.")
+
+  (defun my/open-welcome ()
+    "Open the welcome / lessons file."
+    (interactive)
+    (find-file my/welcome-file))
+
+  (defun my/welcome-done ()
+    "Stop showing welcome.org on startup. `C-c h' still opens it."
+    (interactive)
+    (customize-save-variable 'my/show-welcome nil)
+    (message "Emacs will start on your agenda from now on. C-c h reopens the lessons."))
+
+  (global-set-key (kbd "C-c h") #'my/open-welcome)
+
+  (defun my/initial-buffer ()
+    "What to show at startup: the lessons, or my day."
+    (if my/show-welcome
+        (find-file-noselect my/welcome-file)
+      (progn (org-agenda nil "d")
+             (get-buffer org-agenda-buffer-name))))
+
+  (setq initial-buffer-choice #'my/initial-buffer)
+#+end_src
+
+* finally
+Load what Customize saved, last, so it wins over the defaults above.
+#+begin_src emacs-lisp
+  (load custom-file 'noerror 'nomessage)
+#+end_src

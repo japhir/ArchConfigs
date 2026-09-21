@@ -1,0 +1,60 @@
+#+title: Emacs & org-mode cheatsheet
+#+options: toc:nil num:nil
+
+=C-x= = hold Ctrl, press x. =M-x= = hold Alt, press x. =C-x C-s= = two strokes.
+*=C-g= cancels anything.* Pause after =C-c= or =C-x= for a list of what comes next.
+
+* Editing
+| Key            | Does                                  |
+|----------------+---------------------------------------|
+| =C-x C-s=      | save                                  |
+| =C-/=          | undo (repeat to go further)           |
+| =C-s=          | search this file, live list           |
+| =C-Insert=     | copy (=M-w=)                          |
+| =Shift-Insert= | paste (=C-y=)                         |
+| =Shift-Delete= | cut (=C-w=)                           |
+| =C-a= / =C-e=  | start / end of line                   |
+| =C-x 1=        | keep only this window                 |
+| =C-x k=        | close this buffer                     |
+
+* Files and commands
+| Key       | Does                               |
+|-----------+------------------------------------|
+| =C-c o=   | open one of our org files          |
+| =C-x C-f= | open any file                      |
+| =C-x b=   | switch buffer / recent file        |
+| =M-x=     | run a command by name              |
+| =C-h k=   | what does this key do?             |
+| =C-c h=   | the lessons file                   |
+| =<f5>=    | light / dark theme                 |
+| =C-c v=   | pretty layer off / on              |
+
+* Org
+| Key         | Does                                     |
+|-------------+------------------------------------------|
+| =TAB=       | fold / unfold heading                    |
+| =Shift-TAB= | fold / unfold whole file                 |
+| =C-c C-t=   | todo state (then =t n w k s d D f c=)    |
+| =C-c C-q=   | tags (=l= me, =i= partner)               |
+| =C-c C-s=   | schedule                                 |
+| =C-c C-d=   | deadline                                 |
+| =C-c C-c=   | tick checkbox / finish note / "do it"    |
+| =C-c C-w=   | refile (move) heading                    |
+| =M-Up/Down= | move heading up / down                   |
+| =M-Enter=   | new heading                              |
+
+* Daily loop
+| Key       | Does                                   |
+|-----------+----------------------------------------|
+| =C-c c t= | capture to my inbox                    |
+| =C-c c s= | capture to shared inbox                |
+| =C-c C-c= | file the capture (=C-c C-k= discards)  |
+| =C-c d=   | my day                                 |
+| =C-c a A= | everyone's day                         |
+
+In the agenda: =t= change state, =Enter= go to task, =r= refresh, =f= / =b= next / previous day, =q= quit.
+
+* States
+=TODO= someday-ish · =NEXT= the next action · =WAIT= waiting on someone (logged)
+· =TICK= resurfaces on its date · =SOME= parked (logged) · =DONE-LINE= / =DONE-ILJA= /
+=DONE= finished · =CANC= cancelled

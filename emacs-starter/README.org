@@ -1,0 +1,68 @@
+#+title: emacs-starter: a small Emacs for our shared org todo system
+
+A standalone Emacs configuration for someone who uses Emacs as the desktop
+client of a shared org-mode todo system (phones: orgzly-revived and beorg;
+sync: WebDAV via the Nextcloud desktop client). Independent of =myinit.org=.
+Windows is the target; it also loads on Linux for testing.
+
+| File              | Role                                                        |
+|-------------------+-------------------------------------------------------------|
+| =init.el=         | three lines: tangle and load =config.org=                   |
+| =config.org=      | the configuration, literate; the only file to edit          |
+| =welcome.org=     | the lessons, opened at startup until dismissed              |
+| =cheatsheet.org=  | one page of keys; =cheatsheet.html= is its printable export |
+
+* Setting up her Windows machine
+
+1. Install Emacs 30: in PowerShell, =winget install GNU.Emacs=. Done when
+   "Emacs" appears in the Start menu.
+2. Install the Nextcloud desktop client from nextcloud.com/install, log in to
+   the WebDAV account, and in the folder selection tick only =iljline= and
+   her own folder. Under settings, turn *off* "virtual file support" so files
+   are always physically on disk. Done when both folders exist under
+   =C:\Users\<name>\Nextcloud\= with their =.org= files inside.
+3. Copy this directory's contents (not the directory) into
+   =C:\Users\<name>\AppData\Roaming\.emacs.d\=. Create the folder if missing.
+   Paste =%APPDATA%\.emacs.d= in the Explorer address bar to get there.
+4. Open =config.org= and check the heading "where our files live": the sync
+   root and both folder names must match what step 2 created.
+5. Start Emacs. The first start downloads packages (a few minutes, internet
+   needed); ignore compile warnings. Done when =welcome.org= is showing and
+   =C-c d= opens an agenda listing tasks from both folders.
+6. Print =cheatsheet.html= from a browser.
+
+Regenerate the HTML after editing the cheatsheet:
+#+begin_src sh
+  emacs --batch cheatsheet.org -f org-html-export-to-html
+#+end_src
+
+* Optional: Dutch spell checking
+
+Needs the =hunspell= program and an =nl_NL= dictionary on PATH. One way, in
+PowerShell: install Scoop (scoop.sh), then =scoop install hunspell=, then put
+=nl_NL.aff= and =nl_NL.dic= (from the LibreOffice Dutch dictionary extension,
+or OpenTaal) into Scoop's hunspell =share\hunspell= folder. Done when
+=hunspell -D= lists =nl_NL=. Restart Emacs; misspelled words in org files get
+underlined.
+
+* Testing on Linux
+
+=my/sync-root= falls back to =$HOME/Nextcloud= when =USERPROFILE= is unset.
+Point =HOME= at a scratch tree with dummy org files and start Emacs with its
+own init directory:
+#+begin_src sh
+  HOME=/tmp/starter-test emacs --init-directory /tmp/starter-test/.emacs.d
+#+end_src
+
+* Design notes
+
+- Two variables, =my/me= and =my/partner=, derive the =DONE-<NAME>= keywords,
+  the person tags, =CREATED_BY=, and the agenda filter. Swap them and the
+  same file is Ilja's side.
+- The literate file is =config.org=, not =init.org=: =org-babel-load-file=
+  tangles to a =.el= of the same name, and =init.el= is the bootstrap.
+- Per-person =DONE= states exist because neither phone app can run a hook on
+  state change; a keyword is the only cross-app way to record who finished
+  a task.
+- Lock files off, backups and autosaves local, auto-revert on: the synced
+  folders must contain only what the phones can read.

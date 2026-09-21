@@ -1,0 +1,203 @@
+#+title: Welcome to Emacs
+#+startup: showall
+
+Hello! This file is a short course. Read it top to bottom, do the exercises
+right here in this text, and you will know enough to use our todo system.
+It takes about twenty minutes. You cannot break anything: this is your own
+copy, and nothing in here is synced anywhere.
+
+When you are done, the last section tells you how to stop this file from
+opening at startup. =C-c h= brings it back whenever you want.
+
+* 1. What you are looking at
+
+The whole window is a *frame*. The big area with this text is a *buffer*: the
+contents of a file, loaded into memory. You edit the buffer; =C-x C-s= writes
+it back to the file. The line at the bottom of the text is the *mode line*:
+it shows the file name and, on the left, =**= when there are unsaved changes.
+Below that is the *minibuffer*: a one-line area where Emacs asks you
+questions and where you type commands.
+
+The menu bar at the very top works like in any program. Use it freely; every
+item there also has a key, and the menu shows it.
+
+* 2. The point
+
+In Emacs the cursor is called the *point*, because it points at the spot
+between two characters where typing will insert text. Move it with the arrow
+keys or click with the mouse; both are fine. =Home= and =End= go to the start
+and end of a line, =PgUp= / =PgDn= scroll.
+
+- Exercise :: Click somewhere in this sentence, then press =End=. Then press
+  =C-a= (hold Ctrl, press a): that is Emacs's own key for "start of line".
+
+* 3. How keys are written
+
+- =C-x= means: hold =Ctrl=, press =x=.
+- =M-x= means: hold =Alt=, press =x=. =M= is for "Meta", an old name for that key.
+- =C-x C-s= means: =C-x=, let go, then =C-s=. Two strokes in a row.
+- =C-c C-t= is the same idea. Most org keys start with =C-c=.
+
+The single most important key: *=C-g= cancels whatever Emacs is doing.*
+Wrong menu, half-typed command, a question you did not mean to start: =C-g=.
+Press it twice if once is not enough.
+
+Undo is =C-/= (or =C-x u=). Press it repeatedly to go further back.
+
+- Exercise :: Type a few letters here: ________. Now press =C-/= until
+  they are gone.
+
+Two Windows habits that behave differently here:
+- =C-s= is *search*, not save. Save is =C-x C-s=.
+- =C-c= alone does nothing yet; it is the start of a two-stroke key. Copy is
+  =C-Insert= (or =M-w=), paste is =Shift-Insert= (or =C-y=), cut is =Shift-Delete=
+  (or =C-w=). Select text by dragging with the mouse or with =Shift= + arrows.
+
+* 4. Every command has a name
+
+Everything Emacs can do is a command with a name, like =org-agenda= or
+=save-buffer=. Keys are shortcuts to commands; the menu bar is another set
+of shortcuts. The third way is to type the name: press =M-x=, type a few
+letters of the name in any order, pick from the list, press =Enter=.
+
+- Exercise :: Press =M-x=, type =count words=, press =Enter=. The minibuffer
+  tells you how many words this file has. Press =M-x= again and type =tog
+  theme= to find =modus-themes-toggle=; run it, then run it again. (=<f5>=
+  does the same.)
+
+When you press =C-c= or =C-x= and wait a moment, a panel appears listing what
+you can press next and what each key does. Let it guide you.
+
+* 5. Files
+
+- =C-c o= :: pick one of *our* org files by name.
+- =C-x C-f= :: open any file. Type a path; the list filters as you type.
+- =C-x b= :: switch between open buffers and recently used files.
+- =C-x C-s= :: save. Do it often; Emacs also keeps an autosave.
+- =C-x k= :: close ("kill") the current buffer. The file stays on disk.
+
+- Exercise :: Press =C-c o= and open the shared inbox. Look around. Press
+  =C-x b= and come back to this welcome file.
+
+* 6. Org: the file format
+
+An org file is plain text with a few conventions. This whole file is one.
+
+** Headings and folding
+A line starting with stars is a heading; more stars, deeper level. Put the
+point on a heading and press =TAB=: it folds. =TAB= again unfolds. =Shift-TAB=
+folds or unfolds the whole file.
+
+- Exercise :: Fold and unfold this heading with =TAB=.
+
+** Todo states
+A heading can carry a state. =C-c C-t= on a heading cycles through them:
+=TODO=, =NEXT=, =WAIT=, =TICK=, =SOME=, then the done states. Or press
+=C-c C-t= and then one letter: =t=, =n=, =w=, =k=, =s=; =d= marks it done by
+you, =D= done by your partner, =f= done by whoever, =c= cancelled.
+
+*** TODO Practice: mark this done
+Put the point on the line above and press =C-c C-t d=. A =CLOSED= timestamp
+appears below it. Now press =C-c C-t w=: because =WAIT= logs when it starts,
+Emacs asks you for a note; type anything and press =C-c C-c= to finish it.
+
+** Tags
+=C-c C-q= on a heading opens the tag picker. Press =l= or =i= to assign the
+task to one of us, =Enter= to confirm. No tag means "either of us".
+
+*** TODO Practice: tag this for yourself
+
+** Dates
+=C-c C-s= schedules a task: pick a day in the calendar with the arrows,
+=Enter=. Scheduled means "show me this on that day". =C-c C-d= sets a
+deadline: a date it must be done by. Both show up in the agenda.
+
+*** TODO Practice: schedule this for tomorrow
+In the calendar, =Shift-Right= moves a day, or just type =+1= and =Enter=.
+
+** Checkboxes and "do the obvious thing"
+=- [ ]= at the start of a line is a checkbox. =C-c C-c= on it ticks it.
+=C-c C-c= is org's "do the obvious thing here" key: on a checkbox it toggles,
+on a heading it edits the tags, in a note buffer it finishes the note.
+
+- [ ] Tick me with =C-c C-c=
+- [ ] Me too
+
+** Emphasis and links
+=*bold*=, =/italic/=, =_underline_=, and =[[https://orgmode.org][a link]]=.
+The pretty layer hides the marker characters until your cursor touches them;
+that is what happens when you click on this *bold* word.
+
+* 7. Capture, agenda, refile
+
+These three keys are the daily loop.
+
+- =C-c c= :: *capture*: write a new task without leaving what you are doing.
+  Press =t= for your own inbox or =s= for our shared inbox, type the task,
+  press =C-c C-c= to file it (or =C-c C-k= to throw it away).
+- =C-c d= :: *your day*: today's scheduled tasks and deadlines, then all
+  =NEXT= actions, then everything you are waiting on. =q= closes it. Inside
+  the agenda: =t= changes the state of the task under the point, =Enter=
+  jumps to it in its file, =r= refreshes, =f= / =b= move a day forward or
+  back. =C-c a= shows the other views; =A= there is everyone's day.
+- =C-c C-w= :: *refile*: move the heading under the point to another place.
+  Type part of a file or heading name, pick, =Enter=. This is how the inbox
+  gets emptied into the real lists.
+
+- Exercise :: Capture a shared task with =C-c c s=. Open =C-c d= and find it
+  under "Next actions"? Not yet: it is a =TODO=, not a =NEXT=. Open the
+  shared inbox with =C-c o=, make it =NEXT= with =C-c C-t n=, then look at
+  =C-c d= again.
+
+* 8. What is really in the file
+
+Bullets, pills, boxes, and the proportional font are all drawing on top of
+plain text. Press =C-c v= to switch that drawing off and see the actual
+characters in this file: stars, colons around tags, =[ ]= for checkboxes.
+Press =C-c v= again to bring the pretty layer back. This is the whole trick:
+the file is always just text, which is why your phone can read it too.
+
+* 9. Getting unstuck
+
+- =C-g= :: cancel. Always.
+- =C-h k= then a key :: "what does this key do?"
+- =C-h f= then a name :: "what does this command do?"
+- =C-h m= :: everything the current buffer can do.
+- Menu bar, Help :: the same, with a mouse.
+- The =*Messages*= buffer (=C-x b=, type =mess=) keeps everything Emacs said.
+
+If Emacs looks broken, it is almost always one of: a window split you did not
+want (=C-x 1= keeps only the current window), or a question waiting in the
+minibuffer (=C-g=).
+
+* 10. Our system
+
+Two people, two phones, two computers, one folder of org files.
+
+- The shared folder holds the lists we both work from. Your own folder holds
+  yours; the agenda shows both.
+- Whose task: tag it =line= or =ilja=. No tag means either of us. Your day
+  view hides tasks tagged only for the other person; everyone's day (=C-c a
+  A=) shows all.
+- Who did it: =DONE-LINE= or =DONE-ILJA= (=d= is you, =D= is the other), so
+  we can see later who finished what. Plain =DONE= is fine when it does not
+  matter.
+- Waiting on someone: =WAIT= records when you started waiting, so "how long
+  has this been open?" has an answer.
+- Someday/maybe: =SOME= records when you parked it.
+- Every captured task carries a =CREATED= timestamp; shared ones also
+  =CREATED_BY=, for the "who added this again?" moments.
+- Habits (=:STYLE: habit=) draw a consistency graph in the agenda.
+- The phones and this Emacs read and write the same files. If something
+  looks stale, wait a moment for the sync client; the buffer reloads by
+  itself.
+
+* 11. Done with this file
+
+Run =M-x my/welcome-done=. From now on Emacs starts on your day; =C-c h=
+opens these lessons again. (The same setting is also reachable via =M-x
+customize-variable my/show-welcome=, the graphical settings interface, in
+case you are curious what that looks like.)
+
+There is a one-page cheatsheet next to this file: =cheatsheet.org=, and a
+printable =cheatsheet.html=.
