@@ -1,6 +1,6 @@
 [Unit]
 Description=Call orgsync
-Wants=orgcalsync.timer
+Wants=orggcalsync.timer
 
 [Service]
 ExecStart=/home/japhir/bin/orggcalsync
