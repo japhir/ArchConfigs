@@ -74,4 +74,8 @@ These are agreed (see ADRs) but not yet in =myinit.org= / =~/org=:
   per-=:PersonName:= tags stay
 - Daily pass: actually start using =d=; fix the stale =clumpednotes.org= →
   =work.org= link inside =daily_review.org=
+- Shared system with Line (ADR 0005–0007): mirror the shared keyword set
+  (=DONE-ILJA(d) DONE-LINE(D)=) into =org-todo-keywords=, add the =ilja=/=line=
+  assignee tags, a shared-inbox capture template with =CREATED_BY=, and the
+  shared folder in =secretdirs.el=. Her side is built: =emacs-starter/=.
 - Config drift: see the backlog filed into the personal GTD system

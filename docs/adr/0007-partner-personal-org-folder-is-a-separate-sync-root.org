@@ -1,0 +1,33 @@
+#+title: 0007 — Line's personal org files live in their own synced folder, outside Ilja's org tree
+
+* Status
+accepted
+
+* Decision
+
+Line's own org files (her inbox, todo, etc.) sit in a WebDAV folder of their
+own, a sibling of the shared folder, synced to her laptop and phone and simply
+not selected for sync on Ilja's machine. They are never a subfolder of
+=~/org=.
+
+* Why
+
+Ilja's agenda files are every =.org= under =~/org=, recursively; anything that
+lands there is in his agenda. A subfolder with an exclusion rule would work
+until the rule is forgotten or the file set changes. A separate folder that is
+not synced to his machine cannot leak by construction. It also keeps her
+system independent: if the current WebDAV provider (SURFdrive, possibly ending
+within months) goes away, her folder moves to any other account as a unit
+without disentangling it from his.
+
+Keeping her files only on her phone, as before, was the status quo; it left
+them unbacked-up and unreachable from her laptop.
+
+* Consequences
+
+- Her Emacs has two roots, shared and personal; both are agenda files for
+  her, only the shared one is for him.
+- The shared folder is the sole overlap between the two systems. Anything
+  meant for both of us goes there; anything else does not.
+- Her personal files carry no assignee tags and plain =DONE=; the who is
+  implied by the folder.

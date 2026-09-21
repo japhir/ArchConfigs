@@ -88,7 +88,8 @@ stay is an open question.)
 
 *** Inbox
 Unprocessed captured stuff with no decided meaning yet. Lives in =inbox.org=
-(desktop/web) and =mobin.org= (mobile); both carry =#+filetags: inbox=.
+(desktop/web) and =mobin.org= (mobile); both carry =#+filetags: inbox=. The
+shared system has its own, =inbox-iljline.org=, emptied by either of us.
 /Avoid/: todo list, queue.
 
 *** Stuck Project
@@ -104,3 +105,28 @@ out to its real home during review.
 *** Stray Task
 A TODO-state heading that has leaked into a daily note. The review sweeps these
 out; they should never live in =notes/daily/=.
+
+** Shared system
+Terms for the todo lists Ilja and Line run together. Decisions: ADR 0005–0007.
+
+*** Shared Folder
+The one folder of org files both of us read and write, from two Emacsen and
+two phones. The only overlap between the two personal systems.
+/Avoid/: joint files, our org.
+
+*** Assignee
+The person who should do a shared task, carried as a lowercase person tag
+(=line=, =ilja=); at most one. No tag means either of us. Distinct from the
+capitalised =:PersonName:= tags, which mark an Agenda list (to raise /with/
+someone), not an assignment.
+/Avoid/: owner, responsible, delegated-to.
+
+*** Done-by
+The person who finished a shared task, carried by the keyword =DONE-<NAME>=.
+Plain =DONE= means it does not matter who.
+/Avoid/: closed-by, completer.
+
+*** Captured-by
+The person who wrote a shared task down, carried by the =CREATED_BY= property
+set at capture. Memory aid for stale tasks, not an assignment.
+/Avoid/: author, reporter.

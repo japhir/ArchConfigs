@@ -1,0 +1,40 @@
+#+title: 0006 — On shared tasks, a lowercase person tag is the assignee and CREATED_BY is the origin
+
+* Status
+accepted
+
+* Decision
+
+A shared task carries at most one lowercase person tag, =line= or =ilja=,
+meaning "this person should do it". No tag means either of us. Every capture
+into the shared inbox also sets a =CREATED_BY= property naming who wrote it
+down. Together with ADR 0005 this gives three independent who-fields:
+assignee (tag), origin (=CREATED_BY=), completer (=DONE-<NAME>=).
+
+* Why
+
+Assignment has to be visible and filterable in all four clients; tags are the
+one field the phone apps show inline and can filter on, whereas a property is
+invisible in most views and separate files per person would split a single
+shared list in two.
+
+=CREATED_BY= was nearly dropped as redundant with the other two fields. It
+stays because it answers a question the other two cannot: when a shared task
+has gone stale, "who added this again?" is what jogs the memory needed to
+decide whether it still matters. The cost is one template line in each client
+that captures; orgzly-revived cannot set it, so it will be missing on tasks
+captured there, which is accepted.
+
+* Consequences
+
+- The person tags form a mutually exclusive group; a task is never tagged both.
+- Lowercase distinguishes assignee tags from Ilja's capitalised
+  =:PersonName:= tags, which mean "to raise with this person" (the Agenda
+  list, see CONTEXT.org). Same shape, different meaning; the case is the
+  only signal, so do not lowercase the agenda-list tags.
+- Each person's agenda hides shared tasks tagged only for the other; a
+  second view shows everything for planning together.
+- Capture never prompts for the assignee; untagged is a valid meaning and
+  tagging happens during clarify.
+- Ilja's =myinit.org= still needs the =line= tag and a shared-inbox template
+  with =CREATED_BY= to honour this on his side.

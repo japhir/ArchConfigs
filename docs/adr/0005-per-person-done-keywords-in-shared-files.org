@@ -1,0 +1,41 @@
+#+title: 0005 — Who finished a shared task is recorded as a DONE-<NAME> keyword
+
+* Status
+accepted
+
+* Decision
+
+In the shared folder, finishing a task sets =DONE-LINE= or =DONE-ILJA=, not
+=DONE=. Plain =DONE= remains in the keyword set for "it does not matter who" and
+for the mobile apps' default. Each Emacs binds the fast key =d= to its own
+owner's keyword and =D= to the partner's, so the keyword strings are shared but
+the keys are per machine.
+
+* Why
+
+The shared files are edited by four clients: two Emacsen, orgzly-revived and
+beorg. Only Emacs can run a hook on a state change; the phone apps cannot
+stamp a property or a note with who acted. A keyword is the one mechanism all
+four clients produce identically, so it is the only cross-app way to answer
+"who closed this?" months later.
+
+Encoding "who" in "what state" is the obvious objection: a state vocabulary
+normally describes the task, not the person. The alternatives were a
+=DONE_BY= property (Emacs-only, so the phones would leave it blank), a tag
+added at completion (an extra manual step nobody would do on a phone), or a
+per-device log (nothing to read it). All lose the information exactly where
+most shared tasks are closed: on a phone.
+
+* Consequences
+
+- The shared keyword set is
+  =TODO NEXT WAIT(!/!) TICK SOME(!/!) | DONE-LINE DONE-ILJA DONE CANC= and must
+  be configured identically in both Emacsen, orgzly-revived and beorg. Adding a
+  keyword means touching four configs.
+- Shared files carry no =#+TODO:= line: an in-file line would fix the fast
+  keys for both machines, defeating the per-machine =d=/=D= mapping.
+- =org-log-done 'time= still stamps =CLOSED= on every done state, so timing
+  and who-did-it are both recorded.
+- Any tooling that tests for "done" must use =org-done-keywords= (or
+  =org-entry-is-done-p=), never the literal string =DONE=.
+- Personal files (Ilja's, Line's) keep plain =DONE=; the who is implied.
