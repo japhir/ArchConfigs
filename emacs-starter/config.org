@@ -211,8 +211,9 @@ machine. Whichever is found first is used.
 ** theme
 The Modus themes are designed for readability and come as a pair:
 =modus-operandi= (light) and =modus-vivendi= (dark). =<f5>= switches. Emacs
-ships the themes themselves, but the toggle and the heading options live in
-the =modus-themes= package, so that is installed. Headings
+ships the themes themselves, but the toggle, the heading options and the
+after-load hook (which recolours the todo keyword blocks, defined in the
+org section) live in the =modus-themes= package, so that is installed. Headings
 get a slightly bigger proportional font when the pretty layer is on.
 #+begin_src emacs-lisp
   (use-package modus-themes
@@ -334,25 +335,53 @@ I park this?" months later.
                     ,(format "%s(D)" (my/done-keyword my/partner))
                     "DONE(f)" "CANC(c)")))
 
+  (defface my/todo-next nil "The NEXT keyword." :group 'org-faces)
+  (defface my/todo-wait nil "The WAIT keyword." :group 'org-faces)
+  (defface my/todo-tick nil "The TICK keyword." :group 'org-faces)
+  (defface my/todo-some nil "The SOME keyword." :group 'org-faces)
+  (defface my/todo-done nil "The done keywords." :group 'org-faces)
+  (defface my/todo-canc nil "The CANC keyword." :group 'org-faces)
+
+  (defun my/set-todo-faces ()
+    "Colour the keyword faces from the palette of the current Modus theme."
+    (modus-themes-with-colors
+      (dolist (spec `((my/todo-next :background ,bg-red-intense    :foreground ,fg-main :weight bold)
+                      (my/todo-wait :background ,bg-yellow-intense :foreground ,fg-main :weight bold)
+                      (my/todo-tick :background ,bg-blue-intense   :foreground ,fg-main :weight bold)
+                      (my/todo-some :background ,bg-cyan-intense   :foreground ,fg-main :weight bold)
+                      (my/todo-done :background ,bg-green-subtle   :foreground ,fg-main :weight bold)
+                      (my/todo-canc :background ,bg-inactive       :foreground ,fg-dim  :weight bold
+                                    :strike-through t)))
+        (face-spec-set (car spec) `((,c ,@(cdr spec))) 'face-defface-spec))))
+
+  (my/set-todo-faces)
+  (add-hook 'modus-themes-after-load-theme-hook #'my/set-todo-faces)
+
   (defvar my/todo-faces
-    `(("NEXT" . (:inherit error :weight bold))
-      ("WAIT" . (:inherit warning :weight bold))
-      ("TICK" . (:inherit org-scheduled :weight bold))
-      ("SOME" . (:inherit shadow))
-      (,(my/done-keyword my/me)      . org-done)
-      (,(my/done-keyword my/partner) . org-done)
-      ("CANC" . (:inherit org-done :strike-through t)))
+    `(("NEXT" . my/todo-next)
+      ("WAIT" . my/todo-wait)
+      ("TICK" . my/todo-tick)
+      ("SOME" . my/todo-some)
+      (,(my/done-keyword my/me)      . my/todo-done)
+      (,(my/done-keyword my/partner) . my/todo-done)
+      ("DONE" . my/todo-done)
+      ("CANC" . my/todo-canc))
     "One alist for both the plain and the org-modern keyword faces.")
 
   (setq org-todo-keyword-faces my/todo-faces)
 #+end_src
 
-Keyword colours come from faces every theme defines (=error=, =warning=,
-=shadow=, the org faces), never from colour names, so they stay legible when
-=<f5>= switches to the dark theme. org-modern does not read
-=org-todo-keyword-faces=, only its own =org-modern-todo-faces=, so the same
-alist is handed to it in the pretty-layer section below; its inverse-video
-pills turn the inherited foreground into the pill background.
+Keywords sit on solid coloured blocks: red for =NEXT=, yellow for =WAIT=,
+blue for =TICK=, cyan for =SOME=, pale green for done, grey and struck
+through for =CANC=. The colours are not named here; they are taken from the
+active Modus theme's palette: once here, after the theme has loaded, and
+again each time =<f5>= switches, so the blocks match the dark theme instead
+of leaving light-theme blocks on a black background. =face-spec-set= is used rather than =custom-set-faces= so
+the colours never end up saved into =custom.el=.
+
+org-modern does not read =org-todo-keyword-faces=, only its own
+=org-modern-todo-faces=, so the same alist is handed to it in the
+pretty-layer section below.
 
 ** tags: whose task is this
 One tag per person; a task can carry only one of them. No tag means "either
