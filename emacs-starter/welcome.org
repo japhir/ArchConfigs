@@ -186,7 +186,9 @@ Two people, two phones, two computers, one folder of org files.
   has this been open?" has an answer.
 - Someday/maybe: =SOME= records when you parked it.
 - Every captured task carries a =CREATED= timestamp; shared ones also
-  =CREATED_BY=, for the "who added this again?" moments.
+  =CREATED_BY=, for the "who added this again?" moments. A task made by hand
+  gets its stamp the moment it first gets a todo keyword; =C-c t= adds one to
+  anything that still lacks it.
 - Habits (=:STYLE: habit=) draw a consistency graph in the agenda.
 - The phones and this Emacs read and write the same files. If something
   looks stale, wait a moment for the sync client; the buffer reloads by

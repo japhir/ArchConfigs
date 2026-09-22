@@ -21,6 +21,7 @@ with Emacs itself:
 | =C-c o=   | open one of our org files                           |
 | =C-c v=   | toggle the pretty layer to see the raw text         |
 | =C-c h=   | open the welcome / lessons file                     |
+| =C-c t=   | stamp CREATED on this task if missing               |
 | =C-s=     | search the current file (live list)                 |
 | =<f5>=    | reload this buffer from the file on disk            |
 | =<f9>=    | switch between light and dark theme                 |
@@ -432,6 +433,37 @@ added this again?" is a useful question when a task has gone stale.
           ("s" "Todo (shared)" entry (file my/shared-inbox)
            ,(format "* TODO %%?\n:PROPERTIES:\n:CREATED:  %%U\n:CREATED_BY: %s\n:END:\n"
                     my/me))))
+#+end_src
+
+** the CREATED stamp
+Capture already stamps =CREATED= on the way in. A heading typed by hand, or
+made with =M-RET=, gets no such thing, because nothing runs the capture
+template for it. Two fixes for that: a key that stamps it on demand, and an
+automatic stamp the moment a heading first gets a todo keyword, since that is
+the moment a heading turns into a task; a structural heading that never gets
+a keyword is left alone.
+#+begin_src emacs-lisp
+  (defun my/org-set-created (&optional pom)
+    "Give the entry at POM (default: point) a CREATED property, if it has none.
+  Returns the timestamp when it set one, nil otherwise."
+    (interactive)
+    (let ((pom (or pom (point))))
+      (unless (org-entry-get pom "CREATED")
+        (let ((now (format-time-string "[%Y-%m-%d %a %H:%M]")))
+          (org-entry-put pom "CREATED" now)
+          now))))
+
+  (defun my/org-stamp-created-on-first-keyword ()
+    "When a heading gets its first todo keyword, stamp CREATED if missing.
+  Runs from `org-after-todo-state-change-hook'; `org-last-state' is the
+  previous keyword, nil or empty when there was none."
+    (when (and org-state
+               (or (null org-last-state) (string-empty-p org-last-state)))
+      (my/org-set-created)))
+
+  (with-eval-after-load 'org
+    (define-key org-mode-map (kbd "C-c t") #'my/org-set-created)
+    (add-hook 'org-after-todo-state-change-hook #'my/org-stamp-created-on-first-keyword))
 #+end_src
 
 ** agenda: what is on today

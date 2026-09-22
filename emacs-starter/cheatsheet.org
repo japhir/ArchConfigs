@@ -43,6 +43,7 @@
 | =C-c C-w=   | refile (move) heading                    |
 | =M-Up/Down= | move heading up / down                   |
 | =M-Enter=   | new heading                              |
+| =C-c t=     | stamp CREATED if missing                 |
 
 * Daily loop
 | Key       | Does                                   |
