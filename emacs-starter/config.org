@@ -334,15 +334,25 @@ I park this?" months later.
                     ,(format "%s(D)" (my/done-keyword my/partner))
                     "DONE(f)" "CANC(c)")))
 
-  (setq org-todo-keyword-faces
-        `(("NEXT" . (:inherit org-todo :foreground "white" :background "firebrick" :weight bold))
-          ("WAIT" . (:inherit org-todo :foreground "black" :background "gold" :weight bold))
-          ("TICK" . (:inherit org-todo :foreground "white" :background "slate blue" :weight bold))
-          ("SOME" . (:inherit org-todo :foreground "black" :background "light gray" :weight bold))
-          (,(my/done-keyword my/me) . org-done)
-          (,(my/done-keyword my/partner) . org-done)
-          ("CANC" . (:inherit org-done :strike-through t))))
+  (defvar my/todo-faces
+    `(("NEXT" . (:inherit error :weight bold))
+      ("WAIT" . (:inherit warning :weight bold))
+      ("TICK" . (:inherit org-scheduled :weight bold))
+      ("SOME" . (:inherit shadow))
+      (,(my/done-keyword my/me)      . org-done)
+      (,(my/done-keyword my/partner) . org-done)
+      ("CANC" . (:inherit org-done :strike-through t)))
+    "One alist for both the plain and the org-modern keyword faces.")
+
+  (setq org-todo-keyword-faces my/todo-faces)
 #+end_src
+
+Keyword colours come from faces every theme defines (=error=, =warning=,
+=shadow=, the org faces), never from colour names, so they stay legible when
+=<f5>= switches to the dark theme. org-modern does not read
+=org-todo-keyword-faces=, only its own =org-modern-todo-faces=, so the same
+alist is handed to it in the pretty-layer section below; its inverse-video
+pills turn the inherited foreground into the pill background.
 
 ** tags: whose task is this
 One tag per person; a task can carry only one of them. No tag means "either
@@ -485,6 +495,7 @@ to install on the first, networked start.
   (use-package org-modern
     :after org
     :custom
+    (org-modern-todo-faces my/todo-faces)
     (org-modern-table nil)
     (org-modern-fold-stars
      '(("▶" . "▼") ("▷" . "▽") ("⏵" . "⏷") ("▹" . "▿") ("▸" . "▾")))
