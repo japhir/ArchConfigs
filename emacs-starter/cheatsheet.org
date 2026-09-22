@@ -26,7 +26,8 @@
 | =M-x=     | run a command by name              |
 | =C-h k=   | what does this key do?             |
 | =C-c h=   | the lessons file                   |
-| =<f5>=    | light / dark theme                 |
+| =<f5>=    | reload this file from disk         |
+| =<f9>=    | light / dark theme                 |
 | =C-c v=   | pretty layer off / on              |
 
 * Org

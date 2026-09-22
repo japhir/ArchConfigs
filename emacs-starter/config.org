@@ -22,7 +22,8 @@ with Emacs itself:
 | =C-c v=   | toggle the pretty layer to see the raw text         |
 | =C-c h=   | open the welcome / lessons file                     |
 | =C-s=     | search the current file (live list)                 |
-| =<f5>=    | switch between light and dark theme                 |
+| =<f5>=    | reload this buffer from the file on disk            |
+| =<f9>=    | switch between light and dark theme                 |
 
 * preamble
 The first line of the tangled file declares the modern Lisp dialect.
@@ -154,6 +155,24 @@ client updates a file that is open here, the buffer reloads automatically.
   (setq auto-revert-verbose nil)
 #+end_src
 
+** refreshing what you're looking at
+=<f5>= means "reload", the way Windows users expect: it re-reads the current
+buffer from the file on disk, discarding any unsaved changes. The agenda is
+not visiting a file, so reverting it does nothing useful; =<f5>= there
+reruns the agenda instead, so the key means "refresh" wherever you press it.
+#+begin_src emacs-lisp
+  (defun my/reload-buffer ()
+    "Reload this buffer from the file on disk."
+    (interactive)
+    (revert-buffer nil t t)
+    (message "Reloaded from disk"))
+
+  (global-set-key (kbd "<f5>") #'my/reload-buffer)
+
+  (with-eval-after-load 'org-agenda
+    (define-key org-agenda-mode-map (kbd "<f5>") #'org-agenda-redo-all))
+#+end_src
+
 ** remembering things between sessions
 Recent files show up in the buffer switcher; the minibuffer remembers what
 you typed before.
@@ -210,7 +229,7 @@ machine. Whichever is found first is used.
 
 ** theme
 The Modus themes are designed for readability and come as a pair:
-=modus-operandi= (light) and =modus-vivendi= (dark). =<f5>= switches. Emacs
+=modus-operandi= (light) and =modus-vivendi= (dark). =<f9>= switches. Emacs
 ships the themes themselves, but the toggle, the heading options and the
 after-load hook (which recolours the todo keyword blocks, defined in the
 org section) live in the =modus-themes= package, so that is installed. Headings
@@ -218,7 +237,7 @@ get a slightly bigger proportional font when the pretty layer is on.
 #+begin_src emacs-lisp
   (use-package modus-themes
     :demand t
-    :bind ("<f5>" . modus-themes-toggle)
+    :bind ("<f9>" . modus-themes-toggle)
     :custom
     (modus-themes-to-toggle '(modus-operandi modus-vivendi))
     (modus-themes-italic-constructs t)
@@ -375,7 +394,7 @@ Keywords sit on solid coloured blocks: red for =NEXT=, yellow for =WAIT=,
 blue for =TICK=, cyan for =SOME=, pale green for done, grey and struck
 through for =CANC=. The colours are not named here; they are taken from the
 active Modus theme's palette: once here, after the theme has loaded, and
-again each time =<f5>= switches, so the blocks match the dark theme instead
+again each time =<f9>= switches, so the blocks match the dark theme instead
 of leaving light-theme blocks on a black background. =face-spec-set= is used rather than =custom-set-faces= so
 the colours never end up saved into =custom.el=.
 

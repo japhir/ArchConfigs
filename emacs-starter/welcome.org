@@ -62,7 +62,7 @@ letters of the name in any order, pick from the list, press =Enter=.
 
 - Exercise :: Press =M-x=, type =count words=, press =Enter=. The minibuffer
   tells you how many words this file has. Press =M-x= again and type =tog
-  theme= to find =modus-themes-toggle=; run it, then run it again. (=<f5>=
+  theme= to find =modus-themes-toggle=; run it, then run it again. (=<f9>=
   does the same.)
 
 When you press =C-c= or =C-x= and wait a moment, a panel appears listing what
