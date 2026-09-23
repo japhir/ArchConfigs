@@ -1,6 +1,10 @@
 #+title: My Literate emacs config
 This is my config file for [[https://www.gnu.org/software/emacs/][emacs]]!
 
+* lexical-binding
+#+begin_src emacs-lisp
+;; -*- lexical-binding: t; -*-
+#+end_src
 * speedups
 ** gc-cons threshold
 The gc-cons-threshold is set to a superlarge number for faster startup time. It
@@ -23,6 +27,7 @@ is reset at [[*reset gc-cons-threshold][reset gc-cons-threshold]].
 #+begin_src emacs-lisp
   (setq native-compile-prune-cache t)
 #+end_src
+
 * package archive
 ** compat
 Emacs 30.x ships compat 30.x built-in. Many packages (orderless, magit, etc.)
@@ -1015,6 +1020,7 @@ customize capture templates
                    ("software" . ?s)   ;; claimable R&D work (Emdesk :R:)
                    ("research" . ?g)   ;; claimable R&D work (Emdesk :R:)
                    ("meeting" . ?M)    ;; context-only in export, no effort claim
+                   ("timeregistration" . ?t)
                    ("fail" . ?x)       ;; failed experiment — WBSO gold
                    ("private" . ?v)    ;; never exported
                    (:startgroup . nil)
@@ -1026,7 +1032,6 @@ customize capture templates
                    ("@klusje" . ?k)    ;; crafts, things that require my toolbox
                    ("@phone" . ?B)     ;; b for Dutch "bellen"
                    ("@email" . ?m)
-                   ("@teams" . ?t)
                    ("@bank" . ?b)      ;; I need my little reader thingie
                    ("@write" . ?w)
                    ("@program" . ?p)
@@ -1103,6 +1108,16 @@ dangling symlinks that would break the agenda, so they're filtered out.
 *** org-export odt
 #+begin_src emacs-lisp
   (require 'ob-org)
+#+end_src
+*** ox-pandoc
+docx via pandoc; the org2gdoc skill's filter drops heading anchors that Drive imports as bookmark icons
+#+begin_src emacs-lisp
+  (use-package ox-pandoc
+    :after ox
+    :config
+    ;; absolute path: pandoc gets the argument without shell expansion, so ~ fails silently
+    (setq org-pandoc-options-for-docx
+          `((lua-filter . ,(expand-file-name "~/.agents/skills/org2gdoc/strip-anchors.lua")))))
 #+end_src
 *** ox-extra
 org-export ignore headlines with ~:ignore:~ tag
