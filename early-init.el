@@ -1,4 +1,5 @@
-;; Disable package.el so it doesn't interfere with elpaca
+;; -*- lexical-binding: t; -*-
+;; Disable package.el so it doesn't interfere with elpaca 
 (setq package-enable-at-startup nil)
 
 ;; Add Homebrew binaries to Emacs' PATH
