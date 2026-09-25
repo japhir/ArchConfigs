@@ -15,14 +15,30 @@ bindkey -v
 # End of lines configured by zsh-newuser-install
 
 # manual changes
-source /usr/share/nvm/init-nvm.sh
+# export NVM_DIR="$HOME/.nvm"
+export NVM_DIR="$HOME/.nvm"
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS (Homebrew)
+  [ -s "$(brew --prefix)/opt/nvm/nvm.sh" ] && \. "$(brew --prefix)/opt/nvm/nvm.sh"
+  [ -s "$(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm" ] && \. "$(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm"
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  # Arch Linux
+  [ -s "/usr/share/nvm/init-nvm.sh" ] && source "/usr/share/nvm/init-nvm.sh"
+fi
 # overwrite beam in insert, I like it blocky everywhere
 function zvm_config() {
     ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BLOCK
 }
 
 # plugins/extensions
-source /usr/share/zsh/plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS (Homebrew)
+  source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  # Arch Linux
+  source /usr/share/zsh/plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+fi
 zvm_after_init_commands+=('source <(fzf --zsh)')
 # make sure fzf comes after vi-mode
 eval "$(zoxide init zsh)"
@@ -31,7 +47,12 @@ eval "$(starship init zsh)"
 
 # User configuration
 typeset -U path PATH
-path=(~/.cargo/bin ~/.local/bin ~/bin ~/SurfDrive/Postdoc1/prj/2024-10-28_HNBody/hnbody-1.0.10-linux-x86_64/bin $path)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    path=(/opt/homebrew/bin $path)
+    path=("$HOME/.rustup/toolchains/stable-aarch64-apple-darwin/bin" $path)
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    path=(~/.cargo/bin ~/.local/bin ~/bin $path)
+fi
 export PATH
 
 # You may need to manually set your language environment
@@ -41,7 +62,7 @@ export LANG=en_US.UTF-8
 if [[ -n $SSH_CONNECTION ]]; then
     export EDITOR='vim'
 else
-    export EDITOR="emacsclient -t"
+    export EDITOR="emacsclient -c"
     export SUDO_EDITOR='vim'
     export VISUAL="emacsclient -cn"
 fi
@@ -60,8 +81,9 @@ alias pacsize="expac -H M '%m\t%n' | sort -h"
 # zsh started, so the alias froze whatever was orphaned at shell-open time and
 # went stale in long-lived terminals. Dropped -c (cascade) too: combined with a
 # stale list it could pull in packages that merely depend on the targets.
-alias killorphans='pacman -Qtdq >/dev/null 2>&1 && sudo pacman -Rns $(pacman -Qtdq) || echo "no orphans"'
-alias pi="pacman -Qq | fzf --preview 'pacman -Qil {}' --layout=reverse --bind 'enter:execute(pacman -Qil {} | less)'"
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+  alias killorphans="sudo pacman -Rnsc $(pacman -Qtdq)"
+  alias pi="pacman -Qq | fzf --preview 'pacman -Qil {}' --layout=reverse --bind 'enter:execute(pacman -Qil {} | less)'"
 
 alias ssh="TERM=xterm-256color ssh"
 alias der="ssh -Y derecho"
@@ -142,10 +164,17 @@ function y() {
 	rm -f -- "$tmp"
 }
 
-# start wm if on tty1
-if [ "$(tty)" = "/dev/tty1" ]; then
-    #sway
-    # hyprland
-    # start-hyprland
-    niri-session
+# start wm if on tty1 (Linux only)
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    if [ "$(tty)" = "/dev/tty1" ]; then
+        #sway
+        # hyprland
+        # start-hyprland
+        niri-session
+    fi
 fi
+
+export LIBRARY_PATH="/opt/homebrew/opt/gcc/lib/gcc/current:/opt/homebrew/opt/libgccjit/lib/gcc/current:$LIBRARY_PATH"
+export PATH="$HOME/.rustup/toolchains/stable-aarch64-apple-darwin/bin:$PATH"
+
+[ -f ~/.secrets.zsh ] && source ~/.secrets.zsh

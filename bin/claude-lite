@@ -1,0 +1,22 @@
+#!/bin/bash
+# claude-lite — low-overhead Claude Code invocation.
+#
+# Strips the two biggest context-window costs found while poking at `/context`:
+#   - default system prompt (~9k tokens)              -> --system-prompt=""
+#   - claude.ai MCP connector schemas (~20-40k tokens) -> --mcp-config="" --strict-mcp-config
+#
+# Keeps CLAUDE.md / project skills / hooks (no --bare) since those are load-bearing
+# for project workflows (e.g. LLM-wiki's ingest/file-answer/lint skills + conventions).
+# Keeps ToolSearch in --tools so non-MCP deferred tools (WebFetch, WebSearch, Task*,
+# Monitor, etc.) stay reachable on demand instead of being dropped outright.
+#
+# Trade-off: claude.ai connectors (Gmail/Slack/Drive/PubMed/...) are fully disconnected
+# for the session, not just permission-denied — there is no discovering them back.
+# Use plain `claude` if you need those.
+
+exec claude \
+  --system-prompt="" \
+  --mcp-config="" \
+  --strict-mcp-config \
+  --tools "Read,Write,Edit,Bash,Skill,WebFetch,WebSearch,ToolSearch,Agent" \
+  "$@"
