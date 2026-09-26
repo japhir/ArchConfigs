@@ -142,8 +142,8 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
   (defvar org-cal-file "~/org/calendars/gcal.org"
     "Google Calendar")
   (defvar org-areas-file "~/org/life.org"
-    "Areas of Responsibility, one top-level heading each (ADR 0002).
-  Read live by `my/gtd-areas'; adding an area is adding a heading.")
+    "Areas of Responsibility: the headings tagged :area:, any level (ADR 0002).
+  Read live by `my/gtd-areas'; adding an area is tagging a heading.")
   (defvar my/org-notes-dir "~/org/notes/"
     "org-roam notes, dailies included: reference and log, never a task bucket
   (ADR 0003). Kept out of the everyday agenda files; the d agenda sweeps them.")
@@ -929,7 +929,7 @@ Filter tasks by context (sorted by todo state)
 #+end_src
 *** stuck projects
 #+begin_src emacs-lisp
-  (org-tags-exclude-from-inheritance '("prj"))
+  (org-tags-exclude-from-inheritance '("prj" "area"))  ;; area: see `my/gtd-areas'
   (org-stuck-projects '("+prj-TODO={^DONE}/-CANC-SOME"  ;; see "j" for TODO={^DONE}
                         ("NEXT" "WAIT" "TICK") ()))  ;;  "SOME"
   (org-hierarchical-todo-statistics nil) ;; look for not-done tasks recursively
@@ -1715,8 +1715,11 @@ https://org-roam.discourse.group/t/creating-an-org-roam-note-from-an-existing-he
     (define-key org-mode-map (kbd "C-c n R") #'my/org-refile-to-created-date))
 #+end_src
 ** areas of responsibility (ADR 0002)
-=life.org= is =org-areas-file=; its top-level headings are the area vocabulary,
-read live, so adding an area is adding a heading there. An area rides on the
+=life.org= is =org-areas-file=; its headings tagged =:area:= are the area
+vocabulary, read live, so adding an area is tagging a heading there. The tag,
+not the outline level, marks an area, so the file is free to hold grouping
+headings, goals and notes around them; =area= is excluded from inheritance
+so an area's children are not areas. An area rides on the
 built-in =CATEGORY= property: it inherits down the subtree, shows in the agenda
 prefix column and is matchable, so one area per item is structural. =C-c A=
 stamps one at clarify; on a =:prj:= heading it is pushed onto every heading in
@@ -1731,9 +1734,9 @@ no area at all, which is the migration worklist. Live means the =j= match.
   a hyphenated keyword (DONE-ILJA) cannot be written as -DONE-ILJA in a match.")
 
   (defun my/gtd-areas ()
-    "The Areas of Responsibility: the top-level headings of `org-areas-file'."
+    "The Areas of Responsibility: the headings tagged area in `org-areas-file'."
     (with-current-buffer (find-file-noselect org-areas-file)
-      (org-map-entries (lambda () (org-get-heading t t t t)) "LEVEL=1" 'file)))
+      (org-map-entries (lambda () (org-get-heading t t t t)) "+area" 'file)))
 
   (defun my/org-set-area (area)
     "Stamp AREA on the heading at point as its CATEGORY.

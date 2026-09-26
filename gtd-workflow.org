@@ -37,8 +37,9 @@ implemented are marked → ADR and listed under "Decided, pending implementation
   - Anything that tests "done" uses =org-done-keywords= or =TODO={^DONE}=,
     never the literal =DONE= (=j= projects, stuck projects)
 - Projects: =:prj:= heading + =[/]= cookie; identified by tag + outline path (ADR 0002)
-- Areas of Responsibility: the top-level headings of =life.org= (=org-areas-file=),
-  read live; carried on items via =:CATEGORY:= (ADR 0002). =C-c A= stamps one
+- Areas of Responsibility: the headings tagged =:area:= in =life.org=
+  (=org-areas-file=), any level, read live; carried on items via =:CATEGORY:=
+  (ADR 0002, amended 2026-09-26). =C-c A= stamps one
   at clarify, and on a =:prj:= heading pushes it onto the whole subtree
 - Contexts: =@=-tags — place / tool / energy / with-whom (=@agenda= + person); see CONTEXT.org.
   The kind-of-work tags (=@write @program @read @createplot @schedule=) and their

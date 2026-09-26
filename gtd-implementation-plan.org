@@ -88,8 +88,10 @@ intentional). Parked should read as quiet, clearly less loud than =NEXT=.
 :END:
 Landed 2026-09-26 as =** areas of responsibility (ADR 0002)= in =myinit.org=.
 - [X] =* dirvar=: =(defvar org-areas-file "~/org/life.org")=.
-- [X] =my/gtd-areas= reads the area list from =life.org= top-level headings
-  (single source of truth, no hardcoded list).
+- [X] =my/gtd-areas= reads the area list from the =:area:=-tagged headings of
+  =life.org=, any level (single source of truth, no hardcoded list). Was
+  top-level headings; changed the same day because =life.org= is nested, and
+  a tag marks an area without dictating the file's shape. ADR 0002 amended.
 - [X] Clarify helper =my/org-set-area= on =C-c A=: =completing-read= over the
   areas (must match), =org-entry-put "CATEGORY"=; on a =:prj:= (local tag) it
   stamps every heading of the subtree, so a stale child value cannot shadow it.

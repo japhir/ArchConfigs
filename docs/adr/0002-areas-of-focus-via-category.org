@@ -3,6 +3,12 @@
 * Status
 accepted
 
+Amended 2026-09-26: an area is a heading tagged =:area:= in =life.org=, at any
+level, not a top-level heading. =life.org= turned out to be nested (grouping
+headings, notes), and a tag declares an area without dictating the file's
+shape. =area= is excluded from tag inheritance so an area's children are not
+areas. Everything else stands.
+
 * Decision
 
 Add Areas of Responsibility as the GTD horizon above projects. Areas live as
