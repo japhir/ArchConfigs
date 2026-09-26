@@ -25,9 +25,12 @@ one pass, every inbox. for each item ask: is it actionable?
 - [ ] inbox.org + mobin.org
 - [ ] email — hawaii, solis, gmail
 - [ ] Teams / other message streams
-- [ ] stray TODO headings in org-roam dailies → refile out
+- [ ] stray TODO headings in org-roam dailies → refile out (the =d= agenda)
 #+begin_src emacs-lisp
   (org-agenda nil "i")
+#+end_src
+#+begin_src emacs-lisp
+  (org-agenda nil "d")
 #+end_src
 #+begin_src emacs-lisp
   (progn

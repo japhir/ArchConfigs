@@ -108,122 +108,134 @@ Landed 2026-09-26 as =** areas of responsibility (ADR 0002)= in =myinit.org=.
   block, but still shows inherited values if wanted.
 
 * Phase 5 — loose ends from gtd-workflow.org's pending list
-Not =myinit.org= work, listed so there is one list.
+Not =myinit.org= work, listed so there is one list. Tooling landed
+2026-09-26; the data and people steps are yours.
 - [ ] =~/org=: one-time pass converting keyword-less project children to =TODO=
-  (ADR 0001). Use the helpers below.
-- [ ] =~/org=: fix the stale =clumpednotes.org= → =work.org= link inside
-  =daily_review.org=; add "run the =d= agenda" as a step.
-- [ ] Google Calendar → org sync: revive =orggcalsync.timer= with the new
-  calendar list (org-gcal block in =secretdirs.el=).
+  (ADR 0001). Evaluate the helper block below, then
+  =C-u M-x my/gtd-keywordless-project-children= and answer per item;
+  =M-x my/gtd-project-audit= for the empty and multi-NEXT projects.
+- [X] =daily_review.org= (a repo file symlinked into =~/org=): the stale
+  =clumpednotes.org= link was already gone; the inbox step now runs the =d=
+  agenda too.
+- [-] Google Calendar → org sync. Found: org-gcal 0.4 registers its OAuth
+  provider at load, before =secretdirs.el='s =:config= sets the id and
+  secret, so no sync could authorise; =bin/orggcalsync= never existed in the
+  repo; the units were never installed. Done: =secretdirs.el= calls
+  =org-gcal-reload-client-id-secret= after the setq; =bin/orggcalsync= kicks
+  =org-gcal-fetch= in the daemon; service is =oneshot= and requires
+  =emacs.service=; both units symlinked into =~/.config/systemd/user=,
+  daemon reloaded, timer NOT enabled. Yours:
+  - [ ] update the calendar list in =secretdirs.el= (the commented entries)
+  - [ ] =M-x org-gcal-sync= once in Emacs: re-authorise in the browser, check
+    =~/org/calendars/= updates
+  - [ ] =systemctl --user enable --now orggcalsync.timer=
 - [ ] Shared system, with Line: agree =@home= / =@errands= / =@work= for shared
   files (commented lines in =emacs-starter/config.org=); phones' =CREATED=
-  property name and full keyword set.
+  property name and full keyword set. A conversation, no tooling.
 
 * One-off elisp migration helpers (USER runs against ~/org)
-Not config — analysis/assist scripts for the data-side backlog. Scaffolds
-below are UNTESTED against real data; refine interactively. They report to a
-buffer and never modify data (review, then act by hand). Project detection uses
-local =:prj:= tags (=prj= is excluded from inheritance). They walk
-=org-agenda-files=, so they see everything except =notes/=.
+Not config: assist scripts for the data-side backlog, evaluated with =C-c C-c=
+on the block (or =M-x eval-buffer= on a copy). Tested 2026-09-26 against a
+synthetic fixture, not real data. Project detection uses local =:prj:= tags
+(=prj= is excluded from inheritance) and skips done projects, archived and
+commented trees. They walk =org-agenda-files=, so everything except =notes/=.
+The CATEGORY audit that used to be here is gone: the last block of the =a=
+agenda lists the same projects, live.
 
-** Project audit — empty / multi-NEXT projects
-Targets: "lots of stale projects with 0 tasks" and "multiple NEXT → demote".
+** project audit and keyword-less children
+=my/gtd-project-audit= reports live projects with no action at all (EMPTY) or
+more than one child =NEXT= (N-NEXT: demote the extras to =TODO=). The project
+heading's own keyword does not count, so a checklist-model project (heading
+=NEXT= + checkboxes) is neither.
+
+=my/gtd-keywordless-project-children= lists sub-headings under a live project
+that carry no keyword: candidate =TODO= (ADR 0001), or notes. With a prefix
+argument (=C-u=) it walks them instead, shows each in place and asks whether
+to make it =TODO=; saying yes goes through =org-todo=, so =CREATED= is stamped
+by the usual hook. Answer =n= for notes; nothing is changed without a yes.
 #+begin_src emacs-lisp
+  (defun my/gtd--live-project-p ()
+    "Non-nil when the heading at point is a :prj: (local tag) that is not done."
+    (and (member "prj" (org-get-tags nil t))
+         (not (org-entry-is-done-p))))
+
   (defun my/gtd-project-audit ()
-    "Report :prj: headings that are EMPTY (0 actions) or have >1 NEXT."
+    "Report live :prj: headings that are EMPTY (no action) or have >1 NEXT.
+  The project heading's own keyword does not count: a heading carrying NEXT
+  with a checklist body is the checklist model, not a 2-NEXT project."
     (interactive)
     (require 'cl-lib)
     (let (report)
       (org-map-entries
        (lambda ()
-         (when (member "prj" (org-get-tags nil t)) ;; local tags only
+         (when (my/gtd--live-project-p)
            (let ((heading (org-get-heading t t t t))
                  (file (file-name-nondirectory (buffer-file-name)))
-                 (next 0) (parked 0) (checks 0))
+                 (top (point))
+                 (next 0) (keyworded 0) (checks 0))
              (save-restriction
                (org-narrow-to-subtree)
                (org-map-entries
                 (lambda ()
-                  (pcase (org-get-todo-state)
-                    ("NEXT" (cl-incf next))
-                    ("TODO" (cl-incf parked))))
+                  (unless (= (point) top)
+                    (when (org-get-todo-state) (cl-incf keyworded))
+                    (when (equal (org-get-todo-state) "NEXT") (cl-incf next))))
                 t 'tree)
                (goto-char (point-min))
                (while (re-search-forward "^[ \t]*[-+*] \\[[ X-]\\]" nil t)
                  (cl-incf checks)))
              (let (flags)
-               (when (and (zerop next) (zerop parked) (zerop checks))
-                 (push "EMPTY" flags))
+               (when (and (zerop keyworded) (zerop checks)) (push "EMPTY" flags))
                (when (> next 1) (push (format "%d-NEXT" next) flags))
                (when flags
-                 (push (format "%-12s %s  [%s]" file heading
-                               (string-join flags ","))
+                 (push (format "%-12s %s  [%s]" file heading (string-join flags ","))
                        report))))))
-       nil 'agenda)
+       nil 'agenda 'archive 'comment)
       (with-current-buffer (get-buffer-create "*GTD project audit*")
         (erase-buffer)
-        (insert "Projects needing attention (EMPTY = stale 0-task; N-NEXT = demote extras to TODO)\n\n")
+        (insert "Live projects needing attention (EMPTY = no action at all; N-NEXT = demote extras to TODO)\n\n")
         (insert (string-join (nreverse report) "\n"))
         (goto-char (point-min))
         (display-buffer (current-buffer)))))
-#+end_src
-Caveat: the inner map counts the =:prj:= heading itself, so a checklist-model
-project (heading carries =NEXT=) reads as =next>=1= → not EMPTY. Tune if you
-want to ignore the heading's own keyword.
 
-** Keyword-less project children — candidates to set TODO
-#+begin_src emacs-lisp
-  (defun my/gtd-keywordless-project-children ()
-    "List sub-headings under a :prj: that carry NO todo keyword (candidate TODO)."
-    (interactive)
+  (defun my/gtd-keywordless-project-children (&optional visit)
+    "Sub-headings under a live :prj: that carry no todo keyword.
+  Without VISIT, list them in a buffer. With VISIT (interactively: a prefix
+  argument), walk them instead: show each and ask whether to make it TODO,
+  which also stamps CREATED through the todo-state hook."
+    (interactive "P")
     (let (report)
       (org-map-entries
        (lambda ()
-         (when (member "prj" (org-get-tags nil t))
-           (let ((proj (org-get-heading t t t t)))
+         (when (my/gtd--live-project-p)
+           (let ((proj (org-get-heading t t t t))
+                 (top (point)))
              (save-restriction
                (org-narrow-to-subtree)
                (org-map-entries
                 (lambda ()
-                  (unless (or (org-get-todo-state)
-                              (= (org-current-level) 1)) ;; skip the prj heading
-                    (push (format "%s  ->  %s" proj (org-get-heading t t t t))
-                          report)))
+                  (unless (or (= (point) top) (org-get-todo-state))
+                    (push (list proj (org-get-heading t t t t) (point-marker)) report)))
                 t 'tree)))))
-       nil 'agenda)
-      (with-current-buffer (get-buffer-create "*GTD keywordless children*")
-        (erase-buffer)
-        (insert "Project sub-headings with no keyword (decide: TODO? note? promote NEXT?)\n\n")
-        (insert (string-join (nreverse report) "\n"))
-        (display-buffer (current-buffer)))))
+       nil 'agenda 'archive 'comment)
+      (setq report (nreverse report))
+      (if visit
+          (dolist (item report)
+            (pcase-let ((`(,proj ,child ,m) item))
+              (switch-to-buffer (marker-buffer m))
+              (goto-char m)
+              (org-fold-show-context)
+              (when (y-or-n-p (format "%s -> %s: make it TODO? " proj child))
+                (org-todo "TODO"))))
+        (with-current-buffer (get-buffer-create "*GTD keywordless children*")
+          (erase-buffer)
+          (insert "Project sub-headings with no keyword (decide: TODO? note? promote NEXT?)\n"
+                  "C-u M-x my/gtd-keywordless-project-children walks them and asks.\n\n")
+          (dolist (item report)
+            (insert (format "%s  ->  %s\n" (car item) (cadr item))))
+          (goto-char (point-min))
+          (display-buffer (current-buffer))))))
 #+end_src
-Caveat: some keyword-less children are legit notes, not actions — human review
-required; this just surfaces candidates. The level-1 skip only works for
-top-level projects; a =:prj:= nested deeper reports its own heading.
-
-** CATEGORY audit — for the area migration (Phase 4, ADR 0002)
-#+begin_src emacs-lisp
-  (defun my/gtd-category-audit ()
-    "List :prj: headings with a LOCAL CATEGORY property (project-name era).
-  These need CATEGORY re-stamped to an area (or cleared)."
-    (interactive)
-    (let (report)
-      (org-map-entries
-       (lambda ()
-         (when (member "prj" (org-get-tags nil t))
-           (let ((cat (org-entry-get (point) "CATEGORY"))) ;; may include inherited
-             (when cat
-               (push (format "%-30s :CATEGORY: %s" (org-get-heading t t t t) cat)
-                     report)))))
-       nil 'agenda)
-      (with-current-buffer (get-buffer-create "*GTD category audit*")
-        (erase-buffer)
-        (insert "Projects with a CATEGORY (review: keep area or restamp)\n\n")
-        (insert (string-join (nreverse report) "\n"))
-        (display-buffer (current-buffer)))))
-#+end_src
-Caveat: =org-entry-get ... "CATEGORY"= can return an inherited/file-level value;
-to see only drawer-local values, parse the =:PROPERTIES:= drawer directly.
 
 * After implementation — update the docs
 - Flip the "Decided, pending implementation" items in =gtd-workflow.org= as they

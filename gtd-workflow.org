@@ -89,11 +89,9 @@ These are agreed (see ADRs) but not yet in =myinit.org= / =~/org=:
 - Areas (config live 2026-09-26): migrate the existing CATEGORY=project-name
   values; the last block of the =a= agenda lists every live project not yet in
   an area, stamp each with =C-c A= (ADR 0002)
-- Daily-note sweep: add "run the =d= agenda" as a step in =daily_review.org=
-  (the agenda itself is live; ADR 0003)
 - Decide whether the per-=:PersonName:= agenda-list tags stay (see CONTEXT.org)
-- Daily pass: actually start using =d=; fix the stale =clumpednotes.org= →
-  =work.org= link inside =daily_review.org=
+- Daily pass: actually start using =d= (the template runs the =d= sweep
+  since 2026-09-26; the stale link was already gone)
 - Shared system with Line (ADR 0005–0007), Emacs side done 2026-09-26. The
   shared folder is an agenda folder through the =~/org= rescan (see
   decisions.org, "Agenda files are discovered, not curated"); Line's personal
@@ -102,7 +100,8 @@ These are agreed (see ADRs) but not yet in =myinit.org= / =~/org=:
     with Line (commented lines in =emacs-starter/config.org=)
   - phones: orgzly-revived's created-at property named =CREATED=; the full
     keyword set in orgzly-revived and beorg
-- Google Calendar → org sync (=orggcalsync.timer=, the org-gcal block in
-  =secretdirs.el=) has lapsed and the timer unit is not installed; the set of
-  calendars to sync has changed since. Revive it with the new list.
+- Google Calendar → org sync: units and =bin/orggcalsync= installed
+  2026-09-26 (the script kicks =org-gcal-fetch= in the daemon). Left, by hand:
+  update the calendar list in =secretdirs.el=, one =M-x org-gcal-sync= to
+  re-authorise, then =systemctl --user enable --now orggcalsync.timer=
 - Config drift: see the backlog filed into the personal GTD system
