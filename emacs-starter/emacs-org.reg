@@ -1,5 +1,11 @@
 Windows Registry Editor Version 5.00
 
+; Registers an "Org file (Emacs)" type: the Emacs icon, and opening via
+; emacs-open.cmd. Per-user, no admin rights. Before double-clicking:
+;   1. replace <USER> with the Windows username (folder under C:\Users)
+;   2. adjust the Emacs path if it is not under C:\Program Files
+; Keep the doubled backslashes; that is .reg syntax.
+
 [HKEY_CURRENT_USER\Software\Classes\Emacs.OrgFile]
 @="Org file (Emacs)"
 
@@ -11,6 +17,3 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CURRENT_USER\Software\Classes\.org]
 @="Emacs.OrgFile"
-
-[HKEY_CURRENT_USER\Software\Classes\.org\OpenWithProgids]
-"Emacs.OrgFile"=""

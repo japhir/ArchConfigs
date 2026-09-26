@@ -63,17 +63,27 @@ does not quote its =-a= alternate-editor argument, so the space in "Program
 Files" breaks the command. =emacs-open.cmd= sidesteps this by trying
 =emacsclient= first and falling back to =runemacs= with =||= instead.
 
-Optional, and *untested from Linux: report back* -- giving =.org= files the
-Emacs icon instead of a generic one:
+Optional: giving =.org= files the Emacs icon instead of the generic one.
+Explorer ignores an icon attached to a batch-file application, so the
+association has to go through a registered file type instead. =emacs-org.reg=
+registers "Org file (Emacs)" with the Emacs icon and =emacs-open.cmd= as its
+open command, and makes it the default for =.org=. Per-user, no admin.
 
-1. Open =emacs-org.reg= in a text editor and replace =<USER>= with her
-   Windows username (the folder name under =C:\Users\=).
-2. Double-click the edited =emacs-org.reg= and accept the "are you sure"
-   prompt. This is a per-user registry change, no admin rights needed.
-3. Windows remembers the earlier "Open with" choice from the section above,
-   so it will not pick up the new icon by itself. Do "Open with" once more
-   on an =.org= file and choose "Org file (Emacs)" from the list, so both
-   the icon and the open command come from the same registry entry.
+1. Get =emacs-org.reg= into =.emacs.d= (it comes along with
+   =M-x my/update-config=, or copy it by hand). Open it in Notepad, replace
+   =<USER>= with her Windows username (the folder name under =C:\Users\=),
+   fix the Emacs path if needed, keep the doubled backslashes. Save with
+   "Opslaan als", type "Alle bestanden (*.*)", name in quotes:
+   ="emacs-org.reg"=, otherwise Notepad appends =.txt=.
+2. Double-click it, accept the "are you sure" prompt.
+3. Windows still remembers the "Open with" choice from above, which
+   overrides the new type. In regedit, go to
+   =HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.org=,
+   right-click the =UserChoice= key under it, Verwijderen. Windows blocks
+   editing inside that key but allows deleting it.
+4. Sign out and in. The icon changes; double-click an =.org= file once to
+   confirm it still opens in Emacs. If Windows asks how to open it, pick
+   "Org file (Emacs)" and tick Always.
 
 * Updating her config
 
