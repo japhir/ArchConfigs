@@ -141,6 +141,9 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
     "Lists of Movies etc.")
   (defvar org-cal-file "~/org/calendars/gcal.org"
     "Google Calendar")
+  (defvar org-areas-file "~/org/life.org"
+    "Areas of Responsibility, one top-level heading each (ADR 0002).
+  Read live by `my/gtd-areas'; adding an area is adding a heading.")
   (defvar my/org-notes-dir "~/org/notes/"
     "org-roam notes, dailies included: reference and log, never a task bucket
   (ADR 0003). Kept out of the everyday agenda files; the d agenda sweeps them.")
@@ -881,6 +884,8 @@ Filter tasks by context (sorted by todo state)
           ;; TODO={^DONE} instead of -DONE: hyphenated keywords (DONE-ILJA)
           ;; cannot be written in a match string, and this covers all of them
           ("j" "Projects" tags "+prj-TODO={^DONE}/-CANC-SOME")
+          ;; a function-typed command: the blocks depend on life.org's headings
+          ("a" "Areas of Responsibility" my/org-agenda-areas "")
           ("S" "Shared with Line, both of us" tags-todo "*"
            ((org-agenda-files (list my/shared-dir))
             (org-agenda-skip-function-global nil)
@@ -1708,6 +1713,86 @@ https://org-roam.discourse.group/t/creating-an-org-roam-note-from-an-existing-he
   (with-eval-after-load 'org
     (define-key org-mode-map (kbd "C-c n r") #'my/org-refile-to-today-toplevel)
     (define-key org-mode-map (kbd "C-c n R") #'my/org-refile-to-created-date))
+#+end_src
+** areas of responsibility (ADR 0002)
+=life.org= is =org-areas-file=; its top-level headings are the area vocabulary,
+read live, so adding an area is adding a heading there. An area rides on the
+built-in =CATEGORY= property: it inherits down the subtree, shows in the agenda
+prefix column and is matchable, so one area per item is structural. =C-c A=
+stamps one at clarify; on a =:prj:= heading it is pushed onto every heading in
+the subtree too, so a stale project-name-era =CATEGORY= on a child cannot
+shadow it. The =a= agenda shows the live projects per area and flags an area
+with none as neglected; its last block lists live projects whose =CATEGORY= is
+no area at all, which is the migration worklist. Live means the =j= match.
+#+begin_src emacs-lisp
+  (defconst my/gtd-live-project-match "+prj-TODO={^DONE}/-CANC-SOME"
+    "Tags match for a project that is still open.
+  Same string as the j agenda and `org-stuck-projects': TODO={^DONE} because
+  a hyphenated keyword (DONE-ILJA) cannot be written as -DONE-ILJA in a match.")
+
+  (defun my/gtd-areas ()
+    "The Areas of Responsibility: the top-level headings of `org-areas-file'."
+    (with-current-buffer (find-file-noselect org-areas-file)
+      (org-map-entries (lambda () (org-get-heading t t t t)) "LEVEL=1" 'file)))
+
+  (defun my/org-set-area (area)
+    "Stamp AREA on the heading at point as its CATEGORY.
+  On a :prj: heading (local tag) stamp every heading of the subtree too."
+    (interactive (list (completing-read "Area: " (my/gtd-areas) nil t)))
+    (if (member "prj" (org-get-tags nil t))
+        (org-map-entries (lambda () (org-entry-put (point) "CATEGORY" area))
+                         nil 'tree)
+      (org-entry-put (point) "CATEGORY" area)))
+
+  (defun my/gtd-live-projects ()
+    "One (CATEGORY . FILE) per live project across the agenda files.
+  Skips archived and commented trees and honours
+  `org-agenda-skip-function-global', as the agenda blocks do."
+    (org-map-entries (lambda () (cons (org-get-category) (buffer-file-name)))
+                     my/gtd-live-project-match 'agenda 'archive 'comment))
+
+  (defun my/org-agenda-areas (&optional _match)
+    "The a agenda: a block of live projects per area, neglected areas flagged.
+  Custom-command type function; MATCH is unused. Each block scans only the
+  files the pre-scan found its projects in (none for a neglected area), so the
+  whole view costs about one pass over the agenda files instead of one per area."
+    (let* ((areas (my/gtd-areas))
+           (projects (my/gtd-live-projects))
+           (files-of (lambda (pred)
+                       (delete-dups (mapcar #'cdr (seq-filter pred projects)))))
+           (blocks
+            (mapcar
+             (lambda (area)
+               (let* ((files (funcall files-of (lambda (p) (equal (car p) area))))
+                      (n (seq-count (lambda (p) (equal (car p) area)) projects)))
+                 `(tags ,(format "+CATEGORY=\"%s\"%s" area my/gtd-live-project-match)
+                        ((org-agenda-files ',files)
+                         (org-agenda-overriding-header
+                          ,(if (zerop n)
+                               (format "%s: NEGLECTED, no live project" area)
+                             (format "%s (%d live)" area n)))))))
+             areas))
+           (stray-files (funcall files-of (lambda (p) (not (member (car p) areas))))))
+      (org-agenda-run-series
+       "Areas of Responsibility"
+       (list (append blocks
+                     `((tags ,my/gtd-live-project-match
+                             ((org-agenda-files ',stray-files)
+                              (org-agenda-overriding-header
+                               "Live projects in no area: stamp one with C-c A")
+                              (org-agenda-skip-function
+                               (lambda ()
+                                 (and (member (org-get-category) ',areas)
+                                      (org-entry-end-position))))))))
+             nil))
+      ;; g rebuilds through this function again, so the counts refresh too
+      (let ((inhibit-read-only t))
+        (put-text-property (point-min) (point-max)
+                           'org-series-redo-cmd '(my/org-agenda-areas)))
+      (setq org-agenda-redo-command '(my/org-agenda-areas))))
+
+  (with-eval-after-load 'org
+    (define-key org-mode-map (kbd "C-c A") #'my/org-set-area))
 #+end_src
 ** zaeph's CREATED and LAST_MODIFIED properties
 https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140

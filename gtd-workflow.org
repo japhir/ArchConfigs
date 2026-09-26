@@ -37,7 +37,9 @@ implemented are marked → ADR and listed under "Decided, pending implementation
   - Anything that tests "done" uses =org-done-keywords= or =TODO={^DONE}=,
     never the literal =DONE= (=j= projects, stuck projects)
 - Projects: =:prj:= heading + =[/]= cookie; identified by tag + outline path (ADR 0002)
-- Areas of Responsibility: =life.org= headings; carried on items via =:CATEGORY:= (ADR 0002)
+- Areas of Responsibility: the top-level headings of =life.org= (=org-areas-file=),
+  read live; carried on items via =:CATEGORY:= (ADR 0002). =C-c A= stamps one
+  at clarify, and on a =:prj:= heading pushes it onto the whole subtree
 - Contexts: =@=-tags — place / tool / energy / with-whom (=@agenda= + person); see CONTEXT.org.
   The kind-of-work tags (=@write @program @read @createplot @schedule=) and their
   =g*= agendas were removed 2026-09-26; items still carrying them are harmless
@@ -58,7 +60,10 @@ implemented are marked → ADR and listed under "Decided, pending implementation
 - *Daily pass* (capture template =d= → =daily_review.org=): the mid-week
   engine — empty =inbox.org= + =mobin.org=, sweep stray tasks out of
   =notes/daily/=, pick the day's =NEXT=s. Light; never duplicates the weekly.
-- Agendas: =A= block, =n= next, =w= waiting, =j= projects, =I= important, =#= stuck, =a= areas
+- Agendas: =A= block, =n= next, =w= waiting, =j= projects, =I= important, =#= stuck
+- =a= areas: one block of live projects per area, an area with none flagged
+  NEGLECTED; the last block lists live projects whose =CATEGORY= is no area
+  (the migration worklist, ADR 0002). Shadows org's built-in week agenda on =a=
 - Agenda files: every =.org= under =~/org= except =notes/= (org-roam),
   rescanned before each agenda; =d= sweeps all of =notes/= for stray tasks
   (ADR 0003)
@@ -80,10 +85,9 @@ These are agreed (see ADRs) but not yet in =myinit.org= / =~/org=:
 
 - One-time pass to convert stray keyword-less project actions to =TODO=
   (ADR 0001; the keyword set itself is live)
-- Areas: wire =life.org= as =org-areas-file=; area completion read from its
-  headings; stamp =:CATEGORY:= at clarify (org-gtd style); add =a= "Areas"
-  agenda with a neglected-area check (area with no active =:prj:=); migrate
-  existing CATEGORY=project-name values (ADR 0002)
+- Areas (config live 2026-09-26): migrate the existing CATEGORY=project-name
+  values; the last block of the =a= agenda lists every live project not yet in
+  an area, stamp each with =C-c A= (ADR 0002)
 - Daily-note sweep: add "run the =d= agenda" as a step in =daily_review.org=
   (the agenda itself is live; ADR 0003)
 - Decide whether the per-=:PersonName:= agenda-list tags stay (see CONTEXT.org)

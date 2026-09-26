@@ -86,27 +86,24 @@ intentional). Parked should read as quiet, clearly less loud than =NEXT=.
 :PROPERTIES:
 :commit: feat(emacs): areas of focus via CATEGORY
 :END:
-The only real build left. =life.org= exists; the =a= agenda key is free.
-- [ ] =* dirvar=: add =(defvar org-areas-file "~/org/life.org")=.
-- [ ] Fn to read the area completion list from =life.org= top-level headings
-  (single source of truth — no hardcoded list):
-  #+begin_src emacs-lisp
-    (defun my/gtd-areas ()
-      "Top-level headings in `org-areas-file' = the areas of responsibility."
-      (with-current-buffer (find-file-noselect org-areas-file)
-        (org-map-entries (lambda () (org-get-heading t t t t))
-                         "LEVEL=1" 'file)))
-  #+end_src
-- [ ] Clarify helper: prompt an area with =completing-read= over
-  =(my/gtd-areas)=, =org-entry-put (point) "CATEGORY" area=; for a =:prj:= push
-  it to child actions (mirror org-gtd.el behaviour). Bind it in the org keymap.
-- [ ] =a= "Areas" agenda + neglected-area check (area with no active =:prj:=).
-  Build from =(my/gtd-areas)=; for each, query live =:prj:= whose =CATEGORY= =
-  area; flag those with none. A block agenda of one =tags= view per area with
-  =+prj+CATEGORY="<area>"-TODO={^DONE}/-CANC-SOME= is the simple first cut; the
-  neglect flag can be the overriding header of any block that comes back empty.
-- [ ] Run the CATEGORY audit helper below first; migrate the project-name-era
-  =:CATEGORY:= values before the =a= view means anything.
+Landed 2026-09-26 as =** areas of responsibility (ADR 0002)= in =myinit.org=.
+- [X] =* dirvar=: =(defvar org-areas-file "~/org/life.org")=.
+- [X] =my/gtd-areas= reads the area list from =life.org= top-level headings
+  (single source of truth, no hardcoded list).
+- [X] Clarify helper =my/org-set-area= on =C-c A=: =completing-read= over the
+  areas (must match), =org-entry-put "CATEGORY"=; on a =:prj:= (local tag) it
+  stamps every heading of the subtree, so a stale child value cannot shadow it.
+- [X] =a= "Areas" agenda: a function-typed custom command
+  (=my/org-agenda-areas=) building a block per area; an area with no live
+  =:prj:= gets a NEGLECTED header. One pre-scan (=my/gtd-live-projects=)
+  gives the counts and the files each block scans, so the view costs about one
+  pass instead of one per area (5–6 s warm vs 13 s naive). A last block lists
+  live projects whose =CATEGORY= is no area: the migration worklist. =g=
+  rebuilds through the function so the flags refresh. Shadows org's built-in
+  week agenda on =a= (the =A= block covers that).
+- [ ] Data side (user, =~/org=): stamp the projects in the "no area" block
+  with =C-c A=. The CATEGORY audit helper below is now redundant with that
+  block, but still shows inherited values if wanted.
 
 * Phase 5 — loose ends from gtd-workflow.org's pending list
 Not =myinit.org= work, listed so there is one list.
