@@ -15,7 +15,6 @@ Windows is the target; it also loads on Linux for testing.
 | =emacs-org.reg=  | optional: gives =.org= files an Emacs icon                   |
 
 * Setting up her Windows machine
-
 1. Install Emacs 30: in PowerShell, =winget install GNU.Emacs=. Done when
    "Emacs" appears in the Start menu.
 2. Install the Nextcloud desktop client from nextcloud.com/install and log in
@@ -47,7 +46,6 @@ Regenerate the HTML after editing the cheatsheet:
 #+end_src
 
 * Opening .org files from Explorer
-
 =emacs-open.cmd= is part of the starter and already sits in =.emacs.d= from
 step 3 above; if it is missing, copy it in. If Emacs is installed somewhere
 other than =C:\Program Files\Emacs\emacs-31.1\bin=, edit the =BIN= line at
@@ -86,7 +84,6 @@ open command, and makes it the default for =.org=. Per-user, no admin.
    "Org file (Emacs)" and tick Always.
 
 * Updating her config
-
 =my/update-config= (defined in =init.el=, so it works even if =config.org=
 is broken) re-downloads every starter file from GitHub. The flow:
 
@@ -100,7 +97,6 @@ is broken) re-downloads every starter file from GitHub. The flow:
    the problem, push again, and have her run =my/update-config= again.
 
 * If something fails on first start
-
 - Only a warning about a lexical-binding cookie in =~/.emacs=, and no
   welcome file: a stray =.emacs= in =%APPDATA%= is being loaded instead of
   =.emacs.d\init.el= (Emacs takes the first of =~/.emacs=, =~/.emacs.el=,
@@ -117,7 +113,6 @@ is broken) re-downloads every starter file from GitHub. The flow:
   has not created it yet. The agenda works with whatever folders exist.
 
 * Reusing this for another household
-
 Names are literal in =config.org=, on purpose. Search and replace, in this
 order: =inbox-iljline.org= (shared inbox file), =iljline= (shared folder),
 then the two names in the "who is who" block, =line= and =ilja=, and the
@@ -126,7 +121,6 @@ keywords, tags and =CREATED_BY= follow from the two variables. Then set the
 same keyword set in every other client that edits the shared files.
 
 * Optional: Dutch spell checking
-
 Needs the =hunspell= program and an =nl_NL= dictionary on PATH. One way, in
 PowerShell: install Scoop (scoop.sh), then =scoop install hunspell=, then put
 =nl_NL.aff= and =nl_NL.dic= (from the LibreOffice Dutch dictionary extension,
@@ -135,7 +129,6 @@ or OpenTaal) into Scoop's hunspell =share\hunspell= folder. Done when
 underlined.
 
 * Testing on Linux
-
 =my/sync-root= falls back to =$HOME/Nextcloud= when =USERPROFILE= is unset.
 Point =HOME= at a scratch tree with dummy org files and start Emacs with its
 own init directory:
@@ -144,7 +137,6 @@ own init directory:
 #+end_src
 
 * Design notes
-
 - Two variables, =my/me= and =my/partner=, derive the =DONE-<NAME>= keywords,
   the person tags, =CREATED_BY=, and the agenda filter. Swap them and the
   same file is Ilja's side.

@@ -10,7 +10,6 @@ When you are done, the last section tells you how to stop this file from
 opening at startup. =C-c h= brings it back whenever you want.
 
 * 1. What you are looking at
-
 The whole window is a *frame*. The big area with this text is a *buffer*: the
 contents of a file, loaded into memory. You edit the buffer; =C-x C-s= writes
 it back to the file. The line at the bottom of the text is the *mode line*:
@@ -22,7 +21,6 @@ The menu bar at the very top works like in any program. Use it freely; every
 item there also has a key, and the menu shows it.
 
 * 2. The point
-
 In Emacs the cursor is called the *point*, because it points at the spot
 between two characters where typing will insert text. Move it with the arrow
 keys or click with the mouse; both are fine. =Home= and =End= go to the start
@@ -32,7 +30,6 @@ and end of a line, =PgUp= / =PgDn= scroll.
   =C-a= (hold Ctrl, press a): that is Emacs's own key for "start of line".
 
 * 3. How keys are written
-
 - =C-x= means: hold =Ctrl=, press =x=.
 - =M-x= means: hold =Alt=, press =x=. =M= is for "Meta", an old name for that key.
 - =C-x C-s= means: =C-x=, let go, then =C-s=. Two strokes in a row.
@@ -54,7 +51,6 @@ Two Windows habits that behave differently here:
   (or =C-w=). Select text by dragging with the mouse or with =Shift= + arrows.
 
 * 4. Every command has a name
-
 Everything Emacs can do is a command with a name, like =org-agenda= or
 =save-buffer=. Keys are shortcuts to commands; the menu bar is another set
 of shortcuts. The third way is to type the name: press =M-x=, type a few
@@ -69,7 +65,6 @@ When you press =C-c= or =C-x= and wait a moment, a panel appears listing what
 you can press next and what each key does. Let it guide you.
 
 * 5. Files
-
 - =C-c o= :: pick one of *our* org files by name.
 - =C-x C-f= :: open any file. Type a path; the list filters as you type.
 - =C-x b= :: switch between open buffers and recently used files.
@@ -80,7 +75,6 @@ you can press next and what each key does. Let it guide you.
   =C-x b= and come back to this welcome file.
 
 * 6. Org: the file format
-
 An org file is plain text with a few conventions. This whole file is one.
 
 ** Headings and folding
@@ -129,7 +123,6 @@ The pretty layer hides the marker characters until your cursor touches them;
 that is what happens when you click on this *bold* word.
 
 * 7. Capture, agenda, refile
-
 These three keys are the daily loop.
 
 - =C-c c= :: *capture*: write a new task without leaving what you are doing.
@@ -150,7 +143,6 @@ These three keys are the daily loop.
   =C-c d= again.
 
 * 8. What is really in the file
-
 Bullets, pills, boxes, and the proportional font are all drawing on top of
 plain text. Press =C-c v= to switch that drawing off and see the actual
 characters in this file: stars, colons around tags, =[ ]= for checkboxes.
@@ -158,7 +150,6 @@ Press =C-c v= again to bring the pretty layer back. This is the whole trick:
 the file is always just text, which is why your phone can read it too.
 
 * 9. Getting unstuck
-
 - =C-g= :: cancel. Always.
 - =C-h k= then a key :: "what does this key do?"
 - =C-h f= then a name :: "what does this command do?"
@@ -171,7 +162,6 @@ want (=C-x 1= keeps only the current window), or a question waiting in the
 minibuffer (=C-g=).
 
 * 10. Our system
-
 Two people, two phones, two computers, one folder of org files.
 
 - The shared folder holds the lists we both work from. Your own folder holds
@@ -195,7 +185,6 @@ Two people, two phones, two computers, one folder of org files.
   itself.
 
 * 11. Done with this file
-
 Run =M-x my/welcome-done=. From now on Emacs starts on your day; =C-c h=
 opens these lessons again. (The same setting is also reachable via =M-x
 customize-variable my/show-welcome=, the graphical settings interface, in
