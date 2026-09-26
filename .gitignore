@@ -39,3 +39,7 @@ handoff-build-html-review.md
 # third-party / company-specific, never shared
 agents/skills/graphify/
 agents/skills/synced/
+
+# marketplace-managed skills and their lockfile: installed per machine, not shared
+agents/skills/qa/
+agents/.skill-lock.json
