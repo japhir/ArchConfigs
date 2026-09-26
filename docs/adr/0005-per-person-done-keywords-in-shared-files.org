@@ -38,4 +38,9 @@ most shared tasks are closed: on a phone.
   and who-did-it are both recorded.
 - Any tooling that tests for "done" must use =org-done-keywords= (or
   =org-entry-is-done-p=), never the literal string =DONE=.
+- A hyphenated keyword cannot be written in a tags/todo match string: the
+  parser reads =-DONE-ILJA= as two terms, so =prj/-DONE= silently lets
+  =DONE-ILJA= projects through (and lists them as stuck). Match on the TODO
+  property instead, =+prj-TODO={^DONE}/-CANC-SOME=, which also keeps
+  keyword-less headings, unlike =/!=.
 - Personal files (Ilja's, Line's) keep plain =DONE=; the who is implied.

@@ -146,6 +146,26 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
   (defvar org-cal-file "~/org/calendars/gcal.org"
     "Google Calendar")
 #+end_src
+* who is who
+The shared org system with Line (ADR 0005–0007) derives everything personal
+from two names: the =DONE-<NAME>= keyword, the assignee tag and the
+=CREATED_BY= property. Same block as in =emacs-starter/config.org=, names
+swapped.
+#+begin_src emacs-lisp
+  (defvar my/me "ilja"
+    "My name, lowercase. Used as tag, in DONE-<NAME> and CREATED_BY.")
+  (defvar my/partner "line"
+    "My partner's name, lowercase. Same uses as `my/me'.")
+
+  (defun my/done-keyword (name)
+    "The todo keyword meaning NAME finished the task, e.g. DONE-ILJA."
+    (concat "DONE-" (upcase name)))
+
+  (defvar my/shared-dir "~/org/iljline/"
+    "The folder of org files Line and I both read and write.")
+  (defvar my/shared-inbox (expand-file-name "inbox-iljline.org" my/shared-dir)
+    "The shared inbox, emptied by either of us.")
+#+end_src
 * interface
 ** turn off UI elements and small tweaks
 #+begin_src emacs-lisp
@@ -324,113 +344,50 @@ This allows me to write nicely on a widescreen monitor in a single buffer.
                   ;; (window-width . 0.5)
                   )))
 #+end_src
-** define new org-todo faces
-*** org-todo-next
+** todo keyword faces from the Modus palette
+The keyword faces take their colours from whichever Modus theme is active, so
+they follow circadian's sunrise/sunset switch instead of staying light-theme
+blocks on a dark background. Recoloured once here and again from
+=enable-theme-functions=, which fires for every =load-theme=, including
+circadian's. =face-spec-set= rather than =custom-set-faces= keeps the colours
+out of =custom.el=. Lifted from =emacs-starter/config.org= with two changes:
+=enable-theme-functions= instead of the Modus hook (which a plain =load-theme=
+does not run), and =:inherit fixed-pitch= in place of a hardcoded font.
 #+begin_src emacs-lisp
-  (defface org-todo-next
-    '((((class color) (min-colors 16) (background light))
-       (:family "Noto Sans Mono" :foreground "light goldenrod yellow"
-		:bold t :background "red"))
-      (((class color) (min-colors 16) (background dark))
-       (:family "Noto Sans Mono" :foreground "light goldenrod yellow"
-		:bold t :background "red"))
-      (((class color) (min-colors 8) (background light))
-       (:family "Noto Sans Mono" :foreground "light goldenrod yellow"
-		:bold t :background "red"))
-      (((class color) (min-colors 8) (background dark))
-       (:family "Noto Sans Mono" :foreground "light goldenrod yellow"
-		:bold t :background "red"))
-      (t (:inverse-video t :bold t)))
-      "Face for NEXT TODO keyword"
-      :group 'org-faces)
-#+end_src
-*** org-todo-waiting
-#+begin_src emacs-lisp
-  (defface org-todo-waiting
-    '((((class color) (min-colors 16) (background light))
-       (:family "Noto Sans Mono" :foreground "dim gray" :bold t
-       :background "yellow"))
-      (((class color) (min-colors 16) (background dark))
-       (:family "Noto Sans Mono" :foreground "dim gray" :bold t
-       :background "yellow"))
-      (((class color) (min-colors 8) (background light))
-       (:family "Noto Sans Mono" :foreground "dim gray" :bold t
-       :background "yellow"))
-      (((class color) (min-colors 8) (background dark))
-       (:family "Noto Sans Mono" :foreground "dim gray" :bold t
-       :background "yellow"))
-      (t (:inverse-video t :bold t)))
-    "Face for WAIT TODO keyword"
-    :group 'org-faces)
-#+end_src
+  (defface my/todo-next nil "The NEXT keyword." :group 'org-faces)
+  (defface my/todo-wait nil "The WAIT keyword." :group 'org-faces)
+  (defface my/todo-tick nil "The TICK keyword." :group 'org-faces)
+  (defface my/todo-some nil "The SOME keyword." :group 'org-faces)
+  (defface my/todo-done nil "The done keywords." :group 'org-faces)
+  (defface my/todo-canc nil "The CANC keyword." :group 'org-faces)
 
-*** org-todo-tick
-#+begin_src emacs-lisp
-  (defface org-todo-tick
-    '((((class color) (min-colors 16) (background light))
-       (:family "Noto Sans Mono" :bold t :background "light slate blue"))
-      (((class color) (min-colors 16) (background dark))
-       (:family "Noto Sans Mono" :bold t :background "light slate blue"))
-      (((class color) (min-colors 8)  (background light))
-       (:family "Noto Sans Mono" :bold t :background "light slate blue"))
-      (((class color) (min-colors 8)  (background dark))
-       (:family "Noto Sans Mono" :bold t :background "light slate blue"))
-      (t (:inverse-video t :bold t)))
-    "Face for TICK TODO keyword"
-    :group 'org-faces)
-#+end_src
+  (defun my/set-todo-faces (&rest _)
+    "Colour the keyword faces from the palette of the current Modus theme.
+  Ignores the THEME argument that `enable-theme-functions' passes."
+    (modus-themes-with-colors
+      (dolist (spec `((my/todo-next :background ,bg-red-intense    :foreground ,fg-main :weight bold)
+                      (my/todo-wait :background ,bg-yellow-intense :foreground ,fg-main :weight bold)
+                      (my/todo-tick :background ,bg-blue-intense   :foreground ,fg-main :weight bold)
+                      (my/todo-some :background ,bg-cyan-intense   :foreground ,fg-main :weight bold)
+                      (my/todo-done :background ,bg-green-subtle   :foreground ,fg-main :weight bold)
+                      (my/todo-canc :background ,bg-inactive       :foreground ,fg-dim  :weight bold
+                                    :strike-through t)))
+        (face-spec-set (car spec) `((,c :inherit fixed-pitch ,@(cdr spec))) 'face-defface-spec))))
 
-*** org-todo-someday
-#+begin_src emacs-lisp
-  (defface org-todo-someday
-    '((((class color) (min-colors 16) (background light))
-       (:family "Noto Sans Mono" :foreground "ghost white" :bold t
-       :background "deep sky blue"))
-      (((class color) (min-colors 16) (background dark))
-       (:family "Noto Sans Mono" :foreground "ghost white" :bold t
-       :background "deep sky blue"))
-      (((class color) (min-colors 8) (background light))
-       (:family "Noto Sans Mono" :foreground "ghost white" :bold t
-       :background "deep sky blue"))
-      (((class color) (min-colors 8) (background dark))
-       (:family "Noto Sans Mono" :foreground "ghost white" :bold t
-       :background "deep sky blue"))
-      (t (:inverse-video t :bold t)))
-    "Face for SOME TODO keyword"
-    :group 'org-faces)
-#+end_src
+  (with-eval-after-load 'modus-themes
+    (my/set-todo-faces)
+    (add-hook 'enable-theme-functions #'my/set-todo-faces))
 
-*** org-done-done
-#+begin_src emacs-lisp
-  (defface org-done-done
-    '((((class color) (min-colors 16) (background light))
-       (:family "Noto Sans Mono" :foreground "green4" :bold t
-       :background "pale green"))
-      (((class color) (min-colors 16) (background dark))
-       (:family "Noto Sans Mono" :foreground "green4" :bold t
-       :background "pale green"))
-      (((class color) (min-colors 8))
-       (:family "Noto Sans Mono" :foreground "green"
-       :background "pale green"))
-      (t (:bold t)))
-    "Face used for todo keywords that indicate DONE items."
-    :group 'org-faces)
-#+end_src
-*** org-done-cancelled
-#+begin_src emacs-lisp
-  (defface org-done-cancelled
-    '((((class color) (min-colors 16) (background light))
-       (:family "Noto Sans Mono" :foreground "dim gray" :bold t
-       :background "gray"))
-      (((class color) (min-colors 16) (background dark))
-       (:family "Noto Sans Mono" :foreground "dim gray" :bold t
-       :background "gray"))
-      (((class color) (min-colors 8))
-       (:family "Noto Sans Mono" :foreground "dim gray"
-       :background "gray"))
-      (t (:bold t)))
-    "Face used for todo keywords that indicate CANC items."
-    :group 'org-faces)
+  (defvar my/todo-faces
+    `(("NEXT" . my/todo-next)
+      ("WAIT" . my/todo-wait)
+      ("TICK" . my/todo-tick)
+      ("SOME" . my/todo-some)
+      (,(my/done-keyword my/me)      . my/todo-done)
+      (,(my/done-keyword my/partner) . my/todo-done)
+      ("DONE" . my/todo-done)
+      ("CANC" . my/todo-canc))
+    "One alist for both `org-todo-keyword-faces' and `org-modern-todo-faces'.")
 #+end_src
 * version control
 ** diff-hl
@@ -819,6 +776,8 @@ basic latex settings
   ;; (setq org-agenda-todo-ignore-with-date t)
   ;;(setq org-agenda-prefix-format "  %-17:c%?-12t% s") ; TODO: see if I like the default
   (org-agenda-include-all-todo nil)
+  ;; shared tasks assigned to Line only stay out of my agendas; "S" shows them
+  (org-agenda-skip-function-global #'my/agenda-skip-partner-only)
 #+end_src
 *** agenda files
 all the org-files in my org-directory. Rebuilt dynamically before every
@@ -837,6 +796,7 @@ swyper makes refiling amazing!
                                    (org-lists-file :maxlevel . 2)
                                    (org-someday-file :maxlevel . 2)
                                    (org-work-file :maxlevel . 6)
+                                   (my/shared-org-files :maxlevel . 3)
                                    )))
   (org-outline-path-complete-in-steps nil)   ;; Refile in a single go
   (org-refile-use-outline-path 'file)            ;; Show full paths for refiling
@@ -914,7 +874,13 @@ Filter tasks by context (sorted by todo state)
           ("n" "Next Actions" todo "NEXT")
           ("w" "Waiting" todo "WAIT")
           ;; ("s" "Someday/Maybe" todo "SOME")
-          ("j" "Projects" tags "prj/-SOME-DONE-CANC")
+          ;; TODO={^DONE} instead of -DONE: hyphenated keywords (DONE-ILJA)
+          ;; cannot be written in a match string, and this covers all of them
+          ("j" "Projects" tags "+prj-TODO={^DONE}/-CANC-SOME")
+          ("S" "Shared with Line, both of us" tags-todo "*"
+           ((org-agenda-files (list my/shared-dir))
+            (org-agenda-skip-function-global nil)
+            (org-agenda-overriding-header "Shared folder, everyone's tasks")))
           ("W" "Work" tags-todo "-Personal/!-WAIT"
            ((org-agenda-todo-ignore-scheduled t)))
           ("P" "Personal" tags-todo "-Work/!-WAIT"
@@ -951,7 +917,7 @@ Filter tasks by context (sorted by todo state)
 *** stuck projects
 #+begin_src emacs-lisp
   (org-tags-exclude-from-inheritance '("prj"))
-  (org-stuck-projects '("+prj/-CANC-SOME-DONE"
+  (org-stuck-projects '("+prj-TODO={^DONE}/-CANC-SOME"  ;; see "j" for TODO={^DONE}
                         ("NEXT" "WAIT" "TICK") ()))  ;;  "SOME"
   (org-hierarchical-todo-statistics nil) ;; look for not-done tasks recursively
   ;; (org-provide-todo-statistics '(("NEXT", "TICK") ("CANC", "SOME", "DONE", "WAIT")))
@@ -960,7 +926,7 @@ Filter tasks by context (sorted by todo state)
 customize capture templates
  #+begin_src emacs-lisp
    (org-capture-templates
-    '(;("a" "Appointment" entry (file org-in-file)
+    `(;("a" "Appointment" entry (file org-in-file)
                                            ; "* %?\n  %^T\n")
       ("t" "Todo" entry (file org-in-file)
        "* %?\n%a" :add-created t)
@@ -968,6 +934,10 @@ customize capture templates
        "* %?" :add-created t)
       ("T" "Todo-nolink-tag" entry (file org-in-file)
        "* %? %^G\n" :add-created t)
+      ;; shared with Line: CREATED_BY says who wrote it down (ADR 0006);
+      ;; CREATED is added by the :add-created hook like everywhere else
+      ("s" "Todo (shared)" entry (file my/shared-inbox)
+       ,(concat "* TODO %?\n:PROPERTIES:\n:CREATED_BY: " my/me "\n:END:\n") :add-created t)
       ("m" "Email" entry (file org-in-file)
        "* %? from %:from on %:subject :@email:\n %i\n %a\n" :add-created t)
       ("w" "Website" entry (file org-in-file)
@@ -986,35 +956,34 @@ customize capture templates
 *** TODO states
 #+begin_src emacs-lisp
   (org-todo-keywords
-   '((sequence "TODO(t)" "NEXT(n)" "WAIT(w!/!)" "TICK(k)" "SOME(s!/!)" "|"
-               "DONE(d)" "CANC(c)")))
-  #+end_src
+   `((sequence "TODO(t)" "NEXT(n)" "WAIT(w!/!)" "TICK(k)" "SOME(s!/!)" "|"
+               ,(format "%s(d)" (my/done-keyword my/me))
+               ,(format "%s(D)" (my/done-keyword my/partner))
+               "DONE(f)" "CANC(c)")))
+#+end_src
+The shared keyword set (ADR 0005): =d= finishes a task as me, =D= as Line,
+=f= as plain =DONE= for "whoever". Personal files get =DONE-ILJA= too; the who
+is redundant there but harmless. Shared files carry no =#+TODO:= line.
 
 *** prettify the todo keywords
+One alist (defined with the faces, see "todo keyword faces from the Modus
+palette") feeds both org and org-modern, which does not read
+=org-todo-keyword-faces=.
 #+begin_src emacs-lisp
-  (org-todo-keyword-faces
-   '(("NEXT" . org-todo-next)
-     ("WAIT" . org-todo-waiting)
-     ("TICK" . org-todo-tick)
-     ("SOME" . org-todo-someday)
-     ("DONE" . org-done-done)
-     ("CANC" . org-done-cancelled)))
-#+end_src
-
-*** prettify the org-modern todo keyword faces
-#+begin_src emacs-lisp
-  (org-modern-todo-faces
-   '(("NEXT" . org-todo-next)
-     ("WAIT" . org-todo-waiting)
-     ("TICK" . org-todo-tick)
-     ("SOME" . org-todo-someday)
-     ("DONE" . org-done-done)
-     ("CANC" . org-done-cancelled)))
+  (org-todo-keyword-faces my/todo-faces)
+  (org-modern-todo-faces my/todo-faces)
 #+end_src
 *** context tags
 #+begin_src emacs-lisp
   (org-fast-tag-selection-single-key t)
-  (org-tag-alist '(("prj" . ?j)
+  (org-tag-alist `(("prj" . ?j)
+                   ;; shared system: who should do it (ADR 0006). Lowercase =
+                   ;; assignee, at most one; the capitalised :Line: below means
+                   ;; "to raise with", a different thing.
+                   (:startgroup . nil)
+                   (,my/me      . ,(string-to-char my/me))
+                   (,my/partner . ,(string-to-char my/partner))
+                   (:endgroup . nil)
                    ;; WBSO / export tags (see ~/org/wbso-export.org and the
                    ;; Note Workflow v2 spec, D6/D9/D23/D24)
                    ("software" . ?s)   ;; claimable R&D work (Emdesk :R:)
@@ -1079,6 +1048,26 @@ dangling symlinks that would break the agenda, so they're filtered out.
   (my/org-agenda-files-refresh)
   (advice-add 'org-agenda :before #'my/org-agenda-files-refresh)
   (advice-add 'org-todo-list :before #'my/org-agenda-files-refresh)
+#+end_src
+*** shared tasks: hide what is Line's alone
+In the shared folder a task tagged =line= and not =ilja= is hers; it is skipped
+in every agenda through =org-agenda-skip-function-global= (set under
+"org-agenda" above), except the =S= view, which binds the global skip to nil.
+Untagged shared tasks are for either of us and stay visible.
+#+begin_src emacs-lisp
+  (defun my/agenda-skip-partner-only ()
+    "Skip entries in the shared folder tagged for my partner and not for me."
+    (when (and buffer-file-name
+               (file-in-directory-p buffer-file-name my/shared-dir))
+      (let ((tags (org-get-tags)))
+        (when (and (member my/partner tags)
+                   (not (member my/me tags)))
+          (or (outline-next-heading) (point-max))))))
+
+  (defun my/shared-org-files ()
+    "The org files in the shared folder, for `org-refile-targets'."
+    (when (file-directory-p my/shared-dir)
+      (directory-files my/shared-dir t "\\`[^.].*\\.org\\'")))
 #+end_src
 *** effort estimates
 #+begin_src emacs-lisp
@@ -1736,6 +1725,25 @@ https://github.com/zaeph/.emacs.d/blob/master/lisp/zp-org.el#L140
         (save-excursion
           (goto-char (point-min))
           (zp/org-set-created-property)))))
+#+end_src
+
+*** set it by hand, or when a heading first becomes a task
+Capture stamps =CREATED= on the way in, but a heading typed by hand or made
+with =M-RET= gets none. =C-c t= stamps it on demand; the hook stamps it the
+moment a heading gets its first todo keyword, which is when a heading turns
+into a task. Same as in =emacs-starter/config.org=.
+#+begin_src emacs-lisp
+  (defun my/org-stamp-created-on-first-keyword ()
+    "When a heading gets its first todo keyword, stamp CREATED if missing.
+  Runs from `org-after-todo-state-change-hook'; `org-last-state' is the
+  previous keyword, nil or empty when there was none."
+    (when (and org-state
+               (or (null org-last-state) (string-empty-p org-last-state)))
+      (zp/org-set-created-property)))
+
+  (with-eval-after-load 'org
+    (define-key org-mode-map (kbd "C-c t") #'zp/org-set-created-property)
+    (add-hook 'org-after-todo-state-change-hook #'my/org-stamp-created-on-first-keyword))
 #+end_src
 
 *** set time-file property
@@ -2534,9 +2542,9 @@ override circular dependency in auctex
 #+end_src
 
 * secret directories
-These are all the settings that require secret directories, such as my org
-agenda files and google overwrite the settings with "<...>"
-syntax above.
+Settings that hold private paths or credentials, such as the org-gcal
+calendar ids. (Agenda files are no longer set there: see "dynamic agenda
+files" above.)
 #+begin_src emacs-lisp
   ;; (use-package emacsdirs)
   (load "~/.emacs.d/secretdirs.el" t)

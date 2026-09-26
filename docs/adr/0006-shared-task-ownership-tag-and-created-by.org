@@ -36,5 +36,6 @@ captured there, which is accepted.
   second view shows everything for planning together.
 - Capture never prompts for the assignee; untagged is a valid meaning and
   tagging happens during clarify.
-- Ilja's =myinit.org= still needs the =line= tag and a shared-inbox template
-  with =CREATED_BY= to honour this on his side.
+- Ilja's =myinit.org= honours this since 2026-09-26: the =ilja=/=line= tag
+  group, capture template =s= with =CREATED_BY=, and a global agenda skip
+  that hides =line=-only shared tasks except in the =S= view.
