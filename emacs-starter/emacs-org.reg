@@ -1,0 +1,16 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\Software\Classes\Emacs.OrgFile]
+@="Org file (Emacs)"
+
+[HKEY_CURRENT_USER\Software\Classes\Emacs.OrgFile\DefaultIcon]
+@="C:\\Program Files\\Emacs\\emacs-31.1\\bin\\runemacs.exe,0"
+
+[HKEY_CURRENT_USER\Software\Classes\Emacs.OrgFile\shell\open\command]
+@="\"C:\\Users\\<USER>\\AppData\\Roaming\\.emacs.d\\emacs-open.cmd\" \"%1\""
+
+[HKEY_CURRENT_USER\Software\Classes\.org]
+@="Emacs.OrgFile"
+
+[HKEY_CURRENT_USER\Software\Classes\.org\OpenWithProgids]
+"Emacs.OrgFile"=""

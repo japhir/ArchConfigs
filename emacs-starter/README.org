@@ -5,12 +5,14 @@ client of a shared org-mode todo system (phones: orgzly-revived and beorg;
 sync: WebDAV via the Nextcloud desktop client). Independent of =myinit.org=.
 Windows is the target; it also loads on Linux for testing.
 
-| File              | Role                                                        |
-|-------------------+-------------------------------------------------------------|
-| =init.el=         | three lines: tangle and load =config.org=                   |
-| =config.org=      | the configuration, literate; the only file to edit          |
-| =welcome.org=     | the lessons, opened at startup until dismissed              |
-| =cheatsheet.org=  | one page of keys; =cheatsheet.html= is its printable export |
+| File             | Role                                                         |
+|------------------+--------------------------------------------------------------|
+| =init.el=        | bootstrap: tangle+load =config.org=, plus =my/update-config= |
+| =config.org=     | the configuration, literate; the only file to edit           |
+| =welcome.org=    | the lessons, opened at startup until dismissed               |
+| =cheatsheet.org= | one page of keys; =cheatsheet.html= is its printable export  |
+| =emacs-open.cmd= | Explorer "Open with" target: routes to emacsclient/runemacs  |
+| =emacs-org.reg=  | optional: gives =.org= files an Emacs icon                   |
 
 * Setting up her Windows machine
 
@@ -43,6 +45,49 @@ Regenerate the HTML after editing the cheatsheet:
 #+begin_src sh
   emacs --batch cheatsheet.org -f org-html-export-to-html
 #+end_src
+
+* Opening .org files from Explorer
+
+=emacs-open.cmd= is part of the starter and already sits in =.emacs.d= from
+step 3 above; if it is missing, copy it in. If Emacs is installed somewhere
+other than =C:\Program Files\Emacs\emacs-31.1\bin=, edit the =BIN= line at
+the top of the file to match.
+
+To make Explorer use it: right-click an =.org= file, "Open with", "Choose
+another app", "Look for another app on this PC", pick =emacs-open.cmd=, and
+tick "Always use this app". A console window flashes briefly when it runs;
+that is harmless.
+
+Why not point Explorer straight at =emacsclient.exe -a runemacs=: emacsclient
+does not quote its =-a= alternate-editor argument, so the space in "Program
+Files" breaks the command. =emacs-open.cmd= sidesteps this by trying
+=emacsclient= first and falling back to =runemacs= with =||= instead.
+
+Optional, and *untested from Linux: report back* -- giving =.org= files the
+Emacs icon instead of a generic one:
+
+1. Open =emacs-org.reg= in a text editor and replace =<USER>= with her
+   Windows username (the folder name under =C:\Users\=).
+2. Double-click the edited =emacs-org.reg= and accept the "are you sure"
+   prompt. This is a per-user registry change, no admin rights needed.
+3. Windows remembers the earlier "Open with" choice from the section above,
+   so it will not pick up the new icon by itself. Do "Open with" once more
+   on an =.org= file and choose "Org file (Emacs)" from the list, so both
+   the icon and the open command come from the same registry entry.
+
+* Updating her config
+
+=my/update-config= (defined in =init.el=, so it works even if =config.org=
+is broken) re-downloads every starter file from GitHub. The flow:
+
+1. Edit and push from here (this repo), as normal.
+2. On her machine: =M-x my/update-config=, then restart Emacs.
+3. Each file's previous copy is kept alongside it as =<file>.bak= before the
+   new one is fetched, so nothing is lost if a download fails or the new
+   version is wrong.
+4. If a new =config.org= fails to load, Emacs still starts: =init.el= is the
+   bootstrap and does not depend on =config.org= loading successfully. Fix
+   the problem, push again, and have her run =my/update-config= again.
 
 * If something fails on first start
 
