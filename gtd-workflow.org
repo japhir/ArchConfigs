@@ -1,6 +1,6 @@
 #+title: GTD Workflow — as built
 #+created: [2026-06-06 Sat]
-#+last_modified:
+#+last_modified: [2026-09-26 Sat 16:25]
 
 As-built snapshot of the GTD workflow implemented in the org-mode section of
 =myinit.org=. Companion to [[file:CONTEXT.org][CONTEXT.org]] (the glossary) and [[file:docs/adr/][docs/adr/]] (the
@@ -11,7 +11,6 @@ This file describes what is /live/ today. Decisions that are agreed but not yet
 implemented are marked → ADR and listed under "Decided, pending implementation".
 
 * The five phases
-
 ** Capture
 - =C-c c= → org-capture; every template lands in =inbox.org=, =CREATED= auto-set
 - Mobile (Orgzly) → =mobin.org=
@@ -19,6 +18,9 @@ implemented are marked → ADR and listed under "Decided, pending implementation
 - =C-c n d= → org-roam daily note — log/journal only, never a task bucket (ADR 0003)
 - =C-c c j= → journal datetree
 - =inbox.org= + =mobin.org= carry =#+filetags: inbox= → =i= agenda catches both
+- =C-c c s= → shared inbox =iljline/inbox-iljline.org=, =CREATED= + =CREATED_BY: ilja= set (ADR 0006)
+- =C-c t= stamps =CREATED= on a hand-written heading; a heading's first todo
+  keyword stamps it automatically
 
 ** Clarify
 - Decision tree lives in =weekly_review.org=, run during the weekly review
@@ -26,14 +28,25 @@ implemented are marked → ADR and listed under "Decided, pending implementation
 - Non-actionable: trash / =TICK= / =SOME= / reference→org-roam
 
 ** Organize
-- TODO states: =TODO → NEXT → WAIT → TICK → SOME | DONE CANC= (ADR 0001)
+- TODO states: =TODO → NEXT → WAIT → TICK → SOME | DONE-ILJA DONE-LINE DONE CANC= (ADR 0001, 0005)
   - =TODO= = parked project action; =NEXT= = the one actionable now (exactly one per project)
+  - =d= = =DONE-ILJA=, =D= = =DONE-LINE=, =f= = plain =DONE=; the shared keyword
+    set, identical on Line's Emacs and both phones. Personal files get
+    =DONE-ILJA= too; harmless.
+  - Keyword faces come from the active Modus palette and follow circadian.
+  - Anything that tests "done" uses =org-done-keywords= or =TODO={^DONE}=,
+    never the literal =DONE= (=j= projects, stuck projects)
 - Projects: =:prj:= heading + =[/]= cookie; identified by tag + outline path (ADR 0002)
 - Areas of Responsibility: =life.org= headings; carried on items via =:CATEGORY:= (ADR 0002)
 - Contexts: =@=-tags — place / tool / energy / with-whom (=@agenda= + person); see CONTEXT.org
+- Assignee (shared folder only): lowercase =ilja= / =line= tag, at most one,
+  none = either of us (ADR 0006). Not the capitalised =:Line:= agenda-list tag.
 - =SCHEDULED= = tickler ("resurface on this date") only; =DEADLINE= + =gcal.org= = hard landscape (ADR 0004)
 - Files: =todo.org= (personal), =work.org= (work), =someday.org=, =lists.org=,
   =journal.org=, =life.org= (areas); reference → org-roam notes
+- Shared folder =~/org/iljline/=: the only files Line and I both edit (ADR
+  0007). Its =.org= files are refile targets so a captured task can be moved
+  there at clarify (convenience, not an ADR requirement)
 - Refile: =C-c C-w=; =C-c n r= / =C-c n R= refile a heading into a daily note (as a log entry)
 
 ** Reflect
@@ -44,25 +57,24 @@ implemented are marked → ADR and listed under "Decided, pending implementation
   engine — empty =inbox.org= + =mobin.org=, sweep stray tasks out of
   =notes/daily/=, pick the day's =NEXT=s. Light; never duplicates the weekly.
 - Agendas: =A= block, =n= next, =w= waiting, =j= projects, =I= important, =#= stuck, =a= areas
+- Shared tasks tagged =line= only are hidden from every agenda
+  (=org-agenda-skip-function-global=); =S= shows the whole shared folder for
+  planning together
 
 ** Engage
 - Context agendas =g*=, energy =E*=, people =p*=, =W= work / =P= personal
 - org-pomodoro (=C-c p=) for focus blocks
 
 * Constraints (do not "fix")
-
 - =weekly_review.org= is frozen — its steps follow David Allen's published
   process deliberately. Do not consolidate it with the daily pass or
   "streamline" its steps.
 
 * Decided, pending implementation
-
 These are agreed (see ADRs) but not yet in =myinit.org= / =~/org=:
 
-- Update =org-todo-keywords= to
-  =TODO(t) NEXT(n) WAIT(w!/!) TICK(k) SOME(s!/!) | DONE(d) CANC(c)= + faces
-  (=TICK= key =t=→=k=); one-time pass to convert stray keyword-less project
-  actions to =TODO= (ADR 0001)
+- One-time pass to convert stray keyword-less project actions to =TODO=
+  (ADR 0001; the keyword set itself is live)
 - Areas: wire =life.org= as =org-areas-file=; area completion read from its
   headings; stamp =:CATEGORY:= at clarify (org-gtd style); add =a= "Areas"
   agenda with a neglected-area check (area with no active =:prj:=); migrate
@@ -74,8 +86,15 @@ These are agreed (see ADRs) but not yet in =myinit.org= / =~/org=:
   per-=:PersonName:= tags stay
 - Daily pass: actually start using =d=; fix the stale =clumpednotes.org= →
   =work.org= link inside =daily_review.org=
-- Shared system with Line (ADR 0005–0007): mirror the shared keyword set
-  (=DONE-ILJA(d) DONE-LINE(D)=) into =org-todo-keywords=, add the =ilja=/=line=
-  assignee tags, a shared-inbox capture template with =CREATED_BY=, and the
-  shared folder in =secretdirs.el=. Her side is built: =emacs-starter/=.
+- Shared system with Line (ADR 0005–0007), Emacs side done 2026-09-26. The
+  shared folder is an agenda folder through the =~/org= rescan (see
+  decisions.org, "Agenda files are discovered, not curated"); Line's personal
+  folder is excluded from Nextcloud sync on this machine. Left:
+  - context tags =@home= / =@errands= / =@work= for shared files, to agree
+    with Line (commented lines in =emacs-starter/config.org=)
+  - phones: orgzly-revived's created-at property named =CREATED=; the full
+    keyword set in orgzly-revived and beorg
+- Google Calendar → org sync (=orggcalsync.timer=, the org-gcal block in
+  =secretdirs.el=) has lapsed and the timer unit is not installed; the set of
+  calendars to sync has changed since. Revive it with the new list.
 - Config drift: see the backlog filed into the personal GTD system

@@ -149,3 +149,39 @@ which for this use is nothing.
 - The literate file is =config.org=, not =init.org=, because
   =org-babel-load-file= tangles to a =.el= of the same name and =init.el= is
   the bootstrap.
+
+* Agenda files are discovered by rescanning ~/org, not curated
+:PROPERTIES:
+:CREATED:  [2026-09-26 Sat]
+:STATUS:   accepted
+:END:
+
+=org-agenda-files= is rebuilt before every agenda by
+=my/org-agenda-files-refresh= in =myinit.org=: every =.org= file under =~/org=,
+recursively, minus lockfiles. The curated list that =~/.emacs.d/secretdirs.el=
+used to set (inbox, todo, work, taxes and five calendar files) was removed on
+this date; it had been overwritten by the rescan since 2026-07-29 anyway.
+
+** Why
+
+Old daily notes under =notes/daily/= may still hold tasks written when the
+dailies were used as a capture surface. A curated list would never show them;
+the rescan surfaces them so they can be captured out, at least once. It also
+means a new file in =~/org= (a shared-folder file, a new project file) is an
+agenda file without touching config.
+
+The cost is that the rescan includes roughly two thousand org-roam notes, which
+makes =org-todo-list= and the global todo views slow. That is accepted for now;
+ADR 0003 (dailies are log-only) is the discipline that shrinks the stray-task
+count over time, not an exclusion rule.
+
+** Consequences
+
+- Anything that must not be in the agenda must not live under =~/org=. Line's
+  personal folder is excluded from Nextcloud sync on this machine for that
+  reason (ADR 0007).
+- Do not add a second mechanism (a curated list, an exclusion regexp) on top
+  of the rescan. If the slowness becomes a problem, the fix is a filter inside
+  =my/org-agenda-files-refresh=, in one place.
+- The daily-note sweep agenda (ADR 0003, pending) is what makes the rescan
+  pay off; it should be the next agenda to build.
