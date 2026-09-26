@@ -16,11 +16,15 @@ Windows is the target; it also loads on Linux for testing.
 
 1. Install Emacs 30: in PowerShell, =winget install GNU.Emacs=. Done when
    "Emacs" appears in the Start menu.
-2. Install the Nextcloud desktop client from nextcloud.com/install, log in to
-   the WebDAV account, and in the folder selection tick only =iljline= and
-   her own folder. Under settings, turn *off* "virtual file support" so files
-   are always physically on disk. Done when both folders exist under
-   =C:\Users\<name>\Nextcloud\= with their =.org= files inside.
+2. Install the Nextcloud desktop client from nextcloud.com/install and log in
+   to the WebDAV account. In the wizard click "Skip folders configuration":
+   its free-space check counts the whole account, not the folders you tick,
+   and blocks on a small disk. Then in the client's settings use "Add Folder
+   Sync Connection" twice: remote =iljline= to local
+   =C:\Users\<name>\Nextcloud\iljline=, and her own folder likewise. Leave
+   "virtual files" off: Emacs opens every file for the agenda and needs them
+   on disk, also offline. Done when both folders show their =.org= files in
+   Explorer.
 3. Copy this directory's contents (not the directory) into
    =C:\Users\<name>\AppData\Roaming\.emacs.d\=. Create the folder if missing.
    Paste =%APPDATA%\.emacs.d= in the Explorer address bar to get there.
@@ -41,6 +45,12 @@ Regenerate the HTML after editing the cheatsheet:
 #+end_src
 
 * If something fails on first start
+
+- Only a warning about a lexical-binding cookie in =~/.emacs=, and no
+  welcome file: a stray =.emacs= in =%APPDATA%= is being loaded instead of
+  =.emacs.d\init.el= (Emacs takes the first of =~/.emacs=, =~/.emacs.el=,
+  =~/.emacs.d/init.el=). =C-h v user-init-file= shows which file won. If
+  the stray one is empty, delete it and restart.
 
 - "The directory ~/.emacs.d/server is unsafe": the =server= folder under
   =.emacs.d= is owned by another account (typically after copying as
