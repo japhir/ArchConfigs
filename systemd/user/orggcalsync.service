@@ -1,9 +1,8 @@
 [Unit]
-Description=Call orgsync
-Wants=orggcalsync.timer
+Description=Google Calendar to org-mode (org-gcal) through the Emacs daemon
+After=emacs.service
+Requisite=emacs.service
 
 [Service]
+Type=oneshot
 ExecStart=/home/japhir/bin/orggcalsync
-
-[Install]
-WantedBy=timers.target

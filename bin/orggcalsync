@@ -1,0 +1,6 @@
+#!/bin/sh
+# Pull Google Calendar into ~/org/calendars through the running Emacs daemon.
+# Run by orggcalsync.timer (systemd/user). The daemon is the only place the
+# OAuth token lives, and org-gcal's fetch is asynchronous, so this only kicks
+# it off; failures show up in Emacs, not here. Manual: M-x org-gcal-sync.
+exec emacsclient --quiet --eval '(org-gcal-fetch)' >/dev/null
