@@ -57,6 +57,8 @@ implemented are marked → ADR and listed under "Decided, pending implementation
   engine — empty =inbox.org= + =mobin.org=, sweep stray tasks out of
   =notes/daily/=, pick the day's =NEXT=s. Light; never duplicates the weekly.
 - Agendas: =A= block, =n= next, =w= waiting, =j= projects, =I= important, =#= stuck, =a= areas
+- Agenda files: every =.org= under =~/org= except =notes/daily/=, rescanned
+  before each agenda; =d= sweeps the dailies alone for stray tasks (ADR 0003)
 - Shared tasks tagged =line= only are hidden from every agenda
   (=org-agenda-skip-function-global=); =S= shows the whole shared folder for
   planning together
@@ -79,8 +81,8 @@ These are agreed (see ADRs) but not yet in =myinit.org= / =~/org=:
   headings; stamp =:CATEGORY:= at clarify (org-gtd style); add =a= "Areas"
   agenda with a neglected-area check (area with no active =:prj:=); migrate
   existing CATEGORY=project-name values (ADR 0002)
-- Daily-note sweep: =a= "stray tasks under notes/daily/" agenda; add the sweep
-  step to the daily pass (ADR 0003)
+- Daily-note sweep: add "run the =d= agenda" as a step in =daily_review.org=
+  (the agenda itself is live; ADR 0003)
 - Demote action-type =@=-tags (=@write @program @read @research @createplot
   @schedule=) + drop their =g*= agendas; keep =@agenda=; decide later whether
   per-=:PersonName:= tags stay
