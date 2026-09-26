@@ -131,12 +131,8 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
     "GTD Inbox")
   (defvar org-gtd-file "~/org/todo.org"
     "Personal TODO's")
-  (defvar org-tickler-file "~/org/tickler.org"
-    "Tickler")
   (defvar org-work-file "~/org/work.org"
     "Work TODO's")
-  (defvar org-notes-file "~/org/notes.org"
-    "General Notes and Protocols")
   (defvar org-someday-file "~/org/someday.org"
     "Someday/Maybe")
   (defvar org-journal-file "~/org/journal.org"
@@ -796,8 +792,6 @@ swyper makes refiling amazing!
 #+begin_src emacs-lisp
   (org-refile-targets (quote ((nil :maxlevel . 9)  ;; current file
                                    (org-gtd-file :maxlevel . 6)
-                                   (org-tickler-file :maxlevel . 2)
-                                   (org-notes-file :maxlevel . 2)
                                    (org-lists-file :maxlevel . 2)
                                    (org-someday-file :maxlevel . 2)
                                    (org-work-file :maxlevel . 6)
@@ -954,7 +948,7 @@ customize capture templates
       ("m" "Email" entry (file org-in-file)
        "* %? from %:from on %:subject :@email:\n %i\n %a\n" :add-created t)
       ("w" "Website" entry (file org-in-file)
-       "* %?\nEntered on %U\n %i\n %a")
+       "* %?\n %i\n %a" :add-created t)
       ("r" "Weekly Review" entry (file "~/org/log.org")
        (file "~/org/weekly_review.org") :clock-in t :clock-keep t :jump-to-captured t)
       ("d" "Daily Review" entry (file "~/org/log.org")
@@ -964,7 +958,7 @@ customize capture templates
       ("L" "Protocol Link" entry (file org-in-file)
        "* %:description%? :@web:\n[[%:link][%:description]]" :add-created t)
       ("j" "Journal" entry (file+olp+datetree org-journal-file)
-       "* %?\nEntered on %U\n %i\n %a")))
+       "* %?\n %i\n %a" :add-created t)))
  #+end_src
 *** TODO states
 #+begin_src emacs-lisp

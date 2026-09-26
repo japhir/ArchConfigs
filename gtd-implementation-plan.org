@@ -1,17 +1,21 @@
 #+title: GTD Implementation Plan — pick up in a fresh session
 #+created: [2026-06-06 Sat]
-#+last_modified:
+#+last_modified: [2026-09-26 Sat 22:33]
 
-Executable plan for translating the GTD decisions into =myinit.org=, plus
-one-off elisp helpers for the =~/org= data migration. Written at the end of a
-grill-with-docs session; meant to be picked up cold.
+Executable plan for the GTD decisions still missing from =myinit.org=, plus
+one-off elisp helpers for the =~/org= data migration. Rewritten 2026-09-26
+after the shared-system session landed most of the original Phases 1, 2 and 5
+by a different route than sketched here; the obsolete sketches are gone.
 
 * Read first
 - [[file:CONTEXT.org][CONTEXT.org]] — glossary (the canonical language)
-- [[file:docs/adr/][docs/adr/]] — 0001 keyword/model, 0002 areas, 0003 daily-notes, 0004 scheduled
+- [[file:docs/adr/][docs/adr/]] — 0001 keyword/model, 0002 areas, 0003 daily-notes, 0004 scheduled,
+  0005–0007 the shared system with Line
+- [[file:decisions.org][decisions.org]] — system/config decisions; "Agenda files are discovered by
+  rescanning ~/org, not curated" is the one this plan must not undo
 - [[file:gtd-workflow.org][gtd-workflow.org]] — as-built snapshot + the FROZEN weekly-review constraint
 - Memory: =project-weekly-review-frozen=, =project-tick-distinct-state=,
-  =project-gtd-functional-migration=
+  =project-org-agenda-files-precedence=, =project-gtd-functional-migration=
 
 * Ground rules
 - Source of truth is =myinit.org= (literate). Edit the =.org=, never =myinit.el=.
@@ -20,113 +24,71 @@ grill-with-docs session; meant to be picked up cold.
   scripts the *user* runs; writing them needs no reading of org data.
 - One commit per phase. After each: tangle + =org-babel-load-file= (or reload),
   open =C-c a=, build the touched view, confirm no error + expected items.
-- Omit the =Co-Authored-By= trailer on commits (user preference).
 
-* Current state (entering the session)
-- =TODO(t)= keyword: ALREADY ADDED by user to =org-todo-keywords=. =TICK= rekeyed
-  to =k=. So Phase 2 keyword string is done; only the FACE + the DRY refactor
-  remain.
-- No =TODO= face exists yet (4 custom faces defined at =** define new org-todo
-  faces=, lines ~243–335; none for =TODO=).
+* Already live (do not redo)
+- Keyword set =TODO NEXT WAIT TICK SOME | DONE-ILJA DONE-LINE DONE CANC= (ADR 0001, 0005).
+- Keyword faces recoloured from the active Modus palette on every theme switch
+  (=** todo keyword faces from the Modus palette=); one alist =my/todo-faces=
+  feeds both =org-todo-keyword-faces= and =org-modern-todo-faces=. The old
+  per-keyword =defface= blocks and the defmacro idea are gone.
+- =org-stuck-projects= trigger set is =("NEXT" "WAIT" "TICK")= — no =TODO=,
+  as ADR 0001 requires. Keep it that way.
+- Agenda files: every =.org= under =~/org= except =notes/=, rebuilt before each
+  agenda (=my/org-agenda-files-refresh=). Never replace this with a curated list.
+- Stray-task sweep: the =d= agenda scans all of =notes/= alone, ignoring
+  nothing (ADR 0003). Supersedes the planned =s= key.
+- Shared folder with Line: capture =s=, =S= agenda, partner-only skip, refile
+  targets (ADR 0005–0007).
 
-* Snags to resolve in-plan
-- *Agenda key collision*: ADR 0002 (Areas) and ADR 0003 (stray sweep) both
-  wanted key =a=. Resolution: =a= = Areas, =s= = stray sweep (=s= is a
-  commented-out Someday key, free).
-- *Face/keyword duplication* (Phase 2): the per-keyword =defface= blocks repeat
-  identical display-class clauses (16/8 colours × light/dark); only fg/bg vary.
-  And the keyword→face alist is duplicated in =org-todo-keyword-faces= AND
-  =org-modern-todo-faces=. Collapse with a generator + one shared alist.
-
-* Phase 1 — config drift  :myinit:
+* Phase 1 — config drift leftovers  :myinit:
 :PROPERTIES:
-:commit: fix(emacs): scope org-agenda-files, drop dead dirvars
+:commit: fix(emacs): drop dead dirvars, stamp CREATED on web and journal captures
 :END:
-Lowest risk, immediate payoff (kills conflict-copy dupes + whole-org-roam scan).
-- [ ] =*** agenda files= (~743): replace
-  =(directory-files-recursively "~/org" "\\.org$")= with an explicit list built
-  from the dirvars + =notes/daily/=. This is also the FUNCTIONAL win (computed,
-  scoped). Sketch:
-  #+begin_src emacs-lisp
-    (org-agenda-files
-     (append
-      (list org-in-file org-gtd-file org-work-file
-            org-someday-file org-lists-file org-journal-file
-            "~/org/mobin.org" "~/org/gcal.org" "~/org/life.org")
-      ;; daily logs are scanned for the stray-task sweep (ADR 0003)
-      (directory-files-recursively
-       (expand-file-name org-roam-dailies-directory org-roam-directory)
-       "\\.org$")))
-  #+end_src
-  Verify each path exists; drop any that don't. The explicit list removes the
-  =conflicted copy= problem for free (no glob).
-- [ ] =* dirvar= (54) + =*** refile targets= (752): remove dead =org-notes-file=
-  (=~/org/notes.org= absent; name also collides with the =~/org/notes/= roam dir).
-- [ ] =* dirvar= (50) + refile (751): drop =org-tickler-file= dirvar + refile
-  target (keep the =TICK= keyword; tickler is TICK+SCHEDULED, ADR 0004). NB the
-  =tickler.org= file deletion itself is a =~/org= task, not this commit.
-- [ ] =*** capture templates= (892, 902): add =:add-created t= to =w= (Website)
-  and =j= (Journal) so =my/org-refile-to-created-date= can place them.
+- [X] =* dirvar= + =*** refile targets=: remove =org-notes-file=
+  (=~/org/notes.org= is absent; the name also collides with =my/org-notes-dir=).
+- [X] =* dirvar= + =*** refile targets=: remove =org-tickler-file= and its refile
+  target. The =TICK= keyword stays; tickler is TICK+SCHEDULED (ADR 0004).
+  Deleting =~/org/tickler.org= itself is a =~/org= task, not this commit —
+  first move whatever is in it to TICK+SCHEDULED items.
+- [X] =*** capture templates=: add =:add-created t= to =w= (Website) and =j=
+  (Journal); =p=, =L=, =s= already have it. Lets =my/org-refile-to-created-date=
+  place them.
 
-* Phase 2 — TODO face + face/keyword DRY refactor  :myinit:
+* Phase 2 — the TODO face  :myinit:
 :PROPERTIES:
-:commit: refactor(emacs): DRY org-todo faces, add TODO face
+:commit: fix(emacs): give the parked TODO keyword a muted face
 :END:
-Keyword string already done. Remaining:
-- [ ] Add a =TODO= face (parked = muted/neutral; distinct from the loud =NEXT=).
-- [ ] Refactor the 4 (→5) =defface= blocks: a generator taking fg/bg and
-  emitting the standard clause set. Sketch:
-  #+begin_src emacs-lisp
-    (defmacro my/def-todo-face (name fg bg doc)
-      "Define a mono, bold, fg-on-bg org todo face NAME."
-      `(defface ,name
-         '((((class color) (min-colors 8))
-            (:family "Noto Sans Mono" :bold t
-             ,@(when fg (list :foreground fg)) :background ,bg))
-           (t (:inverse-video t :bold t)))
-         ,doc :group 'org-faces))
-
-    (my/def-todo-face org-todo-todo    nil      "gray70"           "Parked TODO")
-    (my/def-todo-face org-todo-next    "light goldenrod yellow" "red" "NEXT")
-    (my/def-todo-face org-todo-waiting "dim gray" "yellow"        "WAIT")
-    (my/def-todo-face org-todo-tick    nil      "light slate blue" "TICK")
-    (my/def-todo-face org-todo-someday "ghost white" "deep sky blue" "SOME")
-  #+end_src
-  (The old blocks distinguished min-colors 16 vs 8 with identical specs — that
-  split was redundant; collapse to one =min-colors 8= clause. Verify rendering.)
-- [ ] One shared alist feeds both face vars:
-  #+begin_src emacs-lisp
-    (defvar my/org-todo-faces
-      '(("TODO" . org-todo-todo) ("NEXT" . org-todo-next)
-        ("WAIT" . org-todo-waiting) ("TICK" . org-todo-tick)
-        ("SOME" . org-todo-someday) ("DONE" . org-done-done)
-        ("CANC" . org-done-cancelled)))
-    ;; (org-todo-keyword-faces my/org-todo-faces)
-    ;; (org-modern-todo-faces  my/org-todo-faces)
-  #+end_src
-  NB these live in different =use-package= =:custom= blocks — may need =setq= in
-  a shared place, or just reference the same defvar in both.
-- [ ] Confirm =org-stuck-projects= trigger set stays =("NEXT" "WAIT" "TICK")= —
-  must NOT include =TODO= (else parked-only projects wrongly read as un-stuck;
-  ADR 0001).
+=TODO= currently falls through to the stock =org-todo= face (was not
+intentional). Parked should read as quiet, clearly less loud than =NEXT=.
+- [ ] =(defface my/todo-todo nil "The TODO keyword." :group 'org-faces)= next
+  to the other six.
+- [ ] Add a =my/todo-todo= spec to =my/set-todo-faces=. Muted: e.g.
+  =:background ,bg-dim :foreground ,fg-dim :weight bold=, or =bg-inactive= with
+  =fg-main= if that is too close to =CANC= (which uses =bg-inactive= + strike-through).
+- [ ] Add =("TODO" . my/todo-todo)= to =my/todo-faces=.
+- [ ] Verify in both Modus light and dark (circadian switch or =M-x load-theme=).
 
 * Phase 3 — demote action-type context tags  :myinit:
 :PROPERTIES:
 :commit: refactor(emacs): demote action-type context tags
 :END:
-- [ ] =org-tag-alist= (936): remove =@write @program @read @research
-  @createplot @schedule=. Keep =@agenda= (with-whom context). Leave place/tool/
-  energy + PersonName tags.
-- [ ] custom-commands (850–856): drop =gw gp gr gg gC gs=. Keep =ga= (=@agenda=).
-- [ ] PersonName tags: leave as-is (open question, see backlog/CONTEXT.org).
+- [ ] =org-tag-alist=: remove =@write @program @createplot @read @schedule=.
+  Keep =@agenda= (with-whom context) and all place/tool/energy + PersonName tags.
+- [ ] =org-agenda-custom-commands=: drop =gw gp gC gr gg gs=. Note =gg= and
+  =gs= query the bare tags =research= and =software=, not =@=-tags; drop them too.
+  Keep =ga= (=@agenda=).
+- [ ] PersonName tags: leave as-is (open question, see CONTEXT.org).
+- [ ] Data side (user, =~/org=): existing items carrying the demoted tags keep
+  them harmlessly; strip at leisure during weekly reviews.
 
 * Phase 4 — Areas of Focus via CATEGORY (ADR 0002)  :myinit:
 :PROPERTIES:
 :commit: feat(emacs): areas of focus via CATEGORY
 :END:
+The only real build left. =life.org= exists; the =a= agenda key is free.
 - [ ] =* dirvar=: add =(defvar org-areas-file "~/org/life.org")=.
 - [ ] Fn to read the area completion list from =life.org= top-level headings
-  (single source of truth — no hardcoded =org-gtd-areas-of-focus=):
+  (single source of truth — no hardcoded list):
   #+begin_src emacs-lisp
     (defun my/gtd-areas ()
       "Top-level headings in `org-areas-file' = the areas of responsibility."
@@ -134,25 +96,35 @@ Keyword string already done. Remaining:
         (org-map-entries (lambda () (org-get-heading t t t t))
                          "LEVEL=1" 'file)))
   #+end_src
-- [ ] Clarify helper: prompt an area, =org-entry-put (point) "CATEGORY" area=;
-  for a =:prj:= push it to child actions (mirror org-gtd.el behaviour).
+- [ ] Clarify helper: prompt an area with =completing-read= over
+  =(my/gtd-areas)=, =org-entry-put (point) "CATEGORY" area=; for a =:prj:= push
+  it to child actions (mirror org-gtd.el behaviour). Bind it in the org keymap.
 - [ ] =a= "Areas" agenda + neglected-area check (area with no active =:prj:=).
   Build from =(my/gtd-areas)=; for each, query live =:prj:= whose =CATEGORY= =
-  area; flag those with none.
+  area; flag those with none. A block agenda of one =tags= view per area with
+  =+prj+CATEGORY="<area>"-TODO={^DONE}/-CANC-SOME= is the simple first cut; the
+  neglect flag can be the overriding header of any block that comes back empty.
+- [ ] Run the CATEGORY audit helper below first; migrate the project-name-era
+  =:CATEGORY:= values before the =a= view means anything.
 
-* Phase 5 — daily-note stray-task sweep (ADR 0003)  :myinit:
-:PROPERTIES:
-:commit: feat(emacs): stray-task sweep for daily notes
-:END:
-- [ ] =s= agenda listing every TODO-state heading under =notes/daily/=
-  (dailies are log-only; these are leaks to refile out). Skip-function or an
-  =org-ql=/=tags-todo= scoped to the dailies directory.
+* Phase 5 — loose ends from gtd-workflow.org's pending list
+Not =myinit.org= work, listed so there is one list.
+- [ ] =~/org=: one-time pass converting keyword-less project children to =TODO=
+  (ADR 0001). Use the helpers below.
+- [ ] =~/org=: fix the stale =clumpednotes.org= → =work.org= link inside
+  =daily_review.org=; add "run the =d= agenda" as a step.
+- [ ] Google Calendar → org sync: revive =orggcalsync.timer= with the new
+  calendar list (org-gcal block in =secretdirs.el=).
+- [ ] Shared system, with Line: agree =@home= / =@errands= / =@work= for shared
+  files (commented lines in =emacs-starter/config.org=); phones' =CREATED=
+  property name and full keyword set.
 
 * One-off elisp migration helpers (USER runs against ~/org)
 Not config — analysis/assist scripts for the data-side backlog. Scaffolds
 below are UNTESTED against real data; refine interactively. They report to a
 buffer and never modify data (review, then act by hand). Project detection uses
-local =:prj:= tags (=prj= is excluded from inheritance).
+local =:prj:= tags (=prj= is excluded from inheritance). They walk
+=org-agenda-files=, so they see everything except =notes/=.
 
 ** Project audit — empty / multi-NEXT projects
 Targets: "lots of stale projects with 0 tasks" and "multiple NEXT → demote".
@@ -226,9 +198,10 @@ want to ignore the heading's own keyword.
         (display-buffer (current-buffer)))))
 #+end_src
 Caveat: some keyword-less children are legit notes, not actions — human review
-required; this just surfaces candidates.
+required; this just surfaces candidates. The level-1 skip only works for
+top-level projects; a =:prj:= nested deeper reports its own heading.
 
-** CATEGORY audit — for the area migration (ADR 0002)
+** CATEGORY audit — for the area migration (Phase 4, ADR 0002)
 #+begin_src emacs-lisp
   (defun my/gtd-category-audit ()
     "List :prj: headings with a LOCAL CATEGORY property (project-name era).
