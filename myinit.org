@@ -353,6 +353,7 @@ out of =custom.el=. Lifted from =emacs-starter/config.org= with two changes:
 =enable-theme-functions= instead of the Modus hook (which a plain =load-theme=
 does not run), and =:inherit fixed-pitch= in place of a hardcoded font.
 #+begin_src emacs-lisp
+  (defface my/todo-todo nil "The TODO keyword: a parked action." :group 'org-faces)
   (defface my/todo-next nil "The NEXT keyword." :group 'org-faces)
   (defface my/todo-wait nil "The WAIT keyword." :group 'org-faces)
   (defface my/todo-tick nil "The TICK keyword." :group 'org-faces)
@@ -364,7 +365,10 @@ does not run), and =:inherit fixed-pitch= in place of a hardcoded font.
     "Colour the keyword faces from the palette of the current Modus theme.
   Ignores the THEME argument that `enable-theme-functions' passes."
     (modus-themes-with-colors
-      (dolist (spec `((my/todo-next :background ,bg-red-intense    :foreground ,fg-main :weight bold)
+      ;; TODO is parked (ADR 0001): a quiet grey box, unlike the loud NEXT and
+      ;; unlike CANC, which is the dimmer bg-inactive with strike-through
+      (dolist (spec `((my/todo-todo :background ,bg-active         :foreground ,fg-main :weight bold)
+                      (my/todo-next :background ,bg-red-intense    :foreground ,fg-main :weight bold)
                       (my/todo-wait :background ,bg-yellow-intense :foreground ,fg-main :weight bold)
                       (my/todo-tick :background ,bg-blue-intense   :foreground ,fg-main :weight bold)
                       (my/todo-some :background ,bg-cyan-intense   :foreground ,fg-main :weight bold)
@@ -378,7 +382,8 @@ does not run), and =:inherit fixed-pitch= in place of a hardcoded font.
     (add-hook 'enable-theme-functions #'my/set-todo-faces))
 
   (defvar my/todo-faces
-    `(("NEXT" . my/todo-next)
+    `(("TODO" . my/todo-todo)
+      ("NEXT" . my/todo-next)
       ("WAIT" . my/todo-wait)
       ("TICK" . my/todo-tick)
       ("SOME" . my/todo-some)

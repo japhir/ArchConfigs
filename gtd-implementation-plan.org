@@ -60,12 +60,12 @@ by a different route than sketched here; the obsolete sketches are gone.
 :END:
 =TODO= currently falls through to the stock =org-todo= face (was not
 intentional). Parked should read as quiet, clearly less loud than =NEXT=.
-- [ ] =(defface my/todo-todo nil "The TODO keyword." :group 'org-faces)= next
+- [X] =(defface my/todo-todo nil "The TODO keyword." :group 'org-faces)= next
   to the other six.
-- [ ] Add a =my/todo-todo= spec to =my/set-todo-faces=. Muted: e.g.
+- [X] Add a =my/todo-todo= spec to =my/set-todo-faces=. Muted: e.g.
   =:background ,bg-dim :foreground ,fg-dim :weight bold=, or =bg-inactive= with
   =fg-main= if that is too close to =CANC= (which uses =bg-inactive= + strike-through).
-- [ ] Add =("TODO" . my/todo-todo)= to =my/todo-faces=.
+- [X] Add =("TODO" . my/todo-todo)= to =my/todo-faces=.
 - [ ] Verify in both Modus light and dark (circadian switch or =M-x load-theme=).
 
 * Phase 3 — demote action-type context tags  :myinit:
