@@ -908,10 +908,6 @@ Filter tasks by context (sorted by todo state)
           ("gB" "Phone" tags-todo "@phone")
           ("gm" "e-mail" tags-todo "@email")
           ("gb" "Bank" tags-todo "@bank")
-          ("gw" "Write" tags-todo "@write")
-          ("gp" "Program" tags-todo "@program")
-          ("gC" "Create/Plot" tags-todo "@createplot")
-          ("gr" "Read" tags-todo "@read")
           ("gg" "Research" tags-todo "research")
           ("gs" "Software" tags-todo "software")
           ("ga" "Agenda" tags-todo "@agenda")
@@ -1014,11 +1010,9 @@ palette") feeds both org and org-modern, which does not read
                    ("@phone" . ?B)     ;; b for Dutch "bellen"
                    ("@email" . ?m)
                    ("@bank" . ?b)      ;; I need my little reader thingie
-                   ("@write" . ?w)
-                   ("@program" . ?p)
-                   ("@createplot" . ?C)
-                   ("@read" . ?r)
-                   ("@schedule" . ?s)
+                   ;; action-type contexts (@write @program @read ...) were
+                   ;; demoted 2026-09-26: they never narrowed a list, the
+                   ;; actual context is place/tool/energy. Only with-whom stays.
                    ("@agenda" . ?a)    ;; things to discuss
                    ;; ("@admin" . ??) ;; do I want admin? which key should it use?
                    (:startgroup . nil)

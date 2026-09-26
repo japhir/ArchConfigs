@@ -72,11 +72,12 @@ intentional). Parked should read as quiet, clearly less loud than =NEXT=.
 :PROPERTIES:
 :commit: refactor(emacs): demote action-type context tags
 :END:
-- [ ] =org-tag-alist=: remove =@write @program @createplot @read @schedule=.
+- [X] =org-tag-alist=: remove =@write @program @createplot @read @schedule=.
   Keep =@agenda= (with-whom context) and all place/tool/energy + PersonName tags.
-- [ ] =org-agenda-custom-commands=: drop =gw gp gC gr gg gs=. Note =gg= and
-  =gs= query the bare tags =research= and =software=, not =@=-tags; drop them too.
-  Keep =ga= (=@agenda=).
+- [X] =org-agenda-custom-commands=: drop =gw gp gC gr=. Keep =ga= (=@agenda=).
+  =gg= and =gs= stay: =research= and =software= are WBSO export tags for
+  claimable R&D work, not action-type contexts (an earlier draft of this plan
+  had them wrong).
 - [ ] PersonName tags: leave as-is (open question, see CONTEXT.org).
 - [ ] Data side (user, =~/org=): existing items carrying the demoted tags keep
   them harmlessly; strip at leisure during weekly reviews.
