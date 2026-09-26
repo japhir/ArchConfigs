@@ -28,3 +28,6 @@ turning dailies into a second inbox to process.
   as an explicit step in both the daily and weekly review.
 - Captures into a daily should stay keyword-less (log entries); a task belongs
   in the inbox, not a daily.
+- Extended 2026-09-26 to every org-roam note under =notes/=, not only the
+  dailies: the whole folder is out of the everyday agenda files and the =d=
+  sweep scans all of it. Reference notes are not task buckets either.

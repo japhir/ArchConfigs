@@ -145,9 +145,9 @@ define dirvars 'org-in-file', 'org-gtd-file', etc.
     "Lists of Movies etc.")
   (defvar org-cal-file "~/org/calendars/gcal.org"
     "Google Calendar")
-  (defvar my/org-daily-dir "~/org/notes/daily/"
-    "org-roam daily notes: a log, never a task bucket (ADR 0003).
-  Kept out of the everyday agenda files; the d agenda sweeps them for strays.")
+  (defvar my/org-notes-dir "~/org/notes/"
+    "org-roam notes, dailies included: reference and log, never a task bucket
+  (ADR 0003). Kept out of the everyday agenda files; the d agenda sweeps them.")
 #+end_src
 * who is who
 The shared org system with Line (ADR 0005–0007) derives everything personal
@@ -785,9 +785,9 @@ basic latex settings
   (org-agenda-skip-function-global #'my/agenda-skip-partner-only)
 #+end_src
 *** agenda files
-Every org file under ~/org except the daily notes, rebuilt before every
+Every org file under ~/org except the org-roam notes, rebuilt before every
 agenda build (see "dynamic agenda files" under :config), so a new file is an
-agenda file without touching config. The dailies get their own sweep view, =d=.
+agenda file without touching config. The notes get their own sweep view, =d=.
 #+begin_src emacs-lisp
   ;(setq org-directory "~/org/") ;; changed org-roam capture
 #+end_src
@@ -886,14 +886,14 @@ Filter tasks by context (sorted by todo state)
            ((org-agenda-files (list my/shared-dir))
             (org-agenda-skip-function-global nil)
             (org-agenda-overriding-header "Shared folder, everyone's tasks")))
-          ;; the dailies are not agenda files (see "dynamic agenda files");
-          ;; this scans them alone, ignoring nothing, so every stray shows
-          ("d" "Sweep: stray tasks in daily notes" tags-todo "*"
-           ((org-agenda-files (list my/org-daily-dir))
+          ;; the org-roam notes are not agenda files (see "dynamic agenda
+          ;; files"); this scans them alone, ignoring nothing, so every stray shows
+          ("d" "Sweep: stray tasks in org-roam notes" tags-todo "*"
+           ((org-agenda-files (my/org-files-under my/org-notes-dir))
             (org-agenda-todo-ignore-scheduled nil)
             (org-agenda-todo-ignore-deadlines nil)
             (org-agenda-overriding-header
-             "Stray tasks in daily notes: refile them out or close them (ADR 0003)")))
+             "Stray tasks in org-roam notes: refile them out or close them (ADR 0003)")))
           ("W" "Work" tags-todo "-Personal/!-WAIT"
            ((org-agenda-todo-ignore-scheduled t)))
           ("P" "Personal" tags-todo "-Work/!-WAIT"
@@ -1050,21 +1050,27 @@ palette") feeds both org and org-modern, which does not read
 *** dynamic agenda files
 Rescan ~/org before every agenda build so newly created files show up without
 restarting or re-running init. Two exclusions. Lockfiles (.#foo.org) are
-dangling symlinks that would break the agenda. The daily notes under
-notes/daily/ are over half the tree (1182 of 2199 files on 2026-09-26) and
-doubled every warm agenda build and tripled the cold one, to find tasks that
-leak in there only occasionally; the =d= sweep view scans them alone, on
-demand (ADR 0003; decisions.org, "Agenda files are discovered by rescanning
-~/org"). This is the one filter; no curated list on top of it.
+dangling symlinks that would break the agenda. The org-roam notes under
+notes/ are nearly the whole tree (2144 of 2199 files on 2026-09-26, 1182 of
+them dailies) and are reference and log, not task buckets; scanning them
+doubled every warm agenda build and tripled the cold one to find tasks that
+leak in only occasionally. The 55 files outside notes/ are the task surface.
+The =d= sweep view scans the notes alone, on demand (ADR 0003; decisions.org,
+"Agenda files are discovered by rescanning ~/org"). This is the one filter; no
+curated list on top of it.
 #+begin_src emacs-lisp
+  (defun my/org-files-under (dir &optional exclude)
+    "Every org file under DIR, recursively, minus lockfiles.
+  With EXCLUDE, a directory, the files under it are left out."
+    (let ((skip (and exclude (expand-file-name exclude))))
+      (seq-remove (lambda (f)
+                    (or (string-prefix-p ".#" (file-name-nondirectory f))
+                        (and skip (string-prefix-p skip (expand-file-name f)))))
+                  (directory-files-recursively dir "\\.org\\'"))))
+
   (defun my/org-agenda-files-refresh (&rest _)
-    "Rebuild `org-agenda-files': every org file under ~/org except the dailies."
-    (let ((daily (expand-file-name my/org-daily-dir)))
-      (setq org-agenda-files
-            (seq-remove (lambda (f)
-                          (or (string-prefix-p ".#" (file-name-nondirectory f))
-                              (string-prefix-p daily (expand-file-name f))))
-                        (directory-files-recursively "~/org" "\\.org$")))))
+    "Rebuild `org-agenda-files': every org file under ~/org except the notes."
+    (setq org-agenda-files (my/org-files-under "~/org" my/org-notes-dir)))
   (my/org-agenda-files-refresh)
   (advice-add 'org-agenda :before #'my/org-agenda-files-refresh)
   (advice-add 'org-todo-list :before #'my/org-agenda-files-refresh)
@@ -1587,7 +1593,7 @@ https://github.com/weirdNox/org-noter
             ("g]" . org-roam-dailies-goto-next-note)))
     :custom
     ;; the file-truename part makes it follow symbolic links!
-    (org-roam-directory (file-truename "~/org/notes/"))
+    (org-roam-directory (file-truename my/org-notes-dir))
     (org-roam-dailies-directory "daily/")
     (org-roam-db-location "~/org-roam.db")
     ;; (org-id-link-to-org-use-id 'create-if-interactive)

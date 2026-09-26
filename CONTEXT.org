@@ -103,8 +103,9 @@ out to its real home during review.
 /Avoid/: journal (reserved: see below), inbox, capture surface.
 
 *** Stray Task
-A TODO-state heading that has leaked into a daily note. The review sweeps these
-out; they should never live in =notes/daily/=.
+A TODO-state heading that has leaked into an org-roam note, daily or not. The
+=d= sweep agenda finds them during review; they should never live under
+=notes/=.
 
 ** Shared system
 Terms for the todo lists Ilja and Line run together. Decisions: ADR 0005–0007.

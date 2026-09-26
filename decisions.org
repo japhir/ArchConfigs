@@ -158,7 +158,7 @@ which for this use is nothing.
 
 =org-agenda-files= is rebuilt before every agenda by
 =my/org-agenda-files-refresh= in =myinit.org=: every =.org= file under =~/org=,
-recursively, minus lockfiles and the daily notes. The curated list that =~/.emacs.d/secretdirs.el=
+recursively, minus lockfiles and the org-roam notes under =notes/=. The curated list that =~/.emacs.d/secretdirs.el=
 used to set (inbox, todo, work, taxes and five calendar files) was removed on
 this date; it had been overwritten by the rescan since 2026-07-29 anyway.
 
@@ -170,20 +170,21 @@ the rescan surfaces them so they can be captured out, at least once. It also
 means a new file in =~/org= (a shared-folder file, a new project file) is an
 agenda file without touching config.
 
-The cost is that the rescan includes a thousand org-roam notes, which makes
-=org-todo-list= and the global todo views slower than a curated list would.
-Timed on 2026-09-26 in a bare Emacs: with the 1182 dailies included as well,
-the cold todo list took 31 s against 12 s without them, and every warm agenda
-about twice as long. So the dailies are the one exclusion, and the =d= sweep
-agenda scans them alone when the daily pass calls for it. ADR 0003 (dailies
-are log-only) is the discipline that shrinks the stray-task count over time.
+The cost would be scanning the org-roam tree: 2144 of the 2199 files, 1182 of
+them dailies. Timed on 2026-09-26 in a bare Emacs, the cold todo list took
+31 s with everything and 12 s with only the dailies left out, and every warm
+agenda about twice as long as without them. Org-roam notes are reference and
+log, not task buckets (ADR 0003, extended that day from the dailies to the
+whole tree), so =notes/= is the one exclusion; the 55 files outside it are the
+task surface. The =d= sweep agenda scans the notes alone when the daily pass
+calls for it. ADR 0003 is the discipline that shrinks the stray-task count.
 
 ** Consequences
 
 - Anything that must not be in the agenda must not live under =~/org=. Line's
   personal folder is excluded from Nextcloud sync on this machine for that
   reason (ADR 0007).
-- The one filter lives inside =my/org-agenda-files-refresh= (the dailies).
+- The one filter lives inside =my/org-agenda-files-refresh= (=notes/=).
   No curated list or second exclusion on top of it; if another folder must
   stay out of the agenda, it moves out of =~/org=.
 - The =d= sweep is what surfaces the stray tasks the rescan was kept for; it

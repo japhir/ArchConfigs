@@ -57,8 +57,9 @@ implemented are marked → ADR and listed under "Decided, pending implementation
   engine — empty =inbox.org= + =mobin.org=, sweep stray tasks out of
   =notes/daily/=, pick the day's =NEXT=s. Light; never duplicates the weekly.
 - Agendas: =A= block, =n= next, =w= waiting, =j= projects, =I= important, =#= stuck, =a= areas
-- Agenda files: every =.org= under =~/org= except =notes/daily/=, rescanned
-  before each agenda; =d= sweeps the dailies alone for stray tasks (ADR 0003)
+- Agenda files: every =.org= under =~/org= except =notes/= (org-roam),
+  rescanned before each agenda; =d= sweeps all of =notes/= for stray tasks
+  (ADR 0003)
 - Shared tasks tagged =line= only are hidden from every agenda
   (=org-agenda-skip-function-global=); =S= shows the whole shared folder for
   planning together
