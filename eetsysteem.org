@@ -180,8 +180,10 @@ is a pain.
       sections "")))
 
   (defun eet--week-title (time)
-    "Shopping list title for the ISO week of TIME."
-    (concat eet-list-prefix (format-time-string "%G-W%V" time)))
+    "Shopping list title for a list started at TIME.
+  Named by date, not ISO week: planning on Saturday still falls in the week
+  of the previous list."
+    (concat eet-list-prefix (format-time-string "%Y-%m-%d" time)))
 
   (defun eet-new-week (&optional time)
     "Start this week's shopping list in the current buffer.
@@ -237,7 +239,7 @@ the resulting text; the real =~/org= is never touched.
   (require 'eetsysteem)
 
   (defconst eet-test--time (encode-time '(0 0 12 28 9 2026))
-    "Monday 2026-09-28, ISO week 40.")
+    "Monday 2026-09-28.")
 
   (defmacro eet-test--with-file (content &rest body)
     "Run BODY in an org buffer visiting a temp eetplanning.org with CONTENT."
@@ -283,7 +285,7 @@ the resulting text; the real =~/org= is never touched.
   - [ ]
   ** Picnic
   - [ ] havermout
-  * TODO Boodschappen 2026-W40
+  * TODO Boodschappen 2026-09-28
   :PROPERTIES:
   :CREATED:  [2026-09-28 Mon 12:00]
   :END:
@@ -305,7 +307,7 @@ the resulting text; the real =~/org= is never touched.
     (eet-test--with-file "* Basisvoorraad
   ** Lidl/Hira
   - [ ] brood
-  * TODO Boodschappen 2026-W39
+  * TODO Boodschappen 2026-09-21
   ** Nog in huis
   - 3 tomaten
   ** Menu
@@ -321,7 +323,7 @@ the resulting text; the real =~/org= is never touched.
       (should (equal (eet-test--text) "* Basisvoorraad
   ** Lidl/Hira
   - [ ] brood
-  * TODO Boodschappen 2026-W40
+  * TODO Boodschappen 2026-09-28
   :PROPERTIES:
   :CREATED:  [2026-09-28 Mon 12:00]
   :END:
@@ -342,7 +344,7 @@ the resulting text; the real =~/org= is never touched.
         (should (file-exists-p archive))
         (with-temp-buffer
           (insert-file-contents archive)
-          (should (string-match-p "^\\* DONE Boodschappen 2026-W39" (eet-test--text)))))))
+          (should (string-match-p "^\\* DONE Boodschappen 2026-09-21" (eet-test--text)))))))
 
   (ert-deftest eet-new-week/old-style-lists-go-to-named-store ()
     (eet-test--with-file "* Boodschappen LOOS
@@ -356,7 +358,7 @@ the resulting text; the real =~/org= is never touched.
   - [ ] ui
   "
       (eet-new-week eet-test--time)
-      (should (equal (eet-test--text) "* TODO Boodschappen 2026-W40
+      (should (equal (eet-test--text) "* TODO Boodschappen 2026-09-28
   :PROPERTIES:
   :CREATED:  [2026-09-28 Mon 12:00]
   :END:
@@ -374,8 +376,8 @@ the resulting text; the real =~/org= is never touched.
   - [ ]
   "))))
 
-  (ert-deftest eet-new-week/refuses-same-week-twice ()
-    (eet-test--with-file "* TODO Boodschappen 2026-W40
+  (ert-deftest eet-new-week/refuses-same-day-twice ()
+    (eet-test--with-file "* TODO Boodschappen 2026-09-28
   - [ ] brood
   "
       (should-error (eet-new-week eet-test--time) :type 'user-error)))
