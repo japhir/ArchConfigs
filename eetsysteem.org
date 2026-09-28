@@ -46,6 +46,10 @@ Run the tests:
   (defun eet-planning-file ()
     "The shopping list and meal planning file."
     (expand-file-name "eetplanning.org" eet-dir))
+
+  (defun eet-recipes-file ()
+    "The recipes file."
+    (expand-file-name "recepten.org" eet-dir))
 #+end_src
 
 * Reading lists
@@ -197,7 +201,8 @@ is a pain.
 
   (defun eet-new-week (&optional time)
     "Start this week's shopping list in the current buffer.
-  Carry the unticked items of every open list over, add the unticked
+  Close the Menu of every open list (see `eet--close-menus'), carry their
+  unticked items over, add the unticked
   staples from Basisvoorraad, then mark the old lists done, archive them
   and untick every staple. TIME defaults to now."
     (interactive)
@@ -207,7 +212,8 @@ is a pain.
       (when (seq-some (lambda (m) (org-with-point-at m (equal (eet--title) title)))
                       old)
         (user-error "%s already exists" title))
-      (let* ((staples (eet--staples))
+      (let* ((cooked (eet--close-menus old))
+             (staples (eet--staples))
              (stores (eet--stores staples))
              (carried (eet--carried old stores))
              (get (lambda (al k) (alist-get k al nil nil #'equal)))
@@ -238,6 +244,7 @@ is a pain.
               (org-archive-subtree))))
         (when-let* ((m (eet--staples-heading)))
           (org-with-point-at m (org-reset-checkbox-state-subtree)))
+        (eet--log-cooked cooked time)
         (widen)
         (goto-char new)
         (re-search-forward (concat "^\\*\\* " eet-leftovers-section "\n") nil t)
@@ -260,19 +267,27 @@ name get theirs from =M-x eet-set-naampje=.
   (defconst eet--naampje-re "\\`[a-z0-9]+\\(?:-[a-z0-9]+\\)*\\'"
     "A valid naampje.")
 
+  (defun eet--plain (s)
+    "S lowercase, without accents, keeping only letters, digits, spaces, hyphens."
+    (replace-regexp-in-string
+     "[^a-z0-9 -]" "" (downcase (ucs-normalize-NFD-string s))))
+
   (defun eet--suggest-naampje (title)
     "Suggested naampje for TITLE: its first word, lowercase, without accents."
-    (let* ((plain (replace-regexp-in-string
-                   "[^a-z0-9 -]" ""
-                   (downcase (ucs-normalize-NFD-string title))))
-           (word (car (split-string plain nil t))))
+    (let ((word (car (split-string (eet--plain title) nil t))))
       (string-trim (or word "") "-+" "-+")))
+
+  (defun eet--recipes-here ()
+    "Alist (ID . TITLE) of the level-1 headings with an ID in this buffer."
+    (seq-keep (lambda (m)
+                (org-with-point-at m
+                  (let ((id (org-entry-get nil "ID")))
+                    (and id (not (string-empty-p id)) (cons id (eet--title))))))
+              (eet--find-level-1 #'always)))
 
   (defun eet--recipe-ids ()
     "IDs of the level-1 headings in the current buffer."
-    (seq-keep (lambda (m) (let ((id (org-entry-get m "ID")))
-                            (and id (not (string-empty-p id)) id)))
-              (eet--find-level-1 #'always)))
+    (mapcar #'car (eet--recipes-here)))
 
   (defun eet--naampje-problem (naampje taken)
     "Why NAAMPJE can't be used given TAKEN ids, or nil when it can."
@@ -295,6 +310,213 @@ name get theirs from =M-x eet-set-naampje=.
             (while (setq problem (eet--naampje-problem naampje taken))
               (setq naampje (read-string (format "Naampje (%s): " problem) naampje)))
             (org-entry-put nil "ID" naampje))))))
+#+end_src
+
+* The Menu
+The Menu links recipes with =id:= links, so the cooking log lands on the
+recipe itself. =M-x eet-add-to-menu= picks a recipe and puts it on this
+week's Menu, above the empty checkbox. Recipes without a naampje can't be
+linked, so they aren't offered.
+
+Recipes are looked up in =recepten.org= only, never through org-id's
+global table: a missing ID there makes org-id rescan every agenda file.
+#+begin_src emacs-lisp
+  (defun eet--recipes-buffer ()
+    "Buffer visiting recepten.org, or nil when there is none."
+    (let ((file (eet-recipes-file)))
+      (and (file-exists-p file) (find-file-noselect file))))
+
+  (defun eet--recipes ()
+    "Alist (ID . TITLE) of the recipes in recepten.org with a naampje.
+  Other IDs (uuids) can't be typed on a phone, so they are left out."
+    (when-let* ((buf (eet--recipes-buffer)))
+      (seq-filter (lambda (r) (string-match-p eet--naampje-re (car r)))
+                  (with-current-buffer buf (eet--recipes-here)))))
+
+  (defun eet--link (recipe)
+    "Org id link to RECIPE, an (ID . TITLE) pair."
+    (format "[[id:%s][%s]]" (car recipe) (cdr recipe)))
+
+  (defun eet--choices (recipes)
+    "Alist (LABEL . RECIPE) for picking one of RECIPES by name or naampje."
+    (mapcar (lambda (r) (cons (format "%s (%s)" (cdr r) (car r)) r)) recipes))
+
+  (defun eet--goto-menu ()
+    "Move to the Menu heading of the list at point, or signal a user error."
+    (let ((child (1+ (org-outline-level)))
+          (end (save-excursion (org-end-of-subtree t t)))
+          found)
+      (while (and (not found) (outline-next-heading) (< (point) end))
+        (setq found (and (= (org-outline-level) child)
+                         (equal (eet--title) eet-menu-section))))
+      (unless found (user-error "No %s section in this list" eet-menu-section))))
+
+  (defun eet-add-to-menu ()
+    "Pick a recipe and add it to the Menu of this week's list.
+  The item goes above the section's empty checkbox, so that stays last."
+    (interactive)
+    (let ((choices (eet--choices (eet--recipes))))
+      (unless choices
+        (user-error "No recipes with a naampje in %s" (eet-recipes-file)))
+      (with-current-buffer (find-file-noselect (eet-planning-file))
+        (let ((list (car (last (eet--open-lists)))))
+          (unless list (user-error "No open shopping list; run eet-new-week"))
+          (let* ((recipe (cdr (assoc (completing-read "Recipe: " choices nil t)
+                                     choices)))
+                 (item (concat "- [ ] " (eet--link recipe) "\n")))
+            (org-with-point-at list
+              (eet--goto-menu)
+              (goto-char (org-entry-end-position))
+              (skip-chars-backward " \t\n")
+              (forward-line 0)
+              (if (looking-at "[ \t]*[-+] \\[ \\][ \t]*$")
+                  (insert item)
+                (forward-line 1)
+                (unless (bolp) (insert "\n"))
+                (insert item "- [ ]\n")))
+            (message "%s is on the %s" (cdr recipe) eet-menu-section))))))
+#+end_src
+
+* Closing the week
+Starting a new week closes the Menu of the old lists first; there is no
+separate close command, because closing twice would log every Kookbeurt
+twice, and new-week archives the list right after, so each list is closed
+exactly once. Per Menu item:
+
+- A ticked item that is plain text, typed on a phone, becomes an =id:=
+  link. A naampje (any case: phone keyboards capitalise) or a full recipe
+  name is a sure match; otherwise the recipes whose name holds all the
+  typed words are offered, or every recipe when none does (a typo), with
+  the option to leave the text as it is.
+- A ticked recipe asks for ★1–5 and a verdict, and gets a LOGBOOK note
+  =Gekookt ★n — verdict= in =recepten.org=, stamped with the planning time
+  (the cooking day isn't known, so derived "last cooked" dates run up to a
+  week late). An empty verdict leaves out the dash. Ticked items left as
+  text are listed in a message, since their Kookbeurt isn't logged.
+- An unticked item asks whether to carry it to next week; if not, the line
+  is removed so it isn't carried. A carried plain item is matched like a
+  ticked one, except that text matching no recipe name (=pizza bij Jan=)
+  stays text without asking.
+
+All questions come first and only then is anything changed, so =C-g=
+halfway leaves both files as they were. The notes are written last, after
+archiving, so a failure halfway never logs a Kookbeurt that a rerun logs
+again. =recepten.org= is saved when it had no unsaved changes before: the
+phones should see the log, and saving the user's own half-done edits is
+not ours to do.
+#+begin_src emacs-lisp
+  (defconst eet--leave-as-text "(leave as text)"
+    "Choice that keeps a Menu item as plain text.")
+
+  (defun eet--menu-items ()
+    "(MARKER DONE TEXT) for each checkbox with text in the list at point's Menu.
+  Like `eet--sections', items under deeper headings count toward the Menu,
+  and items under a done heading are skipped."
+    (save-excursion
+      (let ((child (1+ (org-outline-level)))
+            (end (save-excursion (org-end-of-subtree t t)))
+            in skip acc)
+        (forward-line)
+        (while (< (point) end)
+          (cond ((org-at-heading-p)
+                 (setq skip (org-entry-is-done-p))
+                 (when (= (org-outline-level) child)
+                   (setq in (equal (eet--title) eet-menu-section))))
+                ((or skip (not in)))
+                ((and (looking-at eet--checkbox-re)
+                      (not (string-empty-p (match-string 2))))
+                 (push (list (point-marker) (equal (match-string 1) "X")
+                             (match-string-no-properties 2))
+                       acc)))
+          (forward-line))
+        (nreverse acc))))
+
+  (defun eet--resolve (text recipes cooked)
+    "The recipe in RECIPES that Menu item TEXT names, or nil. May ask.
+  When no recipe name holds all of TEXT's words, ask among all RECIPES if
+  the item was COOKED, or else give up."
+    (let ((n (eet--norm text))
+          (words (split-string (eet--plain text) "[ -]+" t)))
+      (or (seq-find (lambda (r) (equal (eet--norm (car r)) n)) recipes)
+          (seq-find (lambda (r) (equal (eet--norm (cdr r)) n)) recipes)
+          (when-let* ((choices
+                       (eet--choices
+                        (or (seq-filter
+                             (lambda (r)
+                               (let ((hay (eet--plain (concat (cdr r) " " (car r)))))
+                                 (seq-every-p (lambda (w) (string-search w hay)) words)))
+                             recipes)
+                            (and cooked recipes)))))
+            (cdr (assoc (completing-read (format "Which recipe is \"%s\"? " text)
+                                         (cons eet--leave-as-text choices) nil t)
+                        choices))))))
+
+  (defun eet--ask-verdict (name)
+    "Ask for stars and a verdict on NAME; return the cooking note."
+    (let ((stars "")
+          verdict)
+      (while (not (member stars '("1" "2" "3" "4" "5")))
+        (setq stars (completing-read (format "★ for %s (1-5): " name)
+                                     '("1" "2" "3" "4" "5") nil t)))
+      (setq verdict (string-trim (read-string (format "Verdict on %s: " name))))
+      (concat "Gekookt ★" stars
+              (if (string-empty-p verdict) "" (concat " — " verdict)))))
+
+  (defun eet--close-menus (lists)
+    "Close the Menu of each list in LISTS (markers): link, carry or drop.
+  Return the cooking notes to log, as (ID . NOTE) pairs."
+    (let ((recipes (eet--recipes))
+          plan cooked unlogged)
+      (dolist (m lists)
+        (org-with-point-at m
+          (pcase-dolist (`(,pos ,done ,text) (eet--menu-items))
+            (let* ((linked (and (string-match "\\[\\[id:\\([^]]+\\)\\]" text)
+                                (match-string 1 text)))
+                   (drop (and (not done)
+                              (not (y-or-n-p (format "Carry %s over to next week? "
+                                                     text)))))
+                   (recipe (cond (drop nil)
+                                 (linked (assoc linked recipes))
+                                 (t (eet--resolve text recipes done)))))
+              (push (list pos drop (and recipe (not linked) (eet--link recipe)))
+                    plan)
+              (when done
+                (if recipe
+                    (push (cons (car recipe) (eet--ask-verdict (cdr recipe))) cooked)
+                  (push text unlogged)))))))
+      (pcase-dolist (`(,pos ,drop ,link) plan)
+        (org-with-point-at pos
+          (cond (drop (delete-region (point) (line-beginning-position 2)))
+                ((and link (looking-at eet--checkbox-re))
+                 (replace-match link t t nil 2))))
+        (set-marker pos nil))
+      (when unlogged
+        (message "Not logged, no recipe: %s" (string-join (nreverse unlogged) ", ")))
+      (nreverse cooked)))
+
+  (defun eet--log (id note time)
+    "Add NOTE, stamped TIME, to the LOGBOOK of recipe ID in the current buffer."
+    (org-with-wide-buffer
+     (when-let* ((pos (org-find-property "ID" id)))
+       (goto-char pos)
+       (let ((org-log-into-drawer "LOGBOOK"))
+         (goto-char (org-log-beginning t)))
+       (insert (format "- Note taken on %s \\\\\n  %s\n"
+                       (format-time-string (org-time-stamp-format t t) time)
+                       note)))))
+
+  (defun eet--log-cooked (cooked time)
+    "Write COOKED, (ID . NOTE) pairs, into recepten.org, stamped TIME."
+    (when-let* ((cooked)
+                (buf (eet--recipes-buffer)))
+      (with-current-buffer buf
+        (let ((save (not (buffer-modified-p))))
+          (pcase-dolist (`(,id . ,note) cooked)
+            (eet--log id note time))
+          (if save
+              (save-buffer)
+            (message "%s had unsaved changes; save it to share the cooking log"
+                     (buffer-name)))))))
 
   (provide 'eetsysteem)
   ;;; eetsysteem.el ends here
@@ -313,11 +535,13 @@ the resulting text; the real =~/org= is never touched.
   (defconst eet-test--time (encode-time '(0 0 12 28 9 2026))
     "Monday 2026-09-28.")
 
-  (defmacro eet-test--with-file (content &rest body)
-    "Run BODY in an org buffer visiting a temp eetplanning.org with CONTENT."
+  (defmacro eet-test--with-files (files &rest body)
+    "Run BODY in an org buffer visiting the first of FILES in a temp `eet-dir'.
+  FILES is an alist (NAME . CONTENT)."
     (declare (indent 1))
-    `(let* ((dir (make-temp-file "eet-" t))
-            (file (expand-file-name "eetplanning.org" dir))
+    `(let* ((files ,files)
+            (dir (file-name-as-directory (make-temp-file "eet-" t)))
+            (eet-dir dir)
             (system-time-locale "C")
             (org-archive-location "%s_archive::")
             (org-todo-keywords '((sequence "TODO" "|" "DONE")))
@@ -325,17 +549,49 @@ the resulting text; the real =~/org= is never touched.
             (org-archive-save-context-info nil))
        (unwind-protect
            (progn
-             (with-temp-file file (insert ,content))
-             (with-current-buffer (find-file-noselect file)
-               (unwind-protect (progn ,@body)
-                 (set-buffer-modified-p nil)
-                 (kill-buffer))))
+             (pcase-dolist (`(,name . ,content) files)
+               (with-temp-file (expand-file-name name dir) (insert content)))
+             (with-current-buffer
+                 (find-file-noselect (expand-file-name (caar files) dir))
+               ,@body))
          (dolist (b (buffer-list))
            (when (and (buffer-file-name b)
                       (string-prefix-p dir (buffer-file-name b)))
              (with-current-buffer b (set-buffer-modified-p nil))
              (kill-buffer b)))
          (delete-directory dir t))))
+
+  (defmacro eet-test--with-file (content &rest body)
+    "Run BODY in an org buffer visiting a temp eetplanning.org with CONTENT."
+    (declare (indent 1))
+    `(eet-test--with-files (list (cons "eetplanning.org" ,content)) ,@body))
+
+  (defun eet-test--file-text (name)
+    "Text of file NAME in `eet-dir', from its buffer when one visits it."
+    (let ((f (expand-file-name name eet-dir)))
+      (if-let* ((b (find-buffer-visiting f)))
+          (with-current-buffer b (eet-test--text))
+        (with-temp-buffer (insert-file-contents f) (eet-test--text)))))
+
+  (defmacro eet-test--answering (answers &rest body)
+    "Run BODY with the prompt functions returning ANSWERS in turn.
+  ANSWERS is an alist (FUNCTION . QUEUE) for `y-or-n-p', `completing-read'
+  and `read-string'; a prompt with an empty queue fails the test."
+    (declare (indent 1))
+    `(let ((queues (copy-tree ,answers)))
+       (cl-flet ((answer (fn prompt)
+                   (let ((q (assq fn queues)))
+                     (unless (cdr q) (error "Unexpected %s: %s" fn prompt))
+                     (pop (cdr q)))))
+         (cl-letf (((symbol-function 'y-or-n-p)
+                    (lambda (prompt) (answer 'y-or-n-p prompt)))
+                   ((symbol-function 'completing-read)
+                    (lambda (prompt &rest _) (answer 'completing-read prompt)))
+                   ((symbol-function 'read-string)
+                    (lambda (prompt &rest _) (answer 'read-string prompt))))
+           ,@body
+           (pcase-dolist (`(,fn . ,q) queues)
+             (should (equal (list fn q) (list fn nil))))))))
 
   (defun eet-test--text ()
     (buffer-substring-no-properties (point-min) (point-max)))
@@ -391,7 +647,8 @@ the resulting text; the real =~/org= is never touched.
   - [ ] paprika
   - [ ]
   "
-      (eet-new-week eet-test--time)
+      (eet-test--answering '((y-or-n-p t))
+        (eet-new-week eet-test--time))
       (should (equal (eet-test--text) "* Basisvoorraad
   ** Lidl/Hira
   - [ ] brood
@@ -412,11 +669,8 @@ the resulting text; the real =~/org= is never touched.
   ** LOOS
   - [ ]
   "))
-      (let ((archive (concat file "_archive")))
-        (should (file-exists-p archive))
-        (with-temp-buffer
-          (insert-file-contents archive)
-          (should (string-match-p "^\\* DONE Boodschappen 2026-09-21" (eet-test--text)))))))
+      (should (string-match-p "^\\* DONE Boodschappen 2026-09-21"
+                              (eet-test--file-text "eetplanning.org_archive")))))
 
   (ert-deftest eet-new-week/old-style-lists-go-to-named-store ()
     (eet-test--with-file "* Boodschappen LOOS
@@ -453,6 +707,128 @@ the resulting text; the real =~/org= is never touched.
   - [ ] brood
   "
       (should-error (eet-new-week eet-test--time) :type 'user-error)))
+
+  (defconst eet-test--recipes "* Pompoen-kikkererwtencurry met zilvervliesrijst :herfst:
+  :PROPERTIES:
+  :ID:       pompoencurry
+  :END:
+  * Linzensoep
+  :PROPERTIES:
+  :ID:       linzensoep
+  :END:
+  :LOGBOOK:
+  - Note taken on [2026-09-01 Tue 19:00] \\\\
+    Gekookt ★3 — te flauw
+  :END:
+  * Idee zonder naampje
+  "
+    "recepten.org fixture.")
+
+  (ert-deftest eet-add-to-menu/links-picked-recipe-above-empty-box ()
+    (eet-test--with-files `(("eetplanning.org" . "* DONE Boodschappen 2026-09-21
+  ** Menu
+  - [ ]
+  * TODO Boodschappen 2026-09-28
+  ** Nog in huis
+  ** Menu
+  - [ ] linzensoep
+  - [ ]
+  ** Lidl/Hira
+  - [ ]
+  ")
+                            ("recepten.org" . ,eet-test--recipes))
+      (eet-test--answering
+          '((completing-read
+             "Pompoen-kikkererwtencurry met zilvervliesrijst (pompoencurry)"))
+        (eet-add-to-menu))
+      (should (equal (eet-test--text) "* DONE Boodschappen 2026-09-21
+  ** Menu
+  - [ ]
+  * TODO Boodschappen 2026-09-28
+  ** Nog in huis
+  ** Menu
+  - [ ] linzensoep
+  - [ ] [[id:pompoencurry][Pompoen-kikkererwtencurry met zilvervliesrijst]]
+  - [ ]
+  ** Lidl/Hira
+  - [ ]
+  "))))
+
+  (ert-deftest eet-new-week/closes-the-menu ()
+    (eet-test--with-files `(("eetplanning.org" . "* TODO Boodschappen 2026-09-21
+  ** Menu
+  - [X] [[id:linzensoep][Linzensoep]]
+  - [X] Pompoencurry
+  - [ ] kikkererwten curry
+  - [ ] linzen
+  - [ ] pizza
+  - [X] stamppot
+  - [ ]
+  ")
+                            ("recepten.org" . ,eet-test--recipes))
+      (eet-test--answering
+          '((completing-read
+             "4" "5"
+             "Pompoen-kikkererwtencurry met zilvervliesrijst (pompoencurry)"
+             "(leave as text)")
+            (read-string "lekker, meer knoflook" "")
+            (y-or-n-p t nil nil))
+        (eet-new-week eet-test--time))
+      (should (equal (eet-test--text) "* TODO Boodschappen 2026-09-28
+  :PROPERTIES:
+  :CREATED:  [2026-09-28 Mon 12:00]
+  :END:
+  ** Nog in huis
+  ** Menu
+  - [ ] [[id:pompoencurry][Pompoen-kikkererwtencurry met zilvervliesrijst]]
+  - [ ]
+  ** Lidl/Hira
+  - [ ]
+  ** Picnic
+  - [ ]
+  ** LOOS
+  - [ ]
+  "))
+      (should (equal (eet-test--file-text "recepten.org")
+                     "* Pompoen-kikkererwtencurry met zilvervliesrijst :herfst:
+  :PROPERTIES:
+  :ID:       pompoencurry
+  :END:
+  :LOGBOOK:
+  - Note taken on [2026-09-28 Mon 12:00] \\\\
+    Gekookt ★5
+  :END:
+  * Linzensoep
+  :PROPERTIES:
+  :ID:       linzensoep
+  :END:
+  :LOGBOOK:
+  - Note taken on [2026-09-28 Mon 12:00] \\\\
+    Gekookt ★4 — lekker, meer knoflook
+  - Note taken on [2026-09-01 Tue 19:00] \\\\
+    Gekookt ★3 — te flauw
+  :END:
+  * Idee zonder naampje
+  "))
+      (let ((archive (eet-test--file-text "eetplanning.org_archive")))
+        (should (string-search "- [X] [[id:pompoencurry][Pompoen-kikkererwtencurry met zilvervliesrijst]]\n- [ ] [[id:pompoencurry]" archive))
+        (should (string-search "- [X] stamppot" archive))
+        (should-not (string-search "pizza" archive)))))
+
+  (ert-deftest eet-add-to-menu/keeps-an-empty-box-last ()
+    (eet-test--with-files `(("eetplanning.org" . "* TODO Boodschappen 2026-09-28
+  ** Menu
+  ** LOOS
+  ")
+                            ("recepten.org" . ,eet-test--recipes))
+      (eet-test--answering '((completing-read "Linzensoep (linzensoep)"))
+        (eet-add-to-menu))
+      (should (equal (eet-test--text) "* TODO Boodschappen 2026-09-28
+  ** Menu
+  - [ ] [[id:linzensoep][Linzensoep]]
+  - [ ]
+  ** LOOS
+  "))))
 
   (defmacro eet-test--with-answers (answers &rest body)
     "Run BODY with `read-string' returning ANSWERS in turn.
