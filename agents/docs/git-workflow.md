@@ -16,9 +16,6 @@ Skip any branch whose worktree shows `locked` in `git worktree list` — another
 - **Stage explicit paths** (`git add <files I changed>`). Another agent may be committing in the same tree; a "file modified by user or linter" notice on a file you didn't touch is the tell. Check `git branch --show-current` before each commit.
 - **Background jobs**: start it, then do unrelated work until the harness's completion notification arrives. Read output on notification or when genuinely blocked.
 
-## `gh` output latency
-`gh issue/pr view --comments` etc. can take ~1s before printing, longer piped through `| grep`/`| head`. Wait for it to return before judging the command.
-
 ## Subagent contract (pin it in every spawn prompt)
 > Commit on your worktree branch. The orchestrator merges, closes the issue, and pushes. Your blocker landed in **local** main and your worktree base includes it; verify against local, not origin.
 
