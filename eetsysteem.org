@@ -392,8 +392,8 @@ global table: a missing ID there makes org-id rescan every agenda file.
 #+end_src
 
 * Recipe to shopping list
-=M-x eet-add-ingredients= with point in a recipe puts its Benodigdheden on
-this week's list, each above the empty checkbox of its Winkel, as written:
+=M-x eet-add-ingredients= with point in a recipe, or on an =id:= link to
+one (a Menu line), puts its Benodigdheden on this week's list, each above the empty checkbox of its Winkel, as written:
 the quantity helps in the shop. The Winkel is where the item last sat:
 Basisvoorraad first, since it is kept up to date, then the archived lists,
 newest first. An item we never bought goes to the first store (Lidl/Hira).
@@ -447,6 +447,23 @@ Nothing changes before every item has a section to go to, and
             (forward-line)))
         (cons title (nreverse acc)))))
 
+  (defun eet--link-id-at-point ()
+    "The ID an id: link at point points to, or nil."
+    (let ((link (org-element-context)))
+      (and (eq (org-element-type link) 'link)
+           (equal (org-element-property :type link) "id")
+           (org-element-property :path link))))
+
+  (defun eet--recipe-ingredients (id)
+    "`eet--ingredients' of recipe ID in recepten.org, or signal a user error."
+    (or (when-let* ((buf (eet--recipes-buffer)))
+          (with-current-buffer buf
+            (org-with-wide-buffer
+             (when-let* ((pos (org-find-property "ID" id)))
+               (goto-char pos)
+               (eet--ingredients)))))
+        (user-error "No recipe %s in %s" id (eet-recipes-file))))
+
   (defun eet--seen-in (markers stores)
     "(NAME . STORE) for each item under MARKERS (lists or Basisvoorraad).
   NAME is an `eet--item-name'. Menu and Nog in huis are no stores; old
@@ -483,9 +500,13 @@ Nothing changes before every item has a section to go to, and
             stores))))))
 
   (defun eet-add-ingredients ()
-    "Put the ingredients of the recipe at point on this week's list."
+    "Put the ingredients of the recipe at point, or linked at point, on
+  this week's list."
     (interactive)
-    (pcase-let ((`(,title . ,items) (eet--ingredients)))
+    (pcase-let ((`(,title . ,items)
+                 (if-let* ((id (eet--link-id-at-point)))
+                     (eet--recipe-ingredients id)
+                   (eet--ingredients))))
       (unless items (user-error "No ingredients under %s" eet-ingredients-section))
       (with-current-buffer (find-file-noselect (eet-planning-file))
         (let* ((list (eet--this-week))
@@ -1166,6 +1187,46 @@ the resulting text; the real =~/org= is never touched.
   - [ ] 1 ui
   - [ ]
   "))))
+
+  (ert-deftest eet-add-ingredients/from-a-recipe-link ()
+    (eet-test--with-files `(("eetplanning.org" . "* TODO Boodschappen 2026-09-28
+  ** Menu
+  - [ ] [[id:pompoencurry][Pompoencurry]]
+  - [ ]
+  ** Lidl/Hira
+  - [ ]
+  ")
+                            ("recepten.org" . ,eet-test--curry))
+      (search-forward "id:pompoen")
+      (eet-add-ingredients)
+      (should (equal (eet-test--text) "* TODO Boodschappen 2026-09-28
+  ** Menu
+  - [ ] [[id:pompoencurry][Pompoencurry]]
+  - [ ]
+  ** Lidl/Hira
+  - [ ] 800 g pompoen (flespompoen of hokkaido), in blokjes
+  - [ ] 2 uien, gesnipperd
+  - [ ] 1 limoen
+  - [ ] 400 ml kokosmelk (light)
+  - [ ] 3 teentjes knoflook
+  - [ ] 1 bosje koriander
+  - [ ]
+  "))))
+
+  (ert-deftest eet-add-ingredients/refuses-a-link-to-no-recipe ()
+    (let ((list "* TODO Boodschappen 2026-09-28
+  ** Menu
+  - [ ] [[id:onbekend][Onbekend]]
+  ** Lidl/Hira
+  - [ ]
+  "))
+      (eet-test--with-files `(("eetplanning.org" . ,list)
+                              ("recepten.org" . ,eet-test--curry))
+        (search-forward "id:onb")
+        (should (string-prefix-p
+                 "No recipe onbekend"
+                 (cadr (should-error (eet-add-ingredients) :type 'user-error))))
+        (should (equal (eet-test--text) list)))))
 
   (ert-deftest eet-add-ingredients/refuses-without-benodigdheden ()
     (eet-test--with-files '(("recepten.org" . "* Idee zonder naampje
