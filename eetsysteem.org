@@ -391,6 +391,8 @@ global table: a missing ID there makes org-id rescan every agenda file.
         (let ((list (eet--this-week))
               (recipe (cdr (assoc (completing-read "Recipe: " choices nil t)
                                   choices))))
+          ;; RET on empty input passes require-match
+          (unless recipe (user-error "No recipe picked"))
           (org-with-point-at list
             (eet--goto-section eet-menu-section)
             (eet--insert-item (eet--link recipe)))
@@ -989,6 +991,18 @@ the resulting text; the real =~/org= is never touched.
   - [ ]
   ** LOOS
   "))))
+
+  (ert-deftest eet-add-to-menu/refuses-an-empty-pick ()
+    (let ((list "* TODO Boodschappen 2026-09-28
+  ** Menu
+  - [ ]
+  "))
+      (eet-test--with-files `(("eetplanning.org" . ,list)
+                              ("recepten.org" . ,eet-test--recipes))
+        ;; RET on empty input passes require-match
+        (eet-test--answering '((completing-read ""))
+          (should-error (eet-add-to-menu) :type 'user-error))
+        (should (equal (eet-test--text) list)))))
 
   (defmacro eet-test--with-answers (answers &rest body)
     "Run BODY with `read-string' returning ANSWERS in turn.
