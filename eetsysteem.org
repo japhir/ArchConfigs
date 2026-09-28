@@ -322,10 +322,13 @@ linked, so they aren't offered.
 Recipes are looked up in =recepten.org= only, never through org-id's
 global table: a missing ID there makes org-id rescan every agenda file.
 #+begin_src emacs-lisp
+  (defun eet--existing-buffer (file)
+    "Buffer visiting FILE, or nil when FILE doesn't exist."
+    (and (file-exists-p file) (find-file-noselect file)))
+
   (defun eet--recipes-buffer ()
     "Buffer visiting recepten.org, or nil when there is none."
-    (let ((file (eet-recipes-file)))
-      (and (file-exists-p file) (find-file-noselect file))))
+    (eet--existing-buffer (eet-recipes-file)))
 
   (defun eet--recipes ()
     "Alist (ID . TITLE) of the recipes in recepten.org with a naampje.
@@ -342,40 +345,179 @@ global table: a missing ID there makes org-id rescan every agenda file.
     "Alist (LABEL . RECIPE) for picking one of RECIPES by name or naampje."
     (mapcar (lambda (r) (cons (format "%s (%s)" (cdr r) (car r)) r)) recipes))
 
-  (defun eet--goto-menu ()
-    "Move to the Menu heading of the list at point, or signal a user error."
+  (defun eet--goto-section (name)
+    "Move to the child heading NAME of the heading at point, or signal a
+  user error."
     (let ((child (1+ (org-outline-level)))
+          (parent (eet--title))
           (end (save-excursion (org-end-of-subtree t t)))
           found)
       (while (and (not found) (outline-next-heading) (< (point) end))
         (setq found (and (= (org-outline-level) child)
-                         (equal (eet--title) eet-menu-section))))
-      (unless found (user-error "No %s section in this list" eet-menu-section))))
+                         (equal (eet--title) name))))
+      (unless found (user-error "No %s section under %s" name parent))))
+
+  (defun eet--insert-item (text)
+    "Add checkbox TEXT to the section at point, above its empty checkbox.
+  A section without one gets one, so it stays last."
+    (let ((item (concat "- [ ] " text "\n")))
+      (goto-char (org-entry-end-position))
+      (skip-chars-backward " \t\n")
+      (forward-line 0)
+      (if (looking-at "[ \t]*[-+] \\[ \\][ \t]*$")
+          (insert item)
+        (forward-line 1)
+        (unless (bolp) (insert "\n"))
+        (insert item "- [ ]\n"))))
+
+  (defun eet--this-week ()
+    "Marker of this week's list, the last open one, or signal a user error."
+    (or (car (last (eet--open-lists)))
+        (user-error "No open shopping list; run eet-new-week")))
 
   (defun eet-add-to-menu ()
-    "Pick a recipe and add it to the Menu of this week's list.
-  The item goes above the section's empty checkbox, so that stays last."
+    "Pick a recipe and add it to the Menu of this week's list."
     (interactive)
     (let ((choices (eet--choices (eet--recipes))))
       (unless choices
         (user-error "No recipes with a naampje in %s" (eet-recipes-file)))
       (with-current-buffer (find-file-noselect (eet-planning-file))
-        (let ((list (car (last (eet--open-lists)))))
-          (unless list (user-error "No open shopping list; run eet-new-week"))
-          (let* ((recipe (cdr (assoc (completing-read "Recipe: " choices nil t)
-                                     choices)))
-                 (item (concat "- [ ] " (eet--link recipe) "\n")))
+        (let ((list (eet--this-week))
+              (recipe (cdr (assoc (completing-read "Recipe: " choices nil t)
+                                  choices))))
+          (org-with-point-at list
+            (eet--goto-section eet-menu-section)
+            (eet--insert-item (eet--link recipe)))
+          (message "%s is on the %s" (cdr recipe) eet-menu-section)))))
+#+end_src
+
+* Recipe to shopping list
+=M-x eet-add-ingredients= with point in a recipe puts its Benodigdheden on
+this week's list, each above the empty checkbox of its Winkel, as written:
+the quantity helps in the shop. The Winkel is where the item last sat:
+Basisvoorraad first, since it is kept up to date, then the archived lists,
+newest first. An item we never bought goes to the first store (Lidl/Hira).
+Items are compared by name: without the leading quantity and unit, the
+notes in brackets and anything after a comma, so =2 uien, gesnipperd=
+matches =uien=. An item still unticked in a Winkel of this week's list is
+skipped, so a staple the new week pre-filled isn't listed twice; the
+quantity is ours to fix by hand. So is an item the recipe names twice.
+
+Nothing changes before every item has a section to go to, and
+=eetplanning.org= isn't saved, just like =eet-add-to-menu=.
+#+begin_src emacs-lisp
+  (defconst eet-ingredients-section "Benodigdheden"
+    "Recipe section with the ingredients, one plain list item each.")
+
+  (defcustom eet-units
+    '("g" "gr" "gram" "kg" "ml" "cl" "dl" "l" "liter" "el" "tl" "eetlepel"
+      "eetlepels" "theelepel" "theelepels" "cm" "blik" "blikken" "blikje"
+      "blikjes" "pot" "potje" "potjes" "pak" "pakje" "pakjes" "zak" "zakje"
+      "zakjes" "bos" "bosje" "bosjes" "teen" "teentje" "teentjes" "tenen"
+      "stuk" "stuks" "snuf" "snufje" "plak" "plakken" "takje" "takjes"
+      "handje" "handvol" "scheut" "scheutje")
+    "Units that may follow the leading number of an ingredient."
+    :type '(repeat string))
+
+  (defconst eet--list-item-re
+    "^[ \t]*[-+][ \t]+\\(?:\\[[ X-]\\]\\)?[ \t]*\\(.*[^ \t]\\)?[ \t]*$"
+    "A plain list item, box or not; group 1 is the text, nil when empty.")
+
+  (defun eet--item-name (text)
+    "Name of item TEXT for matching: without the leading quantity and unit,
+  bracketed notes and anything after a comma, then `eet--norm'."
+    (let* ((qty (concat "\\`[[:space:]]*[0-9½¼¾⅓⅔][0-9½¼¾⅓⅔.,/–-]*"
+                        "\\(?:[[:space:]]*" (regexp-opt eet-units) "\\>\\)?"))
+           (s (replace-regexp-in-string qty "" (downcase text)))
+           (s (replace-regexp-in-string "([^)]*)" "" s)))
+      (eet--norm (car (split-string s ",")))))
+
+  (defun eet--ingredients ()
+    "(TITLE . ITEMS) of the recipe at point: its title and ingredient texts."
+    (save-excursion
+      (org-back-to-heading t)
+      (while (org-up-heading-safe))
+      (let ((title (eet--title))
+            acc)
+        (eet--goto-section eet-ingredients-section)
+        (let ((end (save-excursion (org-end-of-subtree t t))))
+          (while (< (point) end)
+            (when (and (looking-at eet--list-item-re) (match-string 1))
+              (push (match-string-no-properties 1) acc))
+            (forward-line)))
+        (cons title (nreverse acc)))))
+
+  (defun eet--seen-in (markers stores)
+    "(NAME . STORE) for each item under MARKERS (lists or Basisvoorraad).
+  NAME is an `eet--item-name'. Menu and Nog in huis are no stores; old
+  items without a section sit in the store the list title names, if any."
+    (let (acc)
+      (dolist (m markers (nreverse acc))
+        (org-with-point-at m
+          (let ((title (eet--title)))
+            (pcase-dolist (`(,sec . ,items) (eet--sections))
+              (when-let* (((not (member sec (list eet-menu-section
+                                                  eet-leftovers-section))))
+                          (store (or (eet--store-for sec stores)
+                                     (eet--store-for title stores))))
+                (dolist (it items)
+                  (push (cons (eet--item-name (cdr it)) store) acc)))))))))
+
+  (defun eet--last-winkels (list stores)
+    "Alist (NAME . STORE) of where items last sat, the most recent first.
+  LIST is this week's list; its archive file holds the older ones."
+    (let ((archive (org-with-point-at list
+                     ;; internal, but it is what org-archive-subtree uses
+                     (car (org-archive--compute-location
+                           (or (org-entry-get nil "ARCHIVE" 'inherit)
+                               org-archive-location))))))
+      (append
+       (eet--seen-in (ensure-list (eet--staples-heading)) stores)
+       (when-let* ((buf (eet--existing-buffer archive)))
+         (with-current-buffer buf
+           ;; no auto-mode for .org_archive; org-archive does the same
+           (unless (derived-mode-p 'org-mode) (org-mode))
+           (eet--seen-in
+            (reverse (eet--find-level-1
+                      (lambda () (string-prefix-p eet-list-prefix (eet--title)))))
+            stores))))))
+
+  (defun eet-add-ingredients ()
+    "Put the ingredients of the recipe at point on this week's list."
+    (interactive)
+    (pcase-let ((`(,title . ,items) (eet--ingredients)))
+      (unless items (user-error "No ingredients under %s" eet-ingredients-section))
+      (with-current-buffer (find-file-noselect (eet-planning-file))
+        (let* ((list (eet--this-week))
+               (stores (eet--stores (eet--staples)))
+               (seen (eet--last-winkels list stores))
+               (list-title (org-with-point-at list (eet--title)))
+               (sections (org-with-point-at list (eet--sections)))
+               (open (mapcan (pcase-lambda (`(,sec . ,its))
+                               (unless (member sec (list eet-menu-section
+                                                         eet-leftovers-section))
+                                 (mapcar (lambda (it) (eet--item-name (cdr it)))
+                                         (seq-remove #'car its))))
+                             sections))
+               plan skipped)
+          (dolist (it items)
+            (let ((name (eet--item-name it)))
+              (if (member name open)
+                  (push it skipped)
+                (push name open)
+                (push (cons (or (cdr (assoc name seen)) (car stores)) it) plan))))
+          (dolist (p plan)
+            (unless (assoc (car p) sections)
+              (user-error "No %s section in %s" (car p) list-title)))
+          (dolist (p (nreverse plan))
             (org-with-point-at list
-              (eet--goto-menu)
-              (goto-char (org-entry-end-position))
-              (skip-chars-backward " \t\n")
-              (forward-line 0)
-              (if (looking-at "[ \t]*[-+] \\[ \\][ \t]*$")
-                  (insert item)
-                (forward-line 1)
-                (unless (bolp) (insert "\n"))
-                (insert item "- [ ]\n")))
-            (message "%s is on the %s" (cdr recipe) eet-menu-section))))))
+              (eet--goto-section (car p))
+              (eet--insert-item (cdr p))))
+          (message "%d ingredients of %s on the list%s" (length plan) title
+                   (if skipped
+                       (concat "; already there: "
+                               (string-join (nreverse skipped) "; "))
+                     ""))))))
 #+end_src
 
 * Closing the week
@@ -901,6 +1043,144 @@ the resulting text; the real =~/org= is never touched.
       (eet-test--with-answers '()
         (eet-set-naampje))
       (should (null eet-test--defaults))))
+
+  (defconst eet-test--curry "* Pompoencurry
+  :PROPERTIES:
+  :ID:       pompoencurry
+  :END:
+  ** Benodigdheden
+  - 800 g pompoen (flespompoen of hokkaido), in blokjes
+  - 2 uien, gesnipperd
+  - 1 limoen
+  - 400 ml kokosmelk (light)
+  - 3 teentjes knoflook
+  - 1 bosje koriander
+  ** Gereedschap
+  - blender
+  ** Instructies
+  1. Koken.
+  "
+    "recepten.org fixture with ingredients.")
+
+  (ert-deftest eet-add-ingredients/each-to-the-winkel-it-last-sat-in ()
+    (eet-test--with-files `(("recepten.org" . ,eet-test--curry)
+                            ("eetplanning.org" . "* Basisvoorraad
+  ** Lidl/Hira
+  - [ ] uien
+  ** Picnic
+  - [X] knoflook
+  * TODO Boodschappen 2026-09-28
+  ** Nog in huis
+  ** Menu
+  - [ ]
+  ** Lidl/Hira
+  - [ ] brood
+  - [ ]
+  ** Picnic
+  - [ ]
+  ** LOOS
+  - [ ]
+  ")
+                            ("eetplanning.org_archive" . "* DONE Boodschappen LOOS
+  - [ ] koriander
+  - [X] pompoen
+  * DONE Boodschappen 2026-09-14
+  ** Picnic
+  - [X] Kokosmelk
+  ** LOOS
+  - [X] knoflook
+  * DONE Boodschappen 2026-09-21
+  ** Menu
+  - [X] limoen
+  ** Picnic
+  - [X] 1 pompoen
+  "))
+      (search-forward "Koken")
+      (eet-add-ingredients)
+      (should (equal (eet-test--file-text "eetplanning.org") "* Basisvoorraad
+  ** Lidl/Hira
+  - [ ] uien
+  ** Picnic
+  - [X] knoflook
+  * TODO Boodschappen 2026-09-28
+  ** Nog in huis
+  ** Menu
+  - [ ]
+  ** Lidl/Hira
+  - [ ] brood
+  - [ ] 2 uien, gesnipperd
+  - [ ] 1 limoen
+  - [ ]
+  ** Picnic
+  - [ ] 800 g pompoen (flespompoen of hokkaido), in blokjes
+  - [ ] 400 ml kokosmelk (light)
+  - [ ] 3 teentjes knoflook
+  - [ ]
+  ** LOOS
+  - [ ] 1 bosje koriander
+  - [ ]
+  "))))
+
+  (ert-deftest eet-add-ingredients/skips-what-is-still-on-the-list ()
+    (eet-test--with-files `(("recepten.org" . ,eet-test--curry)
+                            ("eetplanning.org" . "* TODO Boodschappen 2026-09-28
+  ** Lidl/Hira
+  - [ ] Uien
+  - [X] limoen
+  - [ ] pompoen
+  - [ ] kokosmelk
+  - [ ] knoflook
+  - [ ] koriander
+  "))
+      (eet-add-ingredients)
+      (should (equal (eet-test--file-text "eetplanning.org") "* TODO Boodschappen 2026-09-28
+  ** Lidl/Hira
+  - [ ] Uien
+  - [X] limoen
+  - [ ] pompoen
+  - [ ] kokosmelk
+  - [ ] knoflook
+  - [ ] koriander
+  - [ ] 1 limoen
+  - [ ]
+  "))))
+
+  (ert-deftest eet-add-ingredients/lists-a-repeated-item-once ()
+    (eet-test--with-files '(("recepten.org" . "* Linzensoep
+  ** Benodigdheden
+  - 1 ui
+  - 1 ui, voor erbovenop
+  ")
+                            ("eetplanning.org" . "* TODO Boodschappen 2026-09-28
+  ** Menu
+  - [ ] ui
+  ** Lidl/Hira
+  - [ ]
+  "))
+      (eet-add-ingredients)
+      (should (equal (eet-test--file-text "eetplanning.org")
+                     "* TODO Boodschappen 2026-09-28
+  ** Menu
+  - [ ] ui
+  ** Lidl/Hira
+  - [ ] 1 ui
+  - [ ]
+  "))))
+
+  (ert-deftest eet-add-ingredients/refuses-without-benodigdheden ()
+    (eet-test--with-files '(("recepten.org" . "* Idee zonder naampje
+  ** Instructies
+  ")
+                            ("eetplanning.org" . "* TODO Boodschappen 2026-09-28
+  ** Lidl/Hira
+  - [ ]
+  "))
+      (should-error (eet-add-ingredients) :type 'user-error)
+      (should (equal (eet-test--file-text "eetplanning.org")
+                     "* TODO Boodschappen 2026-09-28
+  ** Lidl/Hira
+  - [ ]
+  "))))
 
   ;;; eetsysteem-tests.el ends here
 #+end_src

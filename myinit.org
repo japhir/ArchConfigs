@@ -1114,6 +1114,8 @@ is =R= above.
   (org-babel-load-file
    (expand-file-name "eetsysteem.org"
                      (file-name-directory (file-truename "~/.emacs.d/myinit.org"))))
+  ;; C-c e: eetsysteem; b puts the recipe at point on the boodschappenlijst
+  (define-key org-mode-map (kbd "C-c e b") #'eet-add-ingredients)
 #+end_src
 *** effort estimates
 #+begin_src emacs-lisp
