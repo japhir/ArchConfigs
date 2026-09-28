@@ -16,7 +16,7 @@ Legacy configs retained but not active: Hyprland, Sway, Waybar, AShell, Polybar,
 
 - `master` — the laptop (current active branch; intended to be renamed to `main`).
 - `desktop` — old gaming desktop, dead since ~2024. Stale, kept for reference only.
-- `macos` — quick-and-dirty patches for a work laptop running macOS. Exists only locally on that machine, never pushed (it's a mess). Not reconciled with `master`.
+- `macos` — mac-only patches for a work laptop running macOS (AeroSpace, LaunchAgents, pi sandbox, …). Pushed to `origin/macos`; kept rebased on top of `master`. Generic changes (agents, emacs, bin) go to `master` first.
 
 ## Emacs configuration
 
