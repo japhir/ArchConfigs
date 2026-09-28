@@ -390,10 +390,12 @@ exactly once. Per Menu item:
   typed words are offered, or every recipe when none does (a typo), with
   the option to leave the text as it is.
 - A ticked recipe asks for ★1–5 and a verdict, and gets a LOGBOOK note
-  =Gekookt ★n — verdict= in =recepten.org=, stamped with the planning time
+  =Gekookt ★n. verdict= in =recepten.org=, stamped with the planning time
   (the cooking day isn't known, so derived "last cooked" dates run up to a
-  week late). An empty verdict leaves out the dash. Ticked items left as
-  text are listed in a message, since their Kookbeurt isn't logged.
+  week late). The period is always there, even without a verdict, so notes
+  can be added after it by hand; unlike a dash it is easy to type. Ticked
+  items left as text are listed in a message, since their Kookbeurt isn't
+  logged.
 - An unticked item asks whether to carry it to next week; if not, the line
   is removed so it isn't carried. A carried plain item is matched like a
   ticked one, except that text matching no recipe name (=pizza bij Jan=)
@@ -460,8 +462,8 @@ not ours to do.
         (setq stars (completing-read (format "★ for %s (1-5): " name)
                                      '("1" "2" "3" "4" "5") nil t)))
       (setq verdict (string-trim (read-string (format "Verdict on %s: " name))))
-      (concat "Gekookt ★" stars
-              (if (string-empty-p verdict) "" (concat " — " verdict)))))
+      (concat "Gekookt ★" stars "."
+              (if (string-empty-p verdict) "" (concat " " verdict)))))
 
   (defun eet--close-menus (lists)
     "Close the Menu of each list in LISTS (markers): link, carry or drop.
@@ -719,7 +721,7 @@ the resulting text; the real =~/org= is never touched.
   :END:
   :LOGBOOK:
   - Note taken on [2026-09-01 Tue 19:00] \\\\
-    Gekookt ★3 — te flauw
+    Gekookt ★3. te flauw
   :END:
   * Idee zonder naampje
   "
@@ -797,7 +799,7 @@ the resulting text; the real =~/org= is never touched.
   :END:
   :LOGBOOK:
   - Note taken on [2026-09-28 Mon 12:00] \\\\
-    Gekookt ★5
+    Gekookt ★5.
   :END:
   * Linzensoep
   :PROPERTIES:
@@ -805,9 +807,9 @@ the resulting text; the real =~/org= is never touched.
   :END:
   :LOGBOOK:
   - Note taken on [2026-09-28 Mon 12:00] \\\\
-    Gekookt ★4 — lekker, meer knoflook
+    Gekookt ★4. lekker, meer knoflook
   - Note taken on [2026-09-01 Tue 19:00] \\\\
-    Gekookt ★3 — te flauw
+    Gekookt ★3. te flauw
   :END:
   * Idee zonder naampje
   "))
