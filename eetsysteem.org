@@ -271,7 +271,16 @@ org-id rescan every file.
   (require 'org-id)
 
   (defconst eet--naampje-re "\\`[a-z0-9]+\\(?:-[a-z0-9]+\\)*\\'"
-    "A valid naampje.")
+    "Shape of a naampje; `eet--naampje-p' also rules out uuids.")
+
+  (defconst eet--uuid-re
+    "\\`[0-9a-f]\\{8\\}\\(?:-[0-9a-f]\\{4\\}\\)\\{3\\}-[0-9a-f]\\{12\\}\\'"
+    "An org-id uuid, which also has the shape of a naampje.")
+
+  (defun eet--naampje-p (id)
+    "Whether ID is a naampje, not a uuid."
+    (and (string-match-p eet--naampje-re id)
+         (not (string-match-p eet--uuid-re id))))
 
   (defun eet--plain (s)
     "S lowercase, without accents, keeping only letters, digits, spaces, hyphens."
@@ -297,7 +306,7 @@ org-id rescan every file.
 
   (defun eet--naampje-problem (naampje taken)
     "Why NAAMPJE can't be used given TAKEN ids, or nil when it can."
-    (cond ((not (string-match-p eet--naampje-re naampje))
+    (cond ((not (eet--naampje-p naampje))
            "lowercase letters, digits and single hyphens only")
           ((member naampje taken) "already used by another recipe")))
 
@@ -342,7 +351,7 @@ global table: a missing ID there makes org-id rescan every agenda file.
     "Alist (ID . TITLE) of the recipes in recepten.org with a naampje.
   Other IDs (uuids) can't be typed on a phone, so they are left out."
     (when-let* ((buf (eet--recipes-buffer)))
-      (seq-filter (lambda (r) (string-match-p eet--naampje-re (car r)))
+      (seq-filter (lambda (r) (eet--naampje-p (car r)))
                   (with-current-buffer buf (eet--recipes-here)))))
 
   (defun eet--link (recipe)
@@ -1006,6 +1015,26 @@ the resulting text; the real =~/org= is never touched.
   - [ ]
   ** LOOS
   "))))
+
+  (ert-deftest eet-add-to-menu/offers-no-uuids ()
+    (eet-test--with-files `(("eetplanning.org" . "* TODO Boodschappen 2026-09-28
+  ** Menu
+  - [ ]
+  ")
+                            ("recepten.org" . ,(concat eet-test--recipes "* Oud recept
+  :PROPERTIES:
+  :ID:       75bbe54d-3c1f-4d1a-9b7e-2f0a6c8e1d42
+  :END:
+  ")))
+      (let (offered)
+        (cl-letf (((symbol-function 'completing-read)
+                   (lambda (_prompt coll &rest _)
+                     (setq offered (mapcar #'car coll))
+                     (car offered))))
+          (eet-add-to-menu))
+        (should (equal offered
+                       '("Pompoen-kikkererwtencurry met zilvervliesrijst (pompoencurry)"
+                         "Linzensoep (linzensoep)"))))))
 
   (ert-deftest eet-add-to-menu/refuses-an-empty-pick ()
     (let ((list "* TODO Boodschappen 2026-09-28
