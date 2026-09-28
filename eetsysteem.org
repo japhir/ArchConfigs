@@ -90,8 +90,9 @@ the heading body, before any child; those sit under the key nil.
         (nreverse (mapcar (lambda (s) (cons (car s) (reverse (cdr s)))) acc)))))
 
   (defun eet--title ()
-    "Heading text at point, without keyword, priority, tags or comment."
-    (org-get-heading t t t t))
+    "Heading text at point, without keyword, priority, tags, comment or
+  text properties (fontification would travel along into inserted links)."
+    (substring-no-properties (org-get-heading t t t t)))
 
   (defun eet--find-level-1 (pred)
     "Markers of level-1 headings in the buffer satisfying PRED, in order."
