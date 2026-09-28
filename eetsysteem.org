@@ -399,9 +399,9 @@ Basisvoorraad first, since it is kept up to date, then the archived lists,
 newest first. An item we never bought goes to the first store (Lidl/Hira).
 Items are compared by name: without the leading quantity and unit, the
 notes in brackets and anything after a comma, so =2 uien, gesnipperd=
-matches =uien=. An item still unticked in a Winkel of this week's list is
-skipped, so a staple the new week pre-filled isn't listed twice; the
-quantity is ours to fix by hand. So is an item the recipe names twice.
+matches =uien=. Every ingredient is added, even when the list already has
+it: =3 uien= and =1 ui= side by side keep both quantities, where adding
+them up would trip over units and plurals.
 
 Nothing changes before every item has a section to go to, and
 =eetplanning.org= isn't saved, just like =eet-add-to-menu=.
@@ -420,7 +420,7 @@ Nothing changes before every item has a section to go to, and
     :type '(repeat string))
 
   (defconst eet--list-item-re
-    "^[ \t]*[-+][ \t]+\\(?:\\[[ X-]\\]\\)?[ \t]*\\(.*[^ \t]\\)?[ \t]*$"
+    "^[ \t]*[-+][ \t]+\\(?:\\[[ X-]\\]\\)?[ \t]*\\(.*[^ \t\n]\\)?[ \t]*$"
     "A plain list item, box or not; group 1 is the text, nil when empty.")
 
   (defun eet--item-name (text)
@@ -514,31 +514,19 @@ Nothing changes before every item has a section to go to, and
                (seen (eet--last-winkels list stores))
                (list-title (org-with-point-at list (eet--title)))
                (sections (org-with-point-at list (eet--sections)))
-               (open (mapcan (pcase-lambda (`(,sec . ,its))
-                               (unless (member sec (list eet-menu-section
-                                                         eet-leftovers-section))
-                                 (mapcar (lambda (it) (eet--item-name (cdr it)))
-                                         (seq-remove #'car its))))
-                             sections))
-               plan skipped)
-          (dolist (it items)
-            (let ((name (eet--item-name it)))
-              (if (member name open)
-                  (push it skipped)
-                (push name open)
-                (push (cons (or (cdr (assoc name seen)) (car stores)) it) plan))))
+               (plan (mapcar (lambda (it)
+                               (cons (or (cdr (assoc (eet--item-name it) seen))
+                                         (car stores))
+                                     it))
+                             items)))
           (dolist (p plan)
             (unless (assoc (car p) sections)
               (user-error "No %s section in %s" (car p) list-title)))
-          (dolist (p (nreverse plan))
+          (dolist (p plan)
             (org-with-point-at list
               (eet--goto-section (car p))
               (eet--insert-item (cdr p))))
-          (message "%d ingredients of %s on the list%s" (length plan) title
-                   (if skipped
-                       (concat "; already there: "
-                               (string-join (nreverse skipped) "; "))
-                     ""))))))
+          (message "%d ingredients of %s on the list" (length plan) title)))))
 #+end_src
 
 * Closing the week
@@ -1142,49 +1130,24 @@ the resulting text; the real =~/org= is never touched.
   - [ ]
   "))))
 
-  (ert-deftest eet-add-ingredients/skips-what-is-still-on-the-list ()
-    (eet-test--with-files `(("recepten.org" . ,eet-test--curry)
-                            ("eetplanning.org" . "* TODO Boodschappen 2026-09-28
-  ** Lidl/Hira
-  - [ ] Uien
-  - [X] limoen
-  - [ ] pompoen
-  - [ ] kokosmelk
-  - [ ] knoflook
-  - [ ] koriander
-  "))
-      (eet-add-ingredients)
-      (should (equal (eet-test--file-text "eetplanning.org") "* TODO Boodschappen 2026-09-28
-  ** Lidl/Hira
-  - [ ] Uien
-  - [X] limoen
-  - [ ] pompoen
-  - [ ] kokosmelk
-  - [ ] knoflook
-  - [ ] koriander
-  - [ ] 1 limoen
-  - [ ]
-  "))))
-
-  (ert-deftest eet-add-ingredients/lists-a-repeated-item-once ()
+  (ert-deftest eet-add-ingredients/adds-beside-what-is-on-the-list ()
     (eet-test--with-files '(("recepten.org" . "* Linzensoep
   ** Benodigdheden
   - 1 ui
   - 1 ui, voor erbovenop
   ")
                             ("eetplanning.org" . "* TODO Boodschappen 2026-09-28
-  ** Menu
-  - [ ] ui
   ** Lidl/Hira
+  - [ ] 3 uien
   - [ ]
   "))
       (eet-add-ingredients)
       (should (equal (eet-test--file-text "eetplanning.org")
                      "* TODO Boodschappen 2026-09-28
-  ** Menu
-  - [ ] ui
   ** Lidl/Hira
+  - [ ] 3 uien
   - [ ] 1 ui
+  - [ ] 1 ui, voor erbovenop
   - [ ]
   "))))
 
