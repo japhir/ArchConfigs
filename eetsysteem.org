@@ -54,8 +54,7 @@ Run the tests:
 
 * Reading lists
 A list is a level-1 heading; its level-2 children are sections (stores,
-Menu). Only checkbox lines count as items. Old-style lists keep items in
-the heading body, before any child; those sit under the key nil.
+Menu). Only checkbox lines count as items.
 #+begin_src emacs-lisp
   (defconst eet--checkbox-re
     "^[ \t]*[-+] \\[\\([ X-]\\)\\][ \t]*\\(.*?\\)[ \t]*$"
@@ -63,26 +62,20 @@ the heading body, before any child; those sit under the key nil.
 
   (defun eet--sections ()
     "Checkbox items under the heading at point, grouped by child heading.
-  Return an ordered alist (TITLE . ITEMS); items above the first child are
-  under nil. Each item is (DONE . TEXT). Empty items are dropped, and items
-  under deeper headings count toward their level-2 ancestor. Items under a
-  done heading are dropped: that list was finished, so what's left there is
-  stale."
+  Return an ordered alist (TITLE . ITEMS); each item is (DONE . TEXT).
+  Empty items are dropped."
     (save-excursion
       (org-back-to-heading t)
       (let ((child (1+ (org-outline-level)))
             (end (save-excursion (org-end-of-subtree t t)))
-            (acc (list (list nil)))
-            (skip nil))
+            acc)
         (forward-line)
         (while (< (point) end)
           (cond
            ((org-at-heading-p)
-            (setq skip (org-entry-is-done-p))
             (when (= (org-outline-level) child)
               (push (list (org-get-heading t t t t)) acc)))
-           (skip)
-           ((looking-at eet--checkbox-re)
+           ((and acc (looking-at eet--checkbox-re))
             (let ((text (match-string-no-properties 2)))
               (unless (string-empty-p text)
                 (push (cons (equal (match-string 1) "X") text) (cdar acc))))))
@@ -121,7 +114,7 @@ the heading body, before any child; those sit under the key nil.
   Each item is (DONE . TEXT); a tick means we still have it."
     (when-let* ((m (eet--staples-heading)))
       (org-with-point-at m
-        (seq-filter #'car (eet--sections)))))
+        (eet--sections))))
 #+end_src
 
 * Starting a new week
@@ -131,9 +124,8 @@ ticked staple also stops an unbought item of the same name from carrying
 over: the walk is newer than last week's list. Afterwards every staple is
 unticked again, ready for next week's walk.
 
-Unbought items move to the same store in the new list. An unknown section,
-or old items without a section, goes to the store the list title names
-(=Boodschappen LOOS=), otherwise to the first store. Carried items come
+Unbought items move to the same store in the new list, or to the first
+store from a section that is no store. Carried items come
 first, then the staples that aren't already there. Every checkbox section
 ends with one empty =- [ ]=: on beorg and orgzly, return on a checkbox line
 makes the next one, while typing =- [ ]= from nothing on a phone keyboard
@@ -142,12 +134,6 @@ is a pain.
   (defun eet--norm (s)
     "S lowercased without whitespace, for matching names and items."
     (downcase (replace-regexp-in-string "[[:space:]]+" "" s)))
-
-  (defun eet--store-for (title stores)
-    "The store in STORES that TITLE names, or nil."
-    (and title
-         (seq-find (lambda (st) (string-search (eet--norm st) (eet--norm title)))
-                   stores)))
 
   (defun eet--stores (staples)
     "`eet-stores' plus any extra store in STAPLES."
@@ -158,17 +144,14 @@ is a pain.
     (let (acc)
       (dolist (m lists)
         (org-with-point-at m
-          (let ((list-title (eet--title)))
-            (pcase-dolist (`(,sec . ,items) (eet--sections))
-              (let ((target (cond ((equal sec eet-menu-section) sec)
-                                  ((equal sec eet-leftovers-section) nil)
-                                  (t (or (eet--store-for sec stores)
-                                         (eet--store-for list-title stores)
-                                         (car stores))))))
-                (when target
-                  (dolist (it items)
-                    (unless (car it)
-                      (push (cdr it) (alist-get target acc nil nil #'equal))))))))))
+          (pcase-dolist (`(,sec . ,items) (eet--sections))
+            (let ((target (cond ((equal sec eet-menu-section) sec)
+                                ((equal sec eet-leftovers-section) nil)
+                                (t (or (car (member sec stores)) (car stores))))))
+              (when target
+                (dolist (it items)
+                  (unless (car it)
+                    (push (cdr it) (alist-get target acc nil nil #'equal)))))))))
       (mapcar (lambda (c) (cons (car c) (reverse (cdr c)))) acc)))
 
   (defun eet--merge (&rest lists)
@@ -495,19 +478,15 @@ Nothing changes before every item has a section to go to, and
 
   (defun eet--seen-in (markers stores)
     "(NAME . STORE) for each item under MARKERS (lists or Basisvoorraad).
-  NAME is an `eet--item-name'. Menu and Nog in huis are no stores; old
-  items without a section sit in the store the list title names, if any."
+  NAME is an `eet--item-name'; sections that are no store, like Menu, are
+  skipped."
     (let (acc)
       (dolist (m markers (nreverse acc))
         (org-with-point-at m
-          (let ((title (eet--title)))
-            (pcase-dolist (`(,sec . ,items) (eet--sections))
-              (when-let* (((not (member sec (list eet-menu-section
-                                                  eet-leftovers-section))))
-                          (store (or (eet--store-for sec stores)
-                                     (eet--store-for title stores))))
-                (dolist (it items)
-                  (push (cons (eet--item-name (cdr it)) store) acc)))))))))
+          (pcase-dolist (`(,sec . ,items) (eet--sections))
+            (when (member sec stores)
+              (dolist (it items)
+                (push (cons (eet--item-name (cdr it)) sec) acc))))))))
 
   (defun eet--last-winkels (list stores)
     "Alist (NAME . STORE) of where items last sat, the most recent first.
@@ -592,20 +571,17 @@ not ours to do.
     "Choice that keeps a Menu item as plain text.")
 
   (defun eet--menu-items ()
-    "(MARKER DONE TEXT) for each checkbox with text in the list at point's Menu.
-  Like `eet--sections', items under deeper headings count toward the Menu,
-  and items under a done heading are skipped."
+    "(MARKER DONE TEXT) for each checkbox with text in the list at point's Menu."
     (save-excursion
       (let ((child (1+ (org-outline-level)))
             (end (save-excursion (org-end-of-subtree t t)))
-            in skip acc)
+            in acc)
         (forward-line)
         (while (< (point) end)
           (cond ((org-at-heading-p)
-                 (setq skip (org-entry-is-done-p))
                  (when (= (org-outline-level) child)
                    (setq in (equal (eet--title) eet-menu-section))))
-                ((or skip (not in)))
+                ((not in))
                 ((and (looking-at eet--checkbox-re)
                       (not (string-empty-p (match-string 2))))
                  (push (list (point-marker) (equal (match-string 1) "X")
@@ -854,36 +830,6 @@ the resulting text; the real =~/org= is never touched.
   "))
       (should (string-match-p "^\\* DONE Boodschappen 2026-09-21"
                               (eet-test--file-text "eetplanning.org_archive")))))
-
-  (ert-deftest eet-new-week/old-style-lists-go-to-named-store ()
-    (eet-test--with-file "* Boodschappen LOOS
-  - [X] pompoenpitten
-  - [ ] groene linzen
-  * Boodschappen Lidl / Hira
-  - [ ] kaas
-  ** DONE Boodschappen Lidl / Hira
-  - [ ] courgette
-  ** Boodschappen Lidl / Hira
-  - [ ] ui
-  "
-      (eet-new-week eet-test--time)
-      (should (equal (eet-test--text) "* TODO Boodschappen 2026-09-28
-  :PROPERTIES:
-  :CREATED:  [2026-09-28 Mon 12:00]
-  :END:
-  ** Nog in huis
-  ** Menu
-  - [ ]
-  ** Lidl/Hira
-  - [ ] kaas
-  - [ ] ui
-  - [ ]
-  ** Picnic
-  - [ ]
-  ** LOOS
-  - [ ] groene linzen
-  - [ ]
-  "))))
 
   (ert-deftest eet-new-week/archives-oldest-first ()
     (eet-test--with-file "* TODO Boodschappen 2026-09-14
@@ -1196,7 +1142,8 @@ the resulting text; the real =~/org= is never touched.
   ** LOOS
   - [ ]
   ")
-                            ("eetplanning.org_archive" . "* DONE Boodschappen LOOS
+                            ("eetplanning.org_archive" . "* DONE Boodschappen 2026-09-07
+  ** LOOS
   - [ ] koriander
   - [X] pompoen
   * DONE Boodschappen 2026-09-14
