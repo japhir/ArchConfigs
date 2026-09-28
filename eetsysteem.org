@@ -288,8 +288,9 @@ org-id rescan every file.
 
   (defun eet--naampje-p (id)
     "Whether ID is a naampje, not a uuid."
-    (and (string-match-p eet--naampje-re id)
-         (not (string-match-p eet--uuid-re id))))
+    (let ((case-fold-search nil))
+      (and (string-match-p eet--naampje-re id)
+           (not (string-match-p eet--uuid-re id)))))
 
   (defun eet--plain (s)
     "S lowercase, without accents, keeping only letters, digits, spaces, hyphens."
@@ -1115,7 +1116,8 @@ the resulting text; the real =~/org= is never touched.
   :END:
   * Pompoencurry met linzen
   ")
-      (eet-test--with-answers '("pompoencurry" "Pompoen Linzen" "pompoen-linzen")
+      (eet-test--with-answers '("pompoencurry" "Pompoen Linzen" "Pompoen-linzen"
+                                "pompoen-linzen")
         (eet-set-naampje))
       (should (equal (eet-test--text) "* Pompoencurry
   :PROPERTIES:
