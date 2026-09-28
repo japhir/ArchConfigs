@@ -243,6 +243,59 @@ is a pain.
         (re-search-forward (concat "^\\*\\* " eet-leftovers-section "\n") nil t)
         (org-fold-show-subtree))))
 
+#+end_src
+
+* Recipe slugs
+A recipe's =ID= is a slug, a short name we can type from memory in the
+kitchen: =- [ ] pompoencurry= on the Menu, from a phone, which the weekly
+close turns into an =id:= link. org-id accepts any string, so links work
+across files just like with uuids. Lowercase ASCII, hyphens only between
+words. The suggestion is the first word of the title without accents;
+titles are long, so it is meant to be edited. Template R leaves =:ID:=
+empty and calls this before finishing; recipes added on a phone with just a
+name get theirs from =M-x eet-set-recipe-slug=.
+#+begin_src emacs-lisp
+  (require 'ucs-normalize)
+
+  (defconst eet--slug-re "\\`[a-z0-9]+\\(?:-[a-z0-9]+\\)*\\'"
+    "A valid recipe slug.")
+
+  (defun eet--slugify (title)
+    "Suggested slug for TITLE: its first word, lowercase, without accents."
+    (let* ((plain (replace-regexp-in-string
+                   "[^a-z0-9 -]" ""
+                   (downcase (ucs-normalize-NFD-string title))))
+           (word (car (split-string plain nil t))))
+      (string-trim (or word "") "-+" "-+")))
+
+  (defun eet--recipe-ids ()
+    "IDs of the level-1 headings in the current buffer."
+    (seq-keep (lambda (m) (let ((id (org-entry-get m "ID")))
+                            (and id (not (string-empty-p id)) id)))
+              (eet--find-level-1 #'always)))
+
+  (defun eet--slug-problem (slug taken)
+    "Why SLUG can't be used given TAKEN ids, or nil when it can."
+    (cond ((not (string-match-p eet--slug-re slug))
+           "lowercase letters, digits and single hyphens only")
+          ((member slug taken) "already used by another recipe")))
+
+  (defun eet-set-recipe-slug ()
+    "Ask for a slug and store it as the ID of the recipe at point.
+  Leave a recipe that already has an ID alone."
+    (interactive)
+    (save-excursion
+      (org-back-to-heading t)
+      (while (org-up-heading-safe))
+      (let ((id (org-entry-get nil "ID")))
+        (when (or (null id) (string-empty-p id))
+          (let* ((taken (eet--recipe-ids))
+                 (slug (read-string "Slug: " (eet--slugify (eet--title))))
+                 problem)
+            (while (setq problem (eet--slug-problem slug taken))
+              (setq slug (read-string (format "Slug (%s): " problem) slug)))
+            (org-entry-put nil "ID" slug))))))
+
   (provide 'eetsysteem)
   ;;; eetsysteem.el ends here
 #+end_src
@@ -254,6 +307,7 @@ the resulting text; the real =~/org= is never touched.
   ;;; eetsysteem-tests.el --- ERT tests for eetsysteem -*- lexical-binding: t; -*-
   ;; Generated from eetsysteem.org; edit that file instead.
   (require 'ert)
+  (require 'cl-lib)
   (require 'eetsysteem)
 
   (defconst eet-test--time (encode-time '(0 0 12 28 9 2026))
@@ -399,6 +453,75 @@ the resulting text; the real =~/org= is never touched.
   - [ ] brood
   "
       (should-error (eet-new-week eet-test--time) :type 'user-error)))
+
+  (defmacro eet-test--with-answers (answers &rest body)
+    "Run BODY with `read-string' returning ANSWERS in turn.
+  Each prompt's default is recorded in `eet-test--defaults'."
+    (declare (indent 1))
+    `(let ((queue ,answers))
+       (setq eet-test--defaults nil)
+       (cl-letf (((symbol-function 'read-string)
+                  (lambda (_prompt &optional initial &rest _)
+                    (push initial eet-test--defaults)
+                    (pop queue))))
+         ,@body)))
+
+  (defvar eet-test--defaults nil)
+
+  (ert-deftest eet-set-recipe-slug/suggests-and-fills-empty-id ()
+    (with-temp-buffer
+      (org-mode)
+      (insert "* Crème-brûlée met peer :traktatie:
+  :PROPERTIES:
+  :ID:
+  :BRON:     boek
+  :END:
+  ** Benodigdheden
+  ")
+      (goto-char (point-max))
+      (eet-test--with-answers '("creme-brulee")
+        (eet-set-recipe-slug))
+      (should (equal eet-test--defaults '("creme-brulee")))
+      (should (equal (eet-test--text) "* Crème-brûlée met peer :traktatie:
+  :PROPERTIES:
+  :ID:       creme-brulee
+  :BRON:     boek
+  :END:
+  ** Benodigdheden
+  "))))
+
+  (ert-deftest eet-set-recipe-slug/asks-again-when-taken-or-malformed ()
+    (with-temp-buffer
+      (org-mode)
+      (insert "* Pompoencurry
+  :PROPERTIES:
+  :ID:       pompoencurry
+  :END:
+  * Pompoencurry met linzen
+  ")
+      (eet-test--with-answers '("pompoencurry" "Pompoen Linzen" "pompoen-linzen")
+        (eet-set-recipe-slug))
+      (should (equal (eet-test--text) "* Pompoencurry
+  :PROPERTIES:
+  :ID:       pompoencurry
+  :END:
+  * Pompoencurry met linzen
+  :PROPERTIES:
+  :ID:       pompoen-linzen
+  :END:
+  "))))
+
+  (ert-deftest eet-set-recipe-slug/leaves-an-existing-id ()
+    (with-temp-buffer
+      (org-mode)
+      (insert "* Pompoencurry
+  :PROPERTIES:
+  :ID:       pompoencurry
+  :END:
+  ")
+      (eet-test--with-answers '()
+        (eet-set-recipe-slug))
+      (should (null eet-test--defaults))))
 
   ;;; eetsysteem-tests.el ends here
 #+end_src
