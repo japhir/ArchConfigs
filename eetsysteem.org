@@ -201,12 +201,21 @@ is a pain.
     (concat eet-list-prefix (format-time-string "%Y-%m-%d" time)))
 
   (defun eet-new-week (&optional time)
-    "Start this week's shopping list in the current buffer.
+    "Start this week's shopping list in eetplanning.org and show it.
   Close the Menu of every open list (see `eet--close-menus'), carry their
   unticked items over, add the unticked
   staples from Basisvoorraad, then mark the old lists done, archive them
   and untick every staple. TIME defaults to now."
     (interactive)
+    (let* ((buf (find-file-noselect (eet-planning-file)))
+           (pos (with-current-buffer buf (eet--new-week time))))
+      (when (called-interactively-p 'interactive)
+        (pop-to-buffer-same-window buf)
+        (goto-char pos))))
+
+  (defun eet--new-week (time)
+    "`eet-new-week' in the current buffer.
+  Return the position of the new list's Nog in huis items."
     (let* ((time (or time (current-time)))
            (title (eet--week-title time))
            (old (eet--open-lists)))
@@ -251,8 +260,8 @@ is a pain.
         (widen)
         (goto-char new)
         (re-search-forward (concat "^\\*\\* " eet-leftovers-section "\n") nil t)
-        (org-fold-show-subtree))))
-
+        (org-fold-show-subtree)
+        (point))))
 #+end_src
 
 * Naampjes
@@ -887,6 +896,19 @@ the resulting text; the real =~/org= is never touched.
       ;; eet--last-winkels takes the last list in the archive as newest
       (should (string-match-p "2026-09-14\\(.\\|\n\\)*2026-09-21"
                               (eet-test--file-text "eetplanning.org_archive")))))
+
+  (ert-deftest eet-new-week/works-in-the-planning-file ()
+    (eet-test--with-files `(("recepten.org" . ,eet-test--recipes)
+                            ("eetplanning.org" . "* TODO Boodschappen 2026-09-21
+  ** LOOS
+  - [ ] ui
+  "))
+      (eet-new-week eet-test--time)
+      (should (equal (eet-test--text) eet-test--recipes))
+      (should (string-prefix-p "* TODO Boodschappen 2026-09-28"
+                               (eet-test--file-text "eetplanning.org")))
+      (should (string-search "- [ ] ui"
+                             (eet-test--file-text "eetplanning.org")))))
 
   (ert-deftest eet-new-week/refuses-same-day-twice ()
     (eet-test--with-file "* TODO Boodschappen 2026-09-28
