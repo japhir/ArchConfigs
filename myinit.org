@@ -951,6 +951,12 @@ customize capture templates
       ;; CREATED is added by the :add-created hook like everywhere else
       ("s" "Todo (shared)" entry (file my/shared-inbox)
        ,(concat "* TODO %?\n:PROPERTIES:\n:CREATED_BY: " my/me "\n:END:\n") :add-created t)
+      ;; recipes, shared with Line (eetsysteem): ID so the weekly Menu can link it
+      ("R" "Recipe (shared)" entry (file ,(expand-file-name "recepten.org" my/shared-dir))
+       ,(concat "* %^{Name}%^g\n:PROPERTIES:\n:ID:       %(org-id-uuid)\n:CREATED_BY: " my/me
+                "\n:BRON:     %^{Source: book + page, notebook, or link}\n:FOTO:\n:PORTIES:  4\n:VOORBEREIDING:\n:END:\n"
+                "** Ingrediënten\n- %?\n** Bereiding\n1. \n")
+       :add-created t)
       ("m" "Email" entry (file org-in-file)
        "* %? from %:from on %:subject :@email:\n %i\n %a\n" :add-created t)
       ("w" "Website" entry (file org-in-file)
@@ -1092,6 +1098,18 @@ Untagged shared tasks are for either of us and stay visible.
     "The org files in the shared folder, for `org-refile-targets'."
     (when (file-directory-p my/shared-dir)
       (directory-files my/shared-dir t "\\`[^.].*\\.org\\'")))
+#+end_src
+*** meals and groceries (eetsysteem)
+Weekly shopping list and recipes, shared with Line. The code is its own
+literate file, [[file:eetsysteem.org]], so it can be tested in batch and shared;
+spec and tickets are in =iljline/eetsysteem.org=. The recipe capture template
+is =R= above.
+#+begin_src emacs-lisp
+  (require 'org-id)
+  (setq eet-dir my/shared-dir)
+  (org-babel-load-file
+   (expand-file-name "eetsysteem.org"
+                     (file-name-directory (file-truename "~/.emacs.d/myinit.org"))))
 #+end_src
 *** effort estimates
 #+begin_src emacs-lisp

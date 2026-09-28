@@ -1,0 +1,384 @@
+#+title: eetsysteem: weekly meals and groceries in org
+#+property: header-args:emacs-lisp :lexical t :tangle eetsysteem.el
+Shared with Line through =~/org/iljline/=. Spec and tickets live in
+=~/org/iljline/eetsysteem.org=; this file is only the code. Standalone on
+purpose: =myinit.org= loads it, but it runs without the rest of the config,
+so the tests run in =emacs --batch=, and Line's emacs-starter could load it
+too.
+
+Run the tests:
+#+begin_src sh :tangle no
+  emacs --batch -l org --eval '(org-babel-tangle-file "eetsysteem.org")' \
+    -l eetsysteem.el -l eetsysteem-tests.el -f ert-run-tests-batch-and-exit
+#+end_src
+
+* Settings
+#+begin_src emacs-lisp
+  ;;; eetsysteem.el --- Weekly meals and groceries in org -*- lexical-binding: t; -*-
+  ;; Generated from eetsysteem.org; edit that file instead.
+  (require 'org)
+  (require 'org-archive)
+  (require 'seq)
+
+  (defgroup eet nil
+    "Weekly meal planning and groceries in org."
+    :group 'org
+    :prefix "eet-")
+
+  (defcustom eet-dir "~/org/iljline/"
+    "Folder holding eetplanning.org and recepten.org."
+    :type 'directory)
+
+  (defcustom eet-stores '("Lidl/Hira" "Picnic" "LOOS")
+    "Store sections of a shopping list, in order.
+  Extra sections found under Basisvoorraad are added after these."
+    :type '(repeat string))
+
+  (defconst eet-list-prefix "Boodschappen "
+    "Title prefix of a weekly shopping list heading.")
+  (defconst eet-staples-heading "Basisvoorraad"
+    "Title of the heading holding the staples, one sub-heading per store.")
+  (defconst eet-leftovers-section "Nog in huis"
+    "Plain-list section noting what is left; never carried over.")
+  (defconst eet-menu-section "Menu"
+    "Checkbox section with this week's dinners.")
+
+  (defun eet-planning-file ()
+    "The shopping list and meal planning file."
+    (expand-file-name "eetplanning.org" eet-dir))
+#+end_src
+
+* Reading lists
+A list is a level-1 heading; its level-2 children are sections (stores,
+Menu). Only checkbox lines count as items. Old-style lists keep items in
+the heading body, before any child; those sit under the key nil.
+#+begin_src emacs-lisp
+  (defconst eet--checkbox-re
+    "^[ \t]*[-+] \\[\\([ X-]\\)\\][ \t]*\\(.*?\\)[ \t]*$"
+    "A checkbox item; group 1 is the box state, group 2 the text.")
+
+  (defun eet--sections ()
+    "Checkbox items under the heading at point, grouped by child heading.
+  Return an ordered alist (TITLE . ITEMS); items above the first child are
+  under nil. Each item is (DONE . TEXT). Empty items are dropped, and items
+  under deeper headings count toward their level-2 ancestor. Items under a
+  done heading are dropped: that list was finished, so what's left there is
+  stale."
+    (save-excursion
+      (org-back-to-heading t)
+      (let ((child (1+ (org-outline-level)))
+            (end (save-excursion (org-end-of-subtree t t)))
+            (acc (list (list nil)))
+            (skip nil))
+        (forward-line)
+        (while (< (point) end)
+          (cond
+           ((org-at-heading-p)
+            (setq skip (org-entry-is-done-p))
+            (when (= (org-outline-level) child)
+              (push (list (org-get-heading t t t t)) acc)))
+           (skip)
+           ((looking-at eet--checkbox-re)
+            (let ((text (match-string-no-properties 2)))
+              (unless (string-empty-p text)
+                (push (cons (equal (match-string 1) "X") text) (cdar acc))))))
+          (forward-line))
+        (nreverse (mapcar (lambda (s) (cons (car s) (reverse (cdr s)))) acc)))))
+
+  (defun eet--title ()
+    "Heading text at point, without keyword, priority, tags or comment."
+    (org-get-heading t t t t))
+
+  (defun eet--find-level-1 (pred)
+    "Markers of level-1 headings in the buffer satisfying PRED, in order."
+    (let (found)
+      (org-with-wide-buffer
+       (goto-char (point-min))
+       (while (re-search-forward "^\\* " nil t)
+         (beginning-of-line)
+         (when (funcall pred) (push (point-marker) found))
+         (end-of-line)))
+      (nreverse found)))
+
+  (defun eet--open-lists ()
+    "Markers of the shopping lists that are not done yet."
+    (eet--find-level-1
+     (lambda () (and (string-prefix-p eet-list-prefix (eet--title))
+                     (not (org-entry-is-done-p))))))
+
+  (defun eet--staples ()
+    "Alist (STORE . TEXTS) from the Basisvoorraad heading, ticked or not."
+    (when-let* ((m (car (eet--find-level-1
+                         (lambda () (equal (eet--title) eet-staples-heading))))))
+      (org-with-point-at m
+        (seq-keep (lambda (s) (and (car s) (cons (car s) (mapcar #'cdr (cdr s)))))
+                  (eet--sections)))))
+#+end_src
+
+* Starting a new week
+Unbought items move to the same store in the new list. An unknown section,
+or old items without a section, goes to the store the list title names
+(=Boodschappen LOOS=), otherwise to the first store. Carried items come
+first, then the staples that aren't already there. Every checkbox section
+ends with one empty =- [ ]=: on beorg and orgzly, return on a checkbox line
+makes the next one, while typing =- [ ]= from nothing on a phone keyboard
+is a pain.
+#+begin_src emacs-lisp
+  (defun eet--norm (s)
+    "S lowercased without whitespace, for matching names and items."
+    (downcase (replace-regexp-in-string "[[:space:]]+" "" s)))
+
+  (defun eet--store-for (title stores)
+    "The store in STORES that TITLE names, or nil."
+    (and title
+         (seq-find (lambda (st) (string-search (eet--norm st) (eet--norm title)))
+                   stores)))
+
+  (defun eet--stores (staples)
+    "`eet-stores' plus any extra store in STAPLES."
+    (seq-uniq (append eet-stores (mapcar #'car staples))))
+
+  (defun eet--carried (lists stores)
+    "Alist (SECTION . TEXTS) of the unticked items in LISTS (markers)."
+    (let (acc)
+      (dolist (m lists)
+        (org-with-point-at m
+          (let ((list-title (eet--title)))
+            (pcase-dolist (`(,sec . ,items) (eet--sections))
+              (let ((target (cond ((equal sec eet-menu-section) sec)
+                                  ((equal sec eet-leftovers-section) nil)
+                                  (t (or (eet--store-for sec stores)
+                                         (eet--store-for list-title stores)
+                                         (car stores))))))
+                (when target
+                  (dolist (it items)
+                    (unless (car it)
+                      (push (cdr it) (alist-get target acc nil nil #'equal))))))))))
+      (mapcar (lambda (c) (cons (car c) (reverse (cdr c)))) acc)))
+
+  (defun eet--merge (&rest lists)
+    "Concatenate LISTS of item texts, dropping repeats by `eet--norm'."
+    (let (seen out)
+      (dolist (it (apply #'append lists) (nreverse out))
+        (unless (member (eet--norm it) seen)
+          (push (eet--norm it) seen)
+          (push it out)))))
+
+  (defun eet--render (title time sections)
+    "Org text of a list TITLE created at TIME.
+  SECTIONS is a list of (NAME CHECKBOXES . ITEMS)."
+    (concat
+     "* TODO " title "\n"
+     ":PROPERTIES:\n:CREATED:  "
+     (format-time-string "[%Y-%m-%d %a %H:%M]" time) "\n:END:\n"
+     (mapconcat
+      (pcase-lambda (`(,name ,boxes . ,items))
+        (concat "** " name "\n"
+                (mapconcat (lambda (it) (concat (if boxes "- [ ] " "- ") it "\n"))
+                           items "")
+                (if boxes "- [ ]\n" "")))
+      sections "")))
+
+  (defun eet--week-title (time)
+    "Shopping list title for the ISO week of TIME."
+    (concat eet-list-prefix (format-time-string "%G-W%V" time)))
+
+  (defun eet-new-week (&optional time)
+    "Start this week's shopping list in the current buffer.
+  Carry the unticked items of every open list over, add the staples from
+  Basisvoorraad, then mark the old lists done and archive them. TIME
+  defaults to now."
+    (interactive)
+    (let* ((time (or time (current-time)))
+           (title (eet--week-title time))
+           (old (eet--open-lists)))
+      (when (seq-some (lambda (m) (org-with-point-at m (equal (eet--title) title)))
+                      old)
+        (user-error "%s already exists" title))
+      (let* ((staples (eet--staples))
+             (stores (eet--stores staples))
+             (carried (eet--carried old stores))
+             (get (lambda (al k) (alist-get k al nil nil #'equal)))
+             (sections
+              `((,eet-leftovers-section nil)
+                (,eet-menu-section t ,@(funcall get carried eet-menu-section))
+                ,@(mapcar (lambda (st)
+                            `(,st t ,@(eet--merge (funcall get carried st)
+                                                  (funcall get staples st))))
+                          stores)))
+             new)
+        (org-with-wide-buffer
+         (goto-char (point-max))
+         (unless (bolp) (insert "\n"))
+         (setq new (point-marker))
+         (insert (eet--render title time sections)))
+        (let ((org-enforce-todo-dependencies nil)
+              (org-enforce-todo-checkbox-dependencies nil))
+          (dolist (m (reverse old))
+            (org-with-point-at m
+              (org-todo 'done)
+              (org-archive-subtree))))
+        (widen)
+        (goto-char new)
+        (re-search-forward (concat "^\\*\\* " eet-leftovers-section "\n") nil t)
+        (org-fold-show-subtree))))
+
+  (provide 'eetsysteem)
+  ;;; eetsysteem.el ends here
+#+end_src
+
+* Tests
+Each test runs a command on a fixture file in a temp directory and compares
+the resulting text; the real =~/org= is never touched.
+#+begin_src emacs-lisp :tangle eetsysteem-tests.el
+  ;;; eetsysteem-tests.el --- ERT tests for eetsysteem -*- lexical-binding: t; -*-
+  ;; Generated from eetsysteem.org; edit that file instead.
+  (require 'ert)
+  (require 'eetsysteem)
+
+  (defconst eet-test--time (encode-time '(0 0 12 28 9 2026))
+    "Monday 2026-09-28, ISO week 40.")
+
+  (defmacro eet-test--with-file (content &rest body)
+    "Run BODY in an org buffer visiting a temp eetplanning.org with CONTENT."
+    (declare (indent 1))
+    `(let* ((dir (make-temp-file "eet-" t))
+            (file (expand-file-name "eetplanning.org" dir))
+            (system-time-locale "C")
+            (org-archive-location "%s_archive::")
+            (org-todo-keywords '((sequence "TODO" "|" "DONE")))
+            (org-log-done nil)
+            (org-archive-save-context-info nil))
+       (unwind-protect
+           (progn
+             (with-temp-file file (insert ,content))
+             (with-current-buffer (find-file-noselect file)
+               (unwind-protect (progn ,@body)
+                 (set-buffer-modified-p nil)
+                 (kill-buffer))))
+         (dolist (b (buffer-list))
+           (when (and (buffer-file-name b)
+                      (string-prefix-p dir (buffer-file-name b)))
+             (with-current-buffer b (set-buffer-modified-p nil))
+             (kill-buffer b)))
+         (delete-directory dir t))))
+
+  (defun eet-test--text ()
+    (buffer-substring-no-properties (point-min) (point-max)))
+
+  (ert-deftest eet-new-week/fresh-from-staples ()
+    (eet-test--with-file "* Basisvoorraad
+  ** Lidl/Hira
+  - [ ] brood
+  - [X] bananen
+  - [ ]
+  ** Picnic
+  - [ ] havermout
+  "
+      (eet-new-week eet-test--time)
+      (should (equal (eet-test--text) "* Basisvoorraad
+  ** Lidl/Hira
+  - [ ] brood
+  - [X] bananen
+  - [ ]
+  ** Picnic
+  - [ ] havermout
+  * TODO Boodschappen 2026-W40
+  :PROPERTIES:
+  :CREATED:  [2026-09-28 Mon 12:00]
+  :END:
+  ** Nog in huis
+  ** Menu
+  - [ ]
+  ** Lidl/Hira
+  - [ ] brood
+  - [ ] bananen
+  - [ ]
+  ** Picnic
+  - [ ] havermout
+  - [ ]
+  ** LOOS
+  - [ ]
+  "))))
+
+  (ert-deftest eet-new-week/carries-unticked-and-archives ()
+    (eet-test--with-file "* Basisvoorraad
+  ** Lidl/Hira
+  - [ ] brood
+  * TODO Boodschappen 2026-W39
+  ** Nog in huis
+  - 3 tomaten
+  ** Menu
+  - [X] linzensoep
+  - [ ] curry
+  ** Lidl/Hira
+  - [X] courgette
+  - [ ] Brood
+  - [ ] paprika
+  - [ ]
+  "
+      (eet-new-week eet-test--time)
+      (should (equal (eet-test--text) "* Basisvoorraad
+  ** Lidl/Hira
+  - [ ] brood
+  * TODO Boodschappen 2026-W40
+  :PROPERTIES:
+  :CREATED:  [2026-09-28 Mon 12:00]
+  :END:
+  ** Nog in huis
+  ** Menu
+  - [ ] curry
+  - [ ]
+  ** Lidl/Hira
+  - [ ] Brood
+  - [ ] paprika
+  - [ ]
+  ** Picnic
+  - [ ]
+  ** LOOS
+  - [ ]
+  "))
+      (let ((archive (concat file "_archive")))
+        (should (file-exists-p archive))
+        (with-temp-buffer
+          (insert-file-contents archive)
+          (should (string-match-p "^\\* DONE Boodschappen 2026-W39" (eet-test--text)))))))
+
+  (ert-deftest eet-new-week/old-style-lists-go-to-named-store ()
+    (eet-test--with-file "* Boodschappen LOOS
+  - [X] pompoenpitten
+  - [ ] groene linzen
+  * Boodschappen Lidl / Hira
+  - [ ] kaas
+  ** DONE Boodschappen Lidl / Hira
+  - [ ] courgette
+  ** Boodschappen Lidl / Hira
+  - [ ] ui
+  "
+      (eet-new-week eet-test--time)
+      (should (equal (eet-test--text) "* TODO Boodschappen 2026-W40
+  :PROPERTIES:
+  :CREATED:  [2026-09-28 Mon 12:00]
+  :END:
+  ** Nog in huis
+  ** Menu
+  - [ ]
+  ** Lidl/Hira
+  - [ ] kaas
+  - [ ] ui
+  - [ ]
+  ** Picnic
+  - [ ]
+  ** LOOS
+  - [ ] groene linzen
+  - [ ]
+  "))))
+
+  (ert-deftest eet-new-week/refuses-same-week-twice ()
+    (eet-test--with-file "* TODO Boodschappen 2026-W40
+  - [ ] brood
+  "
+      (should-error (eet-new-week eet-test--time) :type 'user-error)))
+
+  ;;; eetsysteem-tests.el ends here
+#+end_src

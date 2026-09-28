@@ -43,3 +43,7 @@ agents/skills/synced/
 # marketplace-managed skills and their lockfile: installed per machine, not shared
 agents/skills/qa/
 agents/.skill-lock.json
+
+# eetsysteem: tangled from eetsysteem.org
+eetsysteem.el
+eetsysteem-tests.el
