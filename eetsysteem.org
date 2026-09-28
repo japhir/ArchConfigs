@@ -261,9 +261,12 @@ across files just like with uuids. Lowercase ASCII, hyphens only between
 words. The suggestion is the first word of the title without accents;
 titles are long, so it is meant to be edited. Template R leaves =:ID:=
 empty and calls this before finishing; recipes added on a phone with just a
-name get theirs from =M-x eet-set-naampje=.
+name get theirs from =M-x eet-set-naampje=. The new naampje goes straight
+into org-id's table: following a link to an ID it doesn't know makes
+org-id rescan every file.
 #+begin_src emacs-lisp
   (require 'ucs-normalize)
+  (require 'org-id)
 
   (defconst eet--naampje-re "\\`[a-z0-9]+\\(?:-[a-z0-9]+\\)*\\'"
     "A valid naampje.")
@@ -310,7 +313,10 @@ name get theirs from =M-x eet-set-naampje=.
                  problem)
             (while (setq problem (eet--naampje-problem naampje taken))
               (setq naampje (read-string (format "Naampje (%s): " problem) naampje)))
-            (org-entry-put nil "ID" naampje))))))
+            (org-entry-put nil "ID" naampje)
+            ;; else following a link to it makes org-id rescan every file
+            (when-let* ((file (buffer-file-name (buffer-base-buffer))))
+              (org-id-add-location naampje file)))))))
 #+end_src
 
 * The Menu
@@ -1052,6 +1058,24 @@ the resulting text; the real =~/org= is never touched.
       (eet-test--with-answers '()
         (eet-set-naampje))
       (should (null eet-test--defaults))))
+
+  (ert-deftest eet-set-naampje/registers-with-org-id ()
+    (eet-test--with-files '(("recepten.org" . "* Pompoencurry\n"))
+      (let* ((org-id-track-globally t)
+             (org-id-locations-file (expand-file-name "id-locations" eet-dir))
+             (org-id-locations (make-hash-table :test #'equal))
+             (org-id-files nil)
+             (file (buffer-file-name))
+             ;; capture fills template R in an indirect buffer
+             (capture (make-indirect-buffer (current-buffer) "eet-capture" t)))
+        (unwind-protect
+            (with-current-buffer capture
+              (goto-char (point-min))
+              (eet-test--with-answers '("pompoencurry")
+                (eet-set-naampje)))
+          (kill-buffer capture))
+        (should (equal (gethash "pompoencurry" org-id-locations)
+                       (abbreviate-file-name file))))))
 
   (defconst eet-test--curry "* Pompoencurry
   :PROPERTIES:
