@@ -955,7 +955,7 @@ customize capture templates
       ("R" "Recipe (shared)" entry (file ,(expand-file-name "recepten.org" my/shared-dir))
        ,(concat "* %^{Name}%^g\n:PROPERTIES:\n:ID:       %(org-id-uuid)\n:CREATED_BY: " my/me
                 "\n:BRON:     %^{Source: book + page, notebook, or link}\n:FOTO:\n:PORTIES:  4\n:VOORBEREIDING:\n:END:\n"
-                "** Ingrediënten\n- %?\n** Bereiding\n1. \n")
+                "** Benodigdheden\n- %?\n** Gereedschap\n- \n** Instructies\n1. \n")
        :add-created t)
       ("m" "Email" entry (file org-in-file)
        "* %? from %:from on %:subject :@email:\n %i\n %a\n" :add-created t)

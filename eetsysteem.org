@@ -106,16 +106,26 @@ the heading body, before any child; those sit under the key nil.
      (lambda () (and (string-prefix-p eet-list-prefix (eet--title))
                      (not (org-entry-is-done-p))))))
 
+  (defun eet--staples-heading ()
+    "Marker of the Basisvoorraad heading, or nil."
+    (car (eet--find-level-1
+          (lambda () (equal (eet--title) eet-staples-heading)))))
+
   (defun eet--staples ()
-    "Alist (STORE . TEXTS) from the Basisvoorraad heading, ticked or not."
-    (when-let* ((m (car (eet--find-level-1
-                         (lambda () (equal (eet--title) eet-staples-heading))))))
+    "Alist (STORE . ITEMS) from the Basisvoorraad heading.
+  Each item is (DONE . TEXT); a tick means we still have it."
+    (when-let* ((m (eet--staples-heading)))
       (org-with-point-at m
-        (seq-keep (lambda (s) (and (car s) (cons (car s) (mapcar #'cdr (cdr s)))))
-                  (eet--sections)))))
+        (seq-filter #'car (eet--sections)))))
 #+end_src
 
 * Starting a new week
+Before planning we walk through the house (the Huisronde) and tick the
+staples we still have. Only unticked staples go onto the new list, and a
+ticked staple also stops an unbought item of the same name from carrying
+over: the walk is newer than last week's list. Afterwards every staple is
+unticked again, ready for next week's walk.
+
 Unbought items move to the same store in the new list. An unknown section,
 or old items without a section, goes to the store the list title names
 (=Boodschappen LOOS=), otherwise to the first store. Carried items come
@@ -187,9 +197,9 @@ is a pain.
 
   (defun eet-new-week (&optional time)
     "Start this week's shopping list in the current buffer.
-  Carry the unticked items of every open list over, add the staples from
-  Basisvoorraad, then mark the old lists done and archive them. TIME
-  defaults to now."
+  Carry the unticked items of every open list over, add the unticked
+  staples from Basisvoorraad, then mark the old lists done, archive them
+  and untick every staple. TIME defaults to now."
     (interactive)
     (let* ((time (or time (current-time)))
            (title (eet--week-title time))
@@ -201,12 +211,18 @@ is a pain.
              (stores (eet--stores staples))
              (carried (eet--carried old stores))
              (get (lambda (al k) (alist-get k al nil nil #'equal)))
+             (have (mapcar (lambda (it) (eet--norm (cdr it)))
+                           (seq-filter #'car (apply #'append (mapcar #'cdr staples)))))
+             (keep (lambda (texts)
+                     (seq-remove (lambda (it) (member (eet--norm it) have)) texts)))
              (sections
               `((,eet-leftovers-section nil)
                 (,eet-menu-section t ,@(funcall get carried eet-menu-section))
                 ,@(mapcar (lambda (st)
-                            `(,st t ,@(eet--merge (funcall get carried st)
-                                                  (funcall get staples st))))
+                            `(,st t ,@(funcall keep
+                                               (eet--merge
+                                                (funcall get carried st)
+                                                (mapcar #'cdr (funcall get staples st))))))
                           stores)))
              new)
         (org-with-wide-buffer
@@ -220,6 +236,8 @@ is a pain.
             (org-with-point-at m
               (org-todo 'done)
               (org-archive-subtree))))
+        (when-let* ((m (eet--staples-heading)))
+          (org-with-point-at m (org-reset-checkbox-state-subtree)))
         (widen)
         (goto-char new)
         (re-search-forward (concat "^\\*\\* " eet-leftovers-section "\n") nil t)
@@ -268,7 +286,7 @@ the resulting text; the real =~/org= is never touched.
   (defun eet-test--text ()
     (buffer-substring-no-properties (point-min) (point-max)))
 
-  (ert-deftest eet-new-week/fresh-from-staples ()
+  (ert-deftest eet-new-week/copies-staples-we-dont-have ()
     (eet-test--with-file "* Basisvoorraad
   ** Lidl/Hira
   - [ ] brood
@@ -281,7 +299,7 @@ the resulting text; the real =~/org= is never touched.
       (should (equal (eet-test--text) "* Basisvoorraad
   ** Lidl/Hira
   - [ ] brood
-  - [X] bananen
+  - [ ] bananen
   - [ ]
   ** Picnic
   - [ ] havermout
@@ -294,7 +312,6 @@ the resulting text; the real =~/org= is never touched.
   - [ ]
   ** Lidl/Hira
   - [ ] brood
-  - [ ] bananen
   - [ ]
   ** Picnic
   - [ ] havermout
@@ -307,6 +324,7 @@ the resulting text; the real =~/org= is never touched.
     (eet-test--with-file "* Basisvoorraad
   ** Lidl/Hira
   - [ ] brood
+  - [X] paprika
   * TODO Boodschappen 2026-09-21
   ** Nog in huis
   - 3 tomaten
@@ -323,6 +341,7 @@ the resulting text; the real =~/org= is never touched.
       (should (equal (eet-test--text) "* Basisvoorraad
   ** Lidl/Hira
   - [ ] brood
+  - [ ] paprika
   * TODO Boodschappen 2026-09-28
   :PROPERTIES:
   :CREATED:  [2026-09-28 Mon 12:00]
@@ -333,7 +352,6 @@ the resulting text; the real =~/org= is never touched.
   - [ ]
   ** Lidl/Hira
   - [ ] Brood
-  - [ ] paprika
   - [ ]
   ** Picnic
   - [ ]
