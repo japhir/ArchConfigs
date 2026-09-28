@@ -239,7 +239,9 @@ is a pain.
          (insert (eet--render title time sections)))
         (let ((org-enforce-todo-dependencies nil)
               (org-enforce-todo-checkbox-dependencies nil))
-          (dolist (m (reverse old))
+          ;; in buffer order: each archive is appended, and
+          ;; `eet--last-winkels' takes the last one as newest
+          (dolist (m old)
             (org-with-point-at m
               (org-todo 'done)
               (org-archive-subtree))))
@@ -863,6 +865,19 @@ the resulting text; the real =~/org= is never touched.
   - [ ] groene linzen
   - [ ]
   "))))
+
+  (ert-deftest eet-new-week/archives-oldest-first ()
+    (eet-test--with-file "* TODO Boodschappen 2026-09-14
+  ** LOOS
+  - [X] ui
+  * TODO Boodschappen 2026-09-21
+  ** Picnic
+  - [X] ui
+  "
+      (eet-new-week eet-test--time)
+      ;; eet--last-winkels takes the last list in the archive as newest
+      (should (string-match-p "2026-09-14\\(.\\|\n\\)*2026-09-21"
+                              (eet-test--file-text "eetplanning.org_archive")))))
 
   (ert-deftest eet-new-week/refuses-same-day-twice ()
     (eet-test--with-file "* TODO Boodschappen 2026-09-28
