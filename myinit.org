@@ -1106,6 +1106,9 @@ spec and tickets are in =iljline/eetsysteem.org=. The recipe capture template
 is =R= above.
 #+begin_src emacs-lisp
   (require 'org-id)
+  ;; C-c l on a heading with an ID stores an id: link, which survives renames;
+  ;; the weekly Menu links recipes this way. Never creates IDs by itself.
+  (setq org-id-link-to-org-use-id 'use-existing)
   (setq eet-dir my/shared-dir)
   (org-babel-load-file
    (expand-file-name "eetsysteem.org"
@@ -1612,7 +1615,7 @@ https://github.com/weirdNox/org-noter
     (org-roam-directory (file-truename my/org-notes-dir))
     (org-roam-dailies-directory "daily/")
     (org-roam-db-location "~/org-roam.db")
-    ;; (org-id-link-to-org-use-id 'create-if-interactive)
+    ;; org-id-link-to-org-use-id: set under "meals and groceries"
     ;; (org-roam-completion-everywhere t) ;; this was a bit excessive
     ;; (org-roam-verbose t)
     (org-roam-buffer-no-delete-other-windows t) ; make org-roam buffer sticky
