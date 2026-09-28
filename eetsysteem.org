@@ -245,23 +245,23 @@ is a pain.
 
 #+end_src
 
-* Recipe slugs
-A recipe's =ID= is a slug, a short name we can type from memory in the
-kitchen: =- [ ] pompoencurry= on the Menu, from a phone, which the weekly
+* Naampjes
+A recipe's =ID= is its naampje (a slug): a short name we can type from
+memory in the kitchen: =- [ ] pompoencurry= on the Menu, from a phone, which the weekly
 close turns into an =id:= link. org-id accepts any string, so links work
 across files just like with uuids. Lowercase ASCII, hyphens only between
 words. The suggestion is the first word of the title without accents;
 titles are long, so it is meant to be edited. Template R leaves =:ID:=
 empty and calls this before finishing; recipes added on a phone with just a
-name get theirs from =M-x eet-set-recipe-slug=.
+name get theirs from =M-x eet-set-naampje=.
 #+begin_src emacs-lisp
   (require 'ucs-normalize)
 
-  (defconst eet--slug-re "\\`[a-z0-9]+\\(?:-[a-z0-9]+\\)*\\'"
-    "A valid recipe slug.")
+  (defconst eet--naampje-re "\\`[a-z0-9]+\\(?:-[a-z0-9]+\\)*\\'"
+    "A valid naampje.")
 
-  (defun eet--slugify (title)
-    "Suggested slug for TITLE: its first word, lowercase, without accents."
+  (defun eet--suggest-naampje (title)
+    "Suggested naampje for TITLE: its first word, lowercase, without accents."
     (let* ((plain (replace-regexp-in-string
                    "[^a-z0-9 -]" ""
                    (downcase (ucs-normalize-NFD-string title))))
@@ -274,14 +274,14 @@ name get theirs from =M-x eet-set-recipe-slug=.
                             (and id (not (string-empty-p id)) id)))
               (eet--find-level-1 #'always)))
 
-  (defun eet--slug-problem (slug taken)
-    "Why SLUG can't be used given TAKEN ids, or nil when it can."
-    (cond ((not (string-match-p eet--slug-re slug))
+  (defun eet--naampje-problem (naampje taken)
+    "Why NAAMPJE can't be used given TAKEN ids, or nil when it can."
+    (cond ((not (string-match-p eet--naampje-re naampje))
            "lowercase letters, digits and single hyphens only")
-          ((member slug taken) "already used by another recipe")))
+          ((member naampje taken) "already used by another recipe")))
 
-  (defun eet-set-recipe-slug ()
-    "Ask for a slug and store it as the ID of the recipe at point.
+  (defun eet-set-naampje ()
+    "Ask for a naampje and store it as the ID of the recipe at point.
   Leave a recipe that already has an ID alone."
     (interactive)
     (save-excursion
@@ -290,11 +290,11 @@ name get theirs from =M-x eet-set-recipe-slug=.
       (let ((id (org-entry-get nil "ID")))
         (when (or (null id) (string-empty-p id))
           (let* ((taken (eet--recipe-ids))
-                 (slug (read-string "Slug: " (eet--slugify (eet--title))))
+                 (naampje (read-string "Naampje: " (eet--suggest-naampje (eet--title))))
                  problem)
-            (while (setq problem (eet--slug-problem slug taken))
-              (setq slug (read-string (format "Slug (%s): " problem) slug)))
-            (org-entry-put nil "ID" slug))))))
+            (while (setq problem (eet--naampje-problem naampje taken))
+              (setq naampje (read-string (format "Naampje (%s): " problem) naampje)))
+            (org-entry-put nil "ID" naampje))))))
 
   (provide 'eetsysteem)
   ;;; eetsysteem.el ends here
@@ -468,7 +468,7 @@ the resulting text; the real =~/org= is never touched.
 
   (defvar eet-test--defaults nil)
 
-  (ert-deftest eet-set-recipe-slug/suggests-and-fills-empty-id ()
+  (ert-deftest eet-set-naampje/suggests-and-fills-empty-id ()
     (with-temp-buffer
       (org-mode)
       (insert "* Crème-brûlée met peer :traktatie:
@@ -480,7 +480,7 @@ the resulting text; the real =~/org= is never touched.
   ")
       (goto-char (point-max))
       (eet-test--with-answers '("creme-brulee")
-        (eet-set-recipe-slug))
+        (eet-set-naampje))
       (should (equal eet-test--defaults '("creme-brulee")))
       (should (equal (eet-test--text) "* Crème-brûlée met peer :traktatie:
   :PROPERTIES:
@@ -490,7 +490,7 @@ the resulting text; the real =~/org= is never touched.
   ** Benodigdheden
   "))))
 
-  (ert-deftest eet-set-recipe-slug/asks-again-when-taken-or-malformed ()
+  (ert-deftest eet-set-naampje/asks-again-when-taken-or-malformed ()
     (with-temp-buffer
       (org-mode)
       (insert "* Pompoencurry
@@ -500,7 +500,7 @@ the resulting text; the real =~/org= is never touched.
   * Pompoencurry met linzen
   ")
       (eet-test--with-answers '("pompoencurry" "Pompoen Linzen" "pompoen-linzen")
-        (eet-set-recipe-slug))
+        (eet-set-naampje))
       (should (equal (eet-test--text) "* Pompoencurry
   :PROPERTIES:
   :ID:       pompoencurry
@@ -511,7 +511,7 @@ the resulting text; the real =~/org= is never touched.
   :END:
   "))))
 
-  (ert-deftest eet-set-recipe-slug/leaves-an-existing-id ()
+  (ert-deftest eet-set-naampje/leaves-an-existing-id ()
     (with-temp-buffer
       (org-mode)
       (insert "* Pompoencurry
@@ -520,7 +520,7 @@ the resulting text; the real =~/org= is never touched.
   :END:
   ")
       (eet-test--with-answers '()
-        (eet-set-recipe-slug))
+        (eet-set-naampje))
       (should (null eet-test--defaults))))
 
   ;;; eetsysteem-tests.el ends here

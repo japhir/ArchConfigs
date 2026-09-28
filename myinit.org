@@ -951,13 +951,13 @@ customize capture templates
       ;; CREATED is added by the :add-created hook like everywhere else
       ("s" "Todo (shared)" entry (file my/shared-inbox)
        ,(concat "* TODO %?\n:PROPERTIES:\n:CREATED_BY: " my/me "\n:END:\n") :add-created t)
-      ;; recipes, shared with Line (eetsysteem): the ID is a slug we can type
-      ;; on the Menu from a phone, asked for by eet-set-recipe-slug
+      ;; recipes, shared with Line (eetsysteem): the ID is a naampje we can
+      ;; type on the Menu from a phone, asked for by eet-set-naampje
       ("R" "Recipe (shared)" entry (file ,(expand-file-name "recepten.org" my/shared-dir))
        ,(concat "* %^{Name}%^g\n:PROPERTIES:\n:ID:\n:CREATED_BY: " my/me
                 "\n:BRON:     %^{Source: book + page, notebook, or link}\n:FOTO:\n:PORTIES:  4\n:VOORBEREIDING:\n:END:\n"
                 "** Benodigdheden\n- %?\n** Gereedschap\n- \n** Instructies\n1. \n")
-       :add-created t :before-finalize eet-set-recipe-slug)
+       :add-created t :before-finalize eet-set-naampje)
       ("m" "Email" entry (file org-in-file)
        "* %? from %:from on %:subject :@email:\n %i\n %a\n" :add-created t)
       ("w" "Website" entry (file org-in-file)
