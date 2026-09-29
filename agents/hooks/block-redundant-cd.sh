@@ -19,6 +19,14 @@ if echo "$COMMAND" | grep -qE '^[[:space:]]*cd[[:space:]]'; then
   TARGET=$(echo "$COMMAND" | sed -E 's/^[[:space:]]*cd[[:space:]]+//; s/[[:space:]]*(&&|;|\|).*$//; s/[[:space:]]+$//')
   TARGET="${TARGET%\"}"; TARGET="${TARGET#\"}"
   TARGET="${TARGET%\'}"; TARGET="${TARGET#\'}"
+  # `cd "$TARGET"` below does no tilde/param expansion; expand the common forms
+  # by hand. No eval: that would execute `$(...)` in the target inside the hook.
+  case "$TARGET" in
+    "~")   TARGET="$HOME" ;;
+    "~/"*) TARGET="$HOME/${TARGET#\~/}" ;;
+  esac
+  TARGET="${TARGET//\$\{HOME\}/$HOME}"; TARGET="${TARGET//\$HOME/$HOME}"
+  TARGET="${TARGET//\$\{PWD\}/$SESSION_CWD}"; TARGET="${TARGET//\$PWD/$SESSION_CWD}"
   if [ -n "$TARGET" ]; then
     RESOLVED=$(cd "$SESSION_CWD" 2>/dev/null && cd "$TARGET" 2>/dev/null && pwd -P)
     if [ -n "$RESOLVED" ] && [ "$RESOLVED" = "$CWD_RESOLVED" ]; then
