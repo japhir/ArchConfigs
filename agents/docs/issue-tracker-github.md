@@ -6,7 +6,7 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 ## Conventions
 
 - **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
-- **Read an issue**: `gh issue view <number>` (body, labels, state, comment count), then, unless it shows `comments: 0`, `gh issue view <number> --comments`. Off a TTY `--comments` prints the comments *only*, never the body, so one call is never enough.
+- **Read an issue**: `gh issue view <number>` (body, labels, state, comment count), then, unless it shows `comments: 0`, `gh issue view <number> --comments`. Off a TTY `--comments` prints the comments *only*, never the body, so one call is never enough. A hook blocks a bare `--comments` view and prescribes the compound form.
 - **`gh` latency**: `gh issue/pr view` can take ~1s before printing, longer piped through `| grep`/`| head`. Wait for it to return before judging the command.
 - **List issues**: `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'` with appropriate `--label` and `--state` filters.
 - **Comment on an issue**: `gh issue comment <number> --body "..."`
