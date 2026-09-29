@@ -8,13 +8,16 @@ INPUT=$(cat)
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 [ -z "$COMMAND" ] && exit 0
 
-# Only `gh` in command position (line start or after ; & | ( ), so a quoted
-# mention in prose or a commit message does not trip it.
+# Block candidates: `gh` in command position only (line start or after ; & | ( ),
+# so a quoted mention in prose or a commit message does not trip it.
 PAT='(^|[;&|(])[[:space:]]*gh (issue|pr) view[^;&|]*'
 echo "$COMMAND" | grep -qE "$PAT" || exit 0
+CANDIDATES=$(echo "$COMMAND" | grep -oE "$PAT" | sed -E 's/^[;&|(]?[[:space:]]*//')
 
-# Each `gh <kind> view ...` segment up to the next shell operator.
-SEGMENTS=$(echo "$COMMAND" | grep -oE "$PAT" | sed -E 's/^[;&|(]?[[:space:]]*//')
+# Plain views are collected from anywhere, so the compound form quoted in prose
+# (`gh issue view N && gh issue view N --comments`) still counts as paired.
+LOOSE='gh (issue|pr) view[^;&|]*'
+ALL=$(echo "$COMMAND" | grep -oE "$LOOSE")
 
 # ref = first token after `view` that is not a flag or a flag's argument.
 ref_of() {
@@ -35,7 +38,7 @@ while IFS= read -r seg; do
   [ -z "$seg" ] && continue
   echo "$seg" | grep -qE -- '--comments' && continue
   PLAIN="$PLAIN$(ref_of "$seg") "
-done <<< "$SEGMENTS"
+done <<< "$ALL"
 
 while IFS= read -r seg; do
   [ -z "$seg" ] && continue
@@ -47,7 +50,7 @@ while IFS= read -r seg; do
   if [ "$kind" = pr ]; then
     note="PR view shows no comment count, so always run both."
   else
-    note="Skip the second only when the first prints \`comments:\t0\`."
+    note="Skip the second only when the first prints \`comments: 0\`."
   fi
   cat >&2 <<MSG
 BLOCKED: off a TTY \`gh $kind view $ref --comments\` prints the comments ONLY, never the body.
@@ -56,6 +59,6 @@ Run both in one call, plain view first:
 $note
 MSG
   exit 2
-done <<< "$SEGMENTS"
+done <<< "$CANDIDATES"
 
 exit 0

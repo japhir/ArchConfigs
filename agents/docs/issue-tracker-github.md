@@ -6,7 +6,7 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 ## Conventions
 
 - **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
-- **Read an issue**: `gh issue view <number>` (body, labels, state, comment count), then, unless it shows `comments: 0`, `gh issue view <number> --comments`. Off a TTY `--comments` prints the comments *only*, never the body, so one call is never enough. A hook blocks a bare `--comments` view and prescribes the compound form.
+- **Read an issue**: `gh issue view <n> && gh issue view <n> --comments`, in one call, plain view first. Off a TTY `--comments` prints the comments *only*, never the body; a hook blocks it on its own. Drop the second half only when the plain view shows `comments: 0`.
 - **`gh` latency**: `gh issue/pr view` can take ~1s before printing, longer piped through `| grep`/`| head`. Wait for it to return before judging the command.
 - **List issues**: `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'` with appropriate `--label` and `--state` filters.
 - **Comment on an issue**: `gh issue comment <number> --body "..."`
@@ -32,7 +32,7 @@ The backlinks do exist server-side; when you need them, read the timeline direct
 
 When set to `yes`, PRs run through the same labels and states as issues, using the `gh pr` equivalents:
 
-- **Read a PR**: `gh pr view <number>`, then always `gh pr view <number> --comments` (raw PR view shows no comment count), and `gh pr diff <number>` for the diff. `--comments` omits review comments; fetch those with `gh api repos/{owner}/{repo}/pulls/<number>/comments`.
+- **Read a PR**: `gh pr view <n> && gh pr view <n> --comments` (PR view shows no comment count, so always both), and `gh pr diff <n>` for the diff. `--comments` omits review comments; fetch those with `gh api repos/{owner}/{repo}/pulls/<number>/comments`.
 - **List external PRs for triage**: `gh pr list --state open --json number,title,body,labels,author,authorAssociation,comments` then keep only `authorAssociation` of `CONTRIBUTOR`, `FIRST_TIME_CONTRIBUTOR`, or `NONE` (drop `OWNER`/`MEMBER`/`COLLABORATOR`).
 - **Comment / label / close**: `gh pr comment`, `gh pr edit --add-label`/`--remove-label`, `gh pr close`.
 
