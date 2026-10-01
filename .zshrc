@@ -26,6 +26,9 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
   # Arch Linux
   [ -s "/usr/share/nvm/init-nvm.sh" ] && source "/usr/share/nvm/init-nvm.sh"
 fi
+# agents often type echo ====, which results in zsh: === not found. Unset this opt.
+unsetopt EQUALS
+
 # overwrite beam in insert, I like it blocky everywhere
 function zvm_config() {
     ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BLOCK
