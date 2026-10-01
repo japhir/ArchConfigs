@@ -82,8 +82,9 @@ alias pacsize="expac -H M '%m\t%n' | sort -h"
 # went stale in long-lived terminals. Dropped -c (cascade) too: combined with a
 # stale list it could pull in packages that merely depend on the targets.
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
-  alias killorphans="sudo pacman -Rnsc $(pacman -Qtdq)"
+  alias killorphans='sudo pacman -Rns $(pacman -Qtdq)'
   alias pi="pacman -Qq | fzf --preview 'pacman -Qil {}' --layout=reverse --bind 'enter:execute(pacman -Qil {} | less)'"
+fi
 
 alias ssh="TERM=xterm-256color ssh"
 alias der="ssh -Y derecho"
