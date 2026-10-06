@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Copy the shared agent docs from ArchConfigs into the current repo's docs/agents/.
+# Source of truth: ~/ArchConfigs/agents/docs/. Shows a diff before overwriting local edits.
+# Repo-specific additions go in docs/agents/<name>.local.md and are appended to the copy.
+# bash 3.2 compatible (macOS): no associative arrays.
+set -euo pipefail
+SRC="${HOME}/ArchConfigs/agents/docs"
+DST="$(git rev-parse --show-toplevel)/docs/agents"
+mkdir -p "$DST"
+PAIRS="issue-tracker-github.md:issue-tracker.md triage-labels.md:triage-labels.md"
+for pair in $PAIRS; do
+  src="$SRC/${pair%%:*}"
+  name="${pair##*:}"
+  dst="$DST/$name"
+  local_add="$DST/${name%.md}.local.md"
+  tmp="$(mktemp)"
+  cp "$src" "$tmp"
+  if [[ -f "$local_add" ]]; then
+    printf '\n<!-- repo-specific additions from %s -->\n\n' "${local_add##*/}" >> "$tmp"
+    cat "$local_add" >> "$tmp"
+  fi
+  if [[ -f "$dst" ]] && ! cmp -s "$tmp" "$dst"; then
+    echo "== $dst differs from central (repo copy is '-', central is '+'):"
+    diff -u "$dst" "$tmp" || true
+  fi
+  mv "$tmp" "$dst"
+  echo "synced $dst"
+done

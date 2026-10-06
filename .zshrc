@@ -26,6 +26,9 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
   # Arch Linux
   [ -s "/usr/share/nvm/init-nvm.sh" ] && source "/usr/share/nvm/init-nvm.sh"
 fi
+# agents often type echo ====, which results in zsh: === not found. Unset this opt.
+unsetopt EQUALS
+
 # overwrite beam in insert, I like it blocky everywhere
 function zvm_config() {
     ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BLOCK
@@ -82,8 +85,9 @@ alias pacsize="expac -H M '%m\t%n' | sort -h"
 # went stale in long-lived terminals. Dropped -c (cascade) too: combined with a
 # stale list it could pull in packages that merely depend on the targets.
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
-  alias killorphans="sudo pacman -Rnsc $(pacman -Qtdq)"
+  alias killorphans='sudo pacman -Rns $(pacman -Qtdq)'
   alias pi="pacman -Qq | fzf --preview 'pacman -Qil {}' --layout=reverse --bind 'enter:execute(pacman -Qil {} | less)'"
+fi
 
 alias ssh="TERM=xterm-256color ssh"
 alias der="ssh -Y derecho"
