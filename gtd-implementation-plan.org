@@ -1,14 +1,14 @@
 #+title: GTD Implementation Plan — pick up in a fresh session
 #+created: [2026-06-06 Sat]
-#+last_modified: [2026-09-26 Sat 22:33]
+#+last_modified: [2026-09-28 Mon 19:55]
 
-Executable plan for the GTD decisions still missing from =myinit.org=, plus
-one-off elisp helpers for the =~/org= data migration. Rewritten 2026-09-26
-after the shared-system session landed most of the original Phases 1, 2 and 5
-by a different route than sketched here; the obsolete sketches are gone.
+Context and one-off helpers for building the GTD system in =myinit.org=.
+Progress lives in the tracker, not here: =~/org/gtd-build.org= (org issue
+tracker, personal laptop only). Slimmed 2026-10-06 when the phase checklists
+moved there as tickets.
 
 * Read first
-- [[file:CONTEXT.org][CONTEXT.org]] — glossary (the canonical language)
+- [[file:GLOSSARY.org][GLOSSARY.org]] — the canonical language
 - [[file:docs/adr/][docs/adr/]] — 0001 keyword/model, 0002 areas, 0003 daily-notes, 0004 scheduled,
   0005–0007 the shared system with Line
 - [[file:decisions.org][decisions.org]] — system/config decisions; "Agenda files are discovered by
@@ -20,9 +20,10 @@ by a different route than sketched here; the obsolete sketches are gone.
 * Ground rules
 - Source of truth is =myinit.org= (literate). Edit the =.org=, never =myinit.el=.
 - =weekly_review.org= is FROZEN — do not edit/consolidate (David Allen canon).
-- Privacy: do not read =~/org= contents. The data-migration helpers below are
-  scripts the *user* runs; writing them needs no reading of org data.
-- One commit per phase. After each: tangle + =org-babel-load-file= (or reload),
+- Privacy: do not read =~/org= contents, except the allowlisted tracker. The
+  data-migration helpers below are scripts the *user* runs; writing them
+  needs no reading of org data.
+- One commit per ticket. After each: tangle + =org-babel-load-file= (or reload),
   open =C-c a=, build the touched view, confirm no error + expected items.
 
 * Already live (do not redo)
@@ -39,99 +40,17 @@ by a different route than sketched here; the obsolete sketches are gone.
   nothing (ADR 0003). Supersedes the planned =s= key.
 - Shared folder with Line: capture =s=, =S= agenda, partner-only skip, refile
   targets (ADR 0005–0007).
-
-* Phase 1 — config drift leftovers  :myinit:
-:PROPERTIES:
-:commit: fix(emacs): drop dead dirvars, stamp CREATED on web and journal captures
-:END:
-- [X] =* dirvar= + =*** refile targets=: remove =org-notes-file=
-  (=~/org/notes.org= is absent; the name also collides with =my/org-notes-dir=).
-- [X] =* dirvar= + =*** refile targets=: remove =org-tickler-file= and its refile
-  target. The =TICK= keyword stays; tickler is TICK+SCHEDULED (ADR 0004).
-  Deleting =~/org/tickler.org= itself is a =~/org= task, not this commit —
-  first move whatever is in it to TICK+SCHEDULED items.
-- [X] =*** capture templates=: add =:add-created t= to =w= (Website) and =j=
-  (Journal); =p=, =L=, =s= already have it. Lets =my/org-refile-to-created-date=
-  place them.
-
-* Phase 2 — the TODO face  :myinit:
-:PROPERTIES:
-:commit: fix(emacs): give the parked TODO keyword a muted face
-:END:
-=TODO= currently falls through to the stock =org-todo= face (was not
-intentional). Parked should read as quiet, clearly less loud than =NEXT=.
-- [X] =(defface my/todo-todo nil "The TODO keyword." :group 'org-faces)= next
-  to the other six.
-- [X] Add a =my/todo-todo= spec to =my/set-todo-faces=. Muted: e.g.
-  =:background ,bg-dim :foreground ,fg-dim :weight bold=, or =bg-inactive= with
-  =fg-main= if that is too close to =CANC= (which uses =bg-inactive= + strike-through).
-- [X] Add =("TODO" . my/todo-todo)= to =my/todo-faces=.
-- [ ] Verify in both Modus light and dark (circadian switch or =M-x load-theme=).
-
-* Phase 3 — demote action-type context tags  :myinit:
-:PROPERTIES:
-:commit: refactor(emacs): demote action-type context tags
-:END:
-- [X] =org-tag-alist=: remove =@write @program @createplot @read @schedule=.
-  Keep =@agenda= (with-whom context) and all place/tool/energy + PersonName tags.
-- [X] =org-agenda-custom-commands=: drop =gw gp gC gr=. Keep =ga= (=@agenda=).
-  =gg= and =gs= stay: =research= and =software= are WBSO export tags for
-  claimable R&D work, not action-type contexts (an earlier draft of this plan
-  had them wrong).
-- [ ] PersonName tags: leave as-is (open question, see CONTEXT.org).
-- [ ] Data side (user, =~/org=): existing items carrying the demoted tags keep
-  them harmlessly; strip at leisure during weekly reviews.
-
-* Phase 4 — Areas of Focus via CATEGORY (ADR 0002)  :myinit:
-:PROPERTIES:
-:commit: feat(emacs): areas of focus via CATEGORY
-:END:
-Landed 2026-09-26 as =** areas of responsibility (ADR 0002)= in =myinit.org=.
-- [X] =* dirvar=: =(defvar org-areas-file "~/org/life.org")=.
-- [X] =my/gtd-areas= reads the area list from the =:area:=-tagged headings of
-  =life.org=, any level (single source of truth, no hardcoded list). Was
-  top-level headings; changed the same day because =life.org= is nested, and
-  a tag marks an area without dictating the file's shape. ADR 0002 amended.
-- [X] Clarify helper =my/org-set-area= on =C-c A=: =completing-read= over the
-  areas (must match), =org-entry-put "CATEGORY"=; on a =:prj:= (local tag) it
-  stamps every heading of the subtree, so a stale child value cannot shadow it.
-- [X] =a= "Areas" agenda: a function-typed custom command
-  (=my/org-agenda-areas=) building a block per area; an area with no live
-  =:prj:= gets a NEGLECTED header. One pre-scan (=my/gtd-live-projects=)
-  gives the counts and the files each block scans, so the view costs about one
-  pass instead of one per area (5–6 s warm vs 13 s naive). A last block lists
-  live projects whose =CATEGORY= is no area: the migration worklist. =g=
-  rebuilds through the function so the flags refresh. Shadows org's built-in
-  week agenda on =a= (the =A= block covers that).
-- [ ] Data side (user, =~/org=): stamp the projects in the "no area" block
-  with =C-c A=. The CATEGORY audit helper below is now redundant with that
-  block, but still shows inherited values if wanted.
-
-* Phase 5 — loose ends from gtd-workflow.org's pending list
-Not =myinit.org= work, listed so there is one list. Tooling landed
-2026-09-26; the data and people steps are yours.
-- [ ] =~/org=: one-time pass converting keyword-less project children to =TODO=
-  (ADR 0001). Evaluate the helper block below, then
-  =C-u M-x my/gtd-keywordless-project-children= and answer per item;
-  =M-x my/gtd-project-audit= for the empty and multi-NEXT projects.
-- [X] =daily_review.org= (a repo file symlinked into =~/org=): the stale
-  =clumpednotes.org= link was already gone; the inbox step now runs the =d=
-  agenda too.
-- [-] Google Calendar → org sync. Found: org-gcal 0.4 registers its OAuth
-  provider at load, before =secretdirs.el='s =:config= sets the id and
-  secret, so no sync could authorise; =bin/orggcalsync= never existed in the
-  repo; the units were never installed. Done: =secretdirs.el= calls
-  =org-gcal-reload-client-id-secret= after the setq; =bin/orggcalsync= kicks
-  =org-gcal-fetch= in the daemon; service is =oneshot= and requires
-  =emacs.service=; both units symlinked into =~/.config/systemd/user=,
-  daemon reloaded, timer NOT enabled. Yours:
-  - [ ] update the calendar list in =secretdirs.el= (the commented entries)
-  - [ ] =M-x org-gcal-sync= once in Emacs: re-authorise in the browser, check
-    =~/org/calendars/= updates
-  - [ ] =systemctl --user enable --now orggcalsync.timer=
-- [ ] Shared system, with Line: agree =@home= / =@errands= / =@work= for shared
-  files (commented lines in =emacs-starter/config.org=); phones' =CREATED=
-  property name and full keyword set. A conversation, no tooling.
+- Dead dirvars =org-notes-file=, =org-tickler-file= and their refile targets
+  removed; =:add-created t= on every capture template.
+- =TODO= has its own muted face, =my/todo-todo=.
+- Action-type tags =@write @program @createplot @read @schedule= and their
+  =gw gp gC gr= agendas removed. =gg= / =gs= stay: =research= / =software= are
+  WBSO export tags, not contexts.
+- Areas (ADR 0002): =org-areas-file= = =life.org=, areas = its =:area:=-tagged
+  headings at any level; =C-c A= (=my/org-set-area=) stamps =CATEGORY=, the
+  whole subtree on a =:prj:=; =a= agenda (=my/org-agenda-areas=), one
+  pre-scan (=my/gtd-live-projects=), NEGLECTED flags, a "no area" last block.
+- =daily_review.org= runs the =d= agenda; =bin/orggcalsync= + units installed.
 
 * One-off elisp migration helpers (USER runs against ~/org)
 Not config: assist scripts for the data-side backlog, evaluated with =C-c C-c=
@@ -236,6 +155,9 @@ by the usual hook. Answer =n= for notes; nothing is changed without a yes.
           (goto-char (point-min))
           (display-buffer (current-buffer))))))
 #+end_src
+
+#+RESULTS:
+: my/gtd-keywordless-project-children
 
 * After implementation — update the docs
 - Flip the "Decided, pending implementation" items in =gtd-workflow.org= as they

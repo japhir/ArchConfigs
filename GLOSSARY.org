@@ -1,15 +1,12 @@
-#+title: GTD Context — Glossary
+#+title: GTD Glossary
 #+created: [2026-06-06 Sat]
-#+last_modified:
+#+last_modified: [2026-10-06 Tue 20:05]
 
 Canonical language for the org-mode GTD system implemented in =myinit.org=.
-Glossary only — no implementation detail. For the as-built workflow see
-[[file:gtd-workflow.org][gtd-workflow.org]]; for the decisions behind it see [[file:docs/adr/][docs/adr/]].
+For the as-built workflow see [[file:gtd-workflow.org][gtd-workflow.org]]; for the decisions behind it see [[file:docs/adr/][docs/adr/]].
 
 * Language
-
 ** Actions & states
-
 *** Next Action
 The single, concrete, physically-doable action that moves a project forward
 right now. Keyword =NEXT=. A project has exactly one.
@@ -45,7 +42,6 @@ Something not committed to — no decision to act has been made. Keyword =SOME=.
 /Avoid/: backlog, wishlist, later.
 
 ** Structure
-
 *** Project
 Any outcome that needs more than one action. Marked with the =:prj:= tag
 (not inherited) on a heading carrying =[/]=; identified by that tag plus its

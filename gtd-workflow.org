@@ -1,9 +1,9 @@
 #+title: GTD Workflow — as built
 #+created: [2026-06-06 Sat]
-#+last_modified: [2026-09-26 Sat 16:25]
+#+last_modified: [2026-10-06 Tue 20:06]
 
 As-built snapshot of the GTD workflow implemented in the org-mode section of
-=myinit.org=. Companion to [[file:CONTEXT.org][CONTEXT.org]] (the glossary) and [[file:docs/adr/][docs/adr/]] (the
+=myinit.org=. Companion to [[file:GLOSSARY.org][GLOSSARY.org]] and [[file:docs/adr/][docs/adr/]] (the
 decisions behind the shape). Reference doc — lives in the ArchConfigs repo,
 deliberately /not/ under =~/org= (not an agenda file).
 
@@ -41,7 +41,7 @@ implemented are marked → ADR and listed under "Decided, pending implementation
   (=org-areas-file=), any level, read live; carried on items via =:CATEGORY:=
   (ADR 0002, amended 2026-09-26). =C-c A= stamps one
   at clarify, and on a =:prj:= heading pushes it onto the whole subtree
-- Contexts: =@=-tags — place / tool / energy / with-whom (=@agenda= + person); see CONTEXT.org.
+- Contexts: =@=-tags — place / tool / energy / with-whom (=@agenda= + person); see GLOSSARY.org.
   The kind-of-work tags (=@write @program @read @createplot @schedule=) and their
   =g*= agendas were removed 2026-09-26; items still carrying them are harmless
 - Assignee (shared folder only): lowercase =ilja= / =line= tag, at most one,
@@ -89,7 +89,7 @@ These are agreed (see ADRs) but not yet in =myinit.org= / =~/org=:
 - Areas (config live 2026-09-26): migrate the existing CATEGORY=project-name
   values; the last block of the =a= agenda lists every live project not yet in
   an area, stamp each with =C-c A= (ADR 0002)
-- Decide whether the per-=:PersonName:= agenda-list tags stay (see CONTEXT.org)
+- Decide whether the per-=:PersonName:= agenda-list tags stay (see GLOSSARY.org)
 - Daily pass: actually start using =d= (the template runs the =d= sweep
   since 2026-09-26; the stale link was already gone)
 - Shared system with Line (ADR 0005–0007), Emacs side done 2026-09-26. The
@@ -104,4 +104,4 @@ These are agreed (see ADRs) but not yet in =myinit.org= / =~/org=:
   2026-09-26 (the script kicks =org-gcal-fetch= in the daemon). Left, by hand:
   update the calendar list in =secretdirs.el=, one =M-x org-gcal-sync= to
   re-authorise, then =systemctl --user enable --now orggcalsync.timer=
-- Config drift: see the backlog filed into the personal GTD system
+- Tickets for all of the above: =~/org/gtd-build.org= (org issue tracker)

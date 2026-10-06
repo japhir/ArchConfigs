@@ -30,7 +30,7 @@ captured there, which is accepted.
 - The person tags form a mutually exclusive group; a task is never tagged both.
 - Lowercase distinguishes assignee tags from Ilja's capitalised
   =:PersonName:= tags, which mean "to raise with this person" (the Agenda
-  list, see CONTEXT.org). Same shape, different meaning; the case is the
+  list, see GLOSSARY.org). Same shape, different meaning; the case is the
   only signal, so do not lowercase the agenda-list tags.
 - Each person's agenda hides shared tasks tagged only for the other; a
   second view shows everything for planning together.
