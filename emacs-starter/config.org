@@ -125,7 +125,12 @@ frame starts maximized.
 =C-z= minimizes the Emacs window ("suspend"), which on Windows looks like a
 crash. Unbound here. Typing while text is selected replaces the selection,
 like every other program. Yes/no questions accept =y= / =n=.
+
+The menu shows one key per command, and the lessons promise that key. For
+undo the menu would show =C-x u=; this makes it show the shorter =C-/=, which
+is easier to press repeatedly.
 #+begin_src emacs-lisp
+  (put 'undo :advertised-binding (kbd "C-/"))
   (global-unset-key (kbd "C-z"))
   (global-unset-key (kbd "C-x C-z"))
   (delete-selection-mode 1)
@@ -316,6 +321,11 @@ file; =Enter= jumps there. =C-x b= lists open buffers and recent files together.
 ** the basics
 Org is built in. Files open showing their headings and first-level content. Done tasks get a timestamp, and state
 changes go in a =LOGBOOK= drawer so the heading stays clean.
+
+=Shift= + arrows selects text, like everywhere else on Windows. Org normally
+takes those keys for itself (cycling todo states and priorities on headings,
+bullets on lists), which makes selecting silently fail. =t= gives them back
+in plain text; on a heading, list item or date they keep their org meaning.
 #+begin_src emacs-lisp
   (use-package org
     :ensure nil
@@ -323,6 +333,7 @@ changes go in a =LOGBOOK= drawer so the heading stays clean.
            ("C-c a" . org-agenda))
     :custom
     (org-startup-folded 'content)
+    (org-support-shift-select t)
     (org-log-done 'time)
     (org-log-into-drawer t)
     (org-tags-column -65)

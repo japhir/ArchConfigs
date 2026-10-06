@@ -39,7 +39,7 @@ The single most important key: *=C-g= cancels whatever Emacs is doing.*
 Wrong menu, half-typed command, a question you did not mean to start: =C-g=.
 Press it twice if once is not enough.
 
-Undo is =C-/= (or =C-x u=). Press it repeatedly to go further back.
+Undo is =C-/=. Press it repeatedly to go further back.
 
 - Exercise :: Type a few letters here: ________. Now press =C-/= until
   they are gone.
@@ -47,8 +47,8 @@ Undo is =C-/= (or =C-x u=). Press it repeatedly to go further back.
 Two Windows habits that behave differently here:
 - =C-s= is *search*, not save. Save is =C-x C-s=.
 - =C-c= alone does nothing yet; it is the start of a two-stroke key. Copy is
-  =C-Insert= (or =M-w=), paste is =Shift-Insert= (or =C-y=), cut is =Shift-Delete=
-  (or =C-w=). Select text by dragging with the mouse or with =Shift= + arrows.
+  =M-w=, paste is =C-y=, cut is =C-w=; the Edit menu shows the same keys.
+  Select text by dragging with the mouse or with =Shift= + arrows.
 
 * 4. Every command has a name
 Everything Emacs can do is a command with a name, like =org-agenda= or

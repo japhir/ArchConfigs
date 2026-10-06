@@ -10,9 +10,10 @@
 | =C-x C-s=      | save                                  |
 | =C-/=          | undo (repeat to go further)           |
 | =C-s=          | search this file, live list           |
-| =C-Insert=     | copy (=M-w=)                          |
-| =Shift-Insert= | paste (=C-y=)                         |
-| =Shift-Delete= | cut (=C-w=)                           |
+| =M-w=          | copy                                  |
+| =C-y=          | paste                                 |
+| =C-w=          | cut                                   |
+| =Shift= arrows | select text                           |
 | =C-a= / =C-e=  | start / end of line                   |
 | =C-x 1=        | keep only this window                 |
 | =C-x k=        | close this buffer                     |
