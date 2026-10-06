@@ -1,6 +1,6 @@
 ---
 name: skimmed
-description: I skimmed your last reply (or a file you wrote) — digest the decisions I still owe, treat the rest as unread.
+description: I skimmed your last reply (or a file you wrote): digest the decisions I still owe, treat the rest as unread.
 disable-model-invocation: true
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: upto
-description: I read your last reply up to the named heading (exclusive) — treat that heading and everything after it as unread.
+description: I read your last reply up to the named heading (exclusive); treat that heading and everything after it as unread.
 disable-model-invocation: true
 ---
 

@@ -9,7 +9,7 @@ if echo "$COMMAND" | grep -qE "git push"; then
   exit 2
 fi
 
-# Broad staging sweeps in another agent's edits (shared trees) — stage explicit paths.
+# Broad staging sweeps in another agent's edits (shared trees): stage explicit paths.
 if echo "$COMMAND" | grep -qE "git add( -[a-zA-Z]+)* +(-A|--all|\.)( |$)"; then
   echo "Stage explicit paths (git add <files you changed>); a parallel agent may have edits in this tree." >&2
   exit 2

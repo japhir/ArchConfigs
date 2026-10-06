@@ -1,4 +1,4 @@
-<!-- synced from ~/ArchConfigs/agents/docs/triage-labels.md — edit there, then run agents-docs-sync -->
+<!-- synced from ~/ArchConfigs/agents/docs/triage-labels.md; edit there, then run agents-docs-sync -->
 # Triage Labels
 
 The skills speak in terms of five canonical triage roles. This file maps those roles to the actual label strings used in this repo's issue tracker. Same vocabulary in every repo.

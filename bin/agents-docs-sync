@@ -7,7 +7,7 @@ set -euo pipefail
 SRC="${HOME}/ArchConfigs/agents/docs"
 DST="$(git rev-parse --show-toplevel)/docs/agents"
 mkdir -p "$DST"
-PAIRS="issue-tracker-github.md:issue-tracker.md triage-labels.md:triage-labels.md"
+PAIRS="issue-tracker-github.md:issue-tracker.md triage-labels.md:triage-labels.md domain.md:domain.md"
 for pair in $PAIRS; do
   src="$SRC/${pair%%:*}"
   name="${pair##*:}"

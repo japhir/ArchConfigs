@@ -11,7 +11,7 @@ Derived from `caveman-commit` by Julius Brussee (github.com/JuliusBrussee/cavema
 
 ## Subject
 
-`<type>(<scope>): <imperative summary>` — scope optional.
+`<type>(<scope>): <imperative summary>`; scope optional.
 
 Types: `feat`, `fix`, `refactor`, `perf`, `docs`, `test`, `chore`, `build`, `ci`,
 `style`, `revert`.
@@ -26,7 +26,7 @@ The diff already says what the code does. The subject says which change this is.
 
 ## Body
 
-Include one when the *why* is non-obvious — and always for a breaking change,
+Include one when the *why* is non-obvious, and always for a breaking change,
 migration, security fix, or revert, where a future debugger needs the reason the
 change existed at all.
 
@@ -46,7 +46,7 @@ unpushed.
 ## Attribution
 
 Every commit ends with `Co-Authored-By: Claude <Model> <noreply@anthropic.com>`
-naming the model that did the work — write it from what this session ran, never
+naming the model that did the work; write it from what this session ran, never
 copied from an earlier commit. When a subagent ran with a `model` override, or
 more than one model shaped the commit, read `ATTRIBUTION.md` for who earns a
 line and in what order.

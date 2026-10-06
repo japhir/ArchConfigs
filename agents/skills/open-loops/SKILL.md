@@ -1,6 +1,6 @@
 ---
 name: open-loops
-description: Close out a stretch of work — landed tickets closed, side-findings filed, questions surfaced.
+description: Close out a stretch of work: landed tickets closed, side-findings filed, questions surfaced.
 disable-model-invocation: true
 ---
 

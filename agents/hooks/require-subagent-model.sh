@@ -17,6 +17,6 @@ jq -n --arg why "$WHY" '{
   hookSpecificOutput: {
     hookEventName: "PreToolUse",
     permissionDecision: "deny",
-    permissionDecisionReason: ($why + ". Pick the tier for this task and retry with model: set.\n- sonnet: mechanical, fully specified — sweeps, lint/format fixes, running a written recipe, lookups.\n- opus: judgement — review, design, debugging, non-trivial code.\n- fable: rarely — only when opus would plausibly get it wrong (deep multi-file architecture, hard diagnosis).")
+    permissionDecisionReason: ($why + ". Pick the tier for this task and retry with model: set.\n- sonnet: mechanical, fully specified: sweeps, lint/format fixes, running a written recipe, lookups.\n- opus: judgement: review, design, debugging, non-trivial code.\n- fable: rarely, only when opus would plausibly get it wrong (deep multi-file architecture, hard diagnosis).")
   }
 }'

@@ -12,6 +12,7 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 - **Comment on an issue**: `gh issue comment <number> --body "..."`
 - **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
 - **Close**: `gh issue close <number> --comment "..."`
+- **Deferred refactors**: refactor/simplification findings not fixed in-session (e.g. from code review) become a `needs-triage` issue, so they aren't lost to session output alone.
 
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
 
