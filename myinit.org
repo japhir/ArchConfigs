@@ -1054,8 +1054,10 @@ palette") feeds both org and org-modern, which does not read
 #+end_src
 *** dynamic agenda files
 Rescan ~/org before every agenda build so newly created files show up without
-restarting or re-running init. Two exclusions. Lockfiles (.#foo.org) are
-dangling symlinks that would break the agenda. The org-roam notes under
+restarting or re-running init. Three exclusions. Lockfiles (.#foo.org) are
+dangling symlinks that would break the agenda. Conflict copies left by
+Nextcloud (=foo (conflicted copy …).org=) and Syncthing
+(=foo.sync-conflict-….org=) would show every task in them twice. The org-roam notes under
 notes/ are nearly the whole tree (2144 of 2199 files on 2026-09-26, 1182 of
 them dailies) and are reference and log, not task buckets; scanning them
 doubled every warm agenda build and tripled the cold one to find tasks that
@@ -1063,16 +1065,54 @@ leak in only occasionally. The 55 files outside notes/ are the task surface.
 The =d= sweep view scans the notes alone, on demand (ADR 0003; decisions.org,
 "Agenda files are discovered by rescanning ~/org"). This is the one filter; no
 curated list on top of it.
+#+name: org-files-under
 #+begin_src emacs-lisp
   (defun my/org-files-under (dir &optional exclude)
-    "Every org file under DIR, recursively, minus lockfiles.
+    "Every org file under DIR, recursively, minus lockfiles and sync conflicts.
   With EXCLUDE, a directory, the files under it are left out."
     (let ((skip (and exclude (expand-file-name exclude))))
       (seq-remove (lambda (f)
-                    (or (string-prefix-p ".#" (file-name-nondirectory f))
+                    (or (string-match-p
+                         "\\`\\.#\\| (conflicted copy \\|\\.sync-conflict-"
+                         (file-name-nondirectory f))
                         (and skip (string-prefix-p skip (expand-file-name f)))))
                   (directory-files-recursively dir "\\.org\\'"))))
+#+end_src
 
+Tests, tangled to their own file so startup never loads them; the helper comes
+in by noweb, so they run without the rest of the config:
+#+begin_src sh :tangle no
+  emacs --batch -l org --eval '(org-babel-tangle-file "myinit.org" nil "emacs-lisp")' \
+    -l myinit-tests.el -f ert-run-tests-batch-and-exit
+#+end_src
+#+begin_src emacs-lisp :tangle myinit-tests.el :noweb yes
+  ;;; myinit-tests.el --- ERT tests for myinit.org -*- lexical-binding: t; -*-
+  ;; Generated from myinit.org; edit that file instead.
+  (require 'ert)
+  (require 'seq)
+  <<org-files-under>>
+
+  (ert-deftest my/org-files-under/skips-sync-conflicts-and-excluded-dir ()
+    (let ((dir (make-temp-file "org-files-under" t)))
+      (unwind-protect
+          (let ((default-directory dir))
+            (dolist (f '("todo.org"
+                         "todo (conflicted copy 2026-10-06 120000).org"
+                         "todo.sync-conflict-20261006-120000-ABCDEFG.org"
+                         "sub/work.org"
+                         "sub/work (conflicted copy 2026-10-06 120000).org"
+                         "sub/work.sync-conflict-20261006-120000-ABCDEFG.org"
+                         "notes/idea.org"))
+              (make-directory (file-name-directory (expand-file-name f)) t)
+              (write-region "" nil f))
+            (should (equal (sort (mapcar (lambda (f) (file-relative-name f dir))
+                                         (my/org-files-under dir "notes"))
+                                 #'string<)
+                           '("sub/work.org" "todo.org"))))
+        (delete-directory dir t))))
+#+end_src
+
+#+begin_src emacs-lisp
   (defun my/org-agenda-files-refresh (&rest _)
     "Rebuild `org-agenda-files': every org file under ~/org except the notes."
     (setq org-agenda-files (my/org-files-under "~/org" my/org-notes-dir)))

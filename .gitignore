@@ -47,3 +47,4 @@ agents/.skill-lock.json
 # eetsysteem: tangled from eetsysteem.org
 eetsysteem.el
 eetsysteem-tests.el
+myinit-tests.el
