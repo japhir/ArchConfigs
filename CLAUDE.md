@@ -22,7 +22,9 @@ Legacy configs retained but not active: Hyprland, Sway, Waybar, AShell, Polybar,
 
 The Emacs config source of truth is `myinit.org` (org-babel literate config at repo root). On startup `init.el` calls `org-babel-load-file` on it, which tangles + loads it. **Always edit `myinit.org` — never `myinit.el`.** `myinit.el` is generated output, gitignored, and regenerated on every startup.
 
-`eetsysteem.org` (repo root) is the literate meal-planning/shopping module: tangled `.el` plus ERT tests on fixture buffers, loaded from `myinit.org`, standalone so it runs in `emacs --batch`. Its spec and tickets live in `~/org/iljline/eetsysteem.org`, an org issue tracker; see `~/.claude/docs/issue-tracker-org.md`.
+The GTD system is configured in `myinit.org`; its docs are `GLOSSARY.org` (language), `gtd-workflow.org` (as built) and `docs/adr/` (decisions).
+
+Machine-specific instructions live in `CLAUDE.local.md` (tracked, different content on `master` and `macos`; auto-loaded by Claude Code). Same for the user-level `agents/CLAUDE.local.md`, imported from `agents/CLAUDE.md`.
 
 The files under `emacs/` (`early-init.el`, `custom-modules/`) were a temporary experiment to integrate `crafted-emacs`. They are not the canonical source.
 
