@@ -22,7 +22,7 @@ Legacy configs retained but not active: Hyprland, Sway, Waybar, AShell, Polybar,
 
 The Emacs config source of truth is `myinit.org` (org-babel literate config at repo root). On startup `init.el` calls `org-babel-load-file` on it, which tangles + loads it. **Always edit `myinit.org` — never `myinit.el`.** `myinit.el` is generated output, gitignored, and regenerated on every startup.
 
-The GTD system is configured in `myinit.org`; its docs are `GLOSSARY.org` (language), `gtd-workflow.org` (as built) and `docs/adr/` (decisions).
+The GTD system is configured in `myinit.org`; its docs are `GLOSSARY.org` (language), `gtd-workflow.org` (as built) and `docs/adr/` (decisions). Domain docs are org: `GLOSSARY.org` and `docs/adr/*.org`. Where the engineering-skill docs say `GLOSSARY.md`, read `GLOSSARY.org`.
 
 Machine-specific instructions live in `CLAUDE.local.md` (tracked, different content on `master` and `macos`; auto-loaded by Claude Code). Same for the user-level `agents/CLAUDE.local.md`, imported from `agents/CLAUDE.md`.
 
