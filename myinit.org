@@ -885,7 +885,7 @@ Filter tasks by context (sorted by todo state)
           ;; cannot be written in a match string, and this covers all of them
           ("j" "Projects" tags "+prj-TODO={^DONE}/-CANC-SOME")
           ;; a function-typed command: the blocks depend on life.org's headings
-          ("a" "Areas of Responsibility" my/org-agenda-areas "")
+          ("r" "Areas of Responsibility" my/org-agenda-areas "")
           ("S" "Shared with Line, both of us" tags-todo "*"
            ((org-agenda-files (list my/shared-dir))
             (org-agenda-skip-function-global nil)
@@ -1788,7 +1788,7 @@ built-in =CATEGORY= property: it inherits down the subtree, shows in the agenda
 prefix column and is matchable, so one area per item is structural. =C-c A=
 stamps one at clarify; on a =:prj:= heading it is pushed onto every heading in
 the subtree too, so a stale project-name-era =CATEGORY= on a child cannot
-shadow it. The =a= agenda shows the live projects per area and flags an area
+shadow it. The =r= agenda shows the live projects per area and flags an area
 with none as neglected; its last block lists live projects whose =CATEGORY= is
 no area at all, which is the migration worklist. Live means the =j= match.
 #+begin_src emacs-lisp

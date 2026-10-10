@@ -62,9 +62,9 @@ implemented are marked → ADR and listed under "Decided, pending implementation
   engine — empty =inbox.org= + =mobin.org=, sweep stray tasks out of
   =notes/daily/=, pick the day's =NEXT=s. Light; never duplicates the weekly.
 - Agendas: =A= block, =n= next, =w= waiting, =j= projects, =I= important, =#= stuck
-- =a= areas: one block of live projects per area, an area with none flagged
+- =r= areas: one block of live projects per area, an area with none flagged
   NEGLECTED; the last block lists live projects whose =CATEGORY= is no area
-  (the migration worklist, ADR 0002). Shadows org's built-in week agenda on =a=
+  (the migration worklist, ADR 0002). On =r= so org's built-in week agenda keeps =a=
 - Agenda files: every =.org= under =~/org= except =notes/= (org-roam),
   rescanned before each agenda; =d= sweeps all of =notes/= for stray tasks
   (ADR 0003)
@@ -87,7 +87,7 @@ These are agreed (see ADRs) but not yet in =myinit.org= / =~/org=:
 - One-time pass to convert stray keyword-less project actions to =TODO=
   (ADR 0001; the keyword set itself is live)
 - Areas (config live 2026-09-26): migrate the existing CATEGORY=project-name
-  values; the last block of the =a= agenda lists every live project not yet in
+  values; the last block of the =r= agenda lists every live project not yet in
   an area, stamp each with =C-c A= (ADR 0002)
 - Decide whether the per-=:PersonName:= agenda-list tags stay (see GLOSSARY.org)
 - Daily pass: actually start using =d= (the template runs the =d= sweep
