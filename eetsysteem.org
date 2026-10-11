@@ -132,9 +132,9 @@ keep their tick, bread simply gets unticked most weeks.
 Unbought items move to the same store in the new list, or to the first
 store from a section that is no store. Carried items come
 first, then the staples that aren't already there. Every checkbox section
-ends with one empty =- [ ]=: on beorg and orgzly, return on a checkbox line
-makes the next one, while typing =- [ ]= from nothing on a phone keyboard
-is a pain.
+has at least one checkbox, an empty =- [ ]= only when it has no items: on
+beorg and orgzly, return on a checkbox line makes the next one, while
+typing =- [ ]= from nothing on a phone keyboard is a pain.
 #+begin_src emacs-lisp
   (defun eet--norm (s)
     "S lowercased without whitespace, for matching names and items."
@@ -199,7 +199,7 @@ is a pain.
         (concat "** " name "\n"
                 (mapconcat (lambda (it) (concat (if boxes "- [ ] " "- ") it "\n"))
                            items "")
-                (if boxes "- [ ]\n" "")))
+                (if (and boxes (null items)) "- [ ]\n" "")))
       sections "")))
 
   (defun eet--week-title (time)
@@ -351,7 +351,7 @@ org-id rescan every file.
 * The Menu
 The Menu links recipes with =id:= links, so the cooking log lands on the
 recipe itself. =M-x eet-add-to-menu= picks a recipe and puts it on this
-week's Menu, above the empty checkbox. Recipes without a naampje can't be
+week's Menu, as its last item. Recipes without a naampje can't be
 linked, so they aren't offered.
 
 Recipes are looked up in =recepten.org= only, never through org-id's
@@ -393,17 +393,17 @@ global table: a missing ID there makes org-id rescan every agenda file.
       (unless found (user-error "No %s section under %s" name parent))))
 
   (defun eet--insert-item (text)
-    "Add checkbox TEXT to the section at point, above its empty checkbox.
-  A section without one gets one, so it stays last."
+    "Add checkbox TEXT as the last item of the section at point.
+  A trailing empty checkbox is filled in rather than kept."
     (let ((item (concat "- [ ] " text "\n")))
       (goto-char (org-entry-end-position))
       (skip-chars-backward " \t\n")
       (forward-line 0)
       (if (looking-at "[ \t]*[-+] \\[ \\][ \t]*$")
-          (insert item)
+          (delete-region (point) (line-beginning-position 2))
         (forward-line 1)
-        (unless (bolp) (insert "\n"))
-        (insert item "- [ ]\n"))))
+        (unless (bolp) (insert "\n")))
+      (insert item)))
 
   (defun eet--this-week ()
     "Marker of this week's list, the last open one, or signal a user error."
@@ -430,7 +430,7 @@ global table: a missing ID there makes org-id rescan every agenda file.
 
 * Recipe to shopping list
 =M-x eet-add-ingredients= with point in a recipe, or on an =id:= link to
-one (a Menu line), puts its Benodigdheden on this week's list, each above the empty checkbox of its Winkel, as written:
+one (a Menu line), puts its Benodigdheden on this week's list, each as the last item of its Winkel, as written:
 the quantity helps in the shop. The Winkel is where the item last sat:
 Basisvoorraad first, since it is kept up to date, then the archived lists,
 newest first. An item we never bought goes to the first store (Lidl/Hira).
@@ -806,10 +806,8 @@ the resulting text; the real =~/org= is never touched.
   - [ ]
   ** Lidl/Hira
   - [ ] brood
-  - [ ]
   ** Picnic
   - [ ] havermout
-  - [ ]
   ** LOOS
   - [ ]
   "))))
@@ -844,10 +842,8 @@ the resulting text; the real =~/org= is never touched.
   ** Nog in huis
   ** Menu
   - [ ] curry
-  - [ ]
   ** Lidl/Hira
   - [ ] Brood
-  - [ ]
   ** Picnic
   - [ ]
   ** LOOS
@@ -889,12 +885,10 @@ the resulting text; the real =~/org= is never touched.
   ** Lidl/Hira
   - [ ] bananen
   - [ ] brood
-  - [ ]
   ** Picnic
   - [ ]
   ** LOOS
   - [ ] oregano
-  - [ ]
   "))))
 
   (ert-deftest eet-new-week/archives-oldest-first ()
@@ -945,7 +939,7 @@ the resulting text; the real =~/org= is never touched.
   "
     "recepten.org fixture.")
 
-  (ert-deftest eet-add-to-menu/links-picked-recipe-above-empty-box ()
+  (ert-deftest eet-add-to-menu/fills-a-trailing-empty-box ()
     (eet-test--with-files `(("eetplanning.org" . "* DONE Boodschappen 2026-09-21
   ** Menu
   - [ ]
@@ -970,7 +964,6 @@ the resulting text; the real =~/org= is never touched.
   ** Menu
   - [ ] linzensoep
   - [ ] [[id:pompoencurry][Pompoen-kikkererwtencurry met zilvervliesrijst]]
-  - [ ]
   ** Lidl/Hira
   - [ ]
   "))))
@@ -1002,7 +995,6 @@ the resulting text; the real =~/org= is never touched.
   ** Nog in huis
   ** Menu
   - [ ] [[id:pompoencurry][Pompoen-kikkererwtencurry met zilvervliesrijst]]
-  - [ ]
   ** Lidl/Hira
   - [ ]
   ** Picnic
@@ -1036,7 +1028,7 @@ the resulting text; the real =~/org= is never touched.
         (should (string-search "- [X] stamppot" archive))
         (should-not (string-search "pizza" archive)))))
 
-  (ert-deftest eet-add-to-menu/keeps-an-empty-box-last ()
+  (ert-deftest eet-add-to-menu/fills-a-section-without-boxes ()
     (eet-test--with-files `(("eetplanning.org" . "* TODO Boodschappen 2026-09-28
   ** Menu
   ** LOOS
@@ -1047,7 +1039,6 @@ the resulting text; the real =~/org= is never touched.
       (should (equal (eet-test--text) "* TODO Boodschappen 2026-09-28
   ** Menu
   - [ ] [[id:linzensoep][Linzensoep]]
-  - [ ]
   ** LOOS
   "))))
 
@@ -1238,15 +1229,12 @@ the resulting text; the real =~/org= is never touched.
   - [ ] brood
   - [ ] 2 uien, gesnipperd
   - [ ] 1 limoen
-  - [ ]
   ** Picnic
   - [ ] 800 g pompoen (flespompoen of hokkaido), in blokjes
   - [ ] 400 ml kokosmelk (light)
   - [ ] 3 teentjes knoflook
-  - [ ]
   ** LOOS
   - [ ] 1 bosje koriander
-  - [ ]
   "))))
 
   (ert-deftest eet-add-ingredients/adds-beside-what-is-on-the-list ()
@@ -1258,7 +1246,6 @@ the resulting text; the real =~/org= is never touched.
                             ("eetplanning.org" . "* TODO Boodschappen 2026-09-28
   ** Lidl/Hira
   - [ ] 3 uien
-  - [ ]
   "))
       (eet-add-ingredients)
       (should (equal (eet-test--file-text "eetplanning.org")
@@ -1267,7 +1254,6 @@ the resulting text; the real =~/org= is never touched.
   - [ ] 3 uien
   - [ ] 1 ui
   - [ ] 1 ui, voor erbovenop
-  - [ ]
   "))))
 
   (ert-deftest eet-add-ingredients/from-a-recipe-link ()
@@ -1292,7 +1278,6 @@ the resulting text; the real =~/org= is never touched.
   - [ ] 400 ml kokosmelk (light)
   - [ ] 3 teentjes knoflook
   - [ ] 1 bosje koriander
-  - [ ]
   "))))
 
   (ert-deftest eet-add-ingredients/refuses-a-link-to-no-recipe ()
