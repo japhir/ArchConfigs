@@ -118,11 +118,16 @@ Menu). Only checkbox lines count as items.
 #+end_src
 
 * Starting a new week
-Before planning we walk through the house (the Huisronde) and tick the
-staples we still have. Only unticked staples go onto the new list, and a
-ticked staple also stops an unbought item of the same name from carrying
-over: the walk is newer than last week's list. Afterwards every staple is
-unticked again, ready for next week's walk.
+A ticked staple means "in the house" and stays ticked until someone
+unticks it: before planning we walk through the house (the Huisronde) and
+untick what is (nearly) gone. Only unticked staples go onto the new list,
+and a ticked staple also stops an unbought item of the same name from
+carrying over: the walk is newer than last week's list. Afterwards every
+item bought on the closed lists ticks its staple again, compared by name
+like =eet-add-ingredients= does. That happens after the new list is
+built, so the walk still wins: bread bought last week but unticked on the
+walk goes onto the list. One rule for every Winkel: jars that last months
+keep their tick, bread simply gets unticked most weeks.
 
 Unbought items move to the same store in the new list, or to the first
 store from a section that is no store. Carried items come
@@ -153,6 +158,26 @@ is a pain.
                   (unless (car it)
                     (push (cdr it) (alist-get target acc nil nil #'equal)))))))))
       (mapcar (lambda (c) (cons (car c) (reverse (cdr c)))) acc)))
+
+  (defun eet--bought (lists)
+    "`eet--item-name' of every ticked item in LISTS (markers)."
+    (let (acc)
+      (dolist (m lists acc)
+        (org-with-point-at m
+          (pcase-dolist (`(,_ . ,items) (eet--sections))
+            (dolist (it items)
+              (when (car it) (push (eet--item-name (cdr it)) acc))))))))
+
+  (defun eet--tick-staples (names)
+    "Tick the unticked staples whose `eet--item-name' is in NAMES."
+    (when-let* ((m (eet--staples-heading)))
+      (org-with-point-at m
+        (let ((end (save-excursion (org-end-of-subtree t t))))
+          (while (re-search-forward eet--checkbox-re end t)
+            (when (and (equal (match-string 1) " ")
+                       (member (eet--item-name (match-string-no-properties 2))
+                               names))
+              (replace-match "X" t t nil 1)))))))
 
   (defun eet--merge (&rest lists)
     "Concatenate LISTS of item texts, dropping repeats by `eet--norm'."
@@ -188,7 +213,7 @@ is a pain.
   Close the Menu of every open list (see `eet--close-menus'), carry their
   unticked items over, add the unticked
   staples from Basisvoorraad, then mark the old lists done, archive them
-  and untick every staple. TIME defaults to now."
+  and tick the staples bought on them. TIME defaults to now."
     (interactive)
     (let* ((buf (find-file-noselect (eet-planning-file)))
            (pos (with-current-buffer buf (eet--new-week time))))
@@ -209,6 +234,7 @@ is a pain.
              (staples (eet--staples))
              (stores (eet--stores staples))
              (carried (eet--carried old stores))
+             (bought (eet--bought old))
              (get (lambda (al k) (alist-get k al nil nil #'equal)))
              (have (mapcar (lambda (it) (eet--norm (cdr it)))
                            (seq-filter #'car (apply #'append (mapcar #'cdr staples)))))
@@ -237,8 +263,7 @@ is a pain.
             (org-with-point-at m
               (org-todo 'done)
               (org-archive-subtree))))
-        (when-let* ((m (eet--staples-heading)))
-          (org-with-point-at m (org-reset-checkbox-state-subtree)))
+        (eet--tick-staples bought)
         (eet--log-cooked cooked time)
         (widen)
         (goto-char new)
@@ -768,7 +793,7 @@ the resulting text; the real =~/org= is never touched.
       (should (equal (eet-test--text) "* Basisvoorraad
   ** Lidl/Hira
   - [ ] brood
-  - [ ] bananen
+  - [X] bananen
   - [ ]
   ** Picnic
   - [ ] havermout
@@ -811,7 +836,7 @@ the resulting text; the real =~/org= is never touched.
       (should (equal (eet-test--text) "* Basisvoorraad
   ** Lidl/Hira
   - [ ] brood
-  - [ ] paprika
+  - [X] paprika
   * TODO Boodschappen 2026-09-28
   :PROPERTIES:
   :CREATED:  [2026-09-28 Mon 12:00]
@@ -830,6 +855,47 @@ the resulting text; the real =~/org= is never touched.
   "))
       (should (string-match-p "^\\* DONE Boodschappen 2026-09-21"
                               (eet-test--file-text "eetplanning.org_archive")))))
+
+  (ert-deftest eet-new-week/bought-items-tick-their-staple ()
+    ;; the Huisronde is newer than last week's list: brood is still on the
+    ;; new list, and ticked only once that list is closed
+    (eet-test--with-file "* Basisvoorraad
+  ** Lidl/Hira
+  - [ ] brood
+  - [ ] bananen
+  ** LOOS
+  - [ ] oregano
+  * TODO Boodschappen 2026-09-21
+  ** Lidl/Hira
+  - [X] 2 Brood (volkoren), vers
+  - [ ] bananen
+  ** LOOS
+  - [X] 1 pot oregano
+  "
+      (eet-new-week eet-test--time)
+      (should (equal (eet-test--text) "* Basisvoorraad
+  ** Lidl/Hira
+  - [X] brood
+  - [ ] bananen
+  ** LOOS
+  - [X] oregano
+  * TODO Boodschappen 2026-09-28
+  :PROPERTIES:
+  :CREATED:  [2026-09-28 Mon 12:00]
+  :END:
+  ** Nog in huis
+  ** Menu
+  - [ ]
+  ** Lidl/Hira
+  - [ ] bananen
+  - [ ] brood
+  - [ ]
+  ** Picnic
+  - [ ]
+  ** LOOS
+  - [ ] oregano
+  - [ ]
+  "))))
 
   (ert-deftest eet-new-week/archives-oldest-first ()
     (eet-test--with-file "* TODO Boodschappen 2026-09-14
