@@ -93,7 +93,8 @@ alias ssh="TERM=xterm-256color ssh"
 alias der="ssh -Y derecho"
 
 # oxidize
-alias ls="eza --icons -a --group-directories-first"
+# not in Claude Code: its shell inherits aliases, and eza's output/flags differ from ls
+[[ -z $CLAUDECODE ]] && alias ls="eza --icons -a --group-directories-first"
 # alias cat="bat"
 # alias cd="z"
 alias zz="z -"
