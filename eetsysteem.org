@@ -474,11 +474,30 @@ Every other ingredient is added, even when the list already has it: =3
 uien= and =1 ui= side by side keep both quantities, where adding them up
 would trip over units and plurals.
 
+Quantities are for who eats, not for the recipe: the recipe keeps what
+its source says in =PORTIES=, the household eats =eet-eters= adult
+portions (a child counts as about half), and a Menu line ending in =6p=
+eats 6. A range in =PORTIES= (=3--4=) counts from its lowest number, since
+the book portions run small. Weights, volumes and spoons round to a step
+that fits their size; counts (=blik=, =ui=, =teen=) round up, since half a
+tin can't be bought; an item without quantity (=olijfolie=) stays as it
+is. A scaled line keeps the original in brackets, =2 blik boterbonen (was
+1 blik)=, which the matching ignores. A recipe without =PORTIES= goes on
+as written.
+
 Nothing changes before every item has a section to go to, and
 =eetplanning.org= isn't saved, just like =eet-add-to-menu=.
 #+begin_src emacs-lisp
   (defconst eet-ingredients-section "Benodigdheden"
     "Recipe section with the ingredients, one plain list item each.")
+
+  (defcustom eet-eters 4
+    "Adult portions the household eats; a child counts as about half.
+  A Menu line ending in a count like 6p eats that many instead."
+    :type 'number)
+
+  (defconst eet--eaters-re "[ \t]+\\([0-9]+\\)p[ \t]*\\'"
+    "A Menu item's trailing eaters count, like 6p; group 1 is the number.")
 
   (defcustom eet-units
     '("g" "gr" "gram" "kg" "ml" "cl" "dl" "l" "liter" "el" "tl" "eetlepel"
@@ -489,6 +508,89 @@ Nothing changes before every item has a section to go to, and
       "handje" "handvol" "scheut" "scheutje")
     "Units that may follow the leading number of an ingredient."
     :type '(repeat string))
+
+  (defcustom eet-measure-units
+    '("g" "gr" "gram" "kg" "ml" "cl" "dl" "l" "liter" "el" "tl" "eetlepel"
+      "eetlepels" "theelepel" "theelepels" "cm")
+    "Units of `eet-units' that scale smoothly; the others count things."
+    :type '(repeat string))
+
+  (defconst eet--fractions '((?½ . 0.5) (?¼ . 0.25) (?¾ . 0.75) (?⅓ . 0.333) (?⅔ . 0.667))
+    "Fraction characters a quantity may use, and their values.")
+
+  (defconst eet--number-re
+    "\\(?:[0-9]*[½¼¾⅓⅔]\\|[0-9]+\\(?:[.,][0-9]+\\|/[0-9]+\\)?\\)"
+    "A quantity's number: 2, 1.5, 2,5, 1/2, ½ or 1½.")
+
+  (defun eet--number (s)
+    "Value of S, a match of `eet--number-re'."
+    (cond ((string-match "\\`\\([0-9]*\\)\\([½¼¾⅓⅔]\\)\\'" s)
+           (+ (string-to-number (match-string 1 s))
+              (alist-get (aref (match-string 2 s) 0) eet--fractions)))
+          ((string-match "\\`\\([0-9]+\\)/\\([0-9]+\\)\\'" s)
+           (/ (float (string-to-number (match-string 1 s)))
+              (string-to-number (match-string 2 s))))
+          (t (string-to-number (string-replace "," "." s)))))
+
+  (defun eet--quantity-re ()
+    "Leading quantity of an ingredient: groups 1 prefix (>, ~), 2 number,
+  3 upper end of a range (1--2), 4 unit."
+    (concat "\\`\\([<>~]?\\)\\(" eet--number-re "\\)"
+            "\\(?:[ \t]*\\(?:--?\\|–\\)[ \t]*\\(" eet--number-re "\\)\\)?"
+            "\\(?:[ \t]*\\(" (regexp-opt eet-units) "\\)\\>\\)?"))
+
+  (defun eet--round (x measure)
+    "X rounded for the shop: to a step that fits its size when MEASURE,
+  else up to a whole one."
+    (if measure
+        (let ((step (cond ((>= x 100) 10) ((>= x 10) 5) (t 0.5))))
+          (max step (* step (round x step))))
+      ;; 1.5 * 4/3 is 2.0000000000000004, which is still 2
+      (max 1 (ceiling (- x 1e-9)))))
+
+  (defun eet--format-number (x)
+    "X without a trailing .0."
+    (if (= x (truncate x)) (format "%d" x) (format "%s" x)))
+
+  (defun eet--scale (text factor)
+    "Ingredient TEXT with its leading quantity times FACTOR, the original
+  kept in brackets; TEXT itself when it has no quantity or FACTOR is 1."
+    (if (or (= factor 1) (not (string-match (eet--quantity-re) text)))
+        text
+      (let* ((qty (match-string 0 text))
+             (prefix (match-string 1 text))
+             (low (match-string 2 text))
+             (high (match-string 3 text))
+             (unit (match-string 4 text))
+             (rest (substring text (match-end 0)))
+             (measure (member unit eet-measure-units))
+             (scale (lambda (n)
+                      (eet--format-number
+                       (eet--round (* factor (eet--number n)) measure)))))
+        ;; 0.5 tl stays 0.5 tl: then there is nothing to say
+        (if (and (equal (funcall scale low) (eet--format-number (eet--number low)))
+                 (or (not high)
+                     (equal (funcall scale high)
+                            (eet--format-number (eet--number high)))))
+            text
+          (concat prefix (funcall scale low)
+                  (and high (concat "--" (funcall scale high)))
+                  (and unit (concat " " unit))
+                  rest " (was " qty ")")))))
+
+  (defun eet--servings ()
+    "Lowest number in the PORTIES of the entry at point, or nil."
+    (when-let* ((p (org-entry-get nil "PORTIES"))
+                ((string-match "[0-9]+" p)))
+      (string-to-number (match-string 0 p))))
+
+  (defun eet--eaters ()
+    "Eaters of the Menu line at point: its trailing count, else `eet-eters'."
+    (let ((line (buffer-substring-no-properties (line-beginning-position)
+                                                (line-end-position))))
+      (if (string-match eet--eaters-re line)
+          (string-to-number (match-string 1 line))
+        eet-eters)))
 
   (defconst eet--list-item-re
     "^[ \t]*[-+][ \t]+\\(?:\\[[ X-]\\]\\)?[ \t]*\\(.*[^ \t\n]\\)?[ \t]*$"
@@ -514,11 +616,13 @@ Nothing changes before every item has a section to go to, and
                 (seq-filter #'car (apply #'append (mapcar #'cdr staples)))))
 
   (defun eet--ingredients ()
-    "(TITLE . ITEMS) of the recipe at point: its title and ingredient texts."
+    "(TITLE SERVINGS ITEMS) of the recipe at point: its title, `eet--servings'
+  and ingredient texts."
     (save-excursion
       (org-back-to-heading t)
       (while (org-up-heading-safe))
       (let ((title (eet--title))
+            (servings (eet--servings))
             acc)
         (eet--goto-section eet-ingredients-section)
         (let ((end (save-excursion (org-end-of-subtree t t))))
@@ -526,7 +630,7 @@ Nothing changes before every item has a section to go to, and
             (when (and (looking-at eet--list-item-re) (match-string 1))
               (push (match-string-no-properties 1) acc))
             (forward-line)))
-        (cons title (nreverse acc)))))
+        (list title servings (nreverse acc)))))
 
   (defun eet--link-id-at-point ()
     "The ID an id: link at point points to, or nil."
@@ -579,12 +683,16 @@ Nothing changes before every item has a section to go to, and
 
   (defun eet-add-ingredients ()
     "Put the ingredients of the recipe at point, or linked at point, on
-  this week's list, except those a ticked staple says we have."
+  this week's list, except those a ticked staple says we have.
+  Quantities are scaled from the recipe's PORTIES to `eet-eters', or to
+  the count a Menu line ends in, like 6p."
     (interactive)
-    (pcase-let ((`(,title . ,all)
-                 (if-let* ((id (eet--link-id-at-point)))
-                     (eet--recipe-ingredients id)
-                   (eet--ingredients))))
+    (pcase-let* ((`(,eaters ,title ,servings ,written)
+                  (if-let* ((id (eet--link-id-at-point)))
+                      (cons (eet--eaters) (eet--recipe-ingredients id))
+                    (cons eet-eters (eet--ingredients))))
+                 (factor (if servings (/ (float eaters) servings) 1))
+                 (all (mapcar (lambda (it) (eet--scale it factor)) written)))
       (unless all (user-error "No ingredients under %s" eet-ingredients-section))
       (with-current-buffer (find-file-noselect (eet-planning-file))
         (let* ((list (eet--this-week))
@@ -609,7 +717,10 @@ Nothing changes before every item has a section to go to, and
             (org-with-point-at list
               (eet--goto-section (car p))
               (eet--insert-item (cdr p))))
-          (message "%d ingredients of %s on the list%s" (length plan) title
+          (message "%d ingredients of %s on the list%s%s" (length plan) title
+                   (if (= factor 1)
+                       ""
+                     (format ", for %s instead of %d" eaters servings))
                    (if in-house
                        (concat "; in huis: " (string-join in-house ", "))
                      ""))))))
@@ -637,6 +748,8 @@ exactly once. Per Menu item:
   is removed so it isn't carried. A carried plain item is matched like a
   ticked one, except that text matching no recipe name (=pizza bij Jan=)
   stays text without asking.
+- A trailing eaters count (=6p=) is left out of the matching and kept
+  after the link.
 
 All questions come first and only then is anything changed, so =C-g=
 halfway leaves both files as they were. The notes are written last, after
@@ -707,15 +820,19 @@ not ours to do.
       (dolist (m lists)
         (org-with-point-at m
           (pcase-dolist (`(,pos ,done ,text) (eet--menu-items))
-            (let* ((linked (and (string-match "\\[\\[id:\\([^]]+\\)\\]" text)
+            (let* ((eaters (and (string-match eet--eaters-re text)
+                                (match-string 0 text)))
+                   (name (replace-regexp-in-string eet--eaters-re "" text))
+                   (linked (and (string-match "\\[\\[id:\\([^]]+\\)\\]" text)
                                 (match-string 1 text)))
                    (drop (and (not done)
                               (not (y-or-n-p (format "Carry %s over to next week? "
                                                      text)))))
                    (recipe (cond (drop nil)
                                  (linked (assoc linked recipes))
-                                 (t (eet--resolve text recipes done)))))
-              (push (list pos drop (and recipe (not linked) (eet--link recipe)))
+                                 (t (eet--resolve name recipes done)))))
+              (push (list pos drop (and recipe (not linked)
+                                        (concat (eet--link recipe) eaters)))
                     plan)
               (when done
                 (if recipe
@@ -1488,6 +1605,86 @@ the resulting text; the real =~/org= is never touched.
   ** Lidl/Hira
   - [ ]
   "))))
+
+  (ert-deftest eet-scale/rounds-for-the-shop ()
+    (should (equal (eet--scale "1 blik (400 g) boterbonen" (/ 4 3.0))
+                   "2 blik (400 g) boterbonen (was 1 blik)"))
+    (should (equal (eet--scale "175 g pruimtomaten" (/ 4 3.0))
+                   "230 g pruimtomaten (was 175 g)"))
+    (should (equal (eet--scale "1 el tomatenpuree" (/ 4 3.0))
+                   "1.5 el tomatenpuree (was 1 el)"))
+    (should (equal (eet--scale "1tl gedroogde rozemarijn" (/ 4 3.0))
+                   "1.5 tl gedroogde rozemarijn (was 1tl)"))
+    (should (equal (eet--scale "1.5 bosjes bospeen" (/ 4 3.0))
+                   "2 bosjes bospeen (was 1.5 bosjes)"))
+    (should (equal (eet--scale "1½ tl zout" 2) "3 tl zout (was 1½ tl)"))
+    (should (equal (eet--scale "1--2 groene rawitpepers" 1.5)
+                   "2--3 groene rawitpepers (was 1--2)"))
+    (should (equal (eet--scale ">350 g gedroogde witte bonen" 1.25)
+                   ">440 g gedroogde witte bonen (was >350 g)"))
+    (should (equal (eet--scale "4 grote eieren" 1.25) "5 grote eieren (was 4)"))
+    (should (equal (eet--scale "0.5 tl asafoetida" (/ 4 3.0)) "0.5 tl asafoetida"))
+    (should (equal (eet--scale "olijfolie" 2) "olijfolie"))
+    (should (equal (eet--scale "2 uien" 1) "2 uien")))
+
+  (defconst eet-test--stoofpot "* Stoofpot
+  :PROPERTIES:
+  :ID:       stoofpot
+  :PORTIES:  3--4
+  :END:
+  ** Benodigdheden
+  - olijfolie
+  - 1 rode ui, in dunne ringen
+  - 2 blikken van 400 g gepelde tomaten
+  "
+    "recepten.org fixture with PORTIES.")
+
+  (ert-deftest eet-add-ingredients/scales-to-the-household ()
+    (eet-test--with-files `(("recepten.org" . ,eet-test--stoofpot)
+                            ("eetplanning.org" . "* TODO Boodschappen 2026-09-28
+  ** Lidl/Hira
+  - [ ]
+  "))
+      (let ((eet-eters 6))
+        (eet-add-ingredients))
+      (should (equal (eet-test--file-text "eetplanning.org")
+                     "* TODO Boodschappen 2026-09-28
+  ** Lidl/Hira
+  - [ ] olijfolie
+  - [ ] 2 rode ui, in dunne ringen (was 1)
+  - [ ] 4 blikken van 400 g gepelde tomaten (was 2 blikken)
+  "))))
+
+  (ert-deftest eet-add-ingredients/menu-line-says-who-eats ()
+    (eet-test--with-files `(("eetplanning.org" . "* TODO Boodschappen 2026-09-28
+  ** Menu
+  - [ ] [[id:stoofpot][Stoofpot]] 3p
+  ** Lidl/Hira
+  - [ ]
+  ")
+                            ("recepten.org" . ,eet-test--stoofpot))
+      (search-forward "id:stoof")
+      (let ((eet-eters 6))
+        (eet-add-ingredients))
+      (should (equal (eet-test--text) "* TODO Boodschappen 2026-09-28
+  ** Menu
+  - [ ] [[id:stoofpot][Stoofpot]] 3p
+  ** Lidl/Hira
+  - [ ] olijfolie
+  - [ ] 1 rode ui, in dunne ringen
+  - [ ] 2 blikken van 400 g gepelde tomaten
+  "))))
+
+  (ert-deftest eet-new-week/keeps-the-eaters-count ()
+    (eet-test--with-files `(("eetplanning.org" . "* TODO Boodschappen 2026-09-21
+  ** Menu
+  - [ ] linzensoep 6p
+  ")
+                            ("recepten.org" . ,eet-test--recipes))
+      (eet-test--answering '((y-or-n-p t))
+        (eet-new-week eet-test--time))
+      (should (string-search "- [ ] [[id:linzensoep][Linzensoep]] 6p\n"
+                             (eet-test--text)))))
 
   ;;; eetsysteem-tests.el ends here
 #+end_src
