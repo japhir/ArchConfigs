@@ -957,7 +957,9 @@ customize capture templates
       ;; input picks the first tag; add them with C-c C-q
       ("R" "Recipe (shared)" entry (file ,(expand-file-name "recepten.org" my/shared-dir))
        ,(concat "* %^{Name}\n:PROPERTIES:\n:ID:\n:CREATED_BY: " my/me
-                "\n:BRON:     %^{Source: book + page, notebook, or link}\n:FOTO:\n:PORTIES:  4\n:VOORBEREIDING:\n:Effort:\n:END:\n"
+                "\n:BRON:     %^{Source: book + page, notebook, or link}\n:FOTO:\n:PORTIES:  4\n:VOORBEREIDING:\n:Effort:\n"
+                ;; nutrition per person, optional: fill in when the source gives it
+                ":KCAL:\n:EIWIT:\n:VET:\n:KOOLHYDRATEN:\n:VEZELS:\n:END:\n"
                 "** Benodigdheden\n- %?\n** Gereedschap\n- \n** Instructies\n1. \n")
        :add-created t :before-finalize eet-set-naampje)
       ("m" "Email" entry (file org-in-file)
