@@ -1166,7 +1166,9 @@ is =R= above.
 #+end_src
 *** habits
 #+begin_src emacs-lisp
+  ;; org is loaded by now, so org-modules alone no longer loads it
   (add-to-list 'org-modules 'org-habit t)
+  (require 'org-habit)
 #+end_src
 ** exporting
 *** org-babel languages
