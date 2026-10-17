@@ -123,8 +123,8 @@ unticks it: before planning we walk through the house (the Huisronde) and
 untick what is (nearly) gone. Only unticked staples go onto the new list,
 and a ticked staple also stops an unbought item of the same name from
 carrying over: the walk is newer than last week's list. Afterwards every
-item bought on the closed lists ticks its staple again, compared by name
-like =eet-add-ingredients= does. That happens after the new list is
+item bought on the closed lists ticks its staple again, compared by any of
+the staple's names like =eet-add-ingredients= does. That happens after the new list is
 built, so the walk still wins: bread bought last week but unticked on the
 walk goes onto the list. One rule for every Winkel: jars that last months
 keep their tick, bread simply gets unticked most weeks.
@@ -169,14 +169,15 @@ typing =- [ ]= from nothing on a phone keyboard is a pain.
               (when (car it) (push (eet--item-name (cdr it)) acc))))))))
 
   (defun eet--tick-staples (names)
-    "Tick the unticked staples whose `eet--item-name' is in NAMES."
+    "Tick the unticked staples with one of their `eet--names' in NAMES."
     (when-let* ((m (eet--staples-heading)))
       (org-with-point-at m
         (let ((end (save-excursion (org-end-of-subtree t t))))
           (while (re-search-forward eet--checkbox-re end t)
             (when (and (equal (match-string 1) " ")
-                       (member (eet--item-name (match-string-no-properties 2))
-                               names))
+                       (save-match-data
+                         (seq-intersection (eet--names (match-string-no-properties 2))
+                                           names)))
               (replace-match "X" t t nil 1)))))))
 
   (defun eet--merge (&rest lists)
@@ -236,10 +237,9 @@ typing =- [ ]= from nothing on a phone keyboard is a pain.
              (carried (eet--carried old stores))
              (bought (eet--bought old))
              (get (lambda (al k) (alist-get k al nil nil #'equal)))
-             (have (mapcar (lambda (it) (eet--norm (cdr it)))
-                           (seq-filter #'car (apply #'append (mapcar #'cdr staples)))))
+             (have (eet--in-house staples))
              (keep (lambda (texts)
-                     (seq-remove (lambda (it) (member (eet--norm it) have)) texts)))
+                     (seq-remove (lambda (it) (member (eet--item-name it) have)) texts)))
              (sections
               `((,eet-leftovers-section nil)
                 (,eet-menu-section t ,@(funcall get carried eet-menu-section))
@@ -436,9 +436,14 @@ Basisvoorraad first, since it is kept up to date, then the archived lists,
 newest first. An item we never bought goes to the first store (Lidl/Hira).
 Items are compared by name: without the leading quantity and unit, the
 notes in brackets and anything after a comma, so =2 uien, gesnipperd=
-matches =uien=. Every ingredient is added, even when the list already has
-it: =3 uien= and =1 ui= side by side keep both quantities, where adding
-them up would trip over units and plurals.
+matches =uien=. A staple can have more names, separated by =/=:
+=uien / ui / rode ui=, written the way recipes write them, so a miss is
+fixed once on the staple, from a phone too, instead of in the matching.
+An ingredient with the name of a ticked staple is left off, since we have
+it, and named in the message; =verse tijm= never matches =gedroogde tijm=.
+Every other ingredient is added, even when the list already has it: =3
+uien= and =1 ui= side by side keep both quantities, where adding them up
+would trip over units and plurals.
 
 Nothing changes before every item has a section to go to, and
 =eetplanning.org= isn't saved, just like =eet-add-to-menu=.
@@ -468,6 +473,16 @@ Nothing changes before every item has a section to go to, and
            (s (replace-regexp-in-string qty "" (downcase text)))
            (s (replace-regexp-in-string "([^)]*)" "" s)))
       (eet--norm (car (split-string s ",")))))
+
+  (defun eet--names (text)
+    "`eet--item-name's of item TEXT: of all of it and of each /-separated name."
+    (seq-uniq (cons (eet--item-name text)
+                    (mapcar #'eet--item-name (split-string text "/" t)))))
+
+  (defun eet--in-house (staples)
+    "`eet--names' of the ticked items in STAPLES, an alist (STORE . ITEMS)."
+    (seq-mapcat (lambda (it) (eet--names (cdr it)))
+                (seq-filter #'car (apply #'append (mapcar #'cdr staples)))))
 
   (defun eet--ingredients ()
     "(TITLE . ITEMS) of the recipe at point: its title and ingredient texts."
@@ -511,7 +526,8 @@ Nothing changes before every item has a section to go to, and
           (pcase-dolist (`(,sec . ,items) (eet--sections))
             (when (member sec stores)
               (dolist (it items)
-                (push (cons (eet--item-name (cdr it)) sec) acc))))))))
+                (dolist (name (eet--names (cdr it)))
+                  (push (cons name sec) acc)))))))))
 
   (defun eet--last-winkels (list stores)
     "Alist (NAME . STORE) of where items last sat, the most recent first.
@@ -534,16 +550,21 @@ Nothing changes before every item has a section to go to, and
 
   (defun eet-add-ingredients ()
     "Put the ingredients of the recipe at point, or linked at point, on
-  this week's list."
+  this week's list, except those a ticked staple says we have."
     (interactive)
-    (pcase-let ((`(,title . ,items)
+    (pcase-let ((`(,title . ,all)
                  (if-let* ((id (eet--link-id-at-point)))
                      (eet--recipe-ingredients id)
                    (eet--ingredients))))
-      (unless items (user-error "No ingredients under %s" eet-ingredients-section))
+      (unless all (user-error "No ingredients under %s" eet-ingredients-section))
       (with-current-buffer (find-file-noselect (eet-planning-file))
         (let* ((list (eet--this-week))
-               (stores (eet--stores (eet--staples)))
+               (staples (eet--staples))
+               (have (eet--in-house staples))
+               (in-house (seq-filter (lambda (it) (member (eet--item-name it) have))
+                                     all))
+               (items (seq-difference all in-house))
+               (stores (eet--stores staples))
                (seen (eet--last-winkels list stores))
                (list-title (org-with-point-at list (eet--title)))
                (sections (org-with-point-at list (eet--sections)))
@@ -559,7 +580,10 @@ Nothing changes before every item has a section to go to, and
             (org-with-point-at list
               (eet--goto-section (car p))
               (eet--insert-item (cdr p))))
-          (message "%d ingredients of %s on the list" (length plan) title)))))
+          (message "%d ingredients of %s on the list%s" (length plan) title
+                   (if in-house
+                       (concat "; in huis: " (string-join in-house ", "))
+                     ""))))))
 #+end_src
 
 * Closing the week
@@ -1186,7 +1210,7 @@ the resulting text; the real =~/org= is never touched.
   ** Lidl/Hira
   - [ ] uien
   ** Picnic
-  - [X] knoflook
+  - [ ] knoflook
   * TODO Boodschappen 2026-09-28
   ** Nog in huis
   ** Menu
@@ -1220,7 +1244,7 @@ the resulting text; the real =~/org= is never touched.
   ** Lidl/Hira
   - [ ] uien
   ** Picnic
-  - [X] knoflook
+  - [ ] knoflook
   * TODO Boodschappen 2026-09-28
   ** Nog in huis
   ** Menu
@@ -1255,6 +1279,61 @@ the resulting text; the real =~/org= is never touched.
   - [ ] 1 ui
   - [ ] 1 ui, voor erbovenop
   "))))
+
+  (ert-deftest eet-add-ingredients/skips-what-is-in-the-house ()
+    (eet-test--with-files '(("recepten.org" . "* Pasta
+  ** Benodigdheden
+  - 2 uien, gesnipperd
+  - 1 rode ui
+  - 4 tenen knoflook
+  - olijfolie
+  - 3 takjes verse tijm
+  - 1 tl gedroogde tijm
+  ")
+                            ("eetplanning.org" . "* Basisvoorraad
+  ** Lidl/Hira
+  - [X] uien / rode ui
+  - [X] knoflook
+  - [ ] olie / olijfolie
+  ** Droge kruiden
+  - [X] gedroogde tijm
+  * TODO Boodschappen 2026-09-28
+  ** Lidl/Hira
+  - [ ]
+  "))
+      (eet-add-ingredients)
+      (should (equal (eet-test--file-text "eetplanning.org") "* Basisvoorraad
+  ** Lidl/Hira
+  - [X] uien / rode ui
+  - [X] knoflook
+  - [ ] olie / olijfolie
+  ** Droge kruiden
+  - [X] gedroogde tijm
+  * TODO Boodschappen 2026-09-28
+  ** Lidl/Hira
+  - [ ] olijfolie
+  - [ ] 3 takjes verse tijm
+  "))))
+
+  (ert-deftest eet-new-week/bought-items-tick-staples-by-any-name ()
+    (eet-test--with-file "* Basisvoorraad
+  ** Lidl/Hira
+  - [ ] uien / ui
+  - [ ] witte/lima bonen
+  - [ ] olie / olijfolie
+  * TODO Boodschappen 2026-09-21
+  ** Lidl/Hira
+  - [X] 1 ui
+  - [X] witte/lima bonen
+  - [ ] olijfolie
+  "
+      (eet-new-week eet-test--time)
+      (should (string-prefix-p "* Basisvoorraad
+  ** Lidl/Hira
+  - [X] uien / ui
+  - [X] witte/lima bonen
+  - [ ] olie / olijfolie
+  " (eet-test--text)))))
 
   (ert-deftest eet-add-ingredients/from-a-recipe-link ()
     (eet-test--with-files `(("eetplanning.org" . "* TODO Boodschappen 2026-09-28
