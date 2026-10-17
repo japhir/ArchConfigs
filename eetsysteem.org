@@ -36,6 +36,10 @@ Run the tests:
 
   (defconst eet-list-prefix "Boodschappen "
     "Title prefix of a weekly shopping list heading.")
+  (defconst eet--list-date-format "%Y-%m-%d"
+    "Date after `eet-list-prefix' in a list title.")
+  (defconst eet--list-date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}"
+    "Matches `eet--list-date-format'; change both together.")
   (defconst eet-staples-heading "Basisvoorraad"
     "Title of the heading holding the staples, one sub-heading per store.")
   (defconst eet-leftovers-section "Nog in huis"
@@ -53,8 +57,13 @@ Run the tests:
 #+end_src
 
 * Reading lists
-A list is a level-1 heading; its level-2 children are sections (stores,
-Menu). Only checkbox lines count as items.
+A list is a level-1 heading =TODO Boodschappen YYYY-MM-DD=, the shape
+=eet-new-week= makes; its level-2 children are sections (stores, Menu).
+Only checkbox lines count as items. Any other heading starting with
+=Boodschappen= is left alone, like =Boodschappen 16/10= typed on a phone:
+we can't tell how its items are meant, so it is never archived or written
+to, and =eet-new-week= names it, unless it is done, so its items aren't
+missed.
 #+begin_src emacs-lisp
   (defconst eet--checkbox-re
     "^[ \t]*[-+] \\[\\([ X-]\\)\\][ \t]*\\(.*?\\)[ \t]*$"
@@ -98,11 +107,28 @@ Menu). Only checkbox lines count as items.
          (end-of-line)))
       (nreverse found)))
 
+  (defun eet--open-list-p ()
+    "Whether the heading at point is an open list, as `eet-new-week' makes
+  them: TODO and titled by `eet--week-title'. Anything else is someone's
+  own note, never to be archived or written to."
+    (and (equal (org-get-todo-state) "TODO")
+         (string-match-p (concat "\\`" (regexp-quote eet-list-prefix)
+                                 eet--list-date-re "\\'")
+                         (eet--title))))
+
   (defun eet--open-lists ()
     "Markers of the shopping lists that are not done yet."
-    (eet--find-level-1
-     (lambda () (and (string-prefix-p eet-list-prefix (eet--title))
-                     (not (org-entry-is-done-p))))))
+    (eet--find-level-1 #'eet--open-list-p))
+
+  (defun eet--stray-lists ()
+    "Titles of the level-1 headings that start like a list, aren't one and
+  aren't done either, so their items may still be wanted."
+    (mapcar (lambda (m) (org-with-point-at m (eet--title)))
+            (eet--find-level-1
+             (lambda () (and (string-prefix-p (string-trim eet-list-prefix)
+                                              (eet--title))
+                             (not (org-entry-is-done-p))
+                             (not (eet--open-list-p)))))))
 
   (defun eet--staples-heading ()
     "Marker of the Basisvoorraad heading, or nil."
@@ -207,7 +233,7 @@ typing =- [ ]= from nothing on a phone keyboard is a pain.
     "Shopping list title for a list started at TIME.
   Named by date, not ISO week: planning on Saturday still falls in the week
   of the previous list."
-    (concat eet-list-prefix (format-time-string "%Y-%m-%d" time)))
+    (concat eet-list-prefix (format-time-string eet--list-date-format time)))
 
   (defun eet-new-week (&optional time)
     "Start this week's shopping list in eetplanning.org and show it.
@@ -265,6 +291,9 @@ typing =- [ ]= from nothing on a phone keyboard is a pain.
               (org-archive-subtree))))
         (eet--tick-staples bought)
         (eet--log-cooked cooked time)
+        ;; last, so no other message hides it: their items weren't carried
+        (when-let* ((stray (eet--stray-lists)))
+          (message "Left alone, no shopping list: %s" (string-join stray ", ")))
         (widen)
         (goto-char new)
         (re-search-forward (concat "^\\*\\* " eet-leftovers-section "\n") nil t)
@@ -947,6 +976,52 @@ the resulting text; the real =~/org= is never touched.
   "
       (should-error (eet-new-week eet-test--time) :type 'user-error)))
 
+  (ert-deftest eet-new-week/leaves-stray-headings-alone ()
+    (eet-test--with-file "* Basisvoorraad
+  ** Lidl/Hira
+  - [ ] brood
+  * TODO Boodschappen 2026-09-21
+  ** Lidl/Hira
+  - [ ] kaas
+  * Boodschappen 16/10
+  - [ ] melk
+  - appels
+  * TODO Boodschappen extra
+  ** Lidl/Hira
+  - [ ] thee
+  "
+      (let (said)
+        (cl-letf (((symbol-function 'message)
+                   (lambda (fmt &rest args)
+                     (when fmt (push (apply #'format-message fmt args) said)))))
+          (eet-new-week eet-test--time))
+        (should (equal (eet-test--text) "* Basisvoorraad
+  ** Lidl/Hira
+  - [ ] brood
+  * Boodschappen 16/10
+  - [ ] melk
+  - appels
+  * TODO Boodschappen extra
+  ** Lidl/Hira
+  - [ ] thee
+  * TODO Boodschappen 2026-09-28
+  :PROPERTIES:
+  :CREATED:  [2026-09-28 Mon 12:00]
+  :END:
+  ** Nog in huis
+  ** Menu
+  - [ ]
+  ** Lidl/Hira
+  - [ ] kaas
+  - [ ] brood
+  ** Picnic
+  - [ ]
+  ** LOOS
+  - [ ]
+  "))
+        (should (equal (car said)
+                       "Left alone, no shopping list: Boodschappen 16/10, Boodschappen extra")))))
+
   (defconst eet-test--recipes "* Pompoen-kikkererwtencurry met zilvervliesrijst :herfst:
   :PROPERTIES:
   :ID:       pompoencurry
@@ -989,6 +1064,31 @@ the resulting text; the real =~/org= is never touched.
   - [ ] linzensoep
   - [ ] [[id:pompoencurry][Pompoen-kikkererwtencurry met zilvervliesrijst]]
   ** Lidl/Hira
+  - [ ]
+  "))))
+
+  (ert-deftest eet-add-to-menu/skips-stray-headings ()
+    (eet-test--with-files `(("eetplanning.org" . "* TODO Boodschappen 2026-09-28
+  ** Menu
+  - [ ]
+  * TODO Boodschappen extra
+  ** Menu
+  - [ ]
+  * Boodschappen 16/10
+  ** Menu
+  - [ ]
+  ")
+                            ("recepten.org" . ,eet-test--recipes))
+      (eet-test--answering '((completing-read "Linzensoep (linzensoep)"))
+        (eet-add-to-menu))
+      (should (equal (eet-test--text) "* TODO Boodschappen 2026-09-28
+  ** Menu
+  - [ ] [[id:linzensoep][Linzensoep]]
+  * TODO Boodschappen extra
+  ** Menu
+  - [ ]
+  * Boodschappen 16/10
+  ** Menu
   - [ ]
   "))))
 
