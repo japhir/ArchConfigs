@@ -49,7 +49,7 @@ What to build: <end-to-end behaviour, user's view>
 
 ## Editing through emacsclient
 
-The tracker is usually open in the user's Emacs, and phones sync it, so edit the live buffer, not the file on disk. Check `buffer-modified-p` **once, before your first change**; checking before every change makes your own edits trip it. Then `save-buffer`. Write the script to the scratchpad with the Write tool and run `emacsclient --eval '(load "<script>" nil t)'`, using full file paths: shell text naming an org directory trips the privacy hook. Never call `org-id-update-id-locations` or another global rescan: it walks every agenda file, private ones included. A new ID is found anyway the first time a link to it is followed.
+The tracker is usually open in the user's Emacs, and phones sync it, so edit the live buffer, not the file on disk. Check `buffer-modified-p` **once, before your first change**; checking before every change makes your own edits trip it. Then `save-buffer`. Write the script to the scratchpad with the Write tool, starting with the line `;;; -*- lexical-binding: t; -*-` (without it Emacs 30+ pops a warning on every load, and the script runs in the old dynamic dialect), and run `emacsclient --eval '(load "<script>" nil t)'`, using full file paths: shell text naming an org directory trips the privacy hook. Never call `org-id-update-id-locations` or another global rescan: it walks every agenda file, private ones included. A new ID is found anyway the first time a link to it is followed.
 
 A note, with point on the ticket heading:
 
