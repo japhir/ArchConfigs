@@ -3,6 +3,7 @@
 Local-first, linear history. Commit per coherent step, early, since sessions can be cut off mid-work. Push happens only when the maintainer chooses; local `main` may sit ahead of `origin/main` indefinitely.
 
 ## Landing a branch
+`just land <branch>` (from `agents/just/land.just`, imported by every repo's justfile) does steps 2, 3 and 5 for a worktree branch, running the repo's `check` recipe on the rebased tree.
 1. **Order by containment.** `git merge-base --is-ancestor A B` true → B subsumes A: land B, delete A.
 2. **Rebase onto current main:** `git rebase main <branch>`. Shared hot-file conflicts surface here, with the branch author's context still available.
 3. **Fast-forward:** `git checkout main && git merge --ff-only <branch>`. Done when `git log --oneline -1 main` is the branch tip.
