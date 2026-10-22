@@ -24,6 +24,7 @@ Level-1 sections, in this order:
 :END:
 What to build: <end-to-end behaviour, user's view>
 - [ ] acceptance criterion
+Seams: <public interfaces the tests drive>
 *** Answer
 *** Comments
 ```
@@ -32,6 +33,7 @@ What to build: <end-to-end behaviour, user's view>
 - `TYPE` appears only on HITL decision tickets: `grilling`, `prototype`, `task`, `research`.
 - `BLOCKER` uses org-edna syntax. Leave it out when nothing blocks the ticket.
 - Acceptance criteria are plain checkboxes, never nested TODO headings.
+- `Seams` names the public interfaces the ticket's tests drive. Approving the ticket breakdown agrees them, so an agent runs `/tdd` without stopping to ask.
 - `CREATED_BY` records who captured the ticket (ADR 0006). An assignee tag, `:ilja:` or `:line:`, goes on the heading when a human claims it or when agent work waits for their check.
 - `CLAIMED_BY` appears only while an agent works on the ticket.
 - Anything the user must notice goes in the keyword or a tag: those show on the heading line, while properties and drawers stay folded.

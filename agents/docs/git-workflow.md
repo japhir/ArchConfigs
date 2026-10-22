@@ -19,6 +19,12 @@ Skip any branch whose worktree shows `locked` in `git worktree list`: another se
 
 ## Subagent contract (pin it in every spawn prompt)
 > Commit on your worktree branch. The orchestrator merges, closes the issue, and pushes. Your blocker landed in **local** main and your worktree base includes it; verify against local, not origin.
+> Start with `git merge --ff-only main`, then the repo's setup recipe if it has one (`just setup`): a worktree checks out files, not dependencies.
+> The ticket's Seams are agreed: test at them without asking.
+> A reviewer you spawn works from `git diff` and `git show` output and leaves the tree as it found it.
+> Wait on a subagent through the harness's completion notification.
+
+Beside the contract, the spawn prompt carries only the ticket number, the base sha (also `/code-review`'s fixed point), and what parallel agents are touching.
 
 After a subagent returns:
 - Verify: `git -C <worktree> status` clean and a commit exists before merging.
