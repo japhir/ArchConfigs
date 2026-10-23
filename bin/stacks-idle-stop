@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Stops local Supabase stacks nobody has queried for STACKS_IDLE_MIN minutes (default 60), so a
+# stack started for one task doesn't keep running all week. `supabase stop` keeps the data.
+# Run by launchd (LaunchAgents/com.iljakocken.stacks-idle-stop.plist); `just db-up` restarts one.
+#
+# "Queried" is the statement count pg_stat_statements keeps per role, summed over every role but
+# Supabase's own services (realtime, auth, storage, PostgREST's schema cache), which talk to the
+# DB on their own all day; analytics (logflare) writes its log events as postgres, so statements
+# on `_analytics` are left out too. A test run, a psql session, the demo: each moves it. A short run
+# between two checks still counts, which a look at live connections would miss. This script reads
+# as supabase_admin, so its own query is left out too.
+set -euo pipefail
+
+idle_min=${STACKS_IDLE_MIN:-60}
+state=${XDG_STATE_HOME:-$HOME/.local/state}/stacks-idle-stop
+mkdir -p "$state"
+now=$(date +%s)
+
+docker info >/dev/null 2>&1 || exit 0
+
+for container in $(docker ps --format '{{.Names}}' | grep '^supabase_db_' || true); do
+  project=${container#supabase_db_}
+  count=$(docker exec "$container" psql -U supabase_admin -d postgres -Atc \
+    "select coalesce(sum(s.calls), 0) from extensions.pg_stat_statements s join pg_roles r on r.oid = s.userid
+      where r.rolname not in ('supabase_admin', 'supabase_auth_admin', 'supabase_storage_admin',
+                              'supabase_realtime_admin', 'supabase_replication_admin', 'authenticator')
+        and s.query not like '%_analytics%'" 2>/dev/null) || continue
+  file="$state/$project"
+  if [ -f "$file" ]; then read -r last_count last_seen <"$file"; else last_count=-1; last_seen=$now; fi
+  # A different count (higher, or lower after a restart reset the statistics) is activity.
+  if [ "$count" != "$last_count" ]; then
+    echo "$count $now" >"$file"
+  elif [ $((now - last_seen)) -ge $((idle_min * 60)) ]; then
+    echo "$(date '+%F %T') stopping $project: no queries for $(((now - last_seen) / 60)) min"
+    supabase stop --project-id "$project" >/dev/null && rm -f "$file"
+  fi
+done
