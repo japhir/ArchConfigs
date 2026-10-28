@@ -10,7 +10,7 @@ db-up *dirs:
     set -euo pipefail
     docker info >/dev/null 2>&1 || { echo "Docker isn't running: start Docker Desktop first"; exit 1; }
     running=$(docker ps --format '{{{{.Names}}' | sed -n 's/^supabase_db_//p' | sort)
-    echo "running stacks: $(echo ${running:-none})"
+    echo "running on this machine (all repos): $(echo ${running:-none})"
     for dir in {{ if dirs == "" { "$(git ls-files '*supabase/config.toml' | xargs -n1 dirname | xargs -n1 dirname)" } else { dirs } }}; do
         project=$(sed -n 's/^project_id = "\(.*\)"/\1/p' "$dir/supabase/config.toml")
         if grep -qx "$project" <<<"$running"; then echo "$project: up"; continue; fi
