@@ -1611,6 +1611,14 @@ https://github.com/weirdNox/org-noter
 
   (use-package org-noter-pdftools
     :after org-noter
+    :init
+    ;; Emacs 31 warns about files without a lexical-binding cookie;
+    ;; upstream org-pdftools still has none (checked 2026-11-03).
+    ;; Silence it for this file only; drop once upstream adds the cookie.
+    (with-eval-after-load 'warnings
+      (add-to-list 'warning-suppress-log-types
+                   '(files missing-lexbind-cookie
+                           "~/.emacs.d/elpaca/builds/org-noter-pdftools/org-noter-pdftools.el")))
     :config
     ;; Add a function to ensure precise note is inserted
     (defun org-noter-pdftools-insert-precise-note (&optional toggle-no-questions)
