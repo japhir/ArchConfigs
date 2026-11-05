@@ -14,7 +14,7 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 - **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
 - **Close**: `gh issue comment <number> --body "..."`, then `gh issue close <number>`. On an already-closed issue `gh issue close --comment` drops the comment and still exits 0.
 - **Tickets name their seams**: a `## Seams` section after the acceptance criteria names the public interfaces its tests drive. Approving the ticket breakdown agrees them, so an agent runs `/tdd` without stopping to ask.
-- **Deferred refactors**: refactor/simplification findings not fixed in-session (e.g. from code review) become a `needs-triage` issue, so they aren't lost to session output alone.
+- **Deferred refactors**: refactor/simplification findings not fixed in-session (e.g. from code review) go to `docs/INBOX.md` where the repo has one, otherwise a `needs-triage` issue, so they aren't lost to session output alone.
 
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
 
