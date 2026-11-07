@@ -798,8 +798,18 @@ not ours to do.
                              recipes)
                             (and cooked recipes)))))
             (cdr (assoc (completing-read (format "Which recipe is \"%s\"? " text)
-                                         (cons eet--leave-as-text choices) nil t)
+                                         (eet--in-order
+                                          (cons eet--leave-as-text (mapcar #'car choices)))
+                                         nil t)
                         choices))))))
+
+  (defun eet--in-order (strings)
+    "Completion table of STRINGS that completion UIs show unsorted."
+    (lambda (input pred action)
+      (if (eq action 'metadata)
+          '(metadata (display-sort-function . identity)
+                     (cycle-sort-function . identity))
+        (complete-with-action action strings input pred))))
 
   (defun eet--ask-verdict (name)
     "Ask for stars and a verdict on NAME; return the cooking note."
@@ -1208,6 +1218,26 @@ the resulting text; the real =~/org= is never touched.
   ** Menu
   - [ ]
   "))))
+
+  (ert-deftest eet-new-week/offers-leave-as-text-first ()
+    (eet-test--with-files `(("eetplanning.org" . "* TODO Boodschappen 2026-09-21
+  ** Menu
+  - [X] diepvriesrestje
+  ")
+                            ("recepten.org" . ,eet-test--recipes))
+      (let (offered)
+        (cl-letf (((symbol-function 'completing-read)
+                   (lambda (_prompt coll &rest _)
+                     (setq offered
+                           (funcall (completion-metadata-get
+                                     (completion-metadata "" coll nil)
+                                     'display-sort-function)
+                                    (all-completions "" coll)))
+                     eet--leave-as-text)))
+          (eet-new-week eet-test--time))
+        (should (equal (car offered) eet--leave-as-text))
+        (should (string-search "- [X] diepvriesrestje"
+                               (eet-test--file-text "eetplanning.org_archive"))))))
 
   (ert-deftest eet-new-week/closes-the-menu ()
     (eet-test--with-files `(("eetplanning.org" . "* TODO Boodschappen 2026-09-21
