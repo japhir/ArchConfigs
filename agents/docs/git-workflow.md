@@ -24,11 +24,11 @@ Skip any branch whose worktree shows `locked` in `git worktree list`: another se
 > The ticket's Seams are agreed: test at them without asking.
 > A reviewer you spawn works from `git diff` and `git show` output and leaves the tree as it found it.
 > Wait on a subagent through the harness's completion notification.
-> Write your report to the file the orchestrator names before you return; the return is a pointer to it (a report dies with its agent).
+> Your final message is the report: what landed (sha), checks run, and side-findings. The harness hands it back as text; it refuses report files from subagents.
 
-Beside the contract, the spawn prompt carries only the ticket number, the base sha (also `/code-review`'s fixed point), the report file, and what parallel agents are touching.
+Beside the contract, the spawn prompt carries only the ticket number, the base sha (also `/code-review`'s fixed point), and what parallel agents are touching.
 
 After a subagent returns:
 - Verify: `git -C <worktree> status` clean and a commit exists before merging.
-- **Harvest side-findings.** Scan the result for "found / flagged / out of scope / pre-existing" and file each real one as an issue now; the report file is the only place they live.
+- **Harvest side-findings.** Scan the result for "found / flagged / out of scope / pre-existing" and file each real one now (an issue, or the repo's INBOX): the hand-back is the only place they live. Save a report you will need past this session to the scratchpad.
 - A subagent that died mid-flight on a stale base: restart fresh on current main rather than resume.
