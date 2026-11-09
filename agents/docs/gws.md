@@ -46,6 +46,9 @@ registry rules and point here for the rest.
   --upload f.docx`. A plain upload leaves a `.docx` shell the Docs API cannot edit. The reply
   is a bare `id`; the URL is `https://docs.google.com/document/d/<id>/edit`. Plain-text
   export for review: `drive files export --params '{"fileId":…,"mimeType":"text/plain"}'`.
+- Download a binary (PDF) from Drive: `drive files get --params '{"fileId":…,"alt":"media",
+  "supportsAllDrives":true}' -o <path>`. `drive files download` is the long-running export job,
+  not this. `export`/`get` without `-o` write `download.txt` into the cwd: always pass `-o`.
 
 ## Sheets
 

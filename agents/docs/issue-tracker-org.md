@@ -24,6 +24,7 @@ Level-1 sections, in this order:
 :END:
 What to build: <end-to-end behaviour, user's view>
 - [ ] acceptance criterion
+Seams: <public interfaces the tests drive>
 *** Answer
 *** Comments
 ```
@@ -32,6 +33,7 @@ What to build: <end-to-end behaviour, user's view>
 - `TYPE` appears only on HITL decision tickets: `grilling`, `prototype`, `task`, `research`.
 - `BLOCKER` uses org-edna syntax. Leave it out when nothing blocks the ticket.
 - Acceptance criteria are plain checkboxes, never nested TODO headings.
+- `Seams` names the public interfaces the ticket's tests drive. Approving the ticket breakdown agrees them, so an agent runs `/tdd` without stopping to ask.
 - `CREATED_BY` records who captured the ticket (ADR 0006). An assignee tag, `:ilja:` or `:line:`, goes on the heading when a human claims it or when agent work waits for their check.
 - `CLAIMED_BY` appears only while an agent works on the ticket.
 - Anything the user must notice goes in the keyword or a tag: those show on the heading line, while properties and drawers stay folded.
@@ -49,7 +51,7 @@ What to build: <end-to-end behaviour, user's view>
 
 ## Editing through emacsclient
 
-The tracker is usually open in the user's Emacs, and phones sync it, so edit the live buffer, not the file on disk. Check `buffer-modified-p` **once, before your first change**; checking before every change makes your own edits trip it. Then `save-buffer`. Write the script to the scratchpad with the Write tool, starting with the line `;;; -*- lexical-binding: t; -*-` (without it Emacs 30+ pops a warning on every load, and the script runs in the old dynamic dialect), and run `emacsclient --eval '(load "<script>" nil t)'`, using full file paths: shell text naming an org directory trips the privacy hook. Never call `org-id-update-id-locations` or another global rescan: it walks every agenda file, private ones included. A new ID is found anyway the first time a link to it is followed.
+The tracker is usually open in the user's Emacs, and phones sync it, so edit the live buffer, not the file on disk. Check `buffer-modified-p` **once, before your first change**; checking before every change makes your own edits trip it. Then `save-buffer`. Write the script to the scratchpad with the Write tool, starting with the line `;;; -*- lexical-binding: t; -*-` (without it Emacs 30+ pops a warning on every load, and the script runs in the old dynamic dialect), and run `emacsclient --eval '(load "<script>" nil t)'`, using full file paths. Edit/Write on `~/org` are denied by settings: an existing file may be open with unsaved changes, so it is edited through emacsclient. A new file has no live buffer: create it with a Bash heredoc (or emacsclient), with an `:ID:` from `uuidgen` and `#+title:` for a roam note. On the personal laptop a privacy hook also blocks reads. Never call `org-id-update-id-locations` or another global rescan: it walks every agenda file, private ones included. A new ID is found anyway the first time a link to it is followed.
 
 A note, with point on the ticket heading:
 

@@ -47,16 +47,10 @@ while IFS= read -r seg; do
   kind=$(echo "$seg" | awk '{print $2}')
   ref=$(ref_of "$seg")
   case "$PLAIN" in *" $ref "*) continue ;; esac
-  if [ "$kind" = pr ]; then
-    note="PR view shows no comment count, so always run both."
-  else
-    note="Skip the second only when the first prints \`comments: 0\`."
-  fi
   cat >&2 <<MSG
 BLOCKED: off a TTY \`gh $kind view $ref --comments\` prints the comments ONLY, never the body.
 Run both in one call, plain view first:
   gh $kind view $ref && gh $kind view $ref --comments
-$note
 MSG
   exit 2
 done <<< "$CANDIDATES"
