@@ -891,9 +891,14 @@ Filter tasks by context (sorted by todo state)
             (org-agenda-skip-function-global nil)
             (org-agenda-overriding-header "Shared folder, everyone's tasks")))
           ;; the org-roam notes are not agenda files (see "dynamic agenda
-          ;; files"); this scans them alone, ignoring nothing, so every stray shows
+          ;; files"); this scans them alone, ignoring nothing, so every stray shows.
+          ;; notes/ holds symlinks to root files (todo, work, inbox…) so org-roam
+          ;; indexes their nodes; resolve them and drop what lives outside notes/
           ("d" "Sweep: stray tasks in org-roam notes" tags-todo "*"
-           ((org-agenda-files (my/org-files-under my/org-notes-dir))
+           ((org-agenda-files
+             (let ((notes (file-name-as-directory (file-truename my/org-notes-dir))))
+               (seq-filter (lambda (f) (string-prefix-p notes (file-truename f)))
+                           (my/org-files-under my/org-notes-dir))))
             (org-agenda-todo-ignore-scheduled nil)
             (org-agenda-todo-ignore-deadlines nil)
             (org-agenda-overriding-header
