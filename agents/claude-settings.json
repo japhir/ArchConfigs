@@ -55,20 +55,8 @@
     "defaultMode": "auto"
   },
   "model": "opus",
-  "effortLevel": "medium",
-  "modelSettings": {
-    "claude-fable-5-1": {
-      "effortLevel": "medium"
-    }
-  },
   "disableClaudeAiConnectors": true,
   "disableBundledSkills": true,
-  "disableRemoteControl": true,
-  "disableWorkflows": true,
-  "workflowKeywordTriggerEnabled": false,
-  "skipWorkflowUsageWarning": true,
-  "autoMemoryEnabled": false,
-  "fileCheckpointingEnabled": false,
   "hooks": {
     "PreToolUse": [
       {
@@ -136,6 +124,9 @@
       }
     ]
   },
+  "disableRemoteControl": true,
+  "disableWorkflows": true,
+  "workflowKeywordTriggerEnabled": false,
   "statusLine": {
     "type": "command",
     "command": "bash \"$HOME/.claude/hooks/statusline.sh\""
@@ -151,12 +142,21 @@
       }
     }
   },
+  "effortLevel": "medium",
+  "modelSettings": {
+    "claude-fable-5-1": {
+      "effortLevel": "medium"
+    }
+  },
   "tui": "fullscreen",
+  "autoMemoryEnabled": false,
+  "skipWorkflowUsageWarning": true,
   "theme": "dark",
   "editorMode": "vim",
   "verbose": true,
   "autoCompactEnabled": false,
-  "autoContinueAtUsageLimit": false,
   "switchModelsOnFlag": true,
+  "autoContinueAtUsageLimit": false,
+  "fileCheckpointingEnabled": false,
   "agentPushNotifEnabled": true
 }
