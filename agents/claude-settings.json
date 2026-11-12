@@ -35,7 +35,10 @@
       "Bash(export PAGER=cat)",
       "WebSearch",
       "Read(~/.claude/**)",
-      "Read(~/.agents/skills/**)"
+      "Read(~/.agents/skills/**)",
+      "Bash(psql *)",
+      "Bash(docker info *)",
+      "Read(//private/tmp/**)"
     ],
     "deny": [
       "EnterPlanMode",
@@ -158,5 +161,21 @@
   "switchModelsOnFlag": true,
   "autoContinueAtUsageLimit": false,
   "fileCheckpointingEnabled": false,
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Bash(uv run tools/yt_transcript.py:*) in ~/Documents/LLM-wiki — sanctioned transcript capture into raw/videos/, the documented way content lands in raw/"
+    ],
+    "environment": [
+      "$defaults",
+      "**Organization**: fwdfaster.ai — a future with expert-powered AI",
+      "**Primary use of Claude Code**: senior AI research engineer",
+      "**Source control**: local git repositories, most often with a private GitHub remote under github.com/fwdfaster/ — that org and all repos under it are trusted push destinations",
+      "**Repository visibility**: all github.com/fwdfaster repos are private for now; assume private unless a repo is explicitly stated to be public",
+      "**Trusted internal domains**: *.fwdfaster.ai — currently screenathon.fwdfaster.ai, with more subdomains to follow",
+      "**Secrets management**: real secrets live in local .env files that are never committed; git-tracked .env.example files hold placeholder values only and are safe to read, edit, and commit",
+      "**Org-specific CLIs**: none proprietary — uv (Python runner), gh, psql, and graphify are the non-standard CLIs in regular use"
+    ]
+  }
 }
