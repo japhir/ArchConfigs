@@ -916,7 +916,7 @@ Filter tasks by context (sorted by todo state)
           ("gt" "Teams" tags-todo "@teams")
           ("gc" "Computer" tags-todo "@computer")
           ("gB" "Phone" tags-todo "@phone")
-          ("gm" "e-mail" tags-todo "@email")
+          ("gM" "e-mail" tags-todo "@email")
           ("gb" "Bank" tags-todo "@bank")
           ("gg" "Research" tags-todo "research")
           ("gs" "Software" tags-todo "software")
@@ -1017,7 +1017,7 @@ palette") feeds both org and org-modern, which does not read
                    ;; Note Workflow v2 spec, D6/D9/D23/D24)
                    ("software" . ?s)   ;; claimable R&D work (Emdesk :R:)
                    ("research" . ?g)   ;; claimable R&D work (Emdesk :R:)
-                   ("meeting" . ?M)    ;; context-only in export, no effort claim
+                   ("meeting" . ?m)    ;; context-only in export, no effort claim
                    ("timeregistration" . ?t)
                    ("fail" . ?x)       ;; failed experiment — WBSO gold
                    ("private" . ?v)    ;; never exported
@@ -1029,7 +1029,8 @@ palette") feeds both org and org-modern, which does not read
                    ("@computer" . ?c)  ;; general in case I can't decide
                    ("@klusje" . ?k)    ;; crafts, things that require my toolbox
                    ("@phone" . ?B)     ;; b for Dutch "bellen"
-                   ("@email" . ?m)
+                   ("@email" . ?M)     ;; switched to uppercase!
+                   ("meeting" . ?m)    ;; migration from email
                    ("@bank" . ?b)      ;; I need my little reader thingie
                    ;; action-type contexts (@write @program @read ...) were
                    ;; demoted 2026-09-26: they never narrowed a list, the
@@ -1090,6 +1091,7 @@ curated list on top of it.
 
 Tests, tangled to their own file so startup never loads them; the helper comes
 in by noweb, so they run without the rest of the config:
+          ("gm" "meeting" tags-todo "meeting")
 #+begin_src sh :tangle no
   emacs --batch -l org --eval '(org-babel-tangle-file "myinit.org" nil "emacs-lisp")' \
     -l myinit-tests.el -f ert-run-tests-batch-and-exit
