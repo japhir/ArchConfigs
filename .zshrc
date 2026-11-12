@@ -52,7 +52,7 @@ eval "$(starship init zsh)"
 typeset -U path PATH
 if [[ "$OSTYPE" == "darwin"* ]]; then
     path=(/opt/homebrew/bin $path)
-    path=("$HOME/.rustup/toolchains/stable-aarch64-apple-darwin/bin" $path)
+    path=(/opt/homebrew/opt/rustup/bin $path)   # rustup proxies: honour rust-toolchain.toml
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     path=(~/.cargo/bin ~/.local/bin ~/bin $path)
 fi
@@ -180,6 +180,6 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 fi
 
 export LIBRARY_PATH="/opt/homebrew/opt/gcc/lib/gcc/current:/opt/homebrew/opt/libgccjit/lib/gcc/current:$LIBRARY_PATH"
-export PATH="$HOME/.rustup/toolchains/stable-aarch64-apple-darwin/bin:$PATH"
+export PATH="/opt/homebrew/opt/rustup/bin:$PATH"
 
 [ -f ~/.secrets.zsh ] && source ~/.secrets.zsh
