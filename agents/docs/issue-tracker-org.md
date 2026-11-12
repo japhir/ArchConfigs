@@ -43,7 +43,7 @@ Seams: <public interfaces the tests drive>
 - **Frontier**: a ticket is on the frontier when its state is `TODO`, it has no `CLAIMED_BY` and no assignee tag, and every ID in its `BLOCKER` points to a ticket in a done state (`DONE-*`, `DONE`). The first frontier ticket in file order goes first.
 - **Claim**: before any work, set `CLAIMED_BY: Claude`. A human claiming it adds their assignee tag and changes the state to `NEXT`.
 - **Comment**: a LOGBOOK note, the equivalent of a GitHub comment (the user writes them with `C-c C-z`). Agents start theirs with `Claude: `. Long outcomes (research summaries, decisions) go under `*** Answer`, and the note points there.
-- **Finish, proven**: when tests cover every acceptance criterion, tick the criteria, add a note `Claude: <what>, <commit>`, remove `CLAIMED_BY`, and close the ticket with the user's done keyword (`DONE-ILJA`, ADR 0005) **via emacsclient**, so `CLOSED:` is the real time.
+- **Finish, proven**: when tests cover every acceptance criterion, tick the criteria, add a note `Claude: <what>, <commit>`, remove `CLAIMED_BY`, and close the ticket `DONE` **via emacsclient**, so `CLOSED:` is the real time. The closing note already says who closed it; `DONE-ILJA` belongs only to ~/org/ilja+wife (ADR 0005), where two people close tickets.
 - **Finish, needs a human check**: add a note `Claude: te controleren: <what to check>`, remove `CLAIMED_BY`, add the user's assignee tag, and leave the state at `TODO`. The user closes it after checking.
 - **Human tickets**: never close one yourself unless the user asks, and then via emacsclient.
 - **Out of scope**: the user sets the ticket to `CANC`. Add one line under `* Out of scope`.
@@ -62,7 +62,7 @@ A note, with point on the ticket heading:
                   (format-time-string (org-time-stamp-format t t)) text)))
 ```
 
-Close: `(let ((org-enforce-todo-dependencies nil) (org-enforce-todo-checkbox-dependencies nil)) (org-todo "DONE-ILJA"))`.
+Close: `(let ((org-enforce-todo-dependencies nil) (org-enforce-todo-checkbox-dependencies nil)) (org-todo "DONE"))`.
 
 ## Targeted reads (don't load the whole file)
 
