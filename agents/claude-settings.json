@@ -1,8 +1,74 @@
 {
-  "model": "opus",
+  "cleanupPeriodDays": 365,
   "permissions": {
-    "deny": ["AskUserQuestion"]
+    "allow": [
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git diff)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git add *)",
+      "Bash(git restore --staged *)",
+      "Bash(git commit *)",
+      "Bash(git branch)",
+      "Bash(git branch *)",
+      "Bash(git checkout -b *)",
+      "Bash(git switch *)",
+      "Bash(git stash)",
+      "Bash(git stash *)",
+      "Bash(git fetch *)",
+      "Bash(git pull *)",
+      "Bash(git rebase *)",
+      "Bash(git merge *)",
+      "Bash(git worktree *)",
+      "Bash(git remote *)",
+      "Bash(uv run pytest *)",
+      "Bash(uv run ruff check *)",
+      "Bash(uv run ty check *)",
+      "Bash(uv add *)",
+      "Bash(awk *)",
+      "Bash(pdftotext *)",
+      "Bash(gh issue *)",
+      "Bash(gh label *)",
+      "Bash(gh repo *)",
+      "Bash(export PAGER=cat)",
+      "WebSearch",
+      "Read(~/.claude/**)",
+      "Read(~/.agents/skills/**)"
+    ],
+    "deny": [
+      "EnterPlanMode",
+      "ExitPlanMode",
+      "DesignSync",
+      "NotebookEdit",
+      "PushNotification",
+      "RemoteTrigger",
+      "ReportFindings",
+      "ScheduleWakeup",
+      "AskUserQuestion",
+      "CronCreate",
+      "CronDelete",
+      "CronList",
+      "Edit(~/org/**)"
+    ],
+    "defaultMode": "auto"
   },
+  "model": "opus",
+  "effortLevel": "medium",
+  "modelSettings": {
+    "claude-fable-5-1": {
+      "effortLevel": "medium"
+    }
+  },
+  "disableClaudeAiConnectors": true,
+  "disableBundledSkills": true,
+  "disableRemoteControl": true,
+  "disableWorkflows": true,
+  "workflowKeywordTriggerEnabled": false,
+  "skipWorkflowUsageWarning": true,
+  "autoMemoryEnabled": false,
+  "fileCheckpointingEnabled": false,
   "hooks": {
     "PreToolUse": [
       {
@@ -19,11 +85,28 @@
           {
             "type": "command",
             "command": "bash \"$HOME/.claude/hooks/require-uv-run.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/require-gh-view-body.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/block-kill-by-port.sh\""
           }
         ]
       },
       {
-        "matcher": "Edit|Write",
+        "matcher": "Read|Grep|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/block-org-reads.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
         "hooks": [
           {
             "type": "command",
@@ -39,13 +122,15 @@
             "command": "bash \"$HOME/.claude/hooks/require-subagent-model.sh\""
           }
         ]
-      },
+      }
+    ],
+    "PostToolUse": [
       {
-        "matcher": "Read|Grep|Bash",
+        "matcher": "Read|Edit|Write|MultiEdit|Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$HOME/.claude/hooks/block-org-reads.sh\""
+            "command": "bash \"$HOME/.claude/hooks/org-conventions.sh\""
           }
         ]
       }
@@ -71,5 +156,7 @@
   "editorMode": "vim",
   "verbose": true,
   "autoCompactEnabled": false,
-  "autoContinueAtUsageLimit": false
+  "autoContinueAtUsageLimit": false,
+  "switchModelsOnFlag": true,
+  "agentPushNotifEnabled": true
 }
