@@ -26,16 +26,20 @@ allowed() {  # $1: absolute path
 
 under_org() { case "$1" in "$ORG"|"$ORG"/*) return 0 ;; esac; return 1; }
 
+# Canonical path, existing or not (GNU `realpath -m`; BSD realpath lacks -m).
+# Falls back to the raw path so a missing tool never empties it (fail-open).
+canon() { local c; c=$(python3 -Ic 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$1" 2>/dev/null); printf '%s' "${c:-$1}"; }
+
 case "$TOOL" in
   Read)
     F=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
-    F=$(realpath -m "$F")
+    F=$(canon "$F")
     under_org "$F" && ! allowed "$F" && deny "Read of $F blocked."
     ;;
   Grep)
     P=$(echo "$INPUT" | jq -r '.tool_input.path // empty')
     [ -z "$P" ] && P=$(echo "$INPUT" | jq -r '.cwd')
-    P=$(realpath -m "$P")
+    P=$(canon "$P")
     MODE=$(echo "$INPUT" | jq -r '.tool_input.output_mode // "files_with_matches"')
     [ "$MODE" = "content" ] || exit 0
     # A search rooted above ~/org would sweep it too.
@@ -55,7 +59,7 @@ case "$TOOL" in
     fi
     MENTIONS=0
     printf '%s' "$REST" | grep -qE "(~|\\\$HOME|$HOME)/org(/|\b|$)" && MENTIONS=1
-    under_org "$(realpath -m "${CWD:-/}")" && MENTIONS=1
+    under_org "$(canon "${CWD:-/}")" && MENTIONS=1
     [ "$MENTIONS" = 1 ] || exit 0
     # Counting greps only print numbers.
     READERS=$(printf '%s' "$REST" | sed -E 's/grep +-[a-zA-Z]*c[a-zA-Z]*//g')
