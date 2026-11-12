@@ -8,7 +8,7 @@ INPUT=$(cat)
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 
 if echo "$COMMAND" | grep -qE '(^|&&|;)[[:space:]]*(grep|rg|ugrep|find|ag)([[:space:]]|$)'; then
-  echo "$INPUT" | /Users/iljakocken/.local/bin/graphify hook-guard search
+  echo "$INPUT" | "$HOME/.local/bin/graphify" hook-guard search
   exit $?
 fi
 exit 0
